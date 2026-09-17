@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מה שואלים את עוגן · סיכום שאלות ושימוש באתר · 26.8–16.9.2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D3B66; --accent:#0B7FA6; --accent-soft:#9CCBE0; --accent-bg:#E8F4FA;
+  --canvas:#F8FBFF; --surface:#fff; --soft:#F2F7FC;
+  --text:#102A43; --text2:#52687A; --muted:#7A8C9B;
+  --border:#D8E6F2; --border-strong:#BED4E7;
+  --good:#1F7A42; --warn:#8A6209;
+  --sh-sm:0 4px 14px rgba(13,59,102,.06);
+  --sh-md:0 12px 30px rgba(13,59,102,.10);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Assistant','Noto Sans Hebrew',Arial,sans-serif;background:var(--canvas);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:980px;margin:0 auto;padding-inline:20px}
+button{font:inherit;cursor:pointer}
+
+/* ---------- כותרת ---------- */
+header.top{background:linear-gradient(135deg,#124D7A,#087B9C);color:#fff;padding:30px 0 26px}
+.eyebrow{font-size:.8rem;font-weight:700;opacity:.85}
+header.top h1{font-size:1.8rem;font-weight:800;line-height:1.2;margin:6px 0}
+header.top p{font-size:.95rem;opacity:.92;max-width:66ch}
+
+/* ---------- פס הפרקים ---------- */
+nav.chapters{position:sticky;top:0;z-index:20;background:rgba(248,251,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+nav.chapters .wrap{display:flex;gap:6px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+nav.chapters .wrap::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--surface);color:var(--text2);border-radius:999px;padding:7px 15px 7px 13px;font-weight:700;font-size:.9rem;transition:background .15s,color .15s,border-color .15s}
+.tab .n{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:999px;background:var(--soft);color:var(--text2);font-size:.78rem}
+.tab:hover{border-color:var(--border-strong);color:var(--navy)}
+.tab[aria-selected="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+.tab[aria-selected="true"] .n{background:rgba(255,255,255,.2);color:#fff}
+.progress{height:3px;background:var(--border)}
+.progress i{display:block;height:100%;background:var(--accent);width:20%;transition:width .3s ease}
+
+/* ---------- פרק ---------- */
+main{padding-block:26px 34px}
+.panel{animation:rise .28s ease}
+@keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.panel{animation:none}.progress i{transition:none}}
+.panel h2{font-size:1.45rem;color:var(--navy);font-weight:800;line-height:1.25}
+.lede{font-size:.95rem;color:var(--text2);margin:4px 0 20px;max-width:72ch}
+h3{font-size:1rem;color:var(--navy);font-weight:800;margin-bottom:6px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm)}
+.hint{font-size:.8rem;color:var(--muted);margin-top:10px}
+
+/* ---------- פרק 1: שלושה כרטיסי מפתח ---------- */
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.key{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px 22px 18px;box-shadow:var(--sh-sm);display:flex;flex-direction:column;gap:6px;text-align:right;color:inherit;transition:box-shadow .15s,transform .15s,border-color .15s}
+.key:hover{box-shadow:var(--sh-md);transform:translateY(-2px);border-color:var(--border-strong)}
+.key .ic{width:40px;height:40px;border-radius:12px;background:var(--accent-bg);color:var(--accent);display:grid;place-items:center;margin-bottom:6px}
+.key .ic svg{width:22px;height:22px}
+.key .k{font-size:.85rem;font-weight:700;color:var(--text2)}
+.key .v{font-size:2.3rem;font-weight:800;color:var(--navy);line-height:1.1;font-variant-numeric:tabular-nums}
+.key .d{font-size:.88rem;color:var(--text2)}
+.key ol{list-style:none;display:grid;gap:6px;margin:6px 0 4px}
+.key ol li{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-weight:800;font-size:1.02rem;color:var(--navy)}
+.key ol li span{unicode-bidi:isolate;color:var(--muted);font-weight:600;font-size:.8rem;white-space:nowrap}
+.key .go{margin-top:auto;padding-top:10px;font-size:.84rem;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:5px}
+.key .go svg{width:15px;height:15px}
+.big-quote{font-size:1.15rem;font-weight:800;color:var(--navy);line-height:1.35}
+
+/* ---------- פרק 2: נושאים ---------- */
+.topics{display:flex;flex-direction:column;gap:10px}
+.topic{border:1px solid var(--border);border-radius:14px;background:var(--surface);box-shadow:var(--sh-sm);overflow:hidden}
+.topic summary{list-style:none;cursor:pointer;padding:12px 18px;display:grid;grid-template-columns:minmax(150px,250px) 1fr auto auto;gap:14px;align-items:center}
+.topic summary::-webkit-details-marker{display:none}
+.topic .name{font-weight:800;color:var(--navy);font-size:.97rem}
+.topic .track{display:block;height:12px;background:var(--soft);border-radius:4px;overflow:hidden}
+.topic .fill{display:block;height:100%;background:var(--accent);border-radius:4px 0 0 4px}
+.topic .num{font-weight:800;font-variant-numeric:tabular-nums;min-width:62px;text-align:left}
+.topic .num small{color:var(--muted);font-weight:600}
+.topic .chev{width:18px;height:18px;color:var(--muted);transition:transform .2s}
+.topic[open] .chev{transform:rotate(180deg)}
+.topic .body{padding:4px 18px 16px;border-top:1px solid var(--border)}
+.topic .gist{font-size:.9rem;color:var(--text2);margin:10px 0 8px}
+.qs{display:flex;flex-wrap:wrap;gap:6px}
+.q{background:var(--soft);border:1px solid var(--border);border-radius:999px;padding:3px 11px;font-size:.83rem}
+.q.ar{font-family:'Noto Sans Arabic','Assistant',Arial,sans-serif}
+@media (max-width:620px){.topic summary{grid-template-columns:1fr auto auto}.topic .track{grid-column:1 / -1;order:3}}
+
+.mini{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:18px}
+.mini .card{padding:14px 18px}
+.mini .v{font-size:1.6rem;font-weight:800;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.2}
+.mini .k{font-size:.84rem;color:var(--text2);font-weight:600}
+
+/* ---------- פרק 3: מגמות ---------- */
+.trends{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+.trend{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px 18px;box-shadow:var(--sh-sm);display:flex;flex-direction:column;gap:6px}
+.trend .stat{font-size:1.9rem;font-weight:800;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.trend .stat small{unicode-bidi:isolate;display:inline-block;font-size:.8rem;color:var(--text2);font-weight:700;margin-inline-start:6px}
+.trend h3{margin:2px 0 0}
+.trend p{font-size:.88rem;color:var(--text2)}
+.trend.lead{grid-column:1 / -1;background:linear-gradient(135deg,#F0F8FC,#fff);border-color:var(--border-strong)}
+
+/* ---------- גרפים ---------- */
+.chart-title{font-size:.98rem;font-weight:700;color:var(--navy)}
+.chart-sub{font-size:.82rem;color:var(--text2);margin-bottom:12px}
+svg.chart{width:100%;height:auto;display:block;overflow:visible}
+svg text{font-family:'Assistant',Arial,sans-serif}
+.gridline{stroke:var(--border);stroke-width:1}
+.axis-lbl{font-size:11px;fill:var(--text2);font-weight:600}
+.val-lbl{font-size:11.5px;fill:var(--text);font-weight:700}
+.bar{fill:var(--accent)} .bar.dim{fill:var(--accent-soft)}
+.hit{fill:transparent}
+.hit:hover + .bar{fill:var(--navy)}
+.tip{position:fixed;z-index:50;pointer-events:none;background:#0B2B4C;color:#fff;border-radius:9px;padding:8px 11px;font-size:.8rem;line-height:1.45;box-shadow:0 8px 26px rgba(11,43,76,.28);opacity:0;transition:opacity .1s;max-width:240px;font-weight:600}
+.tip.on{opacity:1}
+.tip b{display:block;font-weight:800;margin-bottom:2px}
+
+/* ---------- דירוג עמודים ---------- */
+.rank{list-style:none}
+.rank li{display:grid;grid-template-columns:24px 1fr minmax(70px,34%) 38px;gap:10px;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:.9rem}
+.rank li:last-child{border-bottom:0}
+.rank .i{color:var(--muted);font-weight:700;font-variant-numeric:tabular-nums}
+.rank .t{font-weight:700}
+.rank .bar-h{display:block;height:9px;background:var(--soft);border-radius:4px;overflow:hidden}
+.rank .bar-h i{display:block;height:100%;background:var(--accent);border-radius:4px 0 0 4px}
+.rank .u{text-align:left;font-weight:800;font-variant-numeric:tabular-nums}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px}
+
+/* ---------- פרק 5 ---------- */
+.gap-list{list-style:none;display:grid;gap:10px}
+.gap-list li{display:flex;gap:10px;align-items:flex-start;font-size:.92rem}
+.gap-list svg{width:19px;height:19px;flex:0 0 auto;margin-top:2px}
+.gap-list .open svg{color:var(--warn)} .gap-list .done svg{color:var(--good)}
+details.method{margin-top:18px;font-size:.84rem;color:var(--text2);background:var(--soft);border:1px solid var(--border);border-radius:12px;padding:12px 18px}
+details.method summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details.method ul{margin-top:8px}
+details.method li{margin-inline-start:18px;margin-bottom:4px}
+
+/* ---------- ניווט תחתון ---------- */
+.pager{display:flex;justify-content:space-between;gap:10px;margin-top:28px}
+.pager button{display:flex;align-items:center;gap:10px;border:1px solid var(--border-strong);background:var(--surface);color:var(--navy);border-radius:12px;padding:9px 16px;font-weight:700;font-size:.95rem;box-shadow:var(--sh-sm);text-align:right}
+.pager button:hover{background:var(--accent-bg)}
+.pager button.next{background:var(--navy);color:#fff;border-color:var(--navy);margin-inline-start:auto}
+.pager button.next:hover{background:#124D7A}
+.pager svg{width:18px;height:18px;flex:0 0 auto}
+.pager small{display:block;font-size:.72rem;font-weight:600;opacity:.75;line-height:1.2}
+.kbd-hint{text-align:center;font-size:.75rem;color:var(--muted);margin-top:12px}
+
+footer{text-align:center;color:#8A97A6;font-size:.72rem;line-height:1.8;padding-bottom:26px}
+footer a{color:#8A97A6}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">סיכום לרויטל · 26.8 עד 16.9.2026</div>
+    <h1>על מה שואלים את עוגן, ומה קוראים באתר</h1>
+    <p>חמישה פרקים קצרים. עוברים ביניהם בלשוניות, בכפתור "הבא" בסוף כל פרק או בחיצי המקלדת.</p>
+  </div>
+</header>
+
+<nav class="chapters" aria-label="פרקי הדוח">
+  <div class="wrap" role="tablist" id="tabs"></div>
+  <div class="progress"><i id="prog"></i></div>
+</nav>
+
+<main class="wrap">
+
+<!-- ============ 1 · בקצרה ============ -->
+<section class="panel" id="p-summary" role="tabpanel" data-title="בקצרה">
+  <h2>שלושה דברים שחשוב לדעת</h2>
+  <p class="lede">התמונה בקצרה. לחיצה על כרטיס פותחת את הפרק המלא.</p>
+
+  <div class="keys">
+    <button class="key" data-go="p-site">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
+      <span class="k">כניסות לעמודי האתר</span>
+      <span class="v">2,699</span>
+      <span class="d">צפיות בעמודי התוכן בשלושה שבועות, בלי הטפסים. השיא היה ב-7 וב-8 בספטמבר.</span>
+      <span class="go">לפרק האתר <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+    </button>
+
+    <button class="key" data-go="p-site">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg></span>
+      <span class="k">העמודים הבולטים</span>
+      <ol>
+        <li>בעלי תפקידים <span>43 משתמשים</span></li>
+        <li>השתלמויות ופיתוח מקצועי <span>38</span></li>
+        <li>נתיב הגמר <span>37</span></li>
+      </ol>
+      <span class="d">ואחריהם הודעות ועדכונים, לוח המבחנים ולוח הגאנט.</span>
+      <span class="go">לכל העמודים <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+    </button>
+
+    <button class="key" data-go="p-trends">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+      <span class="k">המגמה הבולטת בעוגן</span>
+      <span class="v">47%</span>
+      <span class="big-quote">מהשאלות הן בקשה לתוכנית לימודים או לחומרי הוראה</span>
+      <span class="d">בעיקר לנתיב הגמר, למגמות המקצועיות ולדוברי ערבית.</span>
+      <span class="go">לכל המגמות <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></span>
+    </button>
+  </div>
+</section>
+
+<!-- ============ 2 · על מה שואלים ============ -->
+<section class="panel" id="p-topics" role="tabpanel" data-title="על מה שואלים" hidden>
+  <h2>על מה שואלים את עוגן</h2>
+  <p class="lede">86 שאלות שנשאלו בין 9.9 ל-16.9, לפי נושא. לחיצה על נושא מציגה את השאלות כפי שנכתבו, כולל שגיאות ההקלדה (רובן נכתבו בנייד).</p>
+  <div class="topics" id="topics"></div>
+
+  <div class="mini">
+    <div class="card"><div class="v">96</div><div class="k">שאלות לעוגן מתוך האתר מאז 30.8, מ-39 משתמשים</div></div>
+    <div class="card"><div class="v">50%</div><div class="k">מהשואלים שאלו יותר משאלה אחת</div></div>
+    <div class="card"><div class="v">45%</div><div class="k">קיבלו תשובה מלאה, ועוד 50% קיבלו תשובה חלקית</div></div>
+  </div>
+
+  <div class="card" style="margin-top:14px">
+    <div class="chart-title">שאלות לעוגן, יום אחר יום</div>
+    <div class="chart-sub">מאז שהתחלנו למדוד (30.8) · העבירו את העכבר על עמודה</div>
+    <svg class="chart" id="ogenChart" role="img" aria-label="שאלות לעוגן ביום"></svg>
+  </div>
+</section>
+
+<!-- ============ 3 · מגמות ============ -->
+<section class="panel" id="p-trends" role="tabpanel" data-title="מגמות" hidden>
+  <h2>מגמות שעולות מהשאלות</h2>
+  <p class="lede">מה השאלות מלמדות על מה שמעסיק את מנהלי בתי הספר, הרכזים והמורים בפתיחת השנה.</p>
+
+  <div class="trends">
+    <div class="trend lead">
+      <div class="stat">47%<small>40 מתוך 86 שאלות</small></div>
+      <h3>השטח מחפש קודם כול תוכניות לימודים</h3>
+      <p>מורים ורכזים משתמשים בעוגן כמו במנוע חיפוש לתכנון השנה: "תוכנית לימודים בתנ"ך כיתה י", "מחפשת תוכנית שנתית בנויה לשכבה ט", "אני מלמדת את הסיפור המפתח".</p>
+    </div>
+    <div class="trend">
+      <div class="stat">14<small>מול 1</small></div>
+      <h3>נתיב הגמר מעסיק יותר מהבגרות</h3>
+      <p>14 שאלות על הגמר (מתמטיקה, אזרחות, מיקוד, תעודות) ורק אחת על הבגרות. גם באתר: 37 משתמשים בעמוד נתיב הגמר ו-19 בעמוד נתיב הבגרות.</p>
+    </div>
+    <div class="trend">
+      <div class="stat">16%<small>14 שאלות</small></div>
+      <h3>המגזר הערבי שואל הרבה ומקבל פחות</h3>
+      <p>6 שאלות נכתבו בערבית ועוד 8 עסקו בתוכניות לדוברי ערבית. רוב התשובות היו חלקיות, כי אין באתר עמוד לשפה הערבית ולא חומרים בערבית.</p>
+    </div>
+    <div class="trend">
+      <div class="stat">16<small>שאלות</small></div>
+      <h3>המגמות המקצועיות הן הפער הגדול</h3>
+      <p>חשמל, אוטוטרוניקה, עיצוב שיער, שנות ינקות, בנייה, הדפס. תוכניות הלימודים של המגמות עוד לא באתר, ועוגן אמרה זאת בכנות.</p>
+    </div>
+    <div class="trend">
+      <div class="stat">10<small>שאלות</small></div>
+      <h3>רכזים פדגוגיים מחפשים תבניות</h3>
+      <p>תבנית לתוכנית שנתית (רכזת אחת ניסתה שלוש פעמים) ותבנית לפרוטוקול ישיבות. כשיש באתר תבנית מוכנה, עוגן מוצאת אותה ונותנת תשובה מלאה.</p>
+    </div>
+    <div class="trend">
+      <div class="stat">20<small>שאלות</small></div>
+      <h3>מנהלים שואלים על ענייני היום-יום</h3>
+      <p>ביקור סדיר ועזיבה, קליטת תלמידים, תשלומי הורים, אורך יום הלימודים, סעיף 108, ש"ש לרכז.ת חניכות וחופשת סוכות.</p>
+    </div>
+    <div class="trend">
+      <div class="stat">60%<small>בין 7:00 ל-13:00</small></div>
+      <h3>שואלים בבוקר, בגלים</h3>
+      <p>רוב השאלות נשאלות בשעות העבודה. ב-7.9 וב-8.9 נשאלו 18 שאלות ביום, וב-15.9 היה גל נוסף. נראה שכל פנייה לשטח מביאה גל שאלות.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4 · האתר ============ -->
+<section class="panel" id="p-site" role="tabpanel" data-title="האתר" hidden>
+  <h2>מה קוראים באתר</h2>
+  <p class="lede">רק עמודי התוכן של האתר. טפסים שמתארחים באתר (נספח בעלי התפקידים, רישום יום הפתיחה, מצבת תלמידים, משובים וסקרים) ודפי המעקב הפנימיים לא נכללים.</p>
+
+  <div class="card">
+    <div class="chart-title">צפיות בעמודי התוכן, יום אחר יום</div>
+    <div class="chart-sub">סה"כ 2,699 · הירידה ב-11.9 וב-12.9 היא ראש השנה · שבתות בגוון בהיר</div>
+    <svg class="chart" id="siteChart" role="img" aria-label="צפיות בעמודי התוכן ביום"></svg>
+  </div>
+
+  <div class="two">
+    <div class="card">
+      <h3>עמודי התוכן הבולטים</h3>
+      <div class="chart-sub">לפי מספר המשתמשים שנכנסו לעמוד</div>
+      <ol class="rank" id="rank"></ol>
+    </div>
+    <div class="card">
+      <h3>שערי הכניסה</h3>
+      <div class="chart-sub">העמודים שדרכם מגיעים לתוכן</div>
+      <ol class="rank" id="rankGate"></ol>
+      <p class="hint" style="margin-top:14px">כ-83% מהכניסות מגיעות מקישור ישיר (ווטסאפ, מייל, מסך הבית), ורק 10 משתמשים הגיעו מגוגל. 64% נכנסים מהנייד.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5 · מה להוסיף ============ -->
+<section class="panel" id="p-gaps" role="tabpanel" data-title="מה להוסיף" hidden>
+  <h2>מה השאלות מלמדות אותנו להוסיף</h2>
+  <p class="lede">שאלות שעוגן לא הצליחה לענות עליהן במלואן הן רשימת עבודה מוכנה לאתר.</p>
+  <div class="two" style="margin-top:0">
+    <div class="card">
+      <h3>עוד פתוח</h3>
+      <ul class="gap-list">
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>תוכניות לימודים למגמות המקצועיות</b> (16 שאלות)</span></li>
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>עמוד לשפה הערבית וחומרים בערבית</b>: ספרי לימוד, אזרחות, מיקוד גמר, מגילת העצמאות (14 שאלות)</span></li>
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>תשובה בשפת השאלה</b>: שאלה בערבית צריכה לקבל תשובה בערבית</span></li>
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>תוכניות עבודה מוכנות לגמר</b>, בעיקר במתמטיקה, ומיקוד רשמי למבחני הגמר</span></li>
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>הזנת ציונים במנב"ס לתעודות גמר</b></span></li>
+        <li class="open"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg><span><b>"מפעלון"</b> בעיצוב שיער: לא ברור מה המושג (2 שאלות)</span></li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>כבר טופל</h3>
+      <ul class="gap-list">
+        <li class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg><span><b>ש"ש לרכז.ת חניכות</b>: הנתון היה באתר ועוגן לא ראתה אותו. תוקן ב-14.9</span></li>
+        <li class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg><span><b>חגים וחופשות</b>: כל תאריכי השנה זמינים לעוגן מ-16.9</span></li>
+        <li class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg><span><b>נספח 8.3</b>: עוגן מפנה למסמך הביקור הסדיר שבו הוא נמצא</span></li>
+        <li class="done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/></svg><span><b>אוגדן כיתה ט׳</b>: יש עמוד ייעודי, ועוגן מוצאת אותו</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <details class="method">
+    <summary>איך נאספו הנתונים</summary>
+    <ul>
+      <li><b>שאלות לעוגן:</b> מספר השאלות נמדד באתר מ-30.8.2026. נוסח השאלות נשמר ביומן של עוגן מ-9.9.2026 בערב. הוסרו שאלות בדיקה פנימיות ושאלות שנשלחו שוב באותה רבע שעה. היומן אנונימי: אין בו שמות, רק מזהה מכשיר.</li>
+      <li><b>האתר:</b> Google Analytics, מ-26.8.2026 (היום שבו הותקנה המדידה). נספרו רק עמודי תוכן. טפסים ודפי מעקב פנימיים הוצאו מהחישוב. הנתונים כוללים גם כניסות של צוות המינהל.</li>
+      <li><b>משתמש</b> הוא מכשיר: אותו אדם בנייד ובמחשב נספר פעמיים.</li>
+      <li>כל שאלה מוינה לנושא אחד, לפי הנוסח שלה.</li>
+    </ul>
+  </details>
+</section>
+
+<div class="pager" id="pager"></div>
+<p class="kbd-hint">אפשר לעבור בין הפרקים גם בחיצי המקלדת</p>
+</main>
+
+<footer>
+  המנהיגות הפדגוגית היוצרת · משרד העבודה · הופק 16.9.2026<br>
+  נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a>
+</footer>
+
+<div class="tip" id="tip"></div>
+
+<script>
+/* ================= פרקים ================= */
+const panels = [...document.querySelectorAll('.panel')];
+const tabs = document.getElementById('tabs');
+const prog = document.getElementById('prog');
+const pager = document.getElementById('pager');
+const nav = document.querySelector('nav.chapters');
+const ARROW_PREV = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>';
+const ARROW_NEXT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>';
+
+panels.forEach((p, i) => {
+  const b = document.createElement('button');
+  b.className = 'tab';
+  b.setAttribute('role', 'tab');
+  b.setAttribute('aria-controls', p.id);
+  b.innerHTML = `<span class="n">${i + 1}</span>${p.dataset.title}`;
+  b.onclick = () => show(i, true);
+  tabs.appendChild(b);
+});
+
+let cur = 0;
+function show(i, jump) {
+  if (i < 0 || i >= panels.length) return;
+  cur = i;
+  panels.forEach((p, j) => { p.hidden = j !== i; });
+  [...tabs.children].forEach((t, j) => t.setAttribute('aria-selected', j === i));
+  const active = tabs.children[i];
+  tabs.scrollLeft += active.getBoundingClientRect().left - tabs.getBoundingClientRect().left - 20;
+  prog.style.width = ((i + 1) / panels.length * 100) + '%';
+  const prev = panels[i - 1], next = panels[i + 1];
+  pager.innerHTML =
+    (prev ? `<button class="prev" data-i="${i - 1}">${ARROW_PREV}<span><small>הקודם</small>${prev.dataset.title}</span></button>` : '') +
+    (next ? `<button class="next" data-i="${i + 1}"><span><small>הבא</small>${next.dataset.title}</span>${ARROW_NEXT}</button>` : '');
+  pager.querySelectorAll('button').forEach(b => b.onclick = () => show(+b.dataset.i, true));
+  // בכתובת: #trends ולא #p-trends, כדי שהדפדפן לא יקפוץ לאלמנט עם אותו מזהה
+  if (jump) try { history.replaceState(null, '', '#' + panels[i].id.slice(2)); } catch (e) {}
+  // קופצים לראש הפרק רק אם גללנו מתחתיו
+  if (jump && window.scrollY > nav.offsetTop) window.scrollTo({top: nav.offsetTop});
+}
+document.querySelectorAll('[data-go]').forEach(el =>
+  el.onclick = () => show(panels.findIndex(p => p.id === el.dataset.go), true));
+document.addEventListener('keydown', e => {
+  if (e.altKey || e.ctrlKey || e.metaKey) return;
+  if (e.key === 'ArrowLeft') show(cur + 1, true);      // בעברית: שמאלה = קדימה
+  if (e.key === 'ArrowRight') show(cur - 1, true);
+});
+const fromHash = () => Math.max(0, panels.findIndex(p => '#' + p.id.slice(2) === location.hash));
+addEventListener('hashchange', () => show(fromHash(), false));
+show(fromHash(), false);
+
+/* ================= נושאים ================= */
+const TOPICS = [
+  {n:'מקצועות ליבה: תוכניות וחומרי הוראה', c:24,
+   g:'תוכניות לימודים וחומרים בהיסטוריה, אזרחות, מתמטיקה, ערבית, תנ"ך, ספרות ומדע וטכנולוגיה, בעיקר לנתיב הגמר ולדוברי ערבית.',
+   q:['אני מחפשת תכנית לימודים בהיסטוריה לכיתה יא','יש תכנית לימודים בהיסטוריה על נושא השואה?','תכנית לימודיים לשפה הערבית','מחפשת חומרים באזרחות','לגמר. חומרים, תוכן. לא שאלונים ולא מבחנים','היסטוריה גמר','תוכנית אזרחות גמר לדוברי ערבית','תוכנית הלמיודים של מטמתיקה גמר דוברי ערבית','תוכנית לימודים בתנ"ך כיתה י','אני מלמדת את הסיפור המפתח מאת יצחק בשביס זינגר','מדע וטכנולוגיה לכל','תוכלי בבקשה לפרט את תוכנית הלימודים של 1 יח"ל?','תוכנית לימודים ערבית גמר','תכנית לימודים במתמטיקה ברמת גמר','كتب وخطط اللغة العربية','درس وثيقة الاستقلال للصف العاشر','درس وثيقة الاستقلال عرض بوربوينت','دوسية المدنيات','كتاب المدنيات']},
+  {n:'מגמות מקצועיות', c:16,
+   g:'תוכניות לימודים ותוכניות עבודה למגמות. ברוב המקרים התוכנית עוד לא קיימת באתר.',
+   q:['מה הדרישות למקצוע אוטוטרוניקה?','חינוך לגיל הרך','חינוך לקריירה','היי, ארצה צוכניות לימוד עבור מגמות','רוצה צוכנהית לימודים עבור מחנכות שנות ינקות לא אוגדן שעות','תוכנית עבודה לחשמל מוסמך נוער 56','תןכנית עבודה למגמת האוטוטרוניקה לכיתות יא-יב','תוכנית לימודים למגמת בניה חדשנית ואקולוגית','מגמת עיצוב שיער','מפעלון עיצוב שיער','הצטיידות מגמות','מחפשת תוכנית שנתית להוראת הדפה בכיתה י גמר','תוכנית לימודים חשמל מעשי תלת פאזי']},
+  {n:'נהלים, תלמידים ולוח השנה', c:14,
+   g:'ביקור סדיר ועזיבה, קליטת תלמידים, תשלומי הורים, אורך יום הלימודים, אוגדנים וחופשות.',
+   q:['אשמח לנספח 8.3','דיווח עזיבה מרצון','תלמיד שלא התחיל את השנה','איך מוסיפים תלמידים','נוהל קליטת תלמידים','תשלומי הורים','אוגדן ט׳','אוגגדנים?','תאריכים של חופשת סוכות משרד העבודה','עד איזי שעה יום לימודים?']},
+  {n:'תכנון עבודה ותבניות', c:10,
+   g:'רכזים פדגוגיים שמחפשים תבנית לתוכנית שנתית, לתכנון לימודי ולפרוטוקול ישיבות.',
+   q:['שלום רב אני רכזת פדגוגית רוצה דוגמה לתכנית שנתית פדגוגית','תבנית לתכנון לימודי','תכנית עבודה גמר במתמטיקה','אפשר קישור לתכנית העבודה אני לא מוציאה אותה','צור לי דוח מובנה לפרוטוקול ישיבות בית ספרית גם פדגוגיות גם מקצועית וגם מגמות וגם רכזים','מחפשת תוכנית שנתית בנויה לשכבה ט','خطة المركز التربوي']},
+  {n:'השתלמויות ופיתוח צוות', c:8,
+   g:'למי מיועדות ההשתלמויות, השתלמות מוסדית, הכשרת רכזים, ומענק שכר לימוד למורים.',
+   q:['אם ההשתלמיות ופיתוח מקצועי זה לרכזים חדשים או לכלל?','השתלמות מוסדית','השתלמות רכזים פדגוגית','השתלמות חניכות','טופס מימון לימודים','מימון לימודים למורה','אילו חומרים יש בתחום הפדגוגיה ופיתוח הצוות?']},
+  {n:'תקציב, שעות ובעלי תפקידים', c:6,
+   g:'סעיפי תקציב, תיק מנהל, הגדרת תפקיד הרכז.ת הפדגוגי.ת, ושעות וגמול לרכז.ת חניכות.',
+   q:['סעיף 108 תקציב','מה זה תיק מנהל?','הגדרת תפקיד רכזת פדגוגית','איך מחשבים ש"ש לרכז חניכות בבית הספר','מה הגמול לרכז חניכות ?']},
+  {n:'מבחנים, מיקודים וציונים', c:5,
+   g:'מבחני גמר לדוגמה, מיקוד לגמר, חובת הגשה לבגרות מלאה והזנת ציונים במנב"ס.',
+   q:['מבחן גמר למתמטיקה','מבחני גמר באזרחות לדוברי ערבית','שלום אני רוצה מיקוד מבחן גמר למגזר הערבי','במסלול הבגרות - האם יהיה חייב להגיש את התלמידים לכל מקצועות הבגרות? בגרות מלאה?','איזה ציונים צריך להזין לתלמידים במנבס בשביל תעודות גמר?']},
+  {n:'פיקוח וליווי', c:3,
+   g:'מפגשי "מפקח ומנהליו" ומעטפת הליווי הפדגוגי לבתי הספר.',
+   q:['המפקח מנהליו','ליווי פדגוגי שמקבלים בתי הספר','אנחנו יוכלים להוסיף את פיתוח האתר הפדגוגי ככלי שנותן מענה לצוותים']},
+];
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const isAr = s => /[؀-ۿ]/.test(s);
+const CHEV = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
+document.getElementById('topics').innerHTML = TOPICS.map(t => `
+  <details class="topic">
+    <summary>
+      <span class="name">${t.n}</span>
+      <span class="track"><span class="fill" style="width:${(t.c / 24 * 100).toFixed(1)}%"></span></span>
+      <span class="num">${t.c} <small>· ${Math.round(t.c / 86 * 100)}%</small></span>${CHEV}
+    </summary>
+    <div class="body">
+      <p class="gist">${t.g}</p>
+      <div class="qs">${t.q.map(q => `<span class="q${isAr(q) ? ' ar' : ''}"${isAr(q) ? ' lang="ar"' : ''}>${esc(q)}</span>`).join('')}</div>
+    </div>
+  </details>`).join('');
+
+/* ================= דירוג עמודים ================= */
+function rank(id, rows) {
+  const max = Math.max(...rows.map(r => r[1]));
+  document.getElementById(id).innerHTML = rows.map((r, i) => `
+    <li><span class="i">${i + 1}</span><span class="t">${r[0]}</span>
+    <span class="bar-h"><i style="width:${(r[1] / max * 100).toFixed(1)}%"></i></span><span class="u">${r[1]}</span></li>`).join('');
+}
+rank('rank', [
+  ['בעלי תפקידים', 43], ['השתלמויות ופיתוח מקצועי', 38], ['נתיב הגמר', 37], ['הודעות ועדכונים', 36],
+  ['לוח מבחנים', 35], ['לוח גאנט צוותים', 34], ['בעלי תפקידים: חלוקת שעות', 30], ['תחומי דעת', 29],
+  ['אוגדן שעות', 23], ['מאגר מבחני הגמר', 20], ['שילוב AI בחינוך', 20], ['עברית · נתיב הגמר', 19],
+  ['נתיב הבגרות', 19], ['היערכות לתשפ"ז', 18], ['כלים דיגיטליים', 18]
+]);
+rank('rankGate', [
+  ['עמוד הבית', 216], ['המרחב הפדגוגי', 59], ['חיפוש באתר', 47], ['מרחב פיקוח', 14], ['מרחב מנהלים', 11]
+]);
+
+/* ================= גרפים ================= */
+const tip = document.getElementById('tip');
+function showTip(e, html) {
+  tip.innerHTML = html; tip.classList.add('on');
+  tip.style.left = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8) + 'px';
+  tip.style.top = (e.clientY - tip.offsetHeight - 12) + 'px';
+}
+function hideTip() { tip.classList.remove('on'); }
+
+function barChart(id, data, o) {
+  const svg = document.getElementById(id);
+  const W = 960, H = 230, padT = 22, padB = 30, padS = 34;
+  const n = data.length, slot = (W - padS * 2) / n, bw = Math.min(slot - 4, 28);
+  const y = v => padT + (H - padT - padB) * (1 - v / o.max);
+  let s = '';
+  for (const t of o.ticks) {
+    s += `<line class="gridline" x1="${padS}" x2="${W - padS}" y1="${y(t)}" y2="${y(t)}"/>`;
+    s += `<text class="axis-lbl" x="${W - padS + 6}" y="${y(t) + 4}">${t}</text>`;
+  }
+  data.forEach((d, i) => {
+    const cx = W - padS - slot * (i + 0.5);                 // ציר הזמן מימין לשמאל
+    const h = H - padB - y(d.v), x = cx - bw / 2, top = H - padB - h, r = Math.min(4, h);
+    const path = h > 0 ? `M${x},${H - padB} V${top + r} Q${x},${top} ${x + r},${top} H${x + bw - r} Q${x + bw},${top} ${x + bw},${top + r} V${H - padB} Z` : '';
+    s += `<rect class="hit" x="${cx - slot / 2}" y="${padT}" width="${slot}" height="${H - padT - padB}" data-i="${i}"/>`;
+    s += `<path class="bar${d.dim ? ' dim' : ''}" d="${path}"/>`;
+    if (o.label(d)) s += `<text class="val-lbl" x="${cx}" y="${top - 5}" text-anchor="middle">${d.v}</text>`;
+    s += `<text class="axis-lbl" x="${cx}" y="${H - padB + 17}" text-anchor="middle">${d.l}</text>`;
+  });
+  s += `<line x1="${padS}" x2="${W - padS}" y1="${H - padB}" y2="${H - padB}" stroke="var(--border-strong)"/>`;
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.innerHTML = s;
+  svg.querySelectorAll('.hit').forEach(el => {
+    el.addEventListener('mousemove', e => showTip(e, o.tip(data[+el.dataset.i])));
+    el.addEventListener('mouseleave', hideTip);
+  });
+}
+
+const DAYS = ['26.8','27.8','28.8','29.8','30.8','31.8','1.9','2.9','3.9','4.9','5.9','6.9','7.9','8.9','9.9','10.9','11.9','12.9','13.9','14.9','15.9','16.9'];
+const WD = ['ד','ה','ו','ש','א','ב','ג','ד','ה','ו','ש','א','ב','ג','ד','ה','ו','ש','א','ב','ג','ד'];
+const CONTENT = [91,231,68,76,111,66,51,61,47,44,73,85,389,349,205,93,35,20,85,103,273,143];
+const OGEN = [null,null,null,null,1,4,1,3,3,1,0,3,18,18,10,5,3,0,2,3,14,7];
+
+barChart('siteChart', DAYS.map((d, i) => ({v: CONTENT[i], l: d, dim: WD[i] === 'ש', i})), {
+  max: 400, ticks: [0, 100, 200, 300, 400],
+  label: d => d.v >= 200,
+  tip: d => `<b>${d.l} · יום ${WD[d.i]}׳</b>${d.v} צפיות בעמודי תוכן`
+});
+barChart('ogenChart', DAYS.map((d, i) => ({v: OGEN[i] ?? 0, l: d, na: OGEN[i] === null})), {
+  max: 20, ticks: [0, 5, 10, 15, 20],
+  label: d => d.v >= 10,
+  tip: d => d.na ? `<b>${d.l}</b>עוד לא נמדד` : `<b>${d.l}</b>${d.v} שאלות לעוגן`
+});
+</script>
+</body>
+</html>
