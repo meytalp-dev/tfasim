@@ -219,12 +219,15 @@
     /* חפיפה (טלפון ומחשב יחד): הדקות הן איחוד הזמנים ולא הסכום, בתנאי
        שכל השורות פוענחו ושכל אחת מתיישבת עם המשך שהזום כתב. */
     var spans = it.spans || [];
-    var okSpans = spans.length > 1 && spans.length === (it.durs || []).length;
-    for (var i = 0; okSpans && i < spans.length; i++) {
-      if (!spans[i] || Math.abs((spans[i][1] - spans[i][0]) / 60000 - it.durs[i]) > 2) okSpans = false;
+    /* "אמין" = לכל שורה יש הצטרפות ועזיבה, וכל מקטע מתיישב עם המשך שזום
+       כתב. נבדק גם לשורה בודדת, כי המקטעים נחוצים בהמשך לאיחוד בין
+       מכשירים בשמות שונים (ראו mergeBySid). */
+    var trusted = spans.length > 0 && spans.length === (it.durs || []).length;
+    for (var i = 0; trusted && i < spans.length; i++) {
+      if (!spans[i] || Math.abs((spans[i][1] - spans[i][0]) / 60000 - it.durs[i]) > 2) trusted = false;
     }
     var minutes = it.minutes;
-    if (okSpans) {
+    if (trusted && spans.length > 1) {
       var u = unionMinutes(spans);
       if (u < minutes - 1) minutes = u;
     }
@@ -241,6 +244,7 @@
       display: names[0] || it.raw,
       names: names,
       minutes: minutes === "" ? "" : Math.round(minutes),
+      spans: trusted ? spans : null,
       email: it.email || "",
       host: host
     };
@@ -339,18 +343,48 @@
     return null;
   }
 
-  /* דקות לכל משתתף, אחרי איחוד של כמה שורות שהותאמו לאותו אדם */
-  function minutesBySid() {
-    var out = {};
+  /* דקות לכל משתתף, אחרי איחוד של כמה שורות שהותאמו לאותו אדם.
+
+     שורות עם אותו שם תצוגה כבר אוחדו ב-finish() באיחוד זמנים. כאן מדובר
+     בשורות עם שמות *שונים* שמיטל שייכה ידנית לאותו אדם — מחשב ו"ה-iPhone
+     של". הגרסה הקודמת חיברה אותן, ולכן מי שישב 35 דקות בשני מכשירים
+     במקביל קיבל 70 ועבר את סף השעה (סקירת קודקס 20.9.26).
+
+     יש מקטעי זמן אמינים לכל השורות → איחוד זמנים אמיתי.
+     אין → הארוכה ביותר, והמשתתף מסומן לבדיקה: חוסר אפשר לתקן ביד,
+     עודף הופך בשקט להיעדרות מאושרת. */
+  function mergeBySid() {
+    var spans = {}, mins = {}, trust = {}, seen = {};
     Z.items.forEach(function (it) {
       if (it.host || !it.sid || it.sid === NOT_PART) return;
-      var cur = out[it.sid];
-      if (cur === undefined) { out[it.sid] = it.minutes; return; }
+      seen[it.sid] = true;
       if (it.minutes === "") return;
-      out[it.sid] = cur === "" ? it.minutes : cur + it.minutes;
+      (mins[it.sid] = mins[it.sid] || []).push(it.minutes);
+      if (trust[it.sid] === undefined) trust[it.sid] = true;
+      if (it.spans && it.spans.length) {
+        (spans[it.sid] = spans[it.sid] || []).push.apply(spans[it.sid], it.spans);
+      } else {
+        trust[it.sid] = false;
+      }
     });
-    return out;
+
+    var minutes = {}, uncertain = {};
+    for (var sid in seen) {
+      if (!Object.prototype.hasOwnProperty.call(seen, sid)) continue;
+      var list = mins[sid];
+      if (!list || !list.length) { minutes[sid] = ""; continue; }
+      if (list.length === 1) { minutes[sid] = list[0]; continue; }
+      if (trust[sid] && spans[sid] && spans[sid].length) {
+        minutes[sid] = Math.round(unionMinutes(spans[sid]));
+        continue;
+      }
+      minutes[sid] = Math.max.apply(null, list);
+      uncertain[sid] = true;
+    }
+    return { minutes: minutes, uncertain: uncertain };
   }
+
+  function minutesBySid() { return mergeBySid().minutes; }
 
   /* מה יקרה לשורה הזאת — אותם כללים כמו zoomApply_ בשרת */
   function preview(p, minutes) {
@@ -483,7 +517,13 @@
   function itemRow(it, idx, withPreview) {
     var p = it.sid && it.sid !== NOT_PART ? personBy(it.sid) : null;
     var sug = it.suggest && !it.sid ? personBy(it.suggest) : null;
-    var pv = withPreview ? preview(p, minutesBySid()[it.sid]) : null;
+    var merged = withPreview ? mergeBySid() : null;
+    var pv = withPreview ? preview(p, merged.minutes[it.sid]) : null;
+    /* שתי שורות של אותו אדם בלי זמני הצטרפות אמינים: לא נדע אם הוא היה
+       פעמיים או פעם אחת בשני מכשירים. נספרות הארוכה ביותר, ומסומן. */
+    if (pv && merged.uncertain[it.sid]) {
+      pv = { cls: "chk", text: "לבדיקה · כמה מכשירים בלי זמנים אמינים" };
+    }
     return '<tr class="' + (it.sid === "" ? "need" : "") + '">' +
       "<td>" + esc(it.raw) + "</td>" + minCell(it.minutes) +
       '<td><select data-zi="' + idx + '" aria-label="משתתף/ת עבור ' + esc(it.display) + '">' + options(it) + "</select>" +

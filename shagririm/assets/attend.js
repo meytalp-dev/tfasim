@@ -363,8 +363,15 @@
     tick: null,
     poll: null,
     fetching: false,
-    marking: null    /* sid שנבחר לסימון ידני */
+    marking: null,   /* sid שנבחר לסימון ידני */
+    /* מונה דורות. כל החלפת מסלול או מפגש מקדמת אותו, וכל תשובה שחוזרת
+       מדור ישן נזרקת. בלי זה תשובה איטית של כלים/מפגש 1 דרסה את הבחירה
+       החדשה, וקריאת האישור נבנתה ממסלול חדש ומספר מפגש ישן — כלומר אישור
+       נוכחות למפגש הלא נכון (סקירת קודקס 20.9.26). */
+    gen: 0
   };
+
+  function bump() { T.gen++; return T.gen; }
 
   var CIRC = 2 * Math.PI * 52;   /* היקף טבעת הספירה, r=52 */
 
@@ -447,7 +454,9 @@
   function loadCode() {
     if (!T.key || !T.track) return Promise.resolve();
     T.fetching = true;
+    var mine = T.gen, track = T.track;
     return apiGet("code").then(function (r) {
+      if (mine !== T.gen || track !== T.track) return;   /* תשובה מדור ישן */
       T.fetching = false;
       if (!r || r.ok !== true) {
         if (r && r.error === "badkey") return gate("המפתח לא זוהה. להדביק מחדש את הקישור שקיבלת.");
@@ -470,12 +479,17 @@
   function loadLive() {
     if (!T.key || !T.track) return Promise.resolve();
     var n = T.sel ? "&n=" + encodeURIComponent(T.sel) : "";
+    var mine = T.gen, track = T.track, sel = T.sel;
     return apiGet("live", n).then(function (r) {
+      /* נזרקת תשובה של דור ישן, של מסלול אחר, או של מפגש שכבר אינו הנבחר.
+         בלי הבדיקה הזאת T.live היה מתמלא בנתוני מסלול אחד ו-T.track בשני. */
+      if (mine !== T.gen || track !== T.track || sel !== T.sel) return;
       if (!r || r.ok !== true) {
         if (r && r.error === "badkey") return gate("המפתח לא זוהה. להדביק מחדש את הקישור שקיבלת.");
         toast(errText(r && r.error), true);
         return;
       }
+      if (r.track && String(r.track) !== String(T.track)) return;
       T.live = r;
       if (!T.sel && r.session) T.sel = Number(r.session);
       renderLive();
@@ -709,19 +723,51 @@
   function approveMeeting() {
     var L = T.live;
     if (!L || !L.session) { toast("לבחור מפגש", true); return; }
+
+    /* המסלול והמפגש נלקחים מאותה תשובה אחת ונבדקים מול הבחירה שעל המסך.
+       קודם המסלול נלקח מ-T.track והמפגש מ-L.session, ולכן תשובה ישנה
+       יכלה לייצר אישור למסלול אחד ולמפגש של אחר (סקירת קודקס 20.9.26). */
+    var track = String(L.track || T.track);
+    var session = Number(L.session);
+    if (track !== String(T.track) || (T.sel && Number(T.sel) !== session)) {
+      toast("המסך התחלף באמצע. לרענן ולנסות שוב.", true);
+      loadLive();
+      return;
+    }
+
     var list = pendingApproval();
     if (!list.length) { toast("אין מה לאשר", true); return; }
-    var openHere = T.code && T.code.open && Number(T.code.session) === Number(L.session);
+    var openHere = T.code && T.code.open && Number(T.code.session) === session;
 
-    var q = "לאשר את הנוכחות של " + list.length + " משתתפים במפגש " + L.session + "?";
+    var q = "לאשר את הנוכחות של " + list.length + " משתתפים במפגש " + session + "?";
     if (L.counts.review) q += "\n" + L.counts.review + " מסומנים לבדיקה ולא יאושרו.";
     if (openHere) q += "\nהרישום ייסגר, ומי שלא נרשם עד עכשיו לא יוכל להירשם.";
     q += "\n\nאחרי האישור הנוכחות נכתבת לקובץ של שני בסנכרון הבא.";
     if (!w.confirm(q)) return;
 
+    sendApprove(track, session, openHere, "");
+  }
+
+  /* מופרד כדי שאפשר יהיה לחזור עליו עם עקיפה, בלי לשאול הכל שוב */
+  function sendApprove(track, session, openHere, force) {
     var btn = el("t-okBtn");
     if (btn) btn.disabled = true;
-    api({ action: "meetApprove", session: L.session, close: openHere ? "כן" : "" }).then(function (r) {
+    api({
+      action: "meetApprove", track: track, session: session,
+      close: openHere ? "כן" : "", force: force || ""
+    }).then(function (r) {
+      /* השרת חוסם אישור סופי לפני שיובא דוח הזום, כדי שההצלבה לא תתבטל.
+         העקיפה קיימת למקרה שזום נפל ביום המפגש, והיא נרשמת ביומן. */
+      if (r && r.error === "nozoom") {
+        if (btn) btn.disabled = false;
+        var ask = "טרם יובא דוח הזום למפגש " + session + ".\n\n" +
+          "בלי הדוח אי אפשר לדעת מי באמת היה בזום, ומי קיבל את הקוד מחבר.\n" +
+          "מומלץ לייבא קודם את הדוח (הכפתור \"ייבוא דוח זום\") ורק אז לאשר.\n\n" +
+          "לאשר בכל זאת, בלי הצלבה? זה יירשם ביומן.";
+        if (w.confirm(ask)) sendApprove(track, session, openHere, "כן");
+        else renderApprove();
+        return;
+      }
       if (!r || r.ok !== true) { toast(errText(r && r.error), true); renderApprove(); return; }
       if (r.closed) {
         T.code = { ok: true, open: false, track: T.track, codeMinutes: (T.code && T.code.codeMinutes) || 5 };
@@ -729,7 +775,8 @@
       }
       toast("אושרו " + r.approved + " משתתפים" +
         (r.skipped && r.skipped.review ? " · " + r.skipped.review + " נשארו לבדיקה" : "") +
-        (r.closed ? " · הרישום נסגר" : ""));
+        (r.closed ? " · הרישום נסגר" : "") +
+        (r.forced ? " · בלי הצלבת זום" : ""));
       loadLive();
     }).catch(function () { toast(errText("network"), true); renderApprove(); });
   }
@@ -813,6 +860,7 @@
   }
 
   function setTrack(track) {
+    bump();
     T.track = track;
     T.sel = 0;
     T.code = null;
@@ -839,7 +887,9 @@
     el("t-okBtn").addEventListener("click", approveMeeting);
     el("t-copy").addEventListener("click", copyReminder);
     el("t-session").addEventListener("change", function () {
+      bump();
       T.sel = Number(el("t-session").value);
+      T.live = null;      /* לא להציג רשימה של המפגש הקודם בזמן הטעינה */
       T.marking = null;
       loadLive();
     });

@@ -135,6 +135,18 @@
     });
   }
 
+  /* GET מאומת: מוסיף את המפתח האישי, את הסשן ואת המכשיר.
+     נדרש מאז ש-mode=content נסגר — עד אז הוא החזיר את קישור הזום
+     ואת החומרים לכל מי ששלח בקשה (סקירת קודקס 20.9.26). */
+  function get(mode, extra) {
+    return fetchJson(API + "?mode=" + encodeURIComponent(mode) +
+      (extra || "") +
+      "&t=" + encodeURIComponent(TOKEN || "") +
+      "&s=" + encodeURIComponent(sessionGet() || "") +
+      "&device=" + encodeURIComponent(deviceId() || "") +
+      "&_=" + Date.now());
+  }
+
   /* POST מאומת לשאר העמודים: מוסיף מפתח, טוקן ומכשיר */
   function api(action, data) {
     var body = { action: action, t: TOKEN, session: sessionGet(), device: deviceId() };
@@ -553,6 +565,7 @@
     fetchJson: fetchJson,
     post: post,
     api: api,
+    get: get,
     ensure: ensure,
     logout: logout,
     /* חשוף לבדיקות ולעמודים שרוצים להציג הודעת שגיאה בעברית */

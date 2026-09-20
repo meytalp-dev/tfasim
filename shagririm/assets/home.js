@@ -248,9 +248,10 @@
   /* קריאות לשרת                                                        */
   /* ------------------------------------------------------------------ */
 
+  /* mode=content דורש הזדהות מאז 20.9.26, ולכן עובר דרך SH_auth.get
+     שמוסיף את המפתח האישי ואת הסשן. השרת מחזיר רק את המסלול של המשתתף. */
   function content(what, extra) {
-    var u = API + "?mode=content&what=" + encodeURIComponent(what) + (extra || "") + "&_=" + Date.now();
-    return w.SH_auth.fetchJson(u);
+    return w.SH_auth.get("content", "&what=" + encodeURIComponent(what) + (extra || ""));
   }
 
   /* נקודת הקצה של משימות 5 ו-12. עד שהיא תיכתב מוחזר noaction, ואז

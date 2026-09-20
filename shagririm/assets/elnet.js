@@ -250,7 +250,10 @@
 
   function loadSessions() {
     if (E.sessions[E.track]) { renderSessions(); return; }
-    return getJson({ mode: "content", what: "list", track: E.track }).then(function (r) {
+    /* mode=content דורש הזדהות מאז 20.9.26 — מפתח הניהול או אסימון השער */
+    var q = auth();
+    q.mode = "content"; q.what = "list"; q.track = E.track;
+    return getJson(q).then(function (r) {
       E.sessions[E.track] = (r && r.ok && r.sessions) ? r.sessions : [];
       renderSessions();
     }).catch(function () { /* התוכן אינו חוסם את הטבלה */ });
