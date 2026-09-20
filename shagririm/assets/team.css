@@ -1,0 +1,309 @@
+/**
+ * שגרירי חדשנות טכנולוגית — מסך "היום" של מיטל (team.html).
+ * משימה 5 באפיון · העיצוב מהמוק-אפ המאושר: מוקאפ-מודול-שגרירי-חדשנות-v2.html
+ *
+ * app.css שייך למשימה 4 (מסכי המשתתף/ת) ואינו נטען כאן, ולכן הטוקנים
+ * מוגדרים מחדש באותם ערכים בדיוק: סעיף 8 באפיון.
+ * כחול 1D6FA5 · כתום C2620C · נייר F4F1EA · נייבי 10344F · לילה 0B2436
+ */
+
+:root {
+  --blue: #1D6FA5;
+  --blue-2: #4A9FD8;
+  --orange: #C2620C;
+  --orange-2: #F08A2E;
+  --paper: #F4F1EA;
+  --ink: #10344F;
+  --night: #0B2436;
+  --night-2: #123A56;
+  --muted: #62727E;
+  --line: #E2DDD2;
+  --ok: #2F9F6A;
+  --bad: #B3261E;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+* { box-sizing: border-box; }
+/* display:grid גובר על hidden, ולכן הכלל הזה חייב להיות כאן (סעיף 9 באפיון) */
+[hidden] { display: none !important; }
+
+html, body { margin: 0; }
+body {
+  font-family: Assistant, "Segoe UI", Arial, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  background-image: radial-gradient(rgba(16, 52, 79, .09) 1px, transparent 1px);
+  background-size: 22px 22px;
+  font-size: 15px;
+  padding-block: 0;
+}
+h1, h2, h3 { font-family: Rubik, Assistant, Arial, sans-serif; }
+button { font: inherit; color: inherit; }
+.ico { flex: none; }
+
+/* ---------------------------- פס עליון ---------------------------- */
+
+.top {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(244, 241, 234, .9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+.top-in {
+  max-width: 1300px; margin: 0 auto;
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+}
+.top .mark { display: flex; align-items: center; gap: 10px; }
+.top .mark img { height: 40px; width: auto; }
+.top .mark .ring { color: var(--blue); }
+.top h1 { font-size: 17px; margin: 0; font-weight: 800; line-height: 1.2; }
+.top h1 small {
+  display: block; font-family: Assistant, Arial, sans-serif;
+  font-weight: 500; color: var(--muted); font-size: 13px;
+}
+.tracks {
+  margin-inline-start: auto;
+  display: flex; background: #fff; border: 1px solid var(--line);
+  border-radius: 999px; padding: 4px; gap: 2px;
+}
+.tracks button {
+  border: 0; background: none; padding: 9px 18px; border-radius: 999px;
+  cursor: pointer; font-weight: 700; color: var(--muted);
+  transition: background .25s var(--ease), color .25s var(--ease);
+  min-height: 42px;
+}
+.tracks button[aria-pressed="true"] { background: var(--night); color: #fff; }
+.tracks button:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+
+.stage { max-width: 1300px; margin: 0 auto; padding: 22px 20px 50px; }
+
+/* ---------------------------- שער המפתח ---------------------------- */
+
+.gate {
+  max-width: 520px; margin: 40px auto;
+  background: #fff; border: 1px solid var(--line);
+  border-radius: 24px; padding: 26px 22px;
+}
+.gate h2 { margin: 0 0 6px; font-size: 20px; }
+.gate p { color: var(--muted); line-height: 1.6; margin: 0 0 16px; }
+.gate input {
+  width: 100%; padding: 13px 14px; border: 1px solid var(--line);
+  border-radius: 14px; font: 400 15px Assistant, Arial, sans-serif;
+  background: var(--paper); color: var(--ink); direction: ltr; text-align: left;
+}
+.gate input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(29, 111, 165, .14); }
+.gate .go {
+  margin-top: 12px; width: 100%; min-height: 50px; border: 0; border-radius: 14px;
+  background: var(--blue); color: #fff; font: 600 1.02rem Assistant, Arial, sans-serif; cursor: pointer;
+}
+.gate .err { color: var(--bad); font-weight: 600; margin: 10px 0 0; font-size: .95rem; }
+
+/* ---------------------------- שורת הבחירה ---------------------------- */
+
+.pick {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  margin: 0 0 14px;
+}
+.pick label { font-weight: 700; font-size: 13px; color: var(--muted); }
+.pick select {
+  flex: 1; min-width: 240px; padding: 11px 12px; border: 1px solid var(--line);
+  border-radius: 14px; background: #fff; font: 400 14px Assistant, Arial, sans-serif;
+  color: var(--ink); min-height: 46px;
+}
+.warn {
+  display: flex; align-items: center; gap: 8px;
+  background: #FCEBDD; border: 1px solid #F0C9A3; color: #8A4707;
+  border-radius: 14px; padding: 10px 14px; font-size: 13.5px; font-weight: 600;
+  margin: 0 0 14px;
+}
+
+/* ---------------------------- הבנטו ---------------------------- */
+
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+.tile { background: #fff; border-radius: 24px; padding: 18px; border: 1px solid var(--line); }
+.tile h3 {
+  margin: 0 0 4px; font-size: 14px; color: var(--muted);
+  font-weight: 700; font-family: Assistant, Arial, sans-serif;
+}
+
+/* הקוד בתוך טבעת הספירה */
+.t-code {
+  grid-column: span 5; grid-row: span 2;
+  background: var(--night); color: #fff; border: 0;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+}
+.t-code h3 { color: #9FB6C8; }
+.cd { position: relative; width: 250px; max-width: 100%; aspect-ratio: 1 / 1; margin: 10px 0; }
+.cd svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+.cd .trk { fill: none; stroke: #1E4A69; stroke-width: 10; }
+.cd .prg {
+  fill: none; stroke: var(--orange-2); stroke-width: 10; stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+.cd .mid {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.cd .mid b {
+  font-family: Rubik, Arial, sans-serif; font-weight: 900; font-size: 62px;
+  letter-spacing: 6px; direction: ltr; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.cd .mid span { color: #9FB6C8; font-size: 13px; margin-top: 8px; padding: 0 10px; line-height: 1.4; }
+.t-code .row { display: flex; gap: 8px; width: 100%; margin-top: auto; }
+.t-code .row button {
+  flex: 1; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .07);
+  color: #fff; border-radius: 14px; padding: 12px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; gap: 7px; min-height: 48px;
+}
+.t-code .row button:hover { background: rgba(255, 255, 255, .15); }
+.t-code .row button:focus-visible { outline: 3px solid var(--orange-2); outline-offset: 2px; }
+
+/* נרשמו עכשיו */
+.t-att { grid-column: span 7; }
+.att-h { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.att-h b { font-family: Rubik, Arial, sans-serif; font-weight: 900; font-size: 40px; font-variant-numeric: tabular-nums; }
+.att-h span { color: var(--muted); font-weight: 700; }
+.people { display: grid; grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)); gap: 7px; margin-top: 12px; }
+.t-pp {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px 6px 6px; border-radius: 999px;
+  background: var(--paper); border: 1.5px dashed #D3CCBD; color: #8D8474;
+  font-size: 13px; font-weight: 700; text-align: right; cursor: pointer;
+  transition: background .45s var(--ease), border-color .45s var(--ease), color .45s var(--ease);
+  min-height: 40px; overflow: hidden;
+}
+.t-pp .av {
+  width: 26px; height: 26px; border-radius: 50%; background: #E6E1D6; color: #A79E8C;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 800; flex: none;
+}
+.t-pp .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.t-pp .st { margin-inline-start: auto; font-size: 11px; font-weight: 700; opacity: .85; flex: none; }
+.t-pp.in { background: #EAF3F9; border: 1.5px solid var(--blue); color: var(--ink); }
+.t-pp.in .av { background: var(--blue); color: #fff; }
+.t-pp.in .st { color: var(--blue); }
+.t-pp.risk { border-color: var(--orange-2); }
+.t-pp.risk .st { color: var(--orange); }
+.t-pp:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.legend { margin-top: 10px; font-size: 13px; color: var(--muted); line-height: 1.5; }
+.t-empty { color: var(--muted); padding: 12px 0; }
+
+/* ארבעה מספרים */
+.t-k { grid-column: span 7; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.k { background: #fff; border-radius: 24px; border: 1px solid var(--line); padding: 16px; }
+.k b {
+  font-family: Rubik, Arial, sans-serif; font-weight: 900; font-size: 34px;
+  display: block; line-height: 1; font-variant-numeric: tabular-nums;
+}
+.k span { color: var(--muted); font-weight: 700; font-size: 13px; }
+.k em { display: block; font-style: normal; color: #94A2AD; font-size: 11.5px; margin-top: 4px; line-height: 1.35; }
+.k.o b { color: var(--orange); }
+.k.q b { color: #9AA7B1; }
+
+/* מי עוד לא נרשם */
+.t-miss { grid-column: span 12; }
+.miss-h { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.miss-h h3 { margin: 0; font-size: 16px; color: var(--ink); font-family: Rubik, Arial, sans-serif; }
+.btn-copy {
+  margin-inline-start: auto; border: 1px solid var(--blue); background: #fff; color: var(--blue);
+  border-radius: 12px; padding: 10px 14px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 7px; min-height: 44px;
+}
+.btn-copy:hover { background: #EAF3F9; }
+.btn-copy[disabled] { border-color: var(--line); color: #A7B2BB; cursor: default; background: #fff; }
+.btn-copy:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+ul.miss { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 20px; }
+ul.miss li {
+  break-inside: avoid; display: flex; align-items: baseline; gap: 8px;
+  padding: 7px 0; border-bottom: 1px solid #EFEBE1; font-size: 14px;
+}
+ul.miss li b { font-weight: 700; }
+ul.miss li span { color: var(--muted); font-size: 12.5px; }
+ul.miss li em { margin-inline-start: auto; font-style: normal; font-size: 12px; font-weight: 700; color: var(--muted); }
+ul.miss li.risk em { color: var(--orange); }
+ul.miss li.ok { color: var(--ok); font-weight: 700; border: 0; }
+@media (max-width: 760px) { ul.miss { columns: 1; } }
+
+/* סימון ידני */
+.t-mark { grid-column: span 12; background: #fff; border: 2px solid var(--blue); border-radius: 24px; padding: 16px 18px; }
+.t-markh { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.t-markh b { font-family: Rubik, Arial, sans-serif; font-size: 17px; }
+.t-markh span { color: var(--muted); font-size: 13px; }
+.t-markh em { font-style: normal; font-size: 12.5px; font-weight: 700; color: var(--blue); }
+.t-markx {
+  margin-inline-start: auto; border: 1px solid var(--line); background: #fff;
+  width: 36px; height: 36px; border-radius: 50%; cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+}
+.t-states { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 12px; }
+.t-states button {
+  border: 1px solid var(--line); background: var(--paper); border-radius: 12px;
+  padding: 11px 16px; font-weight: 700; cursor: pointer; min-height: 46px;
+}
+.t-states button:hover { border-color: var(--blue); }
+.t-states button.on { background: var(--night); color: #fff; border-color: var(--night); }
+.t-states button:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+.t-notel { display: block; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.t-notel input {
+  display: block; width: 100%; margin-top: 4px; padding: 11px 12px;
+  border: 1px solid var(--line); border-radius: 12px; font: 400 14px Assistant, Arial, sans-serif;
+  background: var(--paper); color: var(--ink); min-height: 44px;
+}
+.t-markf { margin-top: 10px; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
+
+@media (max-width: 980px) {
+  .t-code, .t-att, .t-k, .t-miss, .t-mark { grid-column: 1 / -1; }
+  .t-code { grid-row: auto; }
+  .t-k { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 420px) {
+  .cd .mid b { font-size: 48px; letter-spacing: 4px; }
+  .att-h b { font-size: 32px; }
+  .k b { font-size: 27px; }
+}
+
+/* ---------------------------- הודעה צפה ---------------------------- */
+
+.t-toast {
+  position: fixed; inset-inline: 16px; bottom: 16px; z-index: 60;
+  max-width: 460px; margin: 0 auto;
+  display: none; align-items: center; gap: 8px;
+  background: var(--night); color: #fff; border-radius: 16px;
+  padding: 13px 16px; font-weight: 600; font-size: 14px; line-height: 1.45;
+  box-shadow: 0 14px 40px rgba(11, 36, 54, .3);
+}
+.t-toast.on { display: flex; }
+.t-toast.bad { background: var(--bad); }
+
+/* ---------------------------- תחתית ---------------------------- */
+
+.foot { border-top: 1px solid var(--line); margin-top: 34px; padding: 18px 20px 26px; }
+.foot-in {
+  max-width: 1300px; margin: 0 auto;
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  color: var(--muted); font-size: 12.5px;
+}
+.foot-in img { height: 34px; width: auto; }
+.foot .credit { width: 100%; text-align: center; font-size: .72rem; color: #8A97A6; padding-top: 8px; }
+.foot .credit a { color: inherit; font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* אישור המפגש: הלחיצה שמעבירה את הנוכחות לשני */
+.t-ok-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 14px; }
+.t-ok-bar button {
+  border: 0; background: var(--blue); color: #fff; border-radius: 14px;
+  padding: 12px 18px; font: inherit; font-weight: 800; cursor: pointer;
+  display: flex; align-items: center; gap: 8px; min-height: 48px;
+  transition: background .3s var(--ease);
+}
+.t-ok-bar button:hover:not([disabled]) { background: var(--ink); }
+.t-ok-bar button:focus-visible { outline: 3px solid var(--orange-2); outline-offset: 2px; }
+.t-ok-bar button[disabled] { background: #C9D2D8; color: #6B7A85; cursor: default; }
+.t-ok-bar button.warn { background: var(--orange); }
+.t-ok-bar button.warn:hover:not([disabled]) { background: #8E4708; }
+.t-ok-bar p { margin: 0; color: var(--muted); font-size: 13px; font-weight: 700; flex: 1; min-width: 190px; line-height: 1.5; }
+.t-ok-bar p.done { color: var(--ok); }

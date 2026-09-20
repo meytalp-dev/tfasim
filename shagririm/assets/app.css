@@ -1,0 +1,466 @@
+/* ------------------------------------------------------------------------- *
+ * שגרירי חדשנות טכנולוגית — מודול הלמידה. גיליון הסגנון המשותף.
+ * משימה 4 באפיון: רויטל\אפיון-מודול-שגרירי-חדשנות.md (סעיפים 3.1, 4, 8).
+ *
+ * הטוקנים והתבניות נלקחו מהמוק-אפ שמיטל אישרה:
+ *   רויטל\מוקאפ-מודול-שגרירי-חדשנות-v2.html — תצוגת "משתתף/ת".
+ * מי שמשנה כאן צריך לוודא שהמוק-אפ עוד מתואר נכון.
+ *
+ * הקובץ הזה שייך למשימה 4 בלבד. סוכנים אחרים (team.html, attend.js,
+ * unit.js, gallery.js) לא עורכים אותו — מוסיפים גיליון משלהם.
+ *
+ * מובייל תחילה: נבדק ב-360px בלי גלילה אופקית. מטרות נגיעה 44px ומעלה.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  --blue: #1D6FA5;
+  --blue-2: #4A9FD8;
+  --blue-3: #8CC6EE;
+  --orange: #C2620C;
+  --orange-2: #F08A2E;
+  --paper: #F4F1EA;
+  --ink: #10344F;
+  --night: #0B2436;
+  --night-2: #123A56;
+  --night-3: #1E4A69;
+  /* #62727E מהמוק-אפ יוצא 4.4:1 על הנייר — הכהינו ל-5.3:1 (סעיף 8: ניגודיות תקנית) */
+  --muted: #566571;
+  --line: #E2DDD2;
+  --ok: #2F9F6A;
+  --ok-bg: #E3F4EB;
+  --ok-line: #C6E6D4;
+  --bad: #B3261E;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --tap: 44px;
+}
+
+/* display:grid גובר על hidden — המלכודת מסעיף 9 באפיון */
+[hidden] { display: none !important; }
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; padding: 0; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  font-family: Assistant, "Segoe UI", Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--paper);
+  background-image: radial-gradient(rgba(16, 52, 79, .07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, .disp { font-family: Rubik, Assistant, Arial, sans-serif; margin: 0; }
+
+button { font: inherit; color: inherit; }
+
+a { color: var(--blue); }
+
+:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; border-radius: 6px; }
+
+.sh-ico {
+  width: 20px; height: 20px; flex: none;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
+}
+.sh-ico.s { width: 15px; height: 15px; }
+.sh-ico.xs { width: 13px; height: 13px; }
+
+/* קורא מסך בלבד */
+.sh-sr {
+  position: absolute; width: 1px; height: 1px; margin: -1px;
+  padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ===================== מבנה האפליקציה ===================== */
+
+.sh-app {
+  max-width: 560px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* --- פס עליון: לוגו הקהילה (סעיף 8: חובה בכל ממשק) --- */
+.sh-bar {
+  position: sticky; top: 0; z-index: 30;
+  display: flex; align-items: center; gap: 9px;
+  padding: 10px 14px;
+  background: rgba(244, 241, 234, .93);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+/* לקובץ הלוגו יש רקע שבור-לבן ולא שקוף. multiply ממיס אותו לתוך הנייר
+   במקום להשאיר אריח לבן סביב הסמל. */
+.sh-bar .sh-mark { width: 34px; height: 34px; flex: none; mix-blend-mode: multiply; }
+.sh-bar .sh-who { min-width: 0; }
+.sh-bar .sh-who b {
+  display: block; font-family: Rubik, Assistant, Arial, sans-serif;
+  font-weight: 800; font-size: 15px; line-height: 1.15;
+}
+.sh-bar .sh-who small {
+  display: block; font-weight: 600; font-size: 12px; color: var(--blue);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+#sh-lang-slot { margin-inline-start: auto; display: flex; gap: 6px; align-items: center; }
+
+/* --- אזור הגלילה --- */
+.sh-scr {
+  flex: 1;
+  padding: 10px 14px 0;
+  /* מקום לפס הלוגו והניווט הקבועים */
+  padding-bottom: 132px;
+}
+.sh-pane { animation: sh-pane-in .4s var(--ease); }
+@keyframes sh-pane-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* --- פס הלוקאפ של המינהל + הניווט, קבועים בתחתית (סעיף 8) --- */
+.sh-bottom {
+  position: fixed; inset-inline: 0; bottom: 0; z-index: 40;
+  background: var(--paper);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+/* פס דהייה של 16px מעל הרצועה, כדי שהתוכן ייעלם ולא ייחתך באמצע שורה */
+.sh-bottom::before {
+  content: ""; position: absolute; inset-inline: 0; top: -16px; height: 16px;
+  background: linear-gradient(rgba(244, 241, 234, 0), var(--paper));
+  pointer-events: none;
+}
+.sh-bottom-in { max-width: 560px; margin: 0 auto; }
+.sh-gov { display: flex; justify-content: center; align-items: center; padding: 7px 0 4px; }
+.sh-gov img { height: 30px; width: auto; mix-blend-mode: multiply; }
+.sh-tabs {
+  margin: 0 12px 10px;
+  background: var(--night);
+  border-radius: 24px;
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 5px; position: relative;
+}
+.sh-pill {
+  position: absolute; top: 5px; bottom: 5px;
+  width: calc((100% - 10px) / 4); right: 5px;
+  background: var(--night-2); border-radius: 19px;
+  transition: transform .42s var(--ease);
+}
+.sh-tabs button {
+  border: 0; background: none; color: #9FB6C8;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  font-size: 11px; font-weight: 700;
+  min-height: var(--tap); padding: 6px 0;
+  cursor: pointer; position: relative; z-index: 1;
+  transition: color .3s;
+}
+.sh-tabs button[aria-current="page"] { color: #fff; }
+
+.sh-credit {
+  text-align: center; font-size: 11.5px; color: var(--muted);
+  padding: 20px 4px 6px; line-height: 1.7;
+}
+.sh-credit a { color: var(--orange); }
+
+/* ===================== מסך הבית ===================== */
+
+.sh-hero {
+  background: var(--night); color: #fff;
+  border-radius: 28px; padding: 16px 14px 14px;
+  position: relative; overflow: hidden;
+}
+.sh-hero::before {
+  content: ""; position: absolute; inset: auto -60px -90px auto;
+  width: 220px; height: 220px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 138, 46, .32), transparent 65%);
+  pointer-events: none;
+}
+.sh-hi { font-size: 14px; color: #9FB6C8; font-weight: 600; position: relative; }
+.sh-hi b { display: block; color: #fff; font-family: Rubik, Assistant, Arial, sans-serif; font-size: 20px; }
+
+.sh-ringwrap {
+  position: relative;
+  width: min(216px, 60vw); aspect-ratio: 1;
+  margin: 8px auto 6px;
+}
+.sh-ringwrap svg { width: 100%; height: 100%; transform: rotate(-90deg); display: block; }
+.sh-seg {
+  fill: none; stroke-width: 16; stroke-linecap: butt; stroke: var(--night-3);
+  transition: stroke-dasharray 1s var(--ease), stroke .6s;
+}
+.sh-seg.done { stroke: var(--blue-2); }
+.sh-seg.done.async { stroke: var(--blue-3); }
+.sh-seg.cur { stroke: var(--orange-2); animation: sh-pulse 1.9s ease-in-out infinite; }
+/* יחידה עצמית שעוד נעולה — גוון מובדל, בלי להוריד את הנראות */
+.sh-seg.async:not(.done):not(.cur) { stroke: #2C5E80; }
+@keyframes sh-pulse { 50% { opacity: .62; } }
+
+.sh-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center;
+}
+.sh-center .sh-big {
+  font-family: Rubik, Assistant, Arial, sans-serif; font-weight: 900;
+  font-size: clamp(38px, 13vw, 52px); line-height: .92;
+  font-variant-numeric: tabular-nums;
+}
+.sh-center .sh-big small { font-size: .42em; color: #8FA9BF; font-weight: 700; }
+.sh-center .sh-lbl { font-size: 12.5px; color: #9FB6C8; font-weight: 600; margin-top: 2px; }
+
+.sh-next {
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 255, 255, .09);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 20px; padding: 10px 12px;
+  position: relative;
+}
+.sh-next .sh-when { min-width: 0; font-family: Rubik, Assistant, Arial, sans-serif; font-weight: 800; font-size: 14.5px; line-height: 1.3; }
+.sh-next .sh-when small {
+  display: block; font-family: Assistant, Arial, sans-serif; font-weight: 600;
+  color: #B6CBDA; font-size: 12px; margin-top: 2px;
+}
+.sh-go {
+  margin-inline-start: auto; flex: none;
+  width: var(--tap); height: var(--tap); border-radius: 50%;
+  background: var(--orange-2); border: 0; color: #fff;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.sh-go:active { transform: translateY(1px); }
+
+/* --- כותרת מקטע עם המוטיב --- */
+.sh-sec {
+  display: flex; align-items: center; gap: 8px;
+  margin: 18px 3px 8px;
+}
+.sh-sec h2, .sh-sec h3 {
+  font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 7px;
+  font-family: Rubik, Assistant, Arial, sans-serif;
+}
+.sh-sec .sh-note { margin-inline-start: auto; font-size: 12px; color: var(--muted); font-weight: 600; text-align: left; }
+.sh-sec.big h2 { font-size: 22px; font-weight: 900; }
+
+.sh-mot { width: 16px; height: 16px; flex: none; animation: sh-spin 16s linear infinite; }
+.sh-mot circle { fill: none; stroke-width: 5; }
+@keyframes sh-spin { to { transform: rotate(360deg); } }
+
+/* --- הצעד הבא --- */
+.sh-task {
+  background: #fff; border: 1px solid var(--line); border-radius: 22px;
+  padding: 11px 13px; display: flex; align-items: center; gap: 12px;
+}
+.sh-tick {
+  width: var(--tap); height: var(--tap); border-radius: 50%; flex: none;
+  border: 2px solid var(--blue); background: #fff;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  transition: background .3s var(--ease), border-color .3s var(--ease);
+  padding: 0;
+}
+.sh-tick .sh-ico { opacity: 0; transform: scale(.4); transition: .35s var(--ease); color: #fff; }
+.sh-task.on .sh-tick { background: var(--ok); border-color: var(--ok); animation: sh-bump .45s var(--ease); }
+.sh-task.on .sh-tick .sh-ico { opacity: 1; transform: none; }
+.sh-task.on .sh-tt b { text-decoration: line-through; color: var(--muted); }
+@keyframes sh-bump { 40% { transform: scale(1.2); } }
+.sh-tt { min-width: 0; }
+.sh-tt b { display: block; font-size: 14px; font-weight: 700; }
+.sh-tt span { font-size: 12px; color: var(--muted); }
+
+/* --- שלושת המדדים --- */
+.sh-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+.sh-stat {
+  background: #fff; border: 1px solid var(--line); border-radius: 20px;
+  padding: 10px 7px; text-align: center; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.sh-stat b {
+  display: block; font-family: Rubik, Assistant, Arial, sans-serif; font-weight: 900;
+  font-size: 21px; line-height: 1.1; font-variant-numeric: tabular-nums;
+}
+.sh-stat span { font-size: 11px; color: var(--muted); font-weight: 700; }
+.sh-stat.good { background: var(--ok-bg); border-color: var(--ok-line); }
+.sh-stat.good b { color: #1C6B3F; font-size: 14px; padding: 4px 0; }
+.sh-stat.warn { background: #FCEBDD; border-color: #F2D6B8; }
+.sh-stat.warn b { color: var(--orange); font-size: 14px; padding: 4px 0; }
+.sh-mini { height: 5px; border-radius: 3px; background: #ECE8DF; margin-top: 6px; overflow: hidden; }
+.sh-mini i { display: block; height: 100%; background: var(--blue); border-radius: 3px; transition: width .8s var(--ease); }
+
+/* --- קוד נוכחות ביום מפגש (סעיף 3.1: בראש הבית, בלי ניווט) --- */
+.sh-live {
+  background: linear-gradient(140deg, var(--orange-2), var(--orange));
+  color: #fff; border-radius: 26px; padding: 14px; margin-bottom: 12px;
+}
+.sh-live .sh-live-h { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 13px; }
+.sh-rec {
+  width: 9px; height: 9px; border-radius: 50%; background: #fff; flex: none;
+  box-shadow: 0 0 0 0 rgba(255, 255, 255, .7); animation: sh-rec 1.5s infinite;
+}
+@keyframes sh-rec { 70% { box-shadow: 0 0 0 11px rgba(255, 255, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); } }
+.sh-live h2 { font-size: 20px; font-weight: 900; margin: 8px 0 2px; }
+.sh-live p { margin: 0 0 10px; font-size: 13px; color: #FFE8D6; }
+.sh-live-row { display: flex; gap: 8px; align-items: stretch; }
+.sh-code {
+  flex: 1; min-width: 0; min-height: var(--tap);
+  border: 2px solid rgba(255, 255, 255, .6); border-radius: 14px;
+  background: rgba(255, 255, 255, .16); color: #fff;
+  font: 800 22px/1 Rubik, Arial, sans-serif; letter-spacing: .28em;
+  text-align: center; direction: ltr; unicode-bidi: plaintext;
+  padding: 10px 6px;
+}
+.sh-code::placeholder { color: rgba(255, 255, 255, .55); letter-spacing: .2em; }
+.sh-code:focus { outline: 3px solid #fff; outline-offset: 1px; }
+.sh-live-btn {
+  flex: none; min-height: var(--tap); padding: 0 16px;
+  border: 0; border-radius: 14px; background: #fff; color: var(--orange);
+  font-weight: 800; cursor: pointer;
+}
+.sh-live-msg { font-size: 12.5px; margin: 8px 0 0; color: #FFF3E8; min-height: 18px; }
+
+/* ===================== מסך המסע ===================== */
+
+.sh-path { position: relative; padding-inline-start: 30px; }
+.sh-path::before {
+  content: ""; position: absolute; inset-inline-start: 11px; top: 12px; bottom: 12px;
+  width: 3px; border-radius: 2px; background: #DDD7CA;
+}
+.sh-path .sh-line-done {
+  position: absolute; inset-inline-start: 11px; top: 12px;
+  width: 3px; border-radius: 2px; background: var(--blue);
+}
+
+.sh-stop { position: relative; margin-bottom: 9px; opacity: 0; animation: sh-stop-in .5s var(--ease) forwards; }
+@keyframes sh-stop-in { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+
+.sh-dot {
+  position: absolute; inset-inline-start: -30px; top: 13px;
+  width: 25px; height: 25px; border-radius: 50%;
+  background: #fff; border: 3px solid #DDD7CA; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+}
+.sh-stop.done .sh-dot { background: var(--blue); border-color: var(--blue); }
+.sh-stop.async .sh-dot { border-style: dashed; }
+.sh-stop.done.async .sh-dot { border-style: solid; background: var(--blue-3); border-color: var(--blue-3); }
+.sh-stop.cur .sh-dot { border-color: var(--orange-2); box-shadow: 0 0 0 6px rgba(240, 138, 46, .18); }
+
+.sh-stop-card {
+  display: block; width: 100%; text-align: start;
+  background: #fff; border: 1px solid var(--line); border-radius: 18px;
+  padding: 10px 12px; min-height: var(--tap); cursor: pointer;
+}
+.sh-stop.lock .sh-stop-card { background: transparent; border-style: dashed; }
+.sh-stop.cur .sh-stop-card { border: 2px solid var(--orange-2); background: #fff; }
+/* שורת כותרת אחת ושורת מטא אחת, כדי שהתאריך והצ'יפים לא ירדו לשורה
+   מוזרה כשהנושא ארוך (ובסילבוס יש נושאים ארוכים) */
+.sh-stop-h { display: block; font-size: 14px; font-weight: 700; line-height: 1.35; }
+.sh-stop-m {
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+  margin-top: 5px; min-height: 20px;
+}
+.sh-stop-m .sh-date {
+  margin-inline-start: auto; color: var(--muted);
+  font-size: 12px; font-weight: 700; white-space: nowrap;
+}
+
+.sh-chip {
+  font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 999px;
+  background: #EAF3F9; color: #175D8C; white-space: nowrap;
+}
+.sh-chip.o { background: #FCEBDD; color: var(--orange); }
+.sh-chip.g { background: var(--ok-bg); color: #1C6B3F; }
+.sh-chip.dash { background: transparent; border: 1px dashed #B9C6D0; color: var(--muted); }
+
+.sh-phases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 10px; }
+.sh-phase { border-radius: 14px; padding: 8px 7px; background: var(--paper); font-size: 12px; line-height: 1.35; }
+.sh-phase b { display: flex; align-items: center; gap: 4px; font-size: 12px; margin-bottom: 2px; font-family: Rubik, Assistant, Arial, sans-serif; }
+.sh-phase.cur { background: var(--night); color: #fff; }
+.sh-builds {
+  margin-top: 8px; display: flex; align-items: flex-start; gap: 6px;
+  font-size: 12px; font-weight: 700; color: var(--orange); line-height: 1.4;
+}
+.sh-zoom {
+  display: flex; align-items: center; justify-content: center; gap: 7px;
+  margin-top: 9px; min-height: var(--tap);
+  background: var(--night); color: #fff; border-radius: 14px;
+  font-weight: 800; text-decoration: none; padding: 8px 12px;
+}
+
+/* ===================== דף מפגש ===================== */
+
+.sh-back {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: var(--tap); padding: 6px 10px 6px 4px;
+  background: none; border: 0; color: var(--blue); font-weight: 700; cursor: pointer;
+}
+.sh-shead {
+  background: #fff; border: 1px solid var(--line); border-radius: 24px;
+  padding: 14px; margin-bottom: 12px;
+}
+.sh-shead .sh-kicker { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 6px; }
+.sh-shead h2 { font-size: 20px; font-weight: 900; line-height: 1.25; }
+.sh-meta { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 9px; font-size: 13px; color: var(--muted); font-weight: 600; }
+.sh-meta span { display: flex; align-items: center; gap: 5px; }
+
+.sh-block { background: #fff; border: 1px solid var(--line); border-radius: 22px; padding: 13px 14px; margin-bottom: 10px; }
+.sh-block h3 { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+.sh-block p { margin: 0; font-size: 14px; line-height: 1.6; }
+.sh-block ul { margin: 0; padding-inline-start: 18px; font-size: 14px; line-height: 1.7; }
+.sh-block.why { background: #FCEBDD; border-color: #F2D6B8; }
+.sh-block.sum { background: #EAF3F9; border-color: #CFE3F0; }
+
+.sh-empty {
+  background: transparent; border: 1px dashed #C9D3DB; border-radius: 22px;
+  padding: 13px 14px; margin-bottom: 10px; color: var(--muted); font-size: 13.5px; line-height: 1.6;
+}
+.sh-empty b { display: block; color: var(--ink); font-size: 14px; margin-bottom: 3px; font-family: Rubik, Assistant, Arial, sans-serif; }
+
+.sh-links { display: grid; gap: 7px; margin-top: 4px; }
+.sh-links a, .sh-links span {
+  display: flex; align-items: center; gap: 8px; min-height: var(--tap);
+  background: var(--paper); border-radius: 14px; padding: 9px 11px;
+  font-size: 13.5px; font-weight: 600; text-decoration: none; color: var(--ink);
+  word-break: break-word;
+}
+
+/* ===================== מצבים: טעינה, ריק, שגיאה ===================== */
+
+.sh-state { text-align: center; padding: 34px 16px; }
+.sh-state .sh-mark { color: var(--blue); margin: 0 auto 12px; display: block; }
+.sh-state.bad .sh-mark { color: var(--orange); }
+.sh-state h2 { font-size: 19px; margin-bottom: 8px; line-height: 1.35; }
+.sh-state p { margin: 0 auto 12px; font-size: 14.5px; line-height: 1.65; color: var(--muted); max-width: 34em; }
+.sh-state .sh-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px; padding: 12px 22px; border: 0; border-radius: 14px;
+  background: var(--blue); color: #fff; font-weight: 700; font-size: 16px; cursor: pointer;
+}
+.sh-ring-load .sh-seg-l { stroke: #DFE6EC; }
+.sh-ring-load.on .sh-seg-l { stroke: var(--blue); animation: sh-pull 1.5s ease-in-out infinite; }
+@keyframes sh-pull { 0%, 100% { opacity: .25; } 45% { opacity: 1; } }
+
+.sh-soon {
+  background: #fff; border: 1px solid var(--line); border-radius: 24px;
+  padding: 20px 16px; text-align: center;
+}
+.sh-soon .sh-mark { color: var(--blue); margin: 0 auto 10px; display: block; }
+.sh-soon h2 { font-size: 18px; margin-bottom: 6px; }
+.sh-soon p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+/* ===================== 360px ואנימציות מופחתות ===================== */
+
+@media (max-width: 380px) {
+  .sh-scr { padding-inline: 11px; }
+  .sh-stat { padding: 9px 4px; border-radius: 17px; }
+  .sh-stat b { font-size: 19px; }
+  .sh-stat span { font-size: 10px; }
+  .sh-phase { padding: 7px 5px; font-size: 11.5px; }
+  .sh-path { padding-inline-start: 27px; }
+  .sh-dot { inset-inline-start: -27px; }
+  .sh-tabs button { font-size: 10px; }
+  .sh-bar .sh-who b { font-size: 14px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+  .sh-stop { opacity: 1; }
+}

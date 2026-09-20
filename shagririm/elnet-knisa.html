@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>כניסה · זכאות לגמול · שגרירי חדשנות טכנולוגית</title>
+<!--
+  דף כניסה לשני (הגוף המפעיל), משימה 8 באפיון.
+
+  למה יש דף נפרד ולא שער על elnet.html עצמו:
+  auth.js של האתר מסתיר את כל הדף עד שמתבצעת כניסה. אילו היה יושב על
+  elnet.html, גם מיטל הייתה נחסמת ונדרשת לכניסת גוגל לפני מפתח הניהול שלה,
+  ושני מסלולי הכניסה שתוכננו היו מתאחדים לאחד. לכן השער יושב כאן:
+  שני נכנסת דרך הדף הזה, הסשן נשמר ב-sessionStorage של הדומיין,
+  והדף מעביר אותה ל-elnet.html שמוצא אותו שם. מסלול המפתח של מיטל לא נגע.
+
+  הדף הזה חייב לשבת באותו דומיין של elnet.html — sessionStorage אינו חוצה
+  דומיינים. כרגע: tfasim.pedagogiamh.co.il.
+  הדומיין חייב להיות רשום ב-Authorized JavaScript origins ב-Google Cloud,
+  אחרת כפתור הכניסה של גוגל לא ייטען.
+
+  אין בקובץ הזה שום נתון אישי.
+-->
+<script src="https://pedagogiamh.co.il/auth.js" data-space="tikshuv"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { --navy:#10344F; --blue:#1D6FA5; --bg:#F9F8F6; --line:#dcd9d4; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:40px 20px; background:var(--bg); color:var(--navy);
+         font:400 16px/1.7 Assistant, "Segoe UI", system-ui, sans-serif; }
+  main { max-width:520px; margin:0 auto; background:#fff; border:1px solid var(--line);
+         border-radius:14px; padding:32px 28px; text-align:center; }
+  img.mark { width:84px; height:auto; margin:0 auto 18px; display:block; }
+  h1 { font-size:21px; margin:0 0 12px; font-weight:800; }
+  p { margin:0 0 14px; }
+  a.go { display:inline-block; margin-top:8px; padding:11px 22px; border-radius:9px;
+         background:var(--blue); color:#fff; text-decoration:none; font-weight:700; }
+  .gov { margin:26px auto 0; max-width:230px; }
+  .gov img { width:100%; height:auto; display:block; }
+  .credit { margin-top:18px; font-size:13px; color:#5b6b78; }
+  .credit a { color:#5b6b78; }
+</style>
+</head>
+<body>
+
+<main>
+  <img class="mark" src="assets/logo-kehila.png" alt="שגרירי חדשנות טכנולוגית">
+  <h1>זכאות לגמול · שגרירי חדשנות טכנולוגית</h1>
+  <p id="msg">מזהים אותך מול שער ההרשאות של המרחב הפדגוגי…</p>
+  <p id="alt" hidden>
+    הזיהוי הושלם. אם המסך לא נפתח מעצמו:
+    <br><a class="go" href="elnet.html">מעבר למסך הזכאות</a>
+  </p>
+
+  <div class="gov"><img src="assets/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+  <div class="credit">נבנה על ידי
+    <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</main>
+
+<script>
+(function (w, d) {
+  "use strict";
+  var SPACES = ["tikshuv", "all"];
+
+  /* אותו מפתח שבו auth.js של האתר שומר את הסשן, ואותה בדיקה שעושה elnet.js */
+  function ready() {
+    var s;
+    try { s = JSON.parse(w.sessionStorage.getItem("pmh_auth") || "null"); }
+    catch (e) { return false; }
+    if (!s || !s.token || !s.exp || s.exp < Date.now()) return false;
+    var sp = s.spaces || [];
+    for (var i = 0; i < sp.length; i++) {
+      if (SPACES.indexOf(String(sp[i])) > -1) return true;
+    }
+    return false;
+  }
+
+  /* auth.js עושה location.reload() אחרי כניסה מוצלחת, ולכן בטעינה שאחריה
+     הסשן כבר כאן. הבדיקה החוזרת היא למקרה שהחשיפה מתעכבת. */
+  var tries = 0;
+  function check() {
+    if (ready()) {
+      d.getElementById("msg").hidden = true;
+      d.getElementById("alt").hidden = false;
+      w.location.replace("elnet.html");
+      return;
+    }
+    if (++tries < 40) w.setTimeout(check, 250);
+  }
+  check();
+})(window, document);
+</script>
+
+</body>
+</html>

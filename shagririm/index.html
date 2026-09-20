@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>שגרירי חדשנות טכנולוגית · סביבת הלמידה</title>
+
+<!--
+  שגרירי חדשנות טכנולוגית — מודול הלמידה, אפליקציית המשתתף/ת.
+  משימה 4 באפיון: ..\אפיון-מודול-שגרירי-חדשנות.md (סעיפים 3.1, 4, 8, 12).
+  העיצוב לפי המוק-אפ שמיטל אישרה: ..\מוקאפ-מודול-שגרירי-חדשנות-v2.html (תצוגת "משתתף/ת").
+
+  פרטיות (סעיף 6): בקובץ הזה אין שם, בית ספר, מייל או מפתח של אף אחד.
+  כל הנתונים נשלפים בזמן ריצה מהשרת דרך SH_auth, שמחזיר רק את השורה של
+  מחזיק/ת המפתח. אין כאן תג <script> עם נתונים. בקרת הבנייה של משימה 17
+  נכשלת אם משהו דלף.
+
+  לוגואים (סעיף 8 — שניהם חובה):
+    לוגו הקהילה  assets/logo-kehila.png   — בפס העליון
+    לוקאפ המינהל assets/logo-minhal.png                                — בפס הקבוע מעל הניווט
+  שני הנתיבים נכונים גם מקומית (רויטל\shagririm\) וגם בפרסום
+  (pedagogiamh.co.il/shagririm/ → לוגו המינהל הוא logo.png בשורש הרפו).
+  משימה 17 (build_shagririm.py) מעתיקה את קובץ לוגו הקהילה לשורש הרפו.
+
+  לשוניות "ארגז" ו"גלריה" מציגות כאן מציין מקום בכוונה:
+  הן שייכות למשימות 10 ו-15 ולא למשימה הזאת.
+-->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+
+<!-- אייקוני קו SVG בלבד, בלי אימוג'י (סעיף 8 באפיון) -->
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h7a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h7"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M3 8h18v12H3z"/><path d="M9 8V5h6v3M3 13h18"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5L18 18M6 18l2.5-2.5M15.5 8.5L18 6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3.2 2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v4.6"/><path d="M12 15.7v.4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><path d="M12 8.1v.4"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13.5a3.5 3.5 0 0 0 5 0l3-3a3.54 3.54 0 0 0-5-5l-1 1"/><path d="M14 10.5a3.5 3.5 0 0 0-5 0l-3 3a3.54 3.54 0 0 0 5 5l1-1"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5z"/><path d="M14 3.5v5h5"/></symbol>
+  <symbol id="i-keypad" viewBox="0 0 24 24"><rect x="4" y="3.5" width="16" height="17" rx="2.5"/><path d="M8 8h.01M12 8h.01M16 8h.01M8 12h.01M12 12h.01M16 12h.01M8 16h.01M12 16h.01M16 16h.01"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4"/><path d="M6 4.5h10l-1.6 3.8L16 12H6"/></symbol>
+</svg>
+
+<div class="sh-app">
+
+  <!-- פס עליון: לוגו הקהילה (סעיף 8: לוגו הקהילה בראש) -->
+  <header class="sh-bar">
+    <img class="sh-mark" src="assets/logo-kehila.png" alt="קהילת שגרירי חדשנות טכנולוגית" width="34" height="34">
+    <div class="sh-who">
+      <b>שגרירי חדשנות</b>
+      <small id="sh-track">סביבת הלמידה</small>
+    </div>
+    <!-- מתג העברית/ערבית של משימה 16 נכנס לכאן, בלי לגעת בשאר הדף -->
+    <div id="sh-lang-slot"></div>
+  </header>
+
+  <main class="sh-scr" id="sh-scr">
+
+    <!-- מצב טעינה / שגיאה / אין נתונים. home.js מחליף את התוכן. -->
+    <div class="sh-pane sh-state" id="sh-boot">
+      <div class="sh-mark" id="sh-boot-mark"></div>
+      <h2 id="sh-boot-title">רגע, טוענים את הסביבה</h2>
+      <p id="sh-boot-text">אם זה לוקח יותר מכמה שניות — כדאי לרענן את הדף.</p>
+      <button class="sh-btn" id="sh-boot-retry" hidden>נסו שוב</button>
+    </div>
+
+    <!-- ===================== בית ===================== -->
+    <div class="sh-pane" id="pane-home" hidden>
+
+      <!-- ביום מפגש בלבד: קוד הנוכחות בראש הבית, בלי ניווט (סעיף 3.1).
+           השרת הוא זה שמחליט שהיום יום מפגש. -->
+      <section class="sh-live" id="sh-attend" hidden aria-labelledby="sh-attend-h"></section>
+
+      <section class="sh-hero" id="sh-hero">
+        <div class="sh-hi" id="sh-greet"></div>
+        <div class="sh-ringwrap">
+          <svg id="sh-ring" viewBox="0 0 200 200" role="img" aria-label="טבעת ההתקדמות, 10 מפגשים"></svg>
+          <div class="sh-center">
+            <div class="sh-big" id="sh-ringnum" translate="no">0<small>/10</small></div>
+            <div class="sh-lbl" id="sh-ringlbl">מפגשים מאחורייך</div>
+          </div>
+        </div>
+        <div id="sh-next"></div>
+      </section>
+
+      <div class="sh-sec"><h2 id="sh-step-h">הצעד הבא שלך</h2><span class="sh-note" id="sh-step-note"></span></div>
+      <div id="sh-step"></div>
+
+      <div class="sh-sec"><h2>הדרך לגמול</h2><span class="sh-note">מתעדכן אחרי כל מפגש</span></div>
+      <div class="sh-stats" id="sh-stats"></div>
+      <p class="sh-note" id="sh-stats-note" style="margin:8px 3px 0;font-size:12px;color:var(--muted)"></p>
+    </div>
+
+    <!-- ===================== המסע ===================== -->
+    <div class="sh-pane" id="pane-path" hidden>
+      <div class="sh-sec big"><h2>המסע</h2><span class="sh-note" id="sh-path-note"></span></div>
+      <div id="sh-path"></div>
+    </div>
+
+    <!-- ===================== דף מפגש ===================== -->
+    <div class="sh-pane" id="pane-session" hidden>
+      <button class="sh-back" id="sh-session-back"><svg class="sh-ico s"><use href="#i-back"/></svg>חזרה למסע</button>
+      <div id="sh-session"></div>
+    </div>
+
+    <!-- ===================== ארגז / תיק — משימה 10 ===================== -->
+    <div class="sh-pane" id="pane-box" hidden>
+      <div class="sh-sec big"><h2 id="sh-box-h">ארגז הכלים שלי</h2></div>
+      <div class="sh-soon">
+        <div class="sh-mark"><svg class="sh-ico" style="width:36px;height:36px"><use href="#i-box"/></svg></div>
+        <h2>נפתח בשלב הבא</h2>
+        <p id="sh-box-p">שבעת חלקי המטלה, המחוון והמשוב של מיטל ייפתחו כאן לקראת ההגשות הראשונות.</p>
+      </div>
+    </div>
+
+    <!-- ===================== גלריה — משימה 15 ===================== -->
+    <div class="sh-pane" id="pane-gal" hidden>
+      <div class="sh-sec big"><h2>גלריית השגרירים</h2></div>
+      <div class="sh-soon">
+        <div class="sh-mark"><svg class="sh-ico" style="width:36px;height:36px"><use href="#i-spark"/></svg></div>
+        <h2>נפתח בשלב הבא</h2>
+        <p>גלריית התוצרים של שני המסלולים תיפתח אחרי ההגשות הראשונות, ורק בהסכמה מפורשת של מי שיצר/ה את התוצר.</p>
+      </div>
+    </div>
+
+    <div class="sh-credit">
+      שגרירי חדשנות טכנולוגית · משרד העבודה, מינהל הכשרה מקצועית<br>
+      נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a>
+    </div>
+  </main>
+
+  <!-- פס קבוע: לוקאפ המינהל מעל הניווט (סעיף 8, נייד) -->
+  <div class="sh-bottom">
+    <div class="sh-bottom-in">
+      <div class="sh-gov"><img src="assets/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית" height="26"></div>
+      <nav class="sh-tabs" id="sh-tabs" aria-label="ניווט ראשי">
+        <div class="sh-pill" id="sh-pill" aria-hidden="true"></div>
+        <button type="button" data-goto="home" aria-current="page"><svg class="sh-ico"><use href="#i-home"/></svg>בית</button>
+        <button type="button" data-goto="path"><svg class="sh-ico"><use href="#i-route"/></svg>המסע</button>
+        <button type="button" data-goto="box"><svg class="sh-ico"><use href="#i-box"/></svg>ארגז</button>
+        <button type="button" data-goto="gal"><svg class="sh-ico"><use href="#i-spark"/></svg>גלריה</button>
+      </nav>
+    </div>
+  </div>
+
+</div>
+
+<script src="assets/auth.js"></script>
+<script src="assets/attend.js"></script>
+<script src="assets/home.js"></script>
+</body>
+</html>

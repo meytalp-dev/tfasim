@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>היום · שגרירי חדשנות טכנולוגית</title>
+<!--
+  מסך "היום" של מיטל. משימה 5 באפיון (סעיפים 3.2 ו-5.1).
+  העיצוב מהמוק-אפ המאושר: רויטל\מוקאפ-מודול-שגרירי-חדשנות-v2.html, תצוגת "הצוות".
+
+  אין בקובץ הזה מפתח, שם, בית ספר או מייל. המפתח של מיטל מגיע בכתובת
+  (?key=...), נשמר בדפדפן שלה, ונמחק מסרגל הכתובת מיד — שלא יופיע
+  בהיסטוריה, בצילום מסך או בשיתוף מסך בזום.
+
+  הדף אינו מקושר מהתפריט, noindex, ומוחרג מ-build-search ומ-build-knowledge.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/team.css">
+</head>
+<body>
+
+<!-- אייקוני קו SVG בלבד, בלי אימוג'י (סעיף 8 באפיון) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M10.5 9l5 3-5 3z"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+</svg>
+
+<header class="top">
+  <div class="top-in">
+    <!-- לוגו הקהילה. אם התמונה עוד לא הועתקה לתיקיית האתר, נשארת טבעת
+         10 המקטעים מהלוגו כסימן — המוטיב שחוזר בכל המודול. -->
+    <span class="mark">
+      <img src="assets/logo-kehila.png" alt="שגרירי חדשנות טכנולוגית" width="240" height="80"
+           onerror="this.hidden=true;var r=document.getElementById('mark-ring');if(r)r.hidden=false">
+      <!-- טבעת 10 המקטעים מלוגו הקהילה: מקטע לכל מפגש. המוטיב שחוזר
+           בכל מקום שיש בו התקדמות (סעיף 8 באפיון). -->
+      <svg id="mark-ring" class="ring" viewBox="0 0 100 100" width="38" height="38" fill="none"
+           stroke="currentColor" stroke-width="8" stroke-linecap="round"
+           role="img" aria-label="שגרירי חדשנות טכנולוגית" hidden>
+        <path d="M 51.6 12.0 A 38 38 0 0 1 71.0 18.3"/>
+        <path d="M 73.6 20.2 A 38 38 0 0 1 85.6 36.8"/>
+        <path d="M 86.6 39.8 A 38 38 0 0 1 86.6 60.2"/>
+        <path d="M 85.6 63.2 A 38 38 0 0 1 73.6 79.8"/>
+        <path d="M 71.0 81.7 A 38 38 0 0 1 51.6 88.0"/>
+        <path d="M 48.4 88.0 A 38 38 0 0 1 29.0 81.7"/>
+        <path d="M 26.4 79.8 A 38 38 0 0 1 14.4 63.2"/>
+        <path d="M 13.4 60.2 A 38 38 0 0 1 13.4 39.8"/>
+        <path d="M 14.4 36.8 A 38 38 0 0 1 26.4 20.2"/>
+        <path d="M 29.0 18.3 A 38 38 0 0 1 48.4 12.0"/>
+      </svg>
+    </span>
+    <h1>היום<small>שגרירי חדשנות טכנולוגית · חדר הבקרה</small></h1>
+    <div class="tracks" id="t-tracks" role="group" aria-label="בחירת מסלול">
+      <button type="button" data-track="כלים" aria-pressed="true">כלים</button>
+      <button type="button" data-track="הובלה" aria-pressed="false">הובלה</button>
+    </div>
+  </div>
+</header>
+
+<main class="stage">
+
+  <!-- שער: המפתח מגיע בכתובת, וכאן אפשר להדביק אותו מחדש -->
+  <section class="gate" id="t-gate" hidden>
+    <h2>הכניסה למסך "היום"</h2>
+    <p>הכניסה היא בקישור האישי שלך. אם הקישור נחתך בדרך, אפשר להדביק כאן
+      את הקישור המלא או את המפתח לבדו.</p>
+    <label>
+      <span class="sr-only" hidden>המפתח או הקישור</span>
+      <input type="text" id="t-keyin" placeholder="הדביקי כאן את הקישור או את המפתח"
+             autocomplete="off" spellcheck="false" dir="ltr">
+    </label>
+    <button type="button" class="go" id="t-keyGo">כניסה</button>
+    <p class="err" id="t-gerr" hidden></p>
+  </section>
+
+  <div id="t-body" hidden>
+
+    <div class="pick">
+      <label for="t-session">מפגש</label>
+      <select id="t-session" aria-label="בחירת מפגש"></select>
+    </div>
+
+    <div class="warn" id="t-warn" hidden></div>
+
+    <div class="bento">
+
+      <!-- הקוד בתוך טבעת הספירה. מתחלף כל חמש דקות, לא כל דקה. -->
+      <section class="tile t-code" aria-labelledby="t-codeh">
+        <h3 id="t-codeh">רישום נוכחות</h3>
+        <div class="cd">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="trk" cx="60" cy="60" r="52"></circle>
+            <circle class="prg" id="t-arc" cx="60" cy="60" r="52"
+                    stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
+          </svg>
+          <!-- הקוד והמספרים מסומנים "לא לתרגום": מתג הערבית מחליף ספרות,
+               והמשתתפים מקלידים את מה שהם רואים (סעיף 8 באפיון). -->
+          <div class="mid" translate="no">
+            <b id="t-code" aria-live="off">— — — —</b>
+            <span id="t-note" translate="yes">טוען…</span>
+          </div>
+        </div>
+        <div class="row">
+          <button type="button" id="t-openBtn">
+            <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round"><use href="#i-play"/></svg>פתיחת רישום</button>
+          <button type="button" id="t-closeBtn" hidden>
+            <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round"><use href="#i-stop"/></svg>סגירת רישום</button>
+        </div>
+      </section>
+
+      <!-- הרשימה החיה: צ'יפים שנדלקים בכל פעם שמישהו נרשם -->
+      <section class="tile t-att" aria-labelledby="t-atth">
+        <h3 id="t-atth">נרשמו עכשיו</h3>
+        <div class="att-h">
+          <b id="t-attH" translate="no">0</b>
+          <span id="t-attS"></span>
+        </div>
+        <div class="t-ok-bar">
+          <button type="button" id="t-okBtn" disabled>
+            <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>
+            <span id="t-okLbl">אישור נוכחות המפגש</span></button>
+          <p id="t-okNote">בלי האישור הנוכחות לא נכתבת לקובץ של שני.</p>
+        </div>
+        <div class="people" id="t-people" role="group" aria-label="משתתפי המסלול"></div>
+        <p class="legend">כחול = נרשם/ה · מסגרת כתומה = בסיכון · לחיצה על שם פותחת סימון ידני</p>
+      </section>
+
+      <!-- ארבעה מספרים -->
+      <div class="t-k">
+        <div class="k"><b id="t-nReg" translate="no">0</b><span>נרשמו</span><em>במפגש הנבחר</em></div>
+        <div class="k q"><b id="t-nRev" translate="no">0</b><span>ממתין לבדיקה</span><em>תור ההגשות נבנה במשימה 11</em></div>
+        <div class="k o"><b id="t-nRisk" translate="no">0</b><span>בסיכון</span><em id="t-riskNote"></em></div>
+        <div class="k q"><b id="t-nSync" translate="no">0</b><span>מפגשים שסונכרנו</span><em>הסנכרון לקובץ של שני נבנה במשימה 7</em></div>
+      </div>
+
+      <!-- מי עוד לא נרשם + כפתור העתקת תזכורת -->
+      <section class="tile t-miss" aria-labelledby="t-missH">
+        <div class="miss-h">
+          <h3 id="t-missH">מי עוד לא נרשם</h3>
+          <button type="button" class="btn-copy" id="t-copy">
+            <svg class="ico" width="18" height="18" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-copy"/></svg>העתקת תזכורת</button>
+        </div>
+        <ul class="miss" id="t-miss"></ul>
+        <p class="legend">התזכורת נשלחת במייל בלבד, מ-mlypeleg@gmail.com. לא הפצה המונית בוואטסאפ (סעיף 7 באפיון).</p>
+      </section>
+
+      <!-- משימה 6: הצלבה מול דוח הזום. הקובץ נקרא בדפדפן ולא נשלח לשרת. -->
+      <section class="tile t-zoom" aria-labelledby="t-zoomH">
+        <div class="zm-h">
+          <h3 id="t-zoomH">הצלבה מול דוח הזום</h3>
+          <button type="button" class="zm-btn" id="t-zoomBtn">CSV מזום</button>
+          <p>אחרי המפגש: מייבאים את דוח המשתתפים של המפגש שנבחר למעלה. פער מסומן לבדיקה ולא נמחק.</p>
+        </div>
+        <div class="zm" id="t-zoomBox" hidden></div>
+      </section>
+
+      <!-- סימון ידני: נבנה בזמן ריצה, אחרי לחיצה על שם -->
+      <section class="t-mark" id="t-mark" hidden aria-label="סימון נוכחות ידני"></section>
+
+    </div>
+  </div>
+</main>
+
+<div class="t-toast" id="t-toast" role="status" aria-live="polite"></div>
+
+<footer class="foot">
+  <div class="foot-in">
+    <img src="assets/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית" width="1200" height="420"
+         onerror="this.hidden=true">
+    <span>© מינהל הכשרה מקצועית · שגרירי חדשנות טכנולוגית תשפ״ז</span>
+    <div class="credit">נבנה על ידי
+      <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+  </div>
+</footer>
+
+<script src="assets/auth.js"></script>
+<script src="assets/attend.js"></script>
+<script src="assets/zoom-import.js"></script>
+<script>
+  /* auth.js נטען כאן בשביל fetchJson עם שלושה ניסיונות ו-post, ולא בשביל
+     כניסת משתתפים: הכניסה לדף הזה היא במפתח של מיטל. ensure() לא נקרא. */
+  SH_team.start({ tracks: ["כלים", "הובלה"] });
+  SH_zoom.start();
+</script>
+</body>
+</html>
