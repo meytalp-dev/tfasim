@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>לפני המפגש · בינה מלאכותית למפקחים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><rect x='4' y='7' width='16' height='13' rx='3'/><path d='M12 3v4M9 13h.01M15 13h.01'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --sky-soft:#e7f4fc; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before,body::after{content:"";position:fixed;border-radius:50%;filter:blur(70px);z-index:0;pointer-events:none}
+body::before{width:52vw;height:52vw;top:-18vw;inset-inline-start:-14vw;
+  background:radial-gradient(circle,rgba(116,195,237,.40),transparent 70%)}
+body::after{width:46vw;height:46vw;bottom:-16vw;inset-inline-end:-12vw;
+  background:radial-gradient(circle,rgba(24,92,255,.18),transparent 70%)}
+.wrap{max-width:700px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy));
+  position:relative;z-index:2}
+.site{padding:24px 0 4px;position:relative;z-index:1}
+.site .wrap{display:flex;align-items:center;justify-content:center}
+.logo{height:60px;width:auto;display:block}
+@media (max-width:480px){.logo{height:48px}}
+
+.hero{text-align:center;padding:20px 0 4px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+  box-shadow:var(--shadow-s);border-radius:999px;padding:7px 18px;font-size:14.5px;font-weight:700;color:var(--navy)}
+.eyebrow svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(29px,6.2vw,42px);line-height:1.16;margin:16px 0 12px;
+  font-weight:700;letter-spacing:-.02em;
+  background:linear-gradient(100deg,var(--navy) 10%,var(--blue) 55%,var(--sky) 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lede{font-size:18.5px;color:#3d4a70;max-width:46ch;margin:0 auto}
+.hero .lede b{color:var(--navy)}
+
+.livebar{display:flex;align-items:center;justify-content:center;gap:9px;margin-top:16px;
+  font-size:15px;color:var(--muted);opacity:0;transition:opacity .5s var(--ease)}
+.livebar.on{opacity:1}
+.livebar .dot{width:8px;height:8px;border-radius:50%;background:var(--mint);animation:pulse 2.4s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(18,179,159,.45)}70%{box-shadow:0 0 0 9px rgba(18,179,159,0)}100%{box-shadow:0 0 0 0 rgba(18,179,159,0)}}
+.livebar b{color:var(--navy);font-family:'Rubik',sans-serif}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);
+  padding:32px;margin-top:24px}
+@media (max-width:560px){.card{padding:22px 18px}}
+
+.q{margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+.q:first-of-type{margin-top:0;padding-top:0;border-top:0}
+.qhead{display:flex;align-items:flex-start;gap:12px;margin-bottom:10px}
+.qnum{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--navy);
+  font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.qtext{font-family:'Rubik',sans-serif;font-size:20.5px;color:var(--navy);font-weight:600;line-height:1.35}
+.qtext .req{color:var(--blue)}
+.hint{color:var(--muted);font-size:15px;margin:0 0 14px 0;padding-inline-start:42px;line-height:1.5}
+@media (max-width:560px){.hint{padding-inline-start:0}}
+
+input[type=text],textarea{width:100%;padding:14px 16px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease),background .18s var(--ease)}
+textarea{min-height:104px;resize:vertical;line-height:1.55}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+input.bad,textarea.bad{border-color:var(--danger);background:#fff7f8}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:7px}
+.err.on{display:block}
+
+/* ---------- plan cards ---------- */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.plans{grid-template-columns:1fr}}
+.plans input{position:absolute;opacity:0;width:0;height:0}
+.plans label{display:flex;align-items:center;gap:11px;padding:15px 16px;border:2px solid var(--line);
+  border-radius:14px;background:#fbfcff;cursor:pointer;font-weight:600;font-size:16.5px;color:#25325a;
+  transition:border-color .16s var(--ease),background .16s var(--ease),box-shadow .16s var(--ease),color .16s var(--ease)}
+.plans label svg{flex:0 0 auto;width:22px;height:22px;stroke:var(--muted);fill:none;stroke-width:1.9;
+  stroke-linecap:round;stroke-linejoin:round;transition:stroke .16s var(--ease)}
+.plans label:hover{border-color:var(--sky);background:#fff}
+.plans input:checked + label{border-color:var(--blue);background:var(--blue-soft);color:var(--navy);
+  box-shadow:0 0 0 4px rgba(24,92,255,.10)}
+.plans input:checked + label svg{stroke:var(--blue)}
+.plans input:focus-visible + label{outline:3px solid rgba(24,92,255,.4);outline-offset:2px}
+
+/* ---------- submit ---------- */
+.actions{margin-top:32px;padding-top:26px;border-top:1px solid var(--line)}
+.btn{width:100%;padding:17px 22px;border:0;border-radius:16px;cursor:pointer;
+  font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
+  box-shadow:0 8px 22px rgba(24,92,255,.26);transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 28px rgba(24,92,255,.32)}
+.btn:disabled{opacity:.6;cursor:default;transform:none}
+.privacy{margin-top:16px;font-size:14.5px;color:var(--muted);text-align:center;line-height:1.55}
+
+.box{display:none;border-radius:18px;padding:24px;margin-top:22px;text-align:center}
+.box.on{display:block;animation:rise .4s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.box.ok{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1}
+.box.bad{background:#fff7f8;border:1px solid #f4c9ce}
+.box svg{width:42px;height:42px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.box.ok svg{stroke:var(--mint)}
+.box.bad svg{stroke:var(--danger)}
+.box h3{font-family:'Rubik',sans-serif;font-size:22px;margin:10px 0 6px;color:var(--navy)}
+.box p{margin:0;color:#3d4a70;font-size:16.5px}
+.box .again{margin-top:16px;background:#fff;border:2px solid var(--danger);color:var(--danger);
+  border-radius:12px;padding:11px 24px;font-family:inherit;font-weight:700;font-size:16px;cursor:pointer}
+
+.setup{display:none;margin-top:22px;background:#fffaf0;border:1px solid #f0dcb4;border-radius:16px;
+  padding:18px 20px;color:#7a5a12;font-size:15.5px}
+.setup.on{display:block}
+
+footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px;position:relative;z-index:1}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+footer a:hover{text-decoration:underline}
+.helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+  box-shadow:var(--shadow-s);border-radius:999px;padding:10px 20px;font-size:15px;font-weight:600;
+  color:var(--navy);text-decoration:none;margin-bottom:18px;transition:border-color .16s var(--ease),transform .16s var(--ease)}
+.helpbtn:hover{border-color:var(--sky);transform:translateY(-1px);text-decoration:none}
+.helpbtn svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.credit{margin-top:14px;font-size:13.5px;opacity:.85}
+</style>
+</head>
+<body>
+
+<div class="strip"></div>
+
+<header class="site">
+  <div class="wrap">
+    <img class="logo" src="https://pedagogiamh.co.il/logo.png"
+         alt="משרד העבודה — המנהיגות הפדגוגית היוצרת" onerror="this.style.display='none'">
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <span class="eyebrow">
+      <svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/><path d="M12 3v4M9 13h.01M15 13h.01M9 17h6"/></svg>
+      לקראת המפגש על בינה מלאכותית
+    </span>
+    <h1>שלושה משפטים לפני שנתחיל</h1>
+    <p class="lede">במפגש לא נלמד "איך משתמשים בכלי" — <b>נבנה יחד עוזר אישי</b> שיעבוד בשבילך.
+      כדי שהוא יהיה מדויק ולא כללי, צריך לדעת מה באמת מעיק. שלוש דקות.</p>
+    <div class="livebar" id="livebar"><span class="dot"></span>
+      כבר השיבו <b id="liveCount">0</b></div>
+  </section>
+
+  <form class="card" id="form" novalidate>
+
+    <div class="q">
+      <div class="qhead"><span class="qnum">1</span>
+        <span class="qtext">אני מבזבז/ת זמן על…</span></div>
+      <p class="hint">מה אכל לך הכי הרבה זמן בשבועות האחרונים? ככל שתכתבו ספציפי — כך ייצא עוזר שימושי יותר.</p>
+      <textarea id="q1" placeholder="למשל: לקרוא ולהצליב חומרים לפני כל ביקור"></textarea>
+    </div>
+
+    <div class="q">
+      <div class="qhead"><span class="qnum">2</span>
+        <span class="qtext">אני עושה שוב ושוב…</span></div>
+      <p class="hint">משימה שחוזרת אצלכם כמעט אותו דבר בכל פעם. זו בדיוק המשימה שאפשר להפוך לסוכן.</p>
+      <textarea id="q2" placeholder="למשל: כותב/ת סיכום ביקור באותו מבנה בכל פעם"></textarea>
+    </div>
+
+    <div class="q">
+      <div class="qhead"><span class="qnum">3</span>
+        <span class="qtext">הלוואי שמישהו היה עושה עבורי…</span></div>
+      <p class="hint">בלי לחשוב אם זה אפשרי. מה הייתם מעבירים הלאה אם היה לכם עוזר שיושב לידכם?</p>
+      <textarea id="q3" placeholder="למשל: מכין לי את השאלות שכדאי לשאול בכל ביקור"></textarea>
+    </div>
+    <div class="err" id="e_open">נא להשלים לפחות אחד משלושת המשפטים.</div>
+
+    <div class="q">
+      <div class="qhead"><span class="qnum">4</span>
+        <span class="qtext">מה יש לכם היום ב-ChatGPT? <span class="req">*</span></span></div>
+      <p class="hint">שאלה טכנית בלבד — היא קובעת אם במפגש נבנה סוכן מותאם או נעבוד בצ׳אט רגיל.
+        אם אינכם בטוחים, אין בעיה לסמן "לא יודע/ת".</p>
+      <div class="plans" id="plans">
+        <input type="radio" name="plan" id="p_free" value="free">
+        <label for="p_free">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          חשבון חינמי</label>
+
+        <input type="radio" name="plan" id="p_plus" value="plus">
+        <label for="p_plus">
+          <svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.5 6 .9-4.3 4.3 1 6.1-5.3-2.9-5.3 2.9 1-6.1L3.4 9.4l6-.9z"/></svg>
+          מנוי Plus (בתשלום)</label>
+
+        <input type="radio" name="plan" id="p_none" value="none">
+        <label for="p_none">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 8.5 7 7"/></svg>
+          אין לי חשבון</label>
+
+        <input type="radio" name="plan" id="p_unknown" value="unknown">
+        <label for="p_unknown">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.2 2.4c-.5.2-.7.6-.7 1.1v.5M12 16.5h.01"/></svg>
+          לא יודע/ת</label>
+      </div>
+      <div class="err" id="e_plan">נא לבחור אחת מהאפשרויות.</div>
+    </div>
+
+    <div class="q">
+      <div class="qhead"><span class="qnum">5</span>
+        <span class="qtext">שם מלא <span class="req">*</span></span></div>
+      <p class="hint">כדי שנדע מי כבר השיב/ה, ושהעוזר שנבנה במפגש יהיה מותאם לכם אישית.</p>
+      <input type="text" id="name" autocomplete="name" placeholder="שם פרטי ושם משפחה">
+      <div class="err" id="e_name">נא למלא שם מלא.</div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn" id="submitBtn">שליחה</button>
+      <p class="privacy">התשובות נאספות לצורך בניית המפגש בלבד ואינן מפורסמות בשום מקום.</p>
+    </div>
+
+    <div class="box ok" id="okBox">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.6-4.9"/></svg>
+      <h3 id="okTitle">התשובות נקלטו</h3>
+      <p id="okText">תודה — נתראה במפגש.</p>
+    </div>
+
+    <div class="box bad" id="badBox">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <h3>השליחה לא הושלמה</h3>
+      <p id="badText">לא הצלחנו לאמת שהתשובות נקלטו. הן שמורות בדפדפן — אפשר לנסות שוב.</p>
+      <button type="button" class="again" id="retryBtn">נסו שוב</button>
+    </div>
+
+    <div class="setup" id="setup">
+      הטופס עדיין לא חובר לשרת. יש להזין את כתובת ה-API בקוד הדף.
+    </div>
+
+  </form>
+</main>
+
+<footer>
+  <a class="helpbtn" href="mailto:mlypeleg@gmail.com?subject=%D7%A0%D7%AA%D7%A7%D7%9C%D7%AA%D7%99%20%D7%91%D7%91%D7%A2%D7%99%D7%94%20-%20%D7%A9%D7%90%D7%9C%D7%95%D7%9F%20AI">
+    <svg viewBox="0 0 24 24"><path d="M4 5h16v12H8l-4 3z"/><path d="M12 9v3M12 14h.01"/></svg>
+    נתקלתם בבעיה? שלחו הודעה
+  </a>
+  <div>משרד העבודה · מינהל הכשרה מקצועית — המנהיגות הפדגוגית היוצרת</div>
+  <div class="credit">נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</footer>
+
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbwyd-ZxxoyXIJW93VXlgejCSx0z9pa7z-yKNHtmbAMiZxnAKlPqN_G_B4yPfjo9whJFDA/exec";
+var PENDING_KEY = "seker-ai-pending";
+function $(id){ return document.getElementById(id); }
+
+/* ---------- מונה חי ---------- */
+function loadCount(target){
+  if (!API_URL) return Promise.resolve(null);
+  return fetch(API_URL + "?mode=count")
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if (!j || !j.ok) return null;
+      if (target) target.textContent = j.count;
+      return j.count;
+    })
+    .catch(function(){ return null; });
+}
+(function(){
+  if (!API_URL){ $("setup").classList.add("on"); return; }
+  loadCount($("liveCount")).then(function(c){
+    if (c !== null && c > 0) $("livebar").classList.add("on");
+  });
+})();
+
+/* ---------- שחזור טיוטה ---------- */
+(function(){
+  try{
+    var raw = localStorage.getItem(PENDING_KEY);
+    if (raw){
+      var d = JSON.parse(raw);
+      ["q1","q2","q3"].forEach(function(k){ if (d[k]) $(k).value = d[k]; });
+      if (d.plan){ var el = $("p_" + d.plan); if (el) el.checked = true; }
+      if (d.name) $("name").value = d.name;
+    }
+    var saved = localStorage.getItem("seker-ai-name");
+    if (saved && !$("name").value) $("name").value = saved;
+  }catch(e){}
+})();
+
+/* ---------- איסוף וולידציה ---------- */
+function collect(){
+  var picked = document.querySelector('input[name="plan"]:checked');
+  return {
+    type: "seker-ai-mefakchim",
+    name: $("name").value.trim(),
+    q1:   $("q1").value.trim(),
+    q2:   $("q2").value.trim(),
+    q3:   $("q3").value.trim(),
+    plan: picked ? picked.value : ""
+  };
+}
+
+function validate(d){
+  var openOk = !!(d.q1 || d.q2 || d.q3);
+  var planOk = !!d.plan;
+  var nameOk = d.name.length >= 2;
+
+  $("e_open").classList.toggle("on", !openOk);
+  ["q1","q2","q3"].forEach(function(k){ $(k).classList.toggle("bad", !openOk); });
+  $("e_plan").classList.toggle("on", !planOk);
+  $("e_name").classList.toggle("on", !nameOk);
+  $("name").classList.toggle("bad", !nameOk);
+
+  if (!openOk || !planOk || !nameOk){
+    var first = document.querySelector(".err.on");
+    if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
+    return false;
+  }
+  return true;
+}
+
+/* ---------- שליחה ---------- */
+function send(d){
+  if (!API_URL) return Promise.resolve({ok:false, error:"no_api"});
+  return fetch(API_URL, {
+    method: "POST",
+    headers: {"Content-Type":"text/plain;charset=utf-8"},
+    body: JSON.stringify(d)
+  }).then(function(r){ return r.json(); })
+    .catch(function(){ return {ok:false, error:"network"}; });
+}
+
+function show(which){
+  $("okBox").classList.toggle("on",  which === "ok");
+  $("badBox").classList.toggle("on", which === "bad");
+}
+
+function submit(){
+  var d = collect();
+  if (!validate(d)) return;
+
+  try{
+    localStorage.setItem(PENDING_KEY, JSON.stringify(d));
+    localStorage.setItem("seker-ai-name", d.name);
+  }catch(e){}
+
+  var btn = $("submitBtn");
+  btn.disabled = true;
+  btn.textContent = "שולח…";
+  show("");
+
+  send(d).then(function(r){
+    btn.textContent = "שליחה";
+    btn.disabled = false;
+
+    if (r && r.ok){
+      try{ localStorage.removeItem(PENDING_KEY); }catch(e){}
+      $("okTitle").textContent = r.updated ? "התשובות עודכנו" : "התשובות נקלטו";
+      $("okText").textContent  = "תודה, " + d.name.split(" ")[0] + " — נתראה במפגש.";
+      show("ok");
+      $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
+      loadCount($("liveCount")).then(function(c){
+        if (c !== null && c > 0) $("livebar").classList.add("on");
+      });
+    } else {
+      $("badText").textContent = (r && r.error === "no_api")
+        ? "הטופס עדיין לא חובר לשרת. אנא פנו למנהלת המערכת."
+        : "לא הצלחנו לאמת שהתשובות נקלטו. הן שמורות בדפדפן — אפשר לנסות שוב.";
+      show("bad");
+      $("badBox").scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  });
+}
+
+$("form").addEventListener("submit", function(ev){ ev.preventDefault(); submit(); });
+$("retryBtn").addEventListener("click", submit);
+["q1","q2","q3"].forEach(function(k){
+  $(k).addEventListener("input", function(){
+    $(k).classList.remove("bad"); $("e_open").classList.remove("on");
+  });
+});
+$("name").addEventListener("input", function(){
+  $("name").classList.remove("bad"); $("e_name").classList.remove("on");
+});
+$("plans").addEventListener("change", function(){ $("e_plan").classList.remove("on"); });
+</script>
+</body>
+</html>
