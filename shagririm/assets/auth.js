@@ -240,6 +240,16 @@
     ".shauth-foot{margin-top:16px;padding-top:12px;border-top:1px solid #eee7d8;font-size:.78rem;color:#7b8a96;line-height:1.6}",
     ".shauth-foot a{color:var(--sh-orange)}",
     ".shauth-note{font-size:.85rem;color:#6d7f8c;margin:10px 0 0}",
+    /* שדה הדבקת המפתח. שונה מ-shauth-code: הקישור ארוך, ולכן טקסט רגיל
+       בלי ריווח אותיות, ובגודל שמאפשר לראות מה הודבק. */
+    ".shauth-alt{margin:16px 0 0;padding-top:14px;border-top:1px solid #eee7d8;text-align:right}",
+    ".shauth-alt label{display:block;font-size:.85rem;font-weight:700;color:var(--sh-navy);margin:0 0 6px}",
+    ".shauth-key{width:100%;box-sizing:border-box;padding:11px 12px;border:2px solid #cfd8e0;",
+    "border-radius:12px;background:#fbfaf6;color:var(--sh-navy);min-height:44px;",
+    "font:400 .95rem/1.4 Assistant,Arial,sans-serif;direction:ltr;text-align:left;unicode-bidi:plaintext}",
+    ".shauth-key:focus{border-color:var(--sh-blue);outline:none;box-shadow:0 0 0 4px rgba(29,111,165,.14)}",
+    ".shauth-key.bad{border-color:#b3261e}",
+    ".shauth-alt .shauth-btn{margin-top:8px}",
     "@media (max-width:380px){.shauth-card{padding:20px 14px 14px}.shauth h2{font-size:1.1rem}}"
   ].join("");
 
@@ -291,12 +301,70 @@
     );
   }
 
-  function fatal(title, text, retry) {
+  /* חילוץ המפתח מכל מה שאפשר להדביק: הקישור המלא, רק החלק אחרי ?t=,
+     או המפתח לבדו. מי שמגיע לכאן איבד את ההודעה, ולא סביר לצפות שידע
+     איזה חלק מהקישור להעתיק. */
+  function keyFrom(text) {
+    var s = String(text || "").trim();
+    if (!s) return "";
+    var m = s.match(/[?&#]t=([^&#\s]+)/i);
+    if (m) { try { s = decodeURIComponent(m[1]); } catch (e) { s = m[1]; } }
+    s = s.replace(/^["'<]+|["'>]+$/g, "").trim();
+    return /^[A-Za-z0-9_-]{6,80}$/.test(s) ? s : "";
+  }
+
+  /* תיבת "יש לי את הקוד". בלעדיה מי שאיבד את ההודעה בוואטסאפ נתקע
+     במסך הסבר בלי שום דרך פעולה, וכל פנייה כזאת מגיעה למיטל ידנית. */
+  function keyBox(label) {
+    return '<div class="shauth-alt">' +
+      '<label for="shauth-key">' + (label || "יש לך את הקוד? אפשר להדביק כאן") + "</label>" +
+      '<input id="shauth-key" class="shauth-key" type="text" autocomplete="off" ' +
+      'spellcheck="false" placeholder="הקישור המלא או הקוד בלבד">' +
+      '<p class="shauth-msg" id="shauth-keymsg"></p>' +
+      '<button class="shauth-btn" id="shauth-keygo">' + IC.send + " כניסה</button>" +
+      "</div>";
+  }
+
+  function wireKeyBox() {
+    var inp = d.getElementById("shauth-key");
+    var btn = d.getElementById("shauth-keygo");
+    var msg = d.getElementById("shauth-keymsg");
+    if (!inp || !btn) return;
+
+    function go() {
+      var k = keyFrom(inp.value);
+      if (!k) {
+        inp.classList.add("bad");
+        if (msg) { msg.className = "shauth-msg bad"; msg.textContent = "לא זיהינו קוד. אפשר להדביק את הקישור המלא מההודעה."; }
+        inp.focus();
+        return;
+      }
+      inp.classList.remove("bad");
+      if (msg) { msg.className = "shauth-msg"; msg.textContent = "רגע…"; }
+      btn.disabled = true;
+      /* נטענים מחדש עם המפתח בכתובת, ולא מזריקים אותו לזיכרון: כך הכתובת
+         שבדפדפן היא הקישור האישי, ושמירה במועדפים עובדת. */
+      var base = w.location.href.split("#")[0].split("?")[0];
+      w.location.replace(base + "?t=" + encodeURIComponent(k));
+    }
+
+    btn.addEventListener("click", go);
+    inp.addEventListener("keydown", function (ev) {
+      if (ev.key === "Enter") { ev.preventDefault(); go(); }
+    });
+    inp.addEventListener("input", function () {
+      inp.classList.remove("bad");
+      if (msg) msg.textContent = "";
+    });
+  }
+
+  function fatal(title, text, retry, withKey) {
     card(
       '<div class="shauth-mark" style="color:var(--sh-orange)">' + IC.alert + "</div>" +
       "<h2>" + title + "</h2>" +
       "<p>" + text + "</p>" +
       (retry ? '<button class="shauth-btn" id="shauth-retry">' + IC.back + " נסו שוב</button>" : "") +
+      (withKey ? keyBox(withKey === true ? null : withKey) : "") +
       '<p class="shauth-note">אם זה חוזר — אפשר לכתוב ל<a href="mailto:' + SUPPORT +
       '?subject=' + encodeURIComponent("כניסה לסביבת שגרירי חדשנות") + '">מיטל</a>.</p>'
     );
@@ -304,6 +372,7 @@
       var b = d.getElementById("shauth-retry");
       if (b) b.addEventListener("click", retry);
     }
+    if (withKey) wireKeyBox();
   }
 
   /* ------------------------------------------------------------------ */
@@ -499,7 +568,7 @@
       if (!TOKEN) {
         fatal("צריך את הקישור האישי",
           "הכניסה לסביבת הלמידה היא דרך הקישור האישי שנשלח אליך בוואטסאפ או במייל. " +
-          "הוא נראה כך: <span dir=\"ltr\" translate=\"no\">/shagririm/?t=…</span>", null);
+          "הוא נראה כך: <span dir=\"ltr\" translate=\"no\">/shagririm/?t=…</span>", null, true);
         reject(new Error("notoken"));
         return;
       }
@@ -510,7 +579,7 @@
         if (!r || r.ok !== true) {
           var e = r && r.error;
           if (e === "badkey") {
-            fatal("הקישור לא זוהה", errText("badkey"), null);
+            fatal("הקישור לא זוהה", errText("badkey"), null, "להדביק שוב את הקישור או את הקוד");
           } else {
             fatal("השרת לא ענה", errText(e || "server"), function () {
               pending = null;
