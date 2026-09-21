@@ -324,9 +324,15 @@
     if (aState && aState.prev && aState.prev.focus) { try { aState.prev.focus(); } catch (e) { /* הוסר מה-DOM */ } }
   }
 
-  /* SH_attend.open(n) — הקריאה שמסך הבית של משימה 4 עושה ביום מפגש */
+  /* SH_attend.open(n, {code}) — הקריאה שמסך הבית של משימה 4 עושה ביום מפגש.
+
+     opts.code הוא מה שכבר הוקלד במסך הבית. בלעדיו קרה הדבר הבא: המשתתף
+     הקליד את הקוד בשדה שבמסך הבית, לחץ "שליחה", וכאן נפתח חלון שני עם
+     לוח ספרות ריק — כי typed אופס. מבחינתו הוא הקליד והמערכת ביקשה שוב,
+     ושום בקשה לא נשלחה לשרת. נמצא בחזרה היבשה של מיטל, 21.9.26. */
   function aOpen(num, opts) {
     var n = Number(digits(num));
+    var pre = digits((opts && opts.code) || "").substring(0, CODE_LEN);
     aBuild();
     aState = {
       num: n,
@@ -341,7 +347,15 @@
     aBusy(false);
     aRender();
     aMsg("");
-    if (!n) aMsg(errText("nonum"), true);
+    if (!n) { aMsg(errText("nonum"), true); return; }
+
+    /* קוד שכבר הוקלד במסך הבית: ממשיכים ממנו. שלם — נשלח מיד ולא
+       מבקשים מהמשתתף להקליד פעם שנייה. חלקי — מוצג בלוח כדי שישלים. */
+    if (pre) {
+      aSet(pre);
+      if (pre.length === CODE_LEN) { aSend(); return; }
+    }
+
     var first = el("shatt-pad").getElementsByTagName("button")[0];
     if (first) first.focus();
   }

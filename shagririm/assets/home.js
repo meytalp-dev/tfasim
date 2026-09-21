@@ -529,9 +529,14 @@
       return;
     }
 
+    /* מעבירים הלאה את מה שכבר הוקלד כאן. בלי זה נפתח חלון קוד שני ריק
+       והמשתתף התבקש להקליד שוב — נמצא בחזרה היבשה 21.9.26. */
     function hand() {
+      var typed = "";
+      try { typed = el("sh-attend-code").value || ""; } catch (e0) { typed = ""; }
       try {
-        w.SH_attend.open(s.num);
+        w.SH_attend.open(s.num, { code: typed });
+        try { el("sh-attend-code").value = ""; } catch (e1) { /* לא קריטי */ }
       } catch (e) {
         el("sh-attend-msg").textContent = "רישום הנוכחות ייפתח כאן";
       }
