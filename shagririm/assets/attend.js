@@ -437,11 +437,13 @@
       drawRing(0, 1);
       el("t-openBtn").hidden = false;
       el("t-closeBtn").hidden = true;
+      el("t-copyCode").hidden = true;
       return;
     }
 
     el("t-openBtn").hidden = true;
     el("t-closeBtn").hidden = false;
+    el("t-copyCode").hidden = false;
     ttl.textContent = "רישום נוכחות · מפגש " + c.session;
     bigEl.textContent = c.code || "";
 
@@ -668,6 +670,46 @@
     lines.push("הרישום נעשה במודול, בקוד שמוצג בזום. הקוד מתחלף כל חמש דקות,");
     lines.push("והקוד הקודם ממשיך להתקבל, כך שאין לחץ אם הוא התחלף בדיוק עכשיו.");
     return lines.join("\n");
+  }
+
+  /* הודעה מוכנה לצ'אט הזום. מיטל ביקשה (21.9): הרכזים לא יודעים לבד
+     לאן להקליד את הקוד, והיא הסבירה את זה בעל פה לכל אחד בנפרד.
+     הקוד מתחלף כל חמש דקות, ולכן ההודעה נבנית מהקוד שמוצג ברגע ההעתקה. */
+  function zoomChatText() {
+    var c = T.code || {};
+    if (!c.open || !c.code) return "";
+    return "רישום נוכחות למפגש " + c.session + ":\n" +
+      "פתחו את הקישור האישי שקיבלתם בוואטסאפ או במייל,\n" +
+      "ובראש המסך הקלידו את הקוד: " + c.code + "\n" +
+      "הקוד מתחלף כל " + (Number(c.codeMinutes) || 5) + " דקות.";
+  }
+
+  function copyText_(text, okMsg) {
+    if (!text) return;
+    function fallback() {
+      var ta = d.createElement("textarea");
+      ta.value = text;
+      ta.setAttribute("readonly", "readonly");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      d.body.appendChild(ta);
+      ta.select();
+      var ok = false;
+      try { ok = d.execCommand("copy"); } catch (e) { ok = false; }
+      d.body.removeChild(ta);
+      toast(ok ? okMsg : "ההעתקה נחסמה. לסמן את הטקסט ולהעתיק ביד.", !ok);
+    }
+    if (w.navigator && w.navigator.clipboard && w.navigator.clipboard.writeText) {
+      w.navigator.clipboard.writeText(text).then(function () { toast(okMsg); }).catch(fallback);
+    } else {
+      fallback();
+    }
+  }
+
+  function copyZoomChat() {
+    var t = zoomChatText();
+    if (!t) { toast("אין קוד פעיל. לפתוח רישום קודם.", true); return; }
+    copyText_(t, "ההודעה הועתקה · אפשר להדביק בצ׳אט הזום");
   }
 
   function copyReminder() {
@@ -904,6 +946,7 @@
     el("t-closeBtn").addEventListener("click", closeReg);
     el("t-okBtn").addEventListener("click", approveMeeting);
     el("t-copy").addEventListener("click", copyReminder);
+    el("t-copyCode").addEventListener("click", copyZoomChat);
     el("t-session").addEventListener("change", function () {
       bump();
       T.sel = Number(el("t-session").value);

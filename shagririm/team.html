@@ -91,19 +91,30 @@
       <!-- הקוד בתוך טבעת הספירה. מתחלף כל חמש דקות, לא כל דקה. -->
       <section class="tile t-code" aria-labelledby="t-codeh">
         <h3 id="t-codeh">רישום נוכחות</h3>
-        <div class="cd">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="trk" cx="60" cy="60" r="52"></circle>
-            <circle class="prg" id="t-arc" cx="60" cy="60" r="52"
-                    stroke-dasharray="326.7" stroke-dashoffset="326.7"></circle>
-          </svg>
-          <!-- הקוד והמספרים מסומנים "לא לתרגום": מתג הערבית מחליף ספרות,
-               והמשתתפים מקלידים את מה שהם רואים (סעיף 8 באפיון). -->
-          <div class="mid" translate="no">
-            <b id="t-code" aria-live="off">— — — —</b>
-            <span id="t-note" translate="yes">טוען…</span>
-          </div>
+        <!-- הקוד והמספרים מסומנים "לא לתרגום": מתג הערבית מחליף ספרות,
+             והמשתתפים מקלידים את מה שהם רואים (סעיף 8 באפיון).
+
+             21.9.26: הקוד היה במרכז טבעת, והשורה שמתחתיו נחצתה פיזית על ידי
+             קשת ההתקדמות. זה המספר שמיטל מקריאה ל-33 איש בזום — הוא צריך
+             להיות גדול ונקי. השעון ירד לקו דק מתחתיו.
+             ל-line יש pathLength=326.7 שזהה להיקף הטבעת הקודמת, ולכן
+             drawRing ב-attend.js ממשיך לעבוד בלי שינוי. -->
+        <div class="cd2" translate="no">
+          <b id="t-code" aria-live="off">— — — —</b>
         </div>
+        <svg class="cd-bar" viewBox="0 0 326.7 8" preserveAspectRatio="none" aria-hidden="true">
+          <line class="trk" x1="4" y1="4" x2="322.7" y2="4"></line>
+          <line class="prg" id="t-arc" x1="4" y1="4" x2="322.7" y2="4"
+                pathLength="326.7" stroke-dasharray="326.7" stroke-dashoffset="326.7"></line>
+        </svg>
+        <span class="cd-note" id="t-note" translate="yes">טוען…</span>
+
+        <!-- משפט מוכן להדבקה בצ'אט הזום. מיטל ביקשה (21.9): הרכזים לא
+             יודעים לבד לאן להקליד, והיא הסבירה זאת בעל פה לכל אחד. -->
+        <button type="button" class="cd-copy" id="t-copyCode" hidden>
+          <svg class="ico" width="17" height="17" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-copy"/></svg>
+          העתקת הודעה לצ׳אט הזום</button>
         <div class="row">
           <button type="button" id="t-openBtn">
             <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
@@ -121,13 +132,6 @@
           <b id="t-attH" translate="no">0</b>
           <span id="t-attS"></span>
         </div>
-        <div class="t-ok-bar">
-          <button type="button" id="t-okBtn" disabled>
-            <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
-                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>
-            <span id="t-okLbl">אישור נוכחות המפגש</span></button>
-          <p id="t-okNote">בלי האישור הנוכחות לא נכתבת לקובץ של שני.</p>
-        </div>
         <div class="people" id="t-people" role="group" aria-label="משתתפי המסלול"></div>
         <p class="legend">כחול = נרשם/ה · מסגרת כתומה = בסיכון · לחיצה על שם פותחת סימון ידני</p>
       </section>
@@ -135,9 +139,9 @@
       <!-- ארבעה מספרים -->
       <div class="t-k">
         <div class="k"><b id="t-nReg" translate="no">0</b><span>נרשמו</span><em>במפגש הנבחר</em></div>
-        <div class="k q"><b id="t-nRev" translate="no">0</b><span>ממתין לבדיקה</span><em>תור ההגשות נבנה במשימה 11</em></div>
+        <div class="k q"><b id="t-nRev" translate="no">0</b><span>ממתין לבדיקה</span><em>בקרוב</em></div>
         <div class="k o"><b id="t-nRisk" translate="no">0</b><span>בסיכון</span><em id="t-riskNote"></em></div>
-        <div class="k q"><b id="t-nSync" translate="no">0</b><span>מפגשים שסונכרנו</span><em>הסנכרון לקובץ של שני נבנה במשימה 7</em></div>
+        <div class="k q"><b id="t-nSync" translate="no">0</b><span>מפגשים שסונכרנו</span><em>לקובץ של אלנט</em></div>
       </div>
 
       <!-- מי עוד לא נרשם + כפתור העתקת תזכורת -->
@@ -160,6 +164,22 @@
           <p>אחרי המפגש: מייבאים את דוח המשתתפים של המפגש שנבחר למעלה. פער מסומן לבדיקה ולא נמחק.</p>
         </div>
         <div class="zm" id="t-zoomBox" hidden></div>
+      </section>
+
+      <!-- אישור הנוכחות — הפעולה האחרונה של המפגש, ולכן היא בסוף העמוד.
+           עד 21.9 הכפתור הכתום ישב בראש המסך והיה הדבר הרועש ביותר בו,
+           בזמן שהוא הדבר האחרון שעושים. הסדר בעמוד הוא עכשיו סדר העבודה:
+           פתיחת רישום ← מי נרשם ← מי חסר ← הצלבת זום ← אישור.
+           השרת ממילא חוסם אישור לפני ייבוא הדוח. -->
+      <section class="tile t-ok" aria-labelledby="t-okH">
+        <h3 id="t-okH">סיום המפגש</h3>
+        <div class="t-ok-bar">
+          <button type="button" id="t-okBtn" disabled>
+            <svg class="ico" width="19" height="19" fill="none" stroke="currentColor"
+                 stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-check"/></svg>
+            <span id="t-okLbl">אישור נוכחות המפגש</span></button>
+          <p id="t-okNote">בלי האישור הנוכחות לא נכתבת לקובץ של אלנט.</p>
+        </div>
       </section>
 
       <!-- סימון ידני: נבנה בזמן ריצה, אחרי לחיצה על שם -->
