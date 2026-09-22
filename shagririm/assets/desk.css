@@ -1,0 +1,65 @@
+/* שולחן המנחה (desk.js) — תוספת ל-team.css. המראה מהמוק-אפ v3, "שולחן המנחה". */
+
+.dk-desk { background: var(--night); color: #fff; border-radius: 22px; padding: 16px 20px; position: sticky; top: 8px;
+  z-index: 30; margin: 0 0 16px; box-shadow: 0 14px 34px rgba(11, 36, 54, .25); }
+.dk-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 22px; align-items: center; }
+.dk-code b { font: 900 54px/1 Rubik, sans-serif; letter-spacing: 8px; direction: ltr; display: block; }
+.dk-code small { color: #9FB6C8; font-size: 12px; display: block; text-align: center; margin-top: 4px; }
+.dk-step { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.dk-beats { display: flex; gap: 6px; }
+.dk-beat { flex: 1; min-width: 0; border-radius: 12px; padding: 8px 10px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .14);
+  color: #9FB6C8; display: flex; flex-direction: column; gap: 2px; font: inherit; font-size: 12.5px; text-align: right; cursor: pointer; }
+.dk-beat b { color: #fff; font-size: 12.8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dk-beat .t { font: 800 11px Rubik, sans-serif; }
+.dk-beat.done { background: rgba(47, 159, 106, .25); color: #BFE8D0; }
+.dk-beat.done b { color: #BFE8D0; }
+.dk-beat.now { background: var(--orange); border-color: var(--orange); color: #FFE3CC; }
+.dk-ctl { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; font-size: 12.5px; color: #9FB6C8; }
+.dk-ctl button { border: 1px solid rgba(255, 255, 255, .25); background: rgba(255, 255, 255, .1); color: #fff; border-radius: 12px;
+  padding: 9px 16px; font: inherit; font-weight: 700; min-height: 44px; cursor: pointer; }
+.dk-ctl button[disabled] { opacity: .5; cursor: default; }
+.dk-acts { display: flex; flex-direction: column; gap: 8px; }
+.dk-btn { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 255, 255, .22); background: rgba(255, 255, 255, .08);
+  color: #fff; border-radius: 12px; padding: 10px 16px; font: inherit; font-weight: 700; min-height: 44px; text-decoration: none; cursor: pointer; }
+.dk-btn.primary { background: var(--orange); border-color: var(--orange); }
+.dk-counters { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 0; }
+.dk-counters span { background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .16); border-radius: 99px; padding: 5px 12px; font-size: 12.8px; }
+.dk-counters span b { font-family: Rubik, sans-serif; }
+.dk-counters span.warn { background: rgba(240, 138, 46, .22); border-color: rgba(240, 138, 46, .5); }
+
+.dk-walltile { margin: 0 0 14px; }
+.dk-wall { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 10px; }
+.dk-empty { color: var(--muted); font-size: 13.5px; margin: 0; }
+.dk-w { border: 1px solid var(--line); border-radius: 14px; padding: 12px; background: #FBFAF6; display: flex; flex-direction: column; gap: 5px; min-height: 120px; }
+.dk-w b { font-size: 14px; }
+.dk-w .sch, .dk-w .prog { font-size: 12.4px; color: var(--muted); }
+.dk-w .tx { font-size: 12.8px; line-height: 1.45; }
+.dk-w .tx i { font-style: normal; color: var(--muted); }
+.dk-w .flags { display: flex; gap: 5px; flex-wrap: wrap; }
+.dk-w .acts { margin-top: auto; display: flex; gap: 6px; flex-wrap: wrap; padding-top: 6px; }
+.dk-w .acts button, .dk-assess button { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 6px 10px; font: inherit;
+  font-size: 12.8px; font-weight: 700; min-height: 36px; cursor: pointer; }
+.dk-w .acts button[disabled] { opacity: .45; cursor: default; }
+.dk-w.lit { border-color: var(--orange-2); background: #fff; box-shadow: 0 6px 18px rgba(194, 98, 12, .14); }
+.dk-w.stuck { border-color: #F0C9A3; background: #FFF8F1; }
+.v2-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 800; border-radius: 99px; padding: 3px 10px; white-space: nowrap; }
+.v2-chip.done { background: #DCEFE6; color: #23774F; }
+.v2-chip.due { background: #FCEBDD; color: #8A4707; }
+.v2-chip.draft { background: #E3EFF7; color: var(--blue); }
+.dk-assess { border-top: 1px dashed var(--line); margin-top: 8px; padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.dk-assess ul { margin: 0; padding: 0; list-style: none; font-size: 12.8px; line-height: 1.5; max-height: 180px; overflow: auto; }
+.dk-assess ul i { font-style: normal; color: var(--muted); }
+.dk-assess .lv { display: flex; gap: 6px; flex-wrap: wrap; }
+.dk-assess .lv button[aria-pressed=true] { background: var(--night); color: #fff; border-color: var(--night); }
+.dk-assess input[type=text] { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; font: inherit; min-height: 42px; }
+.dk-assess .bk { font-size: 12.8px; display: flex; gap: 6px; align-items: center; }
+.dk-assess button.primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+
+@media (max-width: 960px) {
+  .dk-row { grid-template-columns: 1fr; }
+  .dk-acts { flex-direction: row; flex-wrap: wrap; }
+  .dk-btn { flex: 1; }
+  .dk-beats { flex-wrap: wrap; }
+  .dk-beat { flex: 1 1 30%; }
+  .dk-desk { position: static; }
+}

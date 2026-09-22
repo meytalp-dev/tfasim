@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>מצב הקרנה · שגרירי חדשנות טכנולוגית</title>
+<!--
+  מצב הקרנה: הדף שמיטל משתפת בזום. האפיון v2, סעיף 4.3 והכרעה 3.
+  המראה: מוקאפ-מערכת-שגרירים-v3.html, "מצב הקרנה".
+
+  על המסך: הקוד בענק, הפעימה, התוצר שבזרקור, והמפה החיה (צבירת שדות הבחירה).
+  בלי שום שם, מזהה או בית ספר: השרת (what=proj) לא מחזיר אותם בכלל.
+
+  המפתח: אותו מפתח של מסך "היום" (נשמר בדפדפן של מיטל). המסלול והמפגש
+  בכתובת: proj.html#track=כלים&n=1. הדף מתרענן כל 15 שניות.
+  אין בקובץ הזה מפתח, שם או נתון של אף אחד.
+-->
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root { --blue: #1D6FA5; --blue-2: #4A9FD8; --orange: #C2620C; --orange-2: #F08A2E; --night: #0B2436; --ink: #10344F; --muted: #9FB6C8; --ok: #2F9F6A; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; height: 100%; }
+  body { font-family: Assistant, Arial, sans-serif; background: var(--night); color: #fff;
+    background-image: radial-gradient(rgba(255, 255, 255, .05) 1px, transparent 1px); background-size: 26px 26px; }
+  h1, h2, h3 { font-family: Rubik, Assistant, sans-serif; margin: 0; }
+  .proj { min-height: 100vh; display: grid; grid-template-rows: auto 1fr auto; padding: 24px 40px; gap: 20px; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .top b { font: 800 22px Rubik, sans-serif; }
+  .top .note { color: var(--muted); font-size: 14px; }
+  .mid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: 40px; align-items: start; }
+  .code { text-align: center; padding-top: 10px; }
+  .code small { display: block; color: var(--muted); font-size: 22px; margin: 0 0 6px; }
+  .code b { font: 900 clamp(90px, 15vw, 180px)/1 Rubik, sans-serif; letter-spacing: .12em; direction: ltr; display: block; }
+  .code em { display: block; font-style: normal; color: var(--muted); font-size: 18px; margin: 8px 0 0; }
+  .code.off b { color: rgba(255, 255, 255, .25); }
+  .step { border: 1px solid rgba(255, 255, 255, .18); border-radius: 28px; padding: 24px 30px; background: rgba(255, 255, 255, .05); }
+  .step .eyebrow { color: var(--muted); font-size: 15px; letter-spacing: .05em; font-weight: 800; margin: 0 0 6px; }
+  .step h2 { font-size: 40px; line-height: 1.15; }
+  .spot { margin-top: 18px; background: #fff; color: var(--ink); border-radius: 18px; padding: 16px 20px; }
+  .spot .eyebrow { color: var(--orange); font-size: 12px; letter-spacing: .06em; font-weight: 800; margin: 0 0 8px; }
+  .spot dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 17px; line-height: 1.5; }
+  .spot dt { color: #566571; font-size: 14px; padding-top: 3px; }
+  .spot dd { margin: 0; font-weight: 700; }
+  .map { margin-top: 18px; }
+  .map .eyebrow { color: var(--muted); font-size: 15px; font-weight: 800; letter-spacing: .05em; margin: 0 0 12px; display: flex; justify-content: space-between; }
+  .charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .chart { background: rgba(255, 255, 255, .05); border: 1px solid rgba(255, 255, 255, .14); border-radius: 18px; padding: 14px 16px; }
+  .chart h3 { font-size: 17px; margin: 0 0 10px; }
+  .bar { display: grid; grid-template-columns: minmax(0, 1fr) 2fr auto; gap: 10px; align-items: center; font-size: 15px; margin: 6px 0; }
+  .bar .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bar .trk { display: block; height: 14px; background: rgba(255, 255, 255, .1); border-radius: 7px; overflow: hidden; }
+  .bar .fil { display: block; height: 100%; background: var(--blue-2); border-radius: 7px; transition: width .6s cubic-bezier(.2, .8, .2, 1); }
+  .bar .n { font: 800 16px Rubik, sans-serif; min-width: 2ch; text-align: left; }
+  .foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; color: var(--muted); font-size: 15px; flex-wrap: wrap; }
+  .beats { display: flex; gap: 6px; flex: 1; max-width: 760px; }
+  .beat { flex: 1; border-radius: 12px; padding: 8px 10px; background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .14);
+    color: var(--muted); display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: 12.5px; }
+  .beat b { color: #fff; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .beat .t { font: 800 11px Rubik, sans-serif; }
+  .beat.done { background: rgba(47, 159, 106, .25); }
+  .beat.now { background: var(--orange); border-color: var(--orange); }
+  .gate { max-width: 520px; margin: 12vh auto; background: rgba(255, 255, 255, .06); border-radius: 22px; padding: 26px; }
+  .gate input { width: 100%; border: 1px solid rgba(255, 255, 255, .3); background: rgba(255, 255, 255, .08); color: #fff; border-radius: 12px;
+    padding: 12px 14px; font: inherit; direction: ltr; margin: 10px 0; }
+  .gate button { border: 0; background: var(--orange); color: #fff; border-radius: 12px; padding: 12px 20px; font: inherit; font-weight: 800; cursor: pointer; min-height: 44px; }
+  .err { color: #FFB4A8; font-size: 14px; }
+  @media (max-width: 960px) { .proj { padding: 18px; } .mid { grid-template-columns: 1fr; } .step h2 { font-size: 28px; } .beats { flex-wrap: wrap; } .beat { flex: 1 1 30%; } }
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate" hidden>
+  <h2>מצב הקרנה</h2>
+  <p>המפתח של מסך "היום" לא נמצא בדפדפן הזה. להדביק את הקישור או את המפתח, ולבחור מסלול ומפגש בכתובת:
+    <code dir="ltr">proj.html#track=כלים&amp;n=1</code></p>
+  <input type="text" id="keyin" placeholder="adm-…" autocomplete="off" spellcheck="false">
+  <button type="button" id="keygo">כניסה</button>
+  <p class="err" id="gerr" hidden></p>
+</section>
+
+<div class="proj" id="proj" hidden>
+  <div class="top">
+    <b id="title">שגרירי חדשנות טכנולוגית</b>
+    <span class="note" id="note">מתעדכן כל 15 שניות · בלי שום נתון אישי על המסך</span>
+  </div>
+  <div class="mid">
+    <div class="code" id="codebox"><small>קוד הנוכחות · מקלידים בעמוד המפגש</small><b id="code" translate="no">— — — —</b><em id="codenote"></em></div>
+    <div>
+      <div class="step"><p class="eyebrow" id="stepEyebrow">המפגש עוד לא התחיל</p><h2 id="stepTitle">ברוכים הבאים</h2></div>
+      <div class="spot" id="spot" hidden><p class="eyebrow">בזרקור</p><dl id="spotList"></dl></div>
+      <div class="map" id="map" hidden><p class="eyebrow"><span>המפה החיה</span><span id="mapN"></span></p><div class="charts" id="charts"></div></div>
+    </div>
+  </div>
+  <div class="foot"><div class="beats" id="beats"></div><span id="err" class="err"></span></div>
+</div>
+
+<script src="assets/auth.js"></script>
+<script>
+(function (w, d) {
+  "use strict";
+  var BEATS = [
+    { t: "מה קרה מאז", m: 10, title: "מה קרה מאז" },
+    { t: "ידע", m: 30, title: "ידע" },
+    { t: "סטודיו", m: 60, title: "סטודיו · כולם עובדים בדף המלווה" },
+    { t: "זרקור", m: 15, title: "זרקור" },
+    { t: "לקחת הביתה", m: 10, title: "לקחת הביתה" }
+  ];
+  function el(id) { return d.getElementById(id); }
+  function esc(s) { return String(s === undefined || s === null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function keyFrom(t) { var m = String(t || "").match(/[?&#](?:key|k)=(adm-[0-9a-z-]{8,64})/i) || String(t || "").match(/^(adm-[0-9a-z-]{8,64})$/i); return m ? m[1] : ""; }
+
+  var P = { key: "", track: "", n: 0, gen: 0 };
+
+  function params() {
+    var out = {};
+    String(w.location.hash || "").replace(/^#/, "").split("&").forEach(function (kv) {
+      var i = kv.indexOf("="); if (i > 0) out[kv.substring(0, i)] = decodeURIComponent(kv.substring(i + 1));
+    });
+    return out;
+  }
+
+  function beatsHtml(step) {
+    var h = "";
+    for (var i = 0; i < BEATS.length; i++) {
+      var name = (i === 0 && P.n === 1) ? "פתיחה" : BEATS[i].t;
+      h += '<div class="beat' + (step && i + 1 < step ? " done" : step && i + 1 === step ? " now" : "") + '"><span class="t">' + (i + 1) + " · " + BEATS[i].m + " דק׳</span><b>" + esc(name) + "</b></div>";
+    }
+    return h;
+  }
+
+  function render(r) {
+    el("title").textContent = "שגרירי חדשנות טכנולוגית · מסלול " + r.track + " · מפגש " + r.session + (r.topic ? " · " + r.topic : "");
+    var c = r.code || {};
+    el("codebox").className = "code" + (c.open ? "" : " off");
+    el("code").textContent = c.open && c.code ? c.code : "— — — —";
+    el("codenote").textContent = c.open ? "הקוד מתחלף כל " + (c.codeMinutes || 5) + " דקות." + (c.grace ? " הקודם עוד מתקבל." : "") : "הרישום עוד לא נפתח";
+
+    var step = Number(r.step) || 0;
+    var b = step ? BEATS[step - 1] : null;
+    var name = b ? ((step === 1 && P.n === 1) ? "פתיחה" : b.title) : "";
+    el("stepEyebrow").textContent = b ? "פעימה " + step + " מתוך 5 · " + b.m + " דקות" : "המפגש עוד לא התחיל";
+    el("stepTitle").textContent = b ? name : "ברוכים הבאים";
+    el("beats").innerHTML = beatsHtml(step);
+
+    var sp = r.spot;
+    el("spot").hidden = !(sp && sp.items && sp.items.length);
+    if (sp && sp.items) {
+      el("spotList").innerHTML = sp.items.map(function (i) { return "<dt>" + esc(i.label) + "</dt><dd>" + esc(i.value) + "</dd>"; }).join("");
+    }
+
+    var ag = r.aggregate;
+    var show = ag && ag.charts && ag.charts.length && ag.respondents > 0;
+    el("map").hidden = !show;
+    if (show) {
+      el("mapN").textContent = ag.respondents + " מילאו";
+      el("charts").innerHTML = ag.charts.map(function (ch) {
+        var max = 1;
+        ch.options.forEach(function (o) { if (o.count > max) max = o.count; });
+        return '<div class="chart"><h3>' + esc(ch.label) + "</h3>" + ch.options.map(function (o) {
+          return '<div class="bar"><span class="lbl">' + esc(o.label) + '</span><span class="trk"><span class="fil" style="width:' + Math.round(100 * o.count / max) + '%"></span></span><span class="n">' + o.count + "</span></div>";
+        }).join("") + "</div>";
+      }).join("");
+    }
+    el("err").textContent = "";
+  }
+
+  function load() {
+    if (d.hidden) return;
+    var gen = ++P.gen;
+    w.SH_auth.fetchJson(w.SH_auth.API + "?mode=page&what=proj&key=" + encodeURIComponent(P.key) +
+      "&track=" + encodeURIComponent(P.track) + "&n=" + P.n + "&_=" + Date.now()).then(function (r) {
+      if (gen !== P.gen) return;
+      if (!r || !r.ok) {
+        if (r && r.error === "badkey") { try { w.localStorage.removeItem("shag.teamkey"); } catch (e) {} gate("המפתח לא זוהה."); return; }
+        el("err").textContent = r && r.error === "nomeeting" ? "המפגש לא קיים במסלול. לבדוק את הכתובת." : "השרת לא ענה. מנסים שוב.";
+        return;
+      }
+      render(r);
+    }).catch(function () { if (gen === P.gen) el("err").textContent = "אין חיבור. מנסים שוב בעוד רגע."; });
+  }
+
+  function gate(msg) {
+    el("proj").hidden = true; el("gate").hidden = false;
+    el("gerr").hidden = !msg; el("gerr").textContent = msg || "";
+  }
+
+  function start() {
+    var p = params();
+    P.track = p.track || "כלים"; P.n = Number(p.n) || 1;
+    var k = keyFrom(w.location.search) || keyFrom(w.location.hash);
+    if (k) { try { w.localStorage.setItem("shag.teamkey", k); } catch (e) {} try { w.history.replaceState(null, "", w.location.pathname + "#track=" + encodeURIComponent(P.track) + "&n=" + P.n); } catch (e2) {} }
+    try { P.key = keyFrom(w.localStorage.getItem("shag.teamkey") || "") || k; } catch (e3) { P.key = k; }
+    if (!P.key) { gate(""); return; }
+    el("gate").hidden = true; el("proj").hidden = false;
+    load();
+    w.setInterval(load, 15000);
+  }
+
+  el("keygo").addEventListener("click", function () {
+    var k = keyFrom(el("keyin").value);
+    if (!k) { el("gerr").hidden = false; el("gerr").textContent = "זה לא נראה כמו המפתח. הוא מתחיל ב-adm-"; return; }
+    try { w.localStorage.setItem("shag.teamkey", k); } catch (e) {}
+    start();
+  });
+  w.addEventListener("hashchange", function () { var p = params(); P.track = p.track || P.track; P.n = Number(p.n) || P.n; load(); });
+  d.addEventListener("visibilitychange", function () { if (!d.hidden && P.key) load(); });
+  start();
+})(window, document);
+</script>
+</body>
+</html>
