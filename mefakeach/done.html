@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>משימה מהמפקח.ת · הבית של המפקח</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M9 11l3 3 7-7'/><rect x='3' y='4' width='18' height='16' rx='3'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+.one{max-width:560px;margin:30px auto}
+.one h2{font-size:22px;margin:6px 0 4px}
+.one .strip{border-radius:8px 8px 0 0;margin:-16px -18px 16px}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap"><div class="card one" id="app">טוען…</div></div>
+<div id="toast" hidden></div>
+<div class="credit"><a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+<script src="app.js"></script>
+<script id="page">
+/* דף המנהל.ת: בלי כניסה. הקישור מהמייל נושא מזהה משימה + חתימה; הדף מציג רק את המשימה הזו. */
+(function (w, d) {
+  "use strict";
+  var M = w.MEF, E = M.escapeHtml;
+  function viewHtml(g) {
+    var t = g.task;
+    var h = '<div class="strip"></div><p class="hint" style="margin:0">משימה מהמפקח.ת ' + E(g.sup_name) + " · " + E(g.school_name) + "</p><h2>" + E(t.title) + "</h2>" +
+      (t.owner_role || t.due ? '<p class="sub">' + (t.owner_role ? "אחראי.ת: " + E(t.owner_role) : "") + (t.owner_role && t.due ? " · " : "") + (t.due ? "עד " + E(M.fmtDate(t.due)) : "") + "</p>" : "") +
+      (t.note ? "<p>" + E(t.note).replace(/\n/g, "<br>") + "</p>" : "");
+    if (t.status === "done") return h + '<div class="tag ok">כבר סומן "בוצע"' + (t.done_at ? " · " + E(M.fmtDate(t.done_at)) : "") + "</div>";
+    return h + '<form id="doneForm"><label for="cmt">הערה (לא חובה)</label><textarea class="field" id="cmt" maxlength="500" placeholder="למשל: הוגש לרכזת, מצורף הקובץ"></textarea>' +
+      '<label for="fl">צירוף קובץ (לא חובה, עד 8MB)</label><input class="field" type="file" id="fl" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv">' +
+      '<div class="row" style="margin-top:14px"><button class="btn p" id="doneBtn" type="submit">סימון "בוצע"</button></div></form>';
+  }
+  function thanksHtml(g) { return "<h2>תודה!</h2><p>סומן \"בוצע\" ונשלח אל " + E(g.sup_name) + ". אפשר לסגור את הדף.</p>"; }
+  function invalidHtml() { return "<h2>הקישור לא תקף</h2><p>המשימה נמחקה או שהקישור לא שלם. אפשר לפנות ישירות למפקח.ת.</p>"; }
+  w.DONE = { viewHtml: viewHtml, thanksHtml: thanksHtml, invalidHtml: invalidHtml };
+  if (!d.getElementById("app")) return;
+  var qs = new URLSearchParams(w.location.search), t = qs.get("t") || "", k = qs.get("k") || "", app = d.getElementById("app"), g = null;
+  function submit(e) {
+    e.preventDefault(); var btn = d.getElementById("doneBtn"); btn.disabled = true;
+    var file = d.getElementById("fl").files[0], body = { action: "task.principal_done", t: t, k: k, comment: d.getElementById("cmt").value };
+    var send = function () { return fetch(M.EXEC, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); }); };
+    var go = function () { send().then(function (r) { if (!r.ok) { btn.disabled = false; M.toast({ badmime: "סוג קובץ לא נתמך", toolarge: "הקובץ גדול מדי", invalid: "הקישור לא תקף" }[r.error] || "לא הצלחנו לשמור, נסו שוב"); return; } app.innerHTML = thanksHtml(g); }, function () { btn.disabled = false; M.toast("אין חיבור, נסו שוב"); }); };
+    if (!file) return go();
+    if (file.size > 8 * 1024 * 1024) { btn.disabled = false; M.toast("הקובץ גדול מ-8MB"); return; }
+    var rd = new FileReader(); rd.onload = function () { body.file = { name: file.name, mime: file.type || "application/octet-stream", data: String(rd.result).split(",")[1] }; go(); }; rd.readAsDataURL(file);
+  }
+  fetch(M.EXEC + "?mode=done&t=" + encodeURIComponent(t) + "&k=" + encodeURIComponent(k)).then(function (r) { return r.json(); }).then(function (r) {
+    if (!r.ok) { app.innerHTML = invalidHtml(); return; }
+    g = r; app.innerHTML = viewHtml(r); var f = d.getElementById("doneForm"); if (f) f.addEventListener("submit", submit);
+  }, function () { app.innerHTML = '<div class="empty">השרת לא זמין כרגע. נסו שוב בעוד דקה.</div>'; });
+})(window, document);
+</script>
+</body>
+</html>
