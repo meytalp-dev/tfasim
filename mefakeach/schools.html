@@ -84,7 +84,7 @@
           }).join("") + "</table>"
         : '<div class="empty">אין משימות פתוחות לבית הספר הזה.</div>';
       if (done.length) h += '<details style="margin-top:12px"><summary>בוצעו (' + done.length + ')</summary><ul class="list">' + done.map(function (t) { return "<li>" + E(t.title) + '<span class="m">' + (t.done_at ? M.fmtDate(t.done_at) : "") + "</span></li>"; }).join("") + "</ul></details>";
-      h += '<p class="hint" style="margin-top:14px">כאן רואים בלבד. המעקב המלא, עם "בוצע" ותזכורות, בשלב הבא.</p>';
+      h += '<p style="margin-top:14px"><a class="btn s sm" href="tracking.html?school=' + E(s.id) + '">לניהול המשימות במעקב</a></p>';
     } else {
       h += '<div class="row" style="margin-bottom:10px"><a class="btn s sm" href="visit.html?open=' + E(s.id) + '">+ פתיחת ביקור</a></div>';
       h += visits.length

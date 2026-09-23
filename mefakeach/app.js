@@ -13,12 +13,18 @@
       return s.token;
     } catch (e) { return ""; }
   }
-  function api(action, body) {
-    var payload = Object.assign({ action: action, token: token() }, body || {});
-    return fetch(EXEC, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload) })
-      .then(function (r) { return r.json(); })
+  /* אפס סקריפט נופל לפעמים ל-302→404 רגעי או לא עונה — פסק זמן 25ש' ושני ניסיונות חוזרים לפני "network" */
+  var API_TIMEOUT = 25000, API_RETRIES = 2;
+  function fetchOnce(payload) {
+    var ctl = typeof AbortController !== "undefined" ? new AbortController() : null, timer = ctl && setTimeout(function () { ctl.abort(); }, API_TIMEOUT);
+    return fetch(EXEC, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(payload), signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { return r.json(); }).finally(function () { if (timer) clearTimeout(timer); });
+  }
+  function api(action, body, _try) {
+    var payload = Object.assign({ action: action, token: token() }, body || {}); _try = _try || 0;
+    return fetchOnce(payload)
       .then(function (r) { if (r && r.error === "unauthorized") sessionExpired(); return r; })
-      .catch(function () { return { ok: false, error: "network" }; });
+      .catch(function () { if (_try < API_RETRIES) return api(action, body, _try + 1); return { ok: false, error: "network" }; });
   }
   function escapeHtml(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
@@ -55,7 +61,7 @@
   function shell(opts) {
     opts = opts || {};
     var me = opts.me || {}; var initial = (me.name || "?").charAt(0);
-    var available = opts.available || ["schools.html", "visit.html", "report.html"];
+    var available = opts.available || ["schools.html", "visit.html", "report.html", "tracking.html"];
     var links = NAV.map(function (n) {
       var here = w.location.pathname.indexOf(n[0]) > -1 || (n[0] === "index.html" && /\/mefakeach\/?$/.test(w.location.pathname));
       var soon = available.indexOf(n[0]) < 0;

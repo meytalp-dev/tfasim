@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>המעקב שלי · הבית של המפקח</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><circle cx='12' cy='12' r='9'/><path d='M12 7v5l3 2'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+.school-row{border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:#fff;overflow:hidden}
+.school-row .head{display:flex;gap:10px;align-items:center;padding:10px 14px;cursor:pointer;font-size:15.5px;flex-wrap:wrap}
+.school-row .head .cnt{color:var(--muted);font-size:13.5px}.school-row .head .chev{margin-right:auto;color:var(--muted)}
+.school-row .body{border-top:1px solid var(--line);padding:4px 14px 8px}
+.task{display:grid;grid-template-columns:1fr auto auto auto;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.task:first-child{border-top:0}.task .due{color:var(--muted);font-size:13.5px;white-space:nowrap}
+.task.late{background:#fff5f5;margin:0 -14px;padding:8px 14px}.task.on{background:var(--blue-soft);margin:0 -14px;padding:8px 14px}
+.drawer{position:sticky;top:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-s)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:14px;cursor:pointer;background:#fbfcff;font-weight:400;color:var(--ink)}
+.chip.on{background:var(--blue-soft);border-color:#c9d6ff;color:var(--navy);font-weight:600}
+.progress{height:8px;background:#eef1f7;border-radius:99px;overflow:hidden;margin:6px 0}.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),var(--blue))}
+.card.blue{background:var(--blue-soft);border-color:#c9d6ff}
+@media (max-width:820px){.task{grid-template-columns:1fr auto}.task .due{grid-column:1/-1}.drawer{position:static}}
+</style>
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap"><div class="app" id="app"><div class="empty" style="grid-column:1/-1">טוען…</div></div></div>
+<div id="toast" hidden></div>
+<div class="credit"><a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+<script src="app.js"></script>
+<script id="page">
+(function (w, d) {
+  "use strict";
+  var M = w.MEF, E = M.escapeHtml;
+  var ROLES = ["מנהל/ת", "רכז/ת פדגוגי/ת", "רכז/ת חניכות", "רכז/ת חברתי/ת", "מת\"לית", "רכז/ת תקשוב", "הכלה ושילוב"];
+  var OWNERS = ROLES.concat(["מנהל.ת (עצמו/ה)", "אחר"]);
+  var SOURCE_HE = { manual: "ידני", paste: "הדבקה מהמטה", visit: "מהביקור", question: "משאלה בביקור" };
+  function todayIso() { var t = new Date(); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
+
+  /* ---- רינדור טהור (נבדק ב-tests/tracking.test.mjs) ---- */
+  /* רשימה אחת: משימות שיצר המפקח + פריטי "מהמטה" (טופס פעיל × בית ספר שטרם הגיש), מקובצים לפי בית ספר */
+  function build(data, f) {
+    var today = f.today || todayIso(), byId = {}; (data.schools || []).forEach(function (s) { byId[String(s.id)] = { id: String(s.id), name: s.name, items: [] }; });
+    (data.tasks || []).forEach(function (t) {
+      var g = byId[String(t.school_id)]; if (!g) return;
+      var open = t.status !== "done"; if (f.done ? open : !open) return;
+      var late = open && !!t.due && t.due < today, isToday = open && t.due === today;
+      if (f.late && !late) return;
+      g.items.push({ kind: "task", id: t.id, title: t.title, owner_role: t.owner_role || "", due: t.due || "", status: t.status, late: late, today: isToday, mine: !!t.mine, source: t.source || "manual", note: t.note || "", notify_principal: t.notify_principal || "", done_at: t.done_at || "", done_by: t.done_by || "" });
+    });
+    if (!f.done) ((data.hq && data.hq.forms) || []).forEach(function (fm) {
+      if (fm.kind !== "submission" || !fm.available) return;
+      (fm.missing || []).forEach(function (sid) {
+        var g = byId[String(sid)]; if (!g) return;
+        var late = !!fm.deadline && fm.deadline < today, isToday = fm.deadline === today;
+        if (f.late && !late) return;
+        g.items.push({ kind: "hq", id: "F:" + fm.id + ":" + sid, form_id: fm.id, title: fm.name, due: fm.deadline || "", late: late, today: isToday, link: (fm.link_template || "").replace("{token}", ""), deadline: fm.deadline || "" });
+      });
+    });
+    var groups = [], totals = { open: 0, late: 0, today: 0, quiet: 0, schools: 0 };
+    Object.keys(byId).forEach(function (id) {
+      var g = byId[id]; if (!g.items.length) { totals.quiet++; return; }
+      if (f.school && f.school !== id) return;
+      g.items.sort(function (a, b) { return (a.due || "9999") < (b.due || "9999") ? -1 : 1; });
+      g.open = g.items.length; g.late = g.items.filter(function (i) { return i.late; }).length; g.today = g.items.filter(function (i) { return i.today; }).length;
+      totals.open += g.open; totals.late += g.late; totals.today += g.today; totals.schools++;
+      groups.push(g);
+    });
+    groups.sort(function (a, b) { return b.late - a.late || b.open - a.open; });
+    return { groups: groups, totals: totals };
+  }
+  function dueTag(i) { if (!i.due) return ""; return '<span class="tag ' + (i.late ? "bad" : i.today ? "warn" : "gray") + '">' + (i.late ? "באיחור · " : i.today ? "היום · " : "עד ") + E(M.fmtDate(i.due)) + "</span>"; }
+  function itemHtml(i, f) {
+    var acts = i.kind === "hq" ? '<button class="btn sm" data-act="hqremind" type="button">תזכורת</button><button class="btn sm ghost" data-act="open" type="button">פרטים</button>'
+      : (i.status === "done" ? '<span class="tag ok">בוצע' + (i.done_by === "principal" ? " · המנהל.ת" : "") + "</span>" + (i.mine ? '<button class="btn sm ghost" data-act="reopen" type="button">פתיחה מחדש</button>' : '<button class="btn sm ghost" data-act="open" type="button">פרטים</button>')
+        : (i.mine ? '<button class="btn sm" data-act="done" type="button">בוצע</button>' : "") + '<button class="btn sm ghost" data-act="open" type="button">פרטים</button>');
+    return '<div class="task' + (i.late ? " late" : "") + (f.on === i.id ? " on" : "") + '" data-id="' + E(i.id) + '" data-kind="' + i.kind + '"><div>' + E(i.title) + (i.kind === "hq" ? ' <span class="tag gray">מהמטה</span>' : "") + (i.kind === "task" && !i.mine ? ' <span class="tag gray">של עמית.ה</span>' : "") + (i.owner_role ? ' <span class="hint">· ' + E(i.owner_role) + "</span>" : "") + '</div><div class="due">' + dueTag(i) + "</div>" + acts + "</div>";
+  }
+  function schoolRowsHtml(groups, f) {
+    if (!groups.length) return '<div class="empty">אף בית ספר לא חייב לך כלום כרגע.</div>';
+    return groups.map(function (g) {
+      var open = f.openGroups ? f.openGroups[g.id] !== false : true;
+      return '<div class="school-row" data-school="' + E(g.id) + '"><div class="head"><b>' + E(g.name) + '</b><span class="cnt">' + g.open + (g.open === 1 ? " פתוח" : " פתוחים") + "</span>" + (g.late ? '<span class="tag bad">' + g.late + " באיחור</span>" : "") + (g.today ? '<span class="tag warn">היום</span>' : "") + '<span class="chev">' + (open ? "▾" : "▸") + "</span></div>" + (open ? '<div class="body">' + g.items.map(function (i) { return itemHtml(i, f); }).join("") + "</div>" : "") + "</div>";
+    }).join("");
+  }
+  function missingText(form, byId) { var names = (form.missing || []).map(function (id) { return byId[id] || id; }); return form.name + " — טרם הגישו (" + names.length + "): " + names.join(", "); }
+  function formsHtml(forms, byId) {
+    var subs = forms.filter(function (f) { return f.kind === "submission"; });
+    if (!subs.length) return '<div class="empty">אין טפסים פעילים מהמטה. טופס נוסף בשורה אחת בגיליון.</div>';
+    return subs.map(function (f) {
+      if (!f.available) return '<div class="card" style="margin-bottom:12px"><h3>' + E(f.name) + '</h3><span class="tag gray">לא זמין כרגע</span> <span class="hint">נקודת הקצה של הטופס לא ענתה. ננסה שוב בעוד כמה דקות.</span></div>';
+      var total = f.submitted.length + f.missing.length, pct = total ? Math.round(f.submitted.length * 100 / total) : 0;
+      return '<div class="card" style="margin-bottom:12px" data-form="' + E(f.id) + '"><h3>' + E(f.name) + (f.deadline ? ' <span class="hint">עד ' + E(M.fmtDate(f.deadline)) + "</span>" : "") + '</h3><div class="progress"><i style="width:' + pct + '%"></i></div><div class="row" style="font-size:14.5px"><span>' + f.submitted.length + " מתוך " + total + " הגישו</span>" +
+        (f.missing.length ? '<span class="tag bad">' + f.missing.length + " טרם: " + E(f.missing.map(function (id) { return byId[id] || id; }).join(", ")) + '</span><a href="#" data-act="copymissing" style="margin-right:auto">העתקת מי טרם</a>' : '<span class="tag ok">כולם הגישו</span>') + "</div>" +
+        (f.unresolved && f.unresolved.length ? '<div class="hint" style="margin-top:6px">הגשות עם שם שלא זוהה (לא נספרות): ' + E(f.unresolved.join(", ")) + "</div>" : "") + "</div>";
+    }).join("");
+  }
+  function approvalsHtml(approvals) {
+    if (!approvals || !approvals.length) return "";
+    return '<div class="card blue" style="margin-bottom:14px"><b style="font-family:Rubik;color:var(--navy)">ממתין לאישור שלך</b><ul class="list">' + approvals.map(function (a) { return "<li>" + E(a.school_name) + " · " + E(a.form_name) + (a.title ? ' "' + E(a.title) + '"' : "") + '<span class="m"><a class="btn sm p" target="_blank" rel="noopener" href="' + E(a.link) + '">לאישור</a></span></li>'; }).join("") + "</ul></div>";
+  }
+  function historyHtml(rem) { if (!rem || !rem.length) return ""; return '<details style="margin-top:12px"><summary>היסטוריית תזכורות (' + rem.length + ')</summary><ul class="list">' + rem.map(function (r) { return "<li>" + E(M.fmtDate(r.sent_at)) + " · " + (r.to === "principal" ? "למנהל.ת" : "למפקח.ת") + '<span class="m">' + E(r.result) + "</span></li>"; }).join("") + "</ul></details>"; }
+  function drawerHtml(i, detail) {
+    detail = detail || {};
+    if (i.kind === "hq") return '<h3>' + E(i.title) + '</h3><div class="hint">טופס מהמטה' + (i.deadline ? " · עד " + E(M.fmtDate(i.deadline)) : "") + '</div><p style="font-size:14.5px">מצב חי מהטופס: <span class="tag bad">טרם הוגש</span>. ייסגר לבד כשהמנהל.ת ישלח.ו את הטופס.</p><div class="row"><button class="btn sm" data-act="hqremind" type="button">תזכורת למנהל.ת עכשיו</button>' + (i.link ? '<a class="btn sm ghost" target="_blank" rel="noopener" href="' + E(i.link) + '">לטופס</a>' : "") + "</div>" + historyHtml(detail.reminders);
+    var ro = !i.mine;
+    return '<h3>' + E(i.title) + '</h3><div class="hint">מקור: ' + E(SOURCE_HE[i.source] || i.source) + (i.status === "done" ? " · בוצע " + E(M.fmtDate(i.done_at)) + (i.done_by === "principal" ? " על ידי המנהל.ת" : "") : "") + "</div>" +
+      '<form id="detailForm"><label>אחראי.ת</label><select class="field" name="owner_role"' + (ro ? " disabled" : "") + '><option value="">לא נבחר</option>' + OWNERS.map(function (r) { return '<option value="' + E(r) + '"' + (i.owner_role === r ? " selected" : "") + ">" + E(r) + "</option>"; }).join("") + "</select>" +
+      '<label>עד מתי</label><input class="field" type="date" name="due" value="' + E(i.due) + '"' + (ro ? " disabled" : "") + '>' +
+      '<label class="chip" style="margin-top:10px"><input type="checkbox" name="notify" value="כן"' + (i.notify_principal === "כן" ? " checked" : "") + (ro || !detail.school || !detail.school.principal_email ? " disabled" : "") + "> תזכורת גם למנהל.ת, לא רק לי</label>" +
+      (detail.school && detail.school.principal_email === false ? '<div class="hint">למנהל.ת אין מייל במערכת — אין למי לשלוח.</div>' : '<div class="hint">יוצאת במייל בבוקר במועד היעד, ושוב אחרי 3 ימים אם עדיין פתוח (עד 3). לך: תמיד, בתקציר הבוקר.</div>') +
+      '<label>הערה</label><textarea class="field" name="note" maxlength="500"' + (ro ? " readonly" : "") + ">" + E(i.note) + "</textarea>" +
+      (ro ? "" : '<div class="row" style="margin-top:12px"><button class="btn sm p" type="submit">שמירה</button><button class="btn sm" data-act="remind" type="button">תזכורת עכשיו</button><button class="btn sm ghost" data-act="delete" type="button" style="color:var(--danger)">מחיקה</button></div>') + "</form>" + historyHtml(detail.reminders);
+  }
+  function schoolChecks(schools, pre, all) { return '<div class="row">' + schools.map(function (s) { return '<label class="chip" style="margin:0"><input type="checkbox" name="school_ids" value="' + E(s.id) + '"' + (all || String(s.id) === String(pre) ? " checked" : "") + "> " + E(s.name) + "</label>"; }).join("") + "</div>"; }
+  function newTaskHtml(schools, roles, preId) {
+    return '<form id="newForm" class="card" style="max-width:640px"><h3>משימה חדשה</h3><label for="nTitle">מה צריך לקרות?</label><input class="field" id="nTitle" name="title" required maxlength="200"><label>לאילו בתי ספר</label>' + schoolChecks(schools, preId, false) +
+      '<label for="nDue">עד מתי (לא חובה)</label><input class="field" type="date" id="nDue" name="due"><label for="nOwner">אחראי.ת (לא חובה)</label><select class="field" id="nOwner" name="owner_role"><option value="">לא נבחר</option>' + roles.concat(["מנהל.ת (עצמו/ה)", "אחר"]).map(function (r) { return '<option value="' + E(r) + '">' + E(r) + "</option>"; }).join("") + "</select>" +
+      '<label class="chip" style="margin-top:10px"><input type="checkbox" name="notify_principal" value="כן"> תזכורת גם למנהל.ת</label><label for="nNote">הערה (לא חובה)</label><textarea class="field" id="nNote" name="note" maxlength="500"></textarea>' +
+      '<div class="row" style="margin-top:12px"><button class="btn p" type="submit">יצירה</button><a class="btn" href="tracking.html">ביטול</a></div></form>';
+  }
+  function pasteHtml(schools, parsed) {
+    return '<form id="pasteForm" class="card" style="max-width:640px"><h3>הדבקת בקשה מהמטה</h3>' +
+      (!parsed ? '<label for="pText">הדביקי את הטקסט של הבקשה (מייל, וואטסאפ)</label><textarea class="field" id="pText" name="text" style="min-height:140px" required></textarea><div class="row" style="margin-top:12px"><button class="btn p" type="submit">זיהוי</button><a class="btn" href="tracking.html">ביטול</a></div>'
+        : '<label for="pTitle">כותרת</label><input class="field" id="pTitle" name="title" required maxlength="200" value="' + E(parsed.title) + '"><label for="pDue">מועד (זוהה מהטקסט, אפשר לתקן)</label><input class="field" type="date" id="pDue" name="due" value="' + E(parsed.due) + '"><label>לאילו בתי ספר (ברירת מחדל: כולם)</label>' + schoolChecks(schools, "", true) + '<input type="hidden" name="note" value="' + E(parsed.body) + '"><div class="row" style="margin-top:12px"><button class="btn p" type="submit">יצירת משימה לכל בית ספר</button><a class="btn" href="tracking.html">ביטול</a></div>') + "</form>";
+  }
+  w.TRACK = { build: build, schoolRowsHtml: schoolRowsHtml, formsHtml: formsHtml, approvalsHtml: approvalsHtml, drawerHtml: drawerHtml, newTaskHtml: newTaskHtml, pasteHtml: pasteHtml, missingText: missingText };
+
+  /* ---- חיווט (רץ רק בדפדפן) ---- */
+  if (!d.getElementById("app")) return;
+  var qs = new URLSearchParams(w.location.search);
+  var state = { data: null, f: { school: qs.get("school") || M.pickedSchool() || "", late: false, done: false, view: qs.get("view") === "forms" ? "forms" : "schools", on: "", openGroups: {} }, detail: null, byId: {} };
+  function load() { return M.api("tracking.list").then(function (r) { if (!r.ok) { M.toast(r.error === "network" ? "אין חיבור לשרת" : "לא נטען"); return; } state.data = r; state.byId = {}; r.schools.forEach(function (s) { state.byId[String(s.id)] = s.name; }); render(); }); }
+  function chips() {
+    var f = state.f; return '<div class="row" style="margin:14px 0 16px"><span class="chip' + (f.view === "schools" ? " on" : "") + '" data-view="schools">לפי בית ספר</span><span class="chip' + (f.view === "forms" ? " on" : "") + '" data-view="forms">לפי טופס מהמטה</span><span style="color:var(--line)">|</span><span class="chip' + (f.late ? " on" : "") + '" data-flt="late">רק באיחור</span><span class="chip' + (f.done ? " on" : "") + '" data-flt="done">בוצעו</span></div>';
+  }
+  function render() {
+    var m = d.getElementById("main"), b = build(state.data, state.f);
+    m.innerHTML = '<div class="row" style="justify-content:space-between"><div><h2>המעקב שלי</h2><p class="sub" style="margin:0">מי חייב לי מה · ' + b.totals.open + " פריטים " + (state.f.done ? "שבוצעו" : "פתוחים") + " ב-" + b.totals.schools + ' בתי ספר' + (b.totals.late ? " · " + b.totals.late + " באיחור" : "") + '</p></div><div class="row"><a class="btn" href="tracking.html?paste=1">הדבקת בקשה מהמטה</a><a class="btn p" href="tracking.html?new=1' + (state.f.school ? "&school=" + E(state.f.school) : "") + '">+ משימה</a></div></div>' + chips() + approvalsHtml(state.data.hq.approvals) +
+      (state.f.view === "forms" ? formsHtml(state.data.hq.forms, state.byId) : '<div class="grid g2" style="grid-template-columns:1.4fr 1fr;align-items:start"><div id="rows">' + schoolRowsHtml(b.groups, state.f) + (b.totals.quiet && !state.f.school ? '<div class="school-row" style="opacity:.6"><div class="head" style="cursor:default"><b>' + b.totals.quiet + ' בתי ספר נוספים</b><span class="cnt">לא חייבים כלום</span></div></div>' : "") + '</div><div class="drawer" id="drawer">' + (state.detail ? drawerHtml(state.detail.item, state.detail) : '<div class="empty">בחרי פריט כדי לראות פרטים.</div>') + "</div></div>");
+    wire(b);
+  }
+  function findItem(b, id) { for (var i = 0; i < b.groups.length; i++) for (var j = 0; j < b.groups[i].items.length; j++) if (b.groups[i].items[j].id === id) return b.groups[i].items[j]; return null; }
+  function wire(b) {
+    d.querySelectorAll("[data-view]").forEach(function (el) { el.addEventListener("click", function () { state.f.view = el.getAttribute("data-view"); render(); }); });
+    d.querySelectorAll("[data-flt]").forEach(function (el) { el.addEventListener("click", function () { var k = el.getAttribute("data-flt"); state.f[k] = !state.f[k]; if (k === "done" && state.f.done) state.f.late = false; render(); }); });
+    d.querySelectorAll(".school-row[data-school] .head").forEach(function (h) { h.addEventListener("click", function () { var id = h.parentNode.getAttribute("data-school"); state.f.openGroups[id] = state.f.openGroups[id] === false; render(); }); });
+    d.querySelectorAll(".task [data-act]").forEach(function (btn) { btn.addEventListener("click", function () { var row = btn.closest(".task"), it = findItem(b, row.getAttribute("data-id")); act(btn.getAttribute("data-act"), it); }); });
+    d.querySelectorAll("#drawer [data-act]").forEach(function (btn) { btn.addEventListener("click", function () { act(btn.getAttribute("data-act"), state.detail.item); }); });
+    var df = d.getElementById("detailForm"); if (df) df.addEventListener("submit", saveDetail);
+    d.querySelectorAll("[data-act=copymissing]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); var fid = a.closest("[data-form]").getAttribute("data-form"), fm = state.data.hq.forms.filter(function (f) { return f.id === fid; })[0]; copy(missingText(fm, state.byId), "הרשימה הועתקה"); }); });
+  }
+  function copy(text, msg) { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { M.toast(msg); }, function () { w.prompt("העתיקי ידנית:", text); }); }
+  function act(a, it) {
+    if (!it) return;
+    if (a === "open") { state.f.on = it.id; if (it.kind === "hq") { state.detail = { item: it, reminders: [] }; render(); return; } M.api("tasks.get", { id: it.id }).then(function (r) { state.detail = { item: it, reminders: r.ok ? r.reminders : [], school: r.ok ? r.school : {} }; render(); }); return; }
+    if (a === "done") { M.api("tasks.done", { id: it.id }).then(function (r) { M.toast(r.ok ? "סומן בוצע" : "לא נשמר"); load(); }); return; }
+    if (a === "reopen") { M.api("tasks.reopen", { id: it.id }).then(function () { load(); }); return; }
+    if (a === "delete") { if (!w.confirm("למחוק את המשימה? אי אפשר לשחזר.")) return; M.api("tasks.delete", { id: it.id }).then(function (r) { if (r.ok) { state.detail = null; M.toast("נמחקה"); load(); } else M.toast("לא נמחקה"); }); return; }
+    if (a === "remind") { M.api("tasks.remind", { id: it.id }).then(function (r) { M.toast(r.ok ? "התזכורת נשלחה למנהל.ת" : r.error === "noemail" ? "למנהל.ת אין מייל במערכת" : "לא נשלחה"); if (r.ok) act("open", it); }); return; }
+    if (a === "hqremind") { var sid = it.id.split(":")[2]; M.api("hq.remind", { form_id: it.form_id, school_id: sid }).then(function (r) { M.toast(r.ok ? "התזכורת נשלחה למנהל.ת" : r.error === "noemail" ? "למנהל.ת אין מייל במערכת" : "לא נשלחה"); }); return; }
+  }
+  function saveDetail(e) {
+    e.preventDefault(); var f = e.target, it = state.detail.item;
+    M.api("tasks.update", { id: it.id, owner_role: f.owner_role.value, due: f.due.value, notify_principal: f.notify.checked ? "כן" : "", note: f.note.value }).then(function (r) { M.toast(r.ok ? "נשמר" : r.error === "badrequest" ? "תאריך לא תקין" : "לא נשמר"); if (r.ok) load(); });
+  }
+  function renderNew() {
+    d.getElementById("main").innerHTML = "<h2>המעקב שלי</h2>" + newTaskHtml(state.data.schools, ROLES, qs.get("school") || M.pickedSchool());
+    d.getElementById("newForm").addEventListener("submit", function (e) {
+      e.preventDefault(); var f = e.target, ids = Array.prototype.map.call(f.querySelectorAll("input[name=school_ids]:checked"), function (x) { return x.value; });
+      if (!ids.length) { M.toast("בחרי לפחות בית ספר אחד"); return; }
+      var btn = f.querySelector("button[type=submit]"); btn.disabled = true;
+      M.api("tasks.add", { school_ids: ids, title: f.title.value, due: f.due.value, owner_role: f.owner_role.value, notify_principal: f.notify_principal.checked ? "כן" : "", note: f.note.value }).then(function (r) { if (!r.ok) { btn.disabled = false; M.toast(r.error === "badrequest" ? "תאריך לא תקין" : "לא נשמר"); return; } w.location.href = "tracking.html"; });
+    });
+  }
+  function renderPaste(parsed) {
+    d.getElementById("main").innerHTML = "<h2>המעקב שלי</h2>" + pasteHtml(state.data.schools, parsed);
+    d.getElementById("pasteForm").addEventListener("submit", function (e) {
+      e.preventDefault(); var f = e.target;
+      if (!parsed) { M.api("paste.parse", { text: f.text.value }).then(function (r) { if (!r.ok) { M.toast("לא זוהה"); return; } renderPaste({ title: r.title, due: r.due, body: r.body }); }); return; }
+      var ids = Array.prototype.map.call(f.querySelectorAll("input[name=school_ids]:checked"), function (x) { return x.value; });
+      if (!ids.length) { M.toast("בחרי לפחות בית ספר אחד"); return; }
+      var btn = f.querySelector("button[type=submit]"); btn.disabled = true;
+      M.api("tasks.add", { school_ids: ids, title: f.title.value, due: f.due.value, note: f.note.value, source: "paste" }).then(function (r) { if (!r.ok) { btn.disabled = false; M.toast("לא נשמר"); return; } M.toast("נוצרו " + r.tasks.length + " משימות"); w.location.href = "tracking.html"; });
+    });
+  }
+  function boot() {
+    if (boot._done) return; boot._done = true;
+    M.api("me").then(function (me) {
+      if (!me || !me.ok) {
+        var msg = { network: "השרת לא זמין כרגע. נסי שוב בעוד דקה.", notregistered: "החשבון שלך מאושר באתר, אבל עדיין לא רשום בהבית של המפקח. פני למיטל." };
+        if (me && msg[me.error]) d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">' + E(msg[me.error]) + "</div>";
+        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">משהו השתבש (' + E(me.error) + "). נסי לרענן.</div>";
+        return;
+      }
+      return M.api("tracking.list").then(function (r) {
+        if (!r.ok) { d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">השרת לא זמין כרגע.</div>'; return; }
+        state.data = r; r.schools.forEach(function (s) { state.byId[String(s.id)] = s.name; });
+        M.shell({ me: me, count: r.schools.length }); M.picker(r.schools, function (id) { state.f.school = id; state.detail = null; render(); });
+        if (qs.get("new")) return renderNew();
+        if (qs.get("paste")) return renderPaste(null);
+        render();
+      });
+    });
+  }
+  if (M.token()) boot(); else d.addEventListener("pmh:in", boot);
+})(window, document);
+</script>
+</body>
+</html>

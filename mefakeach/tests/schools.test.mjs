@@ -47,6 +47,6 @@ t("fileHtml visits: ביקור סגור בלי דוח מקבל 'השלמת הד�
 t("fileHtml visits ריק — 'עדיין אין ביקורים' וכפתור פתיחה", () => { const h = SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "visits", { visits: [], tasks: [] }); assert.match(h, /עדיין אין ביקורים/); assert.match(h, /פתיחת ביקור/); });
 t("fileHtml tasks: פתוחות ובוצעו, קריאה בלבד", () => {
   const h = SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "tasks", { visits: [], tasks: [{ id: "T1", title: "גאנט", owner_role: "רכז/ת חברתי/ת", due: "2026-09-30", status: "open" }, { id: "T2", title: "ישן", due: "", status: "done" }] });
-  assert.match(h, /גאנט/); assert.match(h, /בוצעו \(1\)/); assert.match(h, /המעקב המלא/); assert.match(h, /רכז\/ת חברתי\/ת/);
+  assert.match(h, /גאנט/); assert.match(h, /בוצעו \(1\)/); assert.match(h, /tracking\.html\?school=1/); assert.match(h, /רכז\/ת חברתי\/ת/);
 });
 console.log(`\n${n} עברו`);

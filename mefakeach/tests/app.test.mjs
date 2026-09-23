@@ -32,4 +32,13 @@ t("sessionExpired מצייר לתוך #app כשעוד אין #main (לפני she
   assert.match(app.innerHTML, /כניסה מחדש/);
   win.document.getElementById = () => null;
 });
+await (async () => {
+  const ta = async (name, fn) => { try { await fn(); n++; console.log("  ✓ " + name); } catch (e) { console.log("  ✗ " + name + "\n      " + String(e.message).split("\n")[0]); process.exitCode = 1; } };
+  await ta("api: כשל רשת מנוסה שוב פעמיים ואז network; כשל אחד ואז הצלחה — ok", async () => {
+    let calls = 0; ctx.fetch = () => { calls++; return Promise.reject(new Error("down")); };
+    const r = await MEF.api("me"); assert.equal(r.error, "network"); assert.equal(calls, 3);
+    calls = 0; ctx.fetch = () => { calls++; return calls === 1 ? Promise.reject(new Error("down")) : Promise.resolve({ json: () => ({ ok: true, hello: 1 }) }); };
+    const r2 = await MEF.api("me"); assert.equal(r2.ok, true); assert.equal(calls, 2);
+  });
+})();
 console.log(`\n${n} עברו`);
