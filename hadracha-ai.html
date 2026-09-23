@@ -181,37 +181,44 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   <section class="step">
     <h2><span class="badge">2</span>נכנסים למקום הנכון</h2>
     <p class="sub">במחשב, בחשבון הגוגל הרגיל שלכם. לא צריך שום מנוי.</p>
-    <ol class="mini">
-      <li>נכנסים ל-<b>gemini.google.com</b></li>
-      <li>בתפריט הצד לוחצים <b>Explore Gems</b> (או "סייר ב-Gems")</li>
-      <li>ואז על הכפתור <b>New Gem</b> — ייפתח מסך ריק</li>
-    </ol>
-    <a class="big ghost" href="https://gemini.google.com/gems/create" target="_blank" rel="noopener">
+    <p>הכי מהיר — <b>הכפתור למטה</b>. הוא פותח ישר את המסך של Gem חדש.</p>
+    <a class="big" href="https://gemini.google.com/gems/create" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-4"/></svg>
-      פתיחת המסך הזה בלשונית חדשה</a>
+      פתיחת מסך "Gem חדש"</a>
+    <p style="font-size:16.5px;color:var(--muted)">אם תעדיפו דרך התפריט: נכנסים ל-<b>gemini.google.com</b>,
+      ובתפריט הצד מחפשים <b>Gems</b> ואז <b>Gem חדש</b>.</p>
+    <div class="tip"><b>אם המסך נפתח באנגלית</b> — זה בסדר, השדות באותו סדר בדיוק.
+      בהמשך נכתוב את שני השמות.</div>
   </section>
 
   <section class="step">
     <h2><span class="badge">3</span>מה יש במסך</h2>
-    <p class="sub">שלושה שדות בלבד. זה נראה בערך ככה:</p>
+    <p class="sub">המסך מחולק לשניים: מימין ממלאים, ומשמאל רואים תצוגה מקדימה.</p>
 
     <div class="mock">
-      <div class="bar"><i></i><i></i><i></i><span>Gemini · New Gem</span></div>
+      <div class="bar"><i></i><i></i><i></i><span>Gem חדש</span></div>
       <div class="body">
-        <div class="mf"><div class="cap">NAME · שם</div>
-          <div class="val">איך תקראו לו — "עוזר ביקורים"</div>
-          <span class="tag">שורה אחת</span></div>
-        <div class="mf hi"><div class="cap">INSTRUCTIONS · הוראות</div>
+        <div class="mf"><div class="cap">שם</div>
+          <div class="val">איך תקראו לו — למשל "עוזר ביקורים"</div>
+          <span class="tag">חובה</span></div>
+        <div class="mf"><div class="cap">תיאור</div>
+          <div class="val">שורה שמסבירה מה הוא עושה — לכם, לא לו</div>
+          <span class="tag">רשות</span></div>
+        <div class="mf hi"><div class="cap">פרומפט בסיס</div>
           <div class="val">כאן כל העבודה. זה הלב של ה-Gem.</div>
           <span class="tag">השדה הגדול</span></div>
-        <div class="mf"><div class="cap">KNOWLEDGE · קבצים</div>
-          <div class="val">מסמכים שהוא יזכור תמיד — לא חובה</div>
+        <div class="mf"><div class="cap">ידע</div>
+          <div class="val">קבצים שהוא יזכור תמיד — נגיע לזה בפרק ב׳</div>
           <span class="tag">רשות</span></div>
       </div>
     </div>
 
-    <div class="note"><b>השדה האמצעי הוא כל הסיפור.</b> אם תכתבו שם משפט אחד,
-      תקבלו עוזר בינוני. בשלב הבא נראה בדיוק מה כותבים שם.</div>
+    <div class="note"><b>"פרומפט בסיס" הוא כל הסיפור</b> — שם כותבים את ההוראות.
+      (באנגלית הוא נקרא <i>Instructions</i>.) אם תכתבו שם משפט אחד, תקבלו עוזר בינוני.
+      בשלב הבא נראה בדיוק מה כותבים שם.</div>
+
+    <div class="tip"><b>שימו לב:</b> כל עוד לא נתתם שם, התצוגה המקדימה משמאל לא עובדת
+      והמערכת תציג התראה אדומה. <b>תנו שם קודם</b> וזה ייעלם.</div>
   </section>
 
   <section class="step">
@@ -234,6 +241,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <button class="big" data-copy="skeleton">
       <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
       העתקת התבנית הריקה</button>
+    <p style="font-size:16.5px;color:var(--muted);margin:0 0 16px">
+      מדביקים אותה בשדה <b>"פרומפט בסיס"</b>, ומחליפים את מה שבסוגריים.</p>
 
     <div class="note"><b>למה השורה האחרונה היא החשובה ביותר?</b>
       בלעדיה הוא ינחש במקומכם — ויעשה את זה בביטחון גמור.
@@ -243,10 +252,12 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
   <section class="step">
     <h2><span class="badge">5</span>בודקים לפני ששומרים</h2>
-    <p class="sub">בצד המסך יש חלון תצוגה — אפשר לדבר איתו עוד לפני השמירה.</p>
-    <p>כתבו לו משהו ותראו מה חוזר. <b>לא מוצא חן בעיניכם? תקנו את ההוראות, לא את השאלה.</b>
+    <p class="sub">משמאל יש <b>תצוגה מקדימה</b> — אפשר לדבר איתו עוד לפני ששומרים.</p>
+    <p>כתבו לו משהו בחלון השמאלי ותראו מה חוזר.
+      <b>לא מוצא חן בעיניכם? תקנו את הפרומפט, לא את השאלה.</b>
       זה הרגל שכדאי לאמץ מהרגע הראשון.</p>
-    <p>וכשזה נראה טוב — <b>Save</b>. מאותו רגע הוא ברשימה שלכם, ומחכה.</p>
+    <p>וכשזה נראה טוב — <b>שמירה</b>, הכפתור בפינה למעלה.
+      מאותו רגע הוא ברשימת ה-Gems שלכם ומחכה לכם.</p>
     <div class="tip"><b>אפשר לערוך אותו מתי שרוצים.</b> Gem הוא לא משהו שגומרים —
       הוא משתפר בכל פעם שמתקנים לו שורה.</div>
   </section>
@@ -260,32 +271,34 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <p class="sub">וזו בדיוק הסיבה שמידע מפוזר נשאר מפוזר.</p>
     <p>בנינו עוזר שיודע <b>איך</b> לעבוד. אבל הוא עדיין לא יודע <b>כלום</b> על בתי הספר שלכם.
       בכל שיחה חדשה אתם מתחילים מאפס ומדביקים לו הכול שוב.</p>
-    <p><b>ל-Gem יש פתרון לזה: קבצים.</b> מעלים אליו מסמכים פעם אחת —
-      והוא זוכר אותם לתמיד, בכל שיחה, בלי שתדביקו שוב.</p>
+    <p><b>ל-Gem יש פתרון לזה — השדה "ידע".</b> מעלים אליו מסמכים פעם אחת,
+      והוא זוכר אותם לתמיד, בכל שיחה, בלי שתדביקו שוב.
+      <b>זה חינם ואין מגבלה על מספר ה-Gems שתבנו.</b></p>
     <div class="tip">זה ההבדל בין עוזר שעונה על שאלות
       לבין עוזר <b>שמכיר את בתי הספר שלכם בשמם.</b></div>
   </section>
 
   <section class="step">
     <h2><span class="badge">2</span>איפה מעלים</h2>
-    <p class="sub">באותו מסך שבו בניתם את ה-Gem, בשדה השלישי.</p>
+    <p class="sub">באותו מסך שבו בניתם את ה-Gem — השדה האחרון, למטה.</p>
 
     <div class="mock">
-      <div class="bar"><i></i><i></i><i></i><span>Gemini · Edit Gem</span></div>
+      <div class="bar"><i></i><i></i><i></i><span>עריכת Gem</span></div>
       <div class="body">
-        <div class="mf"><div class="cap">NAME</div><div class="val">תיק בתי הספר</div></div>
-        <div class="mf"><div class="cap">INSTRUCTIONS</div>
+        <div class="mf"><div class="cap">שם</div><div class="val">תיק בתי הספר</div></div>
+        <div class="mf"><div class="cap">פרומפט בסיס</div>
           <div class="val">ההוראות שכתבתם בפרק הקודם</div></div>
-        <div class="mf hi"><div class="cap">KNOWLEDGE · קבצים</div>
-          <div class="val">כאן גוררים את המסמכים</div>
+        <div class="mf hi"><div class="cap">ידע</div>
+          <div class="val">"הוספת קבצים שה-Gem יכול לקבל מהם מידע" — לוחצים על הפלוס</div>
           <span class="tag">זה החלק החדש</span></div>
       </div>
     </div>
 
     <ol class="mini">
       <li>פותחים את ה-Gem שבניתם ולוחצים <b>עריכה</b></li>
-      <li>גוללים לשדה <b>Knowledge</b> ומעלים לשם קבצים</li>
-      <li>לוחצים <b>Save</b>. זהו — הוא מכיר אותם מעכשיו</li>
+      <li>גוללים למטה עד <b>"ידע"</b> ולוחצים על <b>+</b></li>
+      <li>בוחרים קבצים מהמחשב או מהדרייב</li>
+      <li>לוחצים <b>שמירה</b>. זהו — הוא מכיר אותם מעכשיו</li>
     </ol>
     <div class="tip"><b>אפשר להוסיף קבצים מתי שרוצים.</b> קיבלתם תוכנית עבודה חדשה?
       מעלים אותה, והתיק מתעדכן.</div>
