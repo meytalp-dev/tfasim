@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>הבית של המפקח · מוקאפ לאישור</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --sky-soft:#e7f4fc; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415;
+  --note:#fff7dc; --note-line:#f0d98a;
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.6;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+h1,h2,h3,h4{font-family:'Rubik',sans-serif;color:var(--navy);margin:0;font-weight:600;line-height:1.3}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;vertical-align:-4px;flex:none}
+
+.mock-head{max-width:1120px;margin:18px auto 10px;padding:0 18px}
+.mock-head h1{font-size:28px}
+.mock-head p{margin:4px 0 0;color:var(--muted);font-size:15.5px}
+.screens{max-width:1120px;margin:0 auto;padding:0 18px;display:flex;gap:6px;flex-wrap:wrap}
+.screens button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 13px;font-family:'Rubik';font-weight:600;font-size:14.5px;color:var(--muted);cursor:pointer;box-shadow:var(--shadow-s)}
+.screens button.on{background:linear-gradient(100deg,var(--navy),var(--blue) 75%);color:#fff;border-color:transparent}
+.screen{display:none;max-width:1120px;margin:16px auto 40px;padding:0 18px}
+.screen.on{display:block}
+.note{background:var(--note);border:1px solid var(--note-line);border-radius:12px;padding:10px 14px;font-size:15px;margin:12px 0;color:#5a4500}
+.note b{color:#7a5a00}
+.note::before{content:"הערת תכנון · ";font-family:'Rubik';font-weight:600}
+
+.app{display:grid;grid-template-columns:220px 1fr;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);overflow:hidden;min-height:520px}
+.side{background:linear-gradient(180deg,#1c3a86,#224292 60%,#2b56b8);color:#fff;padding:22px 16px}
+.side .who{display:flex;gap:10px;align-items:center;margin-bottom:22px}
+.side .who .av{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.18);display:grid;place-items:center;font-family:'Rubik';font-weight:700}
+.side .who small{display:block;opacity:.75;font-size:13px}
+.side nav a{display:flex;gap:10px;align-items:center;padding:11px 12px;border-radius:12px;color:#fff;text-decoration:none;font-family:'Rubik';font-weight:500;font-size:15.5px;opacity:.86}
+.side nav a.on{background:rgba(255,255,255,.16);opacity:1}
+.side nav a .b{margin-right:auto;background:var(--sky);color:var(--navy);font-size:12px;border-radius:99px;padding:0 8px;font-weight:700}
+.main{padding:24px 26px}
+.main h2{font-size:23px;margin-bottom:4px}
+.main .sub{color:var(--muted);margin:0 0 18px;font-size:15.5px}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-s)}
+.card h3{font-size:17px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.card.soft{background:var(--sky-soft);border-color:#cfe6f5}
+.card.blue{background:var(--blue-soft);border-color:#d3ddff}
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line);font-size:15.5px}
+.list li:first-child{border-top:0}
+.list li .m{color:var(--muted);font-size:13.5px;margin-right:auto;white-space:nowrap}
+.tag{display:inline-block;border-radius:99px;padding:1px 10px;font-size:13px;font-weight:600;line-height:1.6;white-space:nowrap}
+.tag.ok{background:#e3f7f3;color:#0b7f70}.tag.warn{background:#fff1e0;color:var(--amber)}.tag.bad{background:#fde7e9;color:var(--danger)}.tag.info{background:var(--blue-soft);color:var(--navy)}.tag.gray{background:#eef1f7;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:12px;padding:9px 16px;font-family:'Rubik';font-weight:600;font-size:15px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;box-shadow:var(--shadow-s);white-space:nowrap}
+.btn.p{background:linear-gradient(100deg,var(--navy),var(--blue) 75%);color:#fff;border-color:transparent}
+.btn.s{background:var(--blue-soft);border-color:#d3ddff}
+.btn.sm{padding:5px 11px;font-size:13.5px;border-radius:9px}
+.btn.ghost{box-shadow:none;background:transparent}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--line);margin:14px 0 16px}
+.tabs span{padding:8px 14px;font-family:'Rubik';font-weight:600;color:var(--muted);font-size:15px;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tabs span.on{color:var(--navy);border-color:var(--blue)}
+table{width:100%;border-collapse:collapse;font-size:15px}
+th{font-family:'Rubik';font-weight:600;color:var(--muted);font-size:13.5px;text-align:right;padding:8px 10px;border-bottom:2px solid var(--line)}
+td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.field{width:100%;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font:inherit;font-size:15px;background:#fbfcff;color:var(--ink)}
+textarea.field{min-height:74px;resize:vertical}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 12px;font-size:14px;font-weight:600;color:var(--muted)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.q{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.q .t{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;margin-bottom:6px}
+.q .t .who{font-size:13px;color:var(--muted)}
+.q .st{display:flex;gap:6px;margin-top:8px;align-items:center}
+.q .st span{font-size:13px;border:1px solid var(--line);border-radius:99px;padding:2px 10px;color:var(--muted)}
+.q .st span.on{background:#e3f7f3;color:#0b7f70;border-color:#bfe9df}
+.q .st span.on.w{background:#fff1e0;color:var(--amber);border-color:#f5d9b3}
+.saved{font-size:13px;color:var(--mint);display:inline-flex;gap:5px;align-items:center}
+.report h4{font-size:16px;margin:16px 0 6px;padding-right:10px;border-right:4px solid var(--sky)}
+.report .auto{background:var(--sky-soft);border-radius:10px;padding:8px 12px;font-size:15px;margin-bottom:6px}
+.report .auto .src{font-size:12.5px;color:var(--muted);display:block}
+.light{display:inline-block;width:14px;height:14px;border-radius:50%;vertical-align:-2px;margin-left:4px}
+.light.g{background:#22b573}.light.y{background:#f2b632}.light.o{background:#dfe4ee}
+.gate{max-width:420px;margin:24px auto;background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:30px 30px 24px;text-align:center}
+.gate .logo{font-family:'Rubik';font-weight:700;color:var(--navy);font-size:22px;margin-bottom:4px}
+.gate p{color:var(--muted);font-size:15px;margin:0 0 18px}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:11px;font-family:'Rubik';font-weight:600;background:#fff;color:var(--ink);margin:0 0 12px}
+.step2{border-top:1px dashed var(--line);margin-top:16px;padding-top:16px}
+/* tracking */
+.school-row{border:1px solid var(--line);border-radius:14px;margin-bottom:10px;background:#fff;overflow:hidden}
+.school-row .head{display:flex;gap:12px;align-items:center;padding:12px 16px;cursor:pointer}
+.school-row .head b{font-family:'Rubik';font-weight:600;color:var(--navy);font-size:16px}
+.school-row .head .cnt{color:var(--muted);font-size:14px}
+.school-row .head .chev{margin-right:auto;color:var(--muted)}
+.school-row .body{border-top:1px solid var(--line);background:#fbfcff}
+.task{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;padding:10px 16px;border-top:1px solid var(--line);font-size:15px}
+.task:first-child{border-top:0}
+.task .due{color:var(--muted);font-size:14px;white-space:nowrap}
+.drawer{border:1px solid #d3ddff;background:var(--blue-soft);border-radius:16px;padding:16px 18px}
+.drawer label{display:block;font-size:13.5px;color:var(--muted);font-weight:600;margin:10px 0 3px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px}
+.toggle .sw{width:38px;height:22px;border-radius:99px;background:var(--mint);position:relative;flex:none}
+.toggle .sw::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff}
+.toggle .sw.off{background:#cfd6e6}.toggle .sw.off::after{left:auto;right:3px}
+.progress{height:10px;border-radius:99px;background:#e6ebf5;overflow:hidden;margin:6px 0}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),var(--blue));width:75%}
+
+/* school picker bar (all screens) */
+.pick{display:flex;align-items:center;gap:10px;padding:10px 26px;border-bottom:1px solid var(--line);background:#fbfcff;font-size:14.5px}
+.pick label{font-family:'Rubik';font-weight:600;color:var(--muted);font-size:13.5px}
+.pick select{border:1px solid var(--line);border-radius:10px;padding:6px 12px;font:inherit;font-size:15px;background:#fff;color:var(--navy);font-weight:600;min-width:220px}
+.pick .hint{color:var(--muted);font-size:13px;margin-right:auto}
+.mainwrap{display:flex;flex-direction:column}
+.credit{text-align:center;color:var(--muted);font-size:13.5px;padding:20px 0 30px}
+.credit a{color:var(--navy);font-weight:700;text-decoration:none}
+@media (max-width:820px){.app{grid-template-columns:1fr}.side{display:none}.g2,.g3{grid-template-columns:1fr}.task{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+
+<div class="mock-head">
+  <h1>הבית של המפקח · מוקאפ לאישור · גרסה 2</h1>
+  <p>גרסה רזה: כל מסך עונה על שאלה אחת. הנתונים בדוגמאות הם של סיגלית דאי מפריסת הפיקוח; שמות המנהלים, המשימות והתשובות מומצאים. הקופסאות הצהובות הן הערות שלי, לא חלק מהמסך.</p>
+</div>
+
+<div class="screens" id="screens">
+  <button class="on" data-s="s1">שער הכניסה</button>
+  <button data-s="s2">על השולחן</button>
+  <button data-s="s3">בתי הספר שלי</button>
+  <button data-s="s4">הביקור · הכנה</button>
+  <button data-s="s5">הביקור · שאלות</button>
+  <button data-s="s6">הדוח שלי</button>
+  <button data-s="s7">המעקב שלי</button>
+  <button data-s="s10">היומן שלי</button>
+</div>
+
+<!-- ============ 1. GATE ============ -->
+<section class="screen on" id="s1">
+  <div class="gate">
+    <div class="logo">הבית של המפקח</div>
+    <p>המרחב הפדגוגי · משרד העבודה</p>
+    <div class="gbtn"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>כניסה עם חשבון Google</div>
+    <p style="font-size:13.5px">עם החשבון הרשום במרחב הפיקוח</p>
+    <div class="step2">
+      <p style="margin-bottom:8px"><b>שלב 2 · סיסמה אישית</b></p>
+      <input class="field" style="text-align:center;font-size:20px;letter-spacing:.2em" value="••••••••" readonly>
+      <div style="margin-top:12px"><span class="btn p" style="width:100%;justify-content:center">כניסה</span></div>
+    </div>
+  </div>
+  <div class="note"><b>בורר בית ספר בכל מסך:</b> מהמסך הבא והלאה, בראש כל מסך יש "בית ספר: כל בתי הספר שלי ▾" עם בתי הספר של המפקח בלבד. הבחירה נשמרת כשעוברים בין הטאבים, וכל מסך מסנן לפיה. שער הכניסה הקיים של האתר, ללא שינוי. <b>אין הרשמה.</b> 14 חשבונות הפיקוח נכנסים מהיום הראשון. השרת בודק בכל קריאה שהמייל בלשונית המפקחים, ומחזיר רק את בתי הספר של אותו מפקח. חיבור לג'ימייל פרטי, אם יבוא, יהיה כפתור בתוך המערכת ולא חלק מהכניסה.</div>
+</section>
+
+<!-- ============ 2. HOME ============ -->
+<section class="screen" id="s2">
+  <style>
+    .lane{border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:var(--shadow-s);overflow:hidden}
+    .lane .lh{display:flex;align-items:center;gap:10px;padding:10px 16px;font-family:'Rubik';font-weight:600;font-size:16px;color:var(--navy);border-bottom:1px solid var(--line)}
+    .lane .lh .c{margin-right:auto;font-size:13px;color:var(--muted);font-weight:500;font-family:'Assistant'}
+    .lane.now .lh{background:var(--blue-soft)}
+    .lane.late .lh{background:#fde7e9;color:var(--danger)}
+    .lane.week .lh{background:#f6f8fd}
+    .lane ul{list-style:none;margin:0;padding:0 16px}
+    .lane li{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);font-size:15px}
+    .lane li:first-child{border-top:0}
+    .lane li .s{color:var(--muted);font-size:13.5px}
+    .lane li .a{margin-right:auto}
+    .lane .more{display:block;padding:8px 16px;font-size:13.5px;color:var(--navy);border-top:1px dashed var(--line);text-align:center}
+  </style>
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ו</div><div>ויסאם סואלחה<small>מפקח פדגוגי · 13 בתי ספר</small></div></div>
+      <nav>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי<span class="b">2</span></a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי<span class="b">7</span></a>
+        <a><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>היומן שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>על השולחן</h2><p class="sub" style="margin:0">יום שלישי, 23.9.2026 · ויסאם, 13 בתי ספר</p></div>
+        <div class="row"><span class="chip on">לפי דחיפות</span><span class="chip">לפי בית ספר</span></div>
+      </div>
+
+      <div class="grid g3" style="margin-top:16px;align-items:start">
+        <div class="lane now">
+          <div class="lh">היום<span class="c">2</span></div>
+          <ul>
+            <li><b>ביקור · ערערה</b><span class="a btn sm">הכנה</span></li>
+            <li>מסאראת · תוכנית השתלמות<span class="s">משימה</span><span class="a btn sm ghost">בוצע</span></li>
+          </ul>
+        </div>
+        <div class="lane late">
+          <div class="lh">באיחור<span class="c">5</span></div>
+          <ul>
+            <li>דוח · אכסאל, ביקור 16.9<span class="s">7 ימים</span><span class="a btn sm">לדוח</span></li>
+            <li>אום אל פחם · מסמך בעלי תפקידים<span class="s">3 ימים</span><span class="a btn sm ghost">תזכורת</span></li>
+            <li>סכנין · גאנט רכז חברתי<span class="s">2 ימים</span><span class="a btn sm ghost">תזכורת</span></li>
+          </ul>
+          <a class="more" href="#">עוד 2 באיחור</a>
+        </div>
+        <div class="lane week">
+          <div class="lh">השבוע<span class="c">6</span></div>
+          <ul>
+            <li>ביקור · כפר יאסיף<span class="s">מחר</span></li>
+            <li>ביקור · נצרת<span class="s">יום ה׳</span></li>
+            <li>מסאראת · תוכנית תלת שנתית<span class="s">יום ה׳</span></li>
+          </ul>
+          <a class="more" href="#">עוד 3 השבוע</a>
+        </div>
+      </div>
+
+      <div class="card blue" style="margin-top:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <b style="font-family:'Rubik';font-weight:600;color:var(--navy)">מהמטה</b>
+        <span style="font-size:15px">4 בקשות השתלמות ממתינות לאישורך · 3 טפסים עם בתי ספר שטרם הגישו</span>
+        <span class="btn sm" style="margin-right:auto">למעקב</span>
+      </div>
+
+      <div class="row" style="margin-top:16px">
+        <span class="btn s">+ משימה לבית ספר</span>
+        <span class="btn s">+ פתיחת ביקור</span>
+        <span class="btn s">הדבקת בקשה מהמטה</span>
+        <span class="btn" style="margin-right:auto"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2"/><path d="M9 9h6M9 13h6"/></svg>סיכום היום · העתקה</span>
+      </div>
+    </div>
+  </div>
+  <div class="note"><b>סיכום היום</b> הוא כפתור כאן ולא מסך: לוחצים בסוף היום ומקבלים טקסט מוכן להעתקה, מה בוצע, מה נוצר, מה נשאר פתוח, מאותם נתונים שכבר על השולחן. <b>למה שלוש קבוצות:</b> מפקח עם 13 בתי ספר יכול להגיע ל-15 פריטים פתוחים ביום רגיל. במקום רשימה אחת: "היום" (מה שקבוע להיום), "באיחור" (מה שעבר), "השבוע" (מה שמגיע). כל קבוצה מציגה עד שלושה פריטים ו"עוד N" שפותח את השאר. "לפי בית ספר" הופך את אותם פריטים לשורה מתקפלת לכל בית ספר, למי שחושב ככה. <b>מאיפה הנתונים:</b> הכול מהמעקב, מהביקורים ומהטפסים מהמטה, הבית לא מחזיק מידע משלו. קבוצה ריקה לא מוצגת.</div>
+</section>
+
+<!-- ============ 3. SCHOOLS ============ -->
+<section class="screen" id="s3">
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית · 12 בתי ספר</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <h2>בתי הספר שלי</h2>
+      <p class="sub">12 בתי ספר</p>
+      <div class="grid g3" style="margin-bottom:22px">
+        <div class="card" style="border-color:var(--blue)"><h3>אורט אורמת</h3><div style="font-size:14.5px;color:var(--muted)">יבנה · אורט</div><div style="margin-top:6px"><span class="tag info">ביקור היום</span></div></div>
+        <div class="card"><h3>עמל אשדוד</h3><div style="font-size:14.5px;color:var(--muted)">אשדוד · עמל</div><div style="margin-top:6px"><span class="tag warn">דוח ממתין</span></div></div>
+        <div class="card"><h3>תיכון החממה</h3><div style="font-size:14.5px;color:var(--muted)">הוד השרון · עמל</div><div style="margin-top:6px"><span class="tag bad">1 באיחור</span></div></div>
+        <div class="card"><h3>עתיד פלמחים</h3><div style="font-size:14.5px;color:var(--muted)">שורק · עתיד</div><div style="margin-top:6px"><span class="tag gray">ביקור אחרון 15.9</span></div></div>
+        <div class="card"><h3>דן גורמה</h3><div style="font-size:14.5px;color:var(--muted)">תל אביב · אורט</div><div style="margin-top:6px"><span class="tag gray">ביקור אחרון 9.9</span></div></div>
+        <div class="card"><h3>קמ"ג דימונה</h3><div style="font-size:14.5px;color:var(--muted)">דימונה · עמל</div><div style="margin-top:6px"><span class="tag gray">טרם בוקר השנה</span></div></div>
+      </div>
+
+      <h2 style="font-size:20px">אורט אורמת</h2>
+      <p class="sub" style="margin-bottom:0">יבנה · אורט · סמל 45005 · מנהלת: רונית לוי · 05x-xxxxxxx</p>
+      <div class="tabs"><span>פרטים</span><span class="on">מסמכים</span><span>משימות</span><span>ביקורים ודוחות</span></div>
+      <table>
+        <tr><th>מסמך</th><th>סוג</th><th>הועלה</th><th></th></tr>
+        <tr><td>תוכנית עבודה בית ספרית תשפ"ז <span class="tag gray">גרסה 2</span></td><td>תוכנית עבודה</td><td>21.9</td><td><a href="#">פתיחה</a></td></tr>
+        <tr><td>מסמך בעלי תפקידים</td><td>בעלי תפקידים</td><td>3.9</td><td><a href="#">פתיחה</a></td></tr>
+        <tr><td>דוח ביקור 7.8.2026</td><td>דוח מאושר</td><td>נוצר במערכת</td><td><a href="#">פתיחה</a></td></tr>
+      </table>
+      <div class="row" style="margin-top:12px"><span class="btn s sm">העלאת מסמך</span></div>
+    </div>
+  </div>
+  <div class="note">כרטיס = שם, יישוב, ושורת מצב אחת. פרטי המנהל רק בתוך התיק. לשונית "פרטים" מציגה את מה שיש בפריסת הפיקוח וקישורים לדפי המעקב הקיימים מסוננים לבית הספר. מסמכים נשמרים בתיקייה פרטית ומוגשים דרך השרת אחרי בדיקת הרשאה. <b>גרסה חדשה לא מוחקת את הקודמת.</b></div>
+</section>
+
+<!-- ============ 4. VISIT PREP ============ -->
+<section class="screen" id="s4">
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <h2>ביקור · אורט אורמת · 23.9.2026</h2>
+      <p class="sub">לפני שנכנסים: מה כדאי לזכור</p>
+      <div class="grid g3">
+        <div class="card soft">
+          <h3>מהדוח הקודם · 7.8</h3>
+          <ul class="list" style="font-size:14.5px">
+            <li>לבנות שגרת ליווי חניכות עם ביקורי רכז</li>
+            <li>מנגנון השלמות למורים שנעדרו מהשתלמות</li>
+            <li>לבירור: מצבת מורי המגמות</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>פתוח מול בית הספר</h3>
+          <ul class="list" style="font-size:14.5px">
+            <li>גאנט שנתי של הרכז החברתי <span class="m"><span class="tag warn">30.9</span></span></li>
+            <li>תוכנית תלת שנתית <span class="m"><span class="tag gray">15.10</span></span></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>נוסף מאז הביקור הקודם</h3>
+          <ul class="list" style="font-size:14.5px">
+            <li>תוכנית עבודה תשפ"ז, גרסה 2 <span class="m"><a href="#">פתיחה</a></span></li>
+            <li>מסמך בעלי תפקידים <span class="m"><a href="#">פתיחה</a></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="row" style="margin-top:20px"><span class="btn p">לשאלות הביקור</span><span style="font-size:14px;color:var(--muted)">אפשר לדלג ולהתחיל ישר מהשאלות</span></div>
+    </div>
+  </div>
+  <div class="note">מסך ההכנה הוא קריאה בלבד, שלושה מקורות מהתיק. הוא מוצג פעם אחת, ואפשר לחזור אליו מהשאלות. אין כאן שאלות ואין סינון.</div>
+</section>
+
+<!-- ============ 5. VISIT QUESTIONS ============ -->
+<section class="screen" id="s5">
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>אורט אורמת · 23.9</h2><p class="sub" style="margin:0">שאלות לביקור</p></div>
+        <span class="saved"><svg class="i" viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg>נשמר 09:42</span>
+      </div>
+      <div class="row" style="margin:14px 0 16px">
+        <select class="field" style="width:190px"><option>ספטמבר-אוקטובר</option><option>כל השנה</option></select>
+        <select class="field" style="width:190px"><option>רכז/ת פדגוגי/ת</option><option>מנהל/ת</option><option>רכז/ת חניכות</option><option>רכז/ת חברתי/ת</option><option>מת"לית</option><option>רכז/ת תקשוב</option><option>כל בעלי התפקידים</option></select>
+        <span style="font-size:14px;color:var(--muted)">11 שאלות</span>
+      </div>
+      <div style="max-width:720px">
+        <div class="q">
+          <div class="t"><b>קיימת תוכנית השתלמות שנתית עם מטרות, נושאים ולוחות זמנים?</b><span class="who">השתלמות מוסדית</span></div>
+          <input class="field" value="יש תוכנית, 6 מפגשים, בלי תיעוד של מפגשים שכבר התקיימו">
+          <div class="st"><span class="on">נענתה</span><span>נדרש בירור</span><span>לא רלוונטית</span><a href="#" style="margin-right:auto;font-size:13.5px">+ משימה</a></div>
+        </div>
+        <div class="q">
+          <div class="t"><b>יש מעבר מהדרכה ליישום: מה כל מורה מנסה השבוע בכיתה?</b><span class="who">השתלמות מוסדית</span></div>
+          <input class="field" placeholder="תשובה קצרה">
+          <div class="st"><span>נענתה</span><span class="on w">נדרש בירור</span><span>לא רלוונטית</span><a href="#" style="margin-right:auto;font-size:13.5px">+ משימה</a></div>
+        </div>
+        <div class="q">
+          <div class="t"><b>סילבוסים של כל המורים קיימים? בדיקה מדגמית</b><span class="who">גאנט ספט'-אוק'</span></div>
+          <input class="field" placeholder="תשובה קצרה">
+          <div class="st"><span>נענתה</span><span>נדרש בירור</span><span>לא רלוונטית</span><a href="#" style="margin-right:auto;font-size:13.5px">+ משימה</a></div>
+        </div>
+        <div class="q">
+          <div class="t"><b>תוכנית תלת שנתית: איפה זה עומד?</b><span class="who">ליווי הרכז הפדגוגי</span></div>
+          <input class="field" placeholder="תשובה קצרה">
+          <div class="st"><span>נענתה</span><span>נדרש בירור</span><span>לא רלוונטית</span><a href="#" style="margin-right:auto;font-size:13.5px">+ משימה</a></div>
+        </div>
+        <div class="row" style="justify-content:space-between;margin-top:10px">
+          <span class="btn ghost sm">+ שאלה משלי</span>
+          <span class="btn p">סיים ביקור</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">שני מסננים בלבד: תקופה ובעל תפקיד. אותו מסך בטלפון, רק בעמודה אחת. <b>אין שאלה חובה ואין אחוז השלמה.</b> "נדרש בירור" הופך אוטומטית ל"להמשך בירור" בדוח. "+ משימה" פותח משימה מקושרת לשאלה. בלי קליטה מוצג "ממתין לשליחה", לא "נשמר". המאגר: לשונית בגיליון, ממולאת מ-30 סעיפי הצ'ק ליסט, 7 בעלי התפקידים והגאנט החודשי.</div>
+</section>
+
+<!-- ============ 6. REPORT ============ -->
+<section class="screen" id="s6">
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>דוח פדגוגי · אורט אורמת · 23.9.2026</h2><p class="sub" style="margin:0"><span class="tag warn">טיוטה</span> נשמר אוטומטית 13:05</p></div>
+        <span class="btn p">אשר דוח</span>
+      </div>
+      <div class="report" style="max-width:760px">
+        <h4>1 · פרטי הביקור</h4>
+        <div class="auto">23.9.2026 · אורט אורמת · משתתפים: רונית לוי (מנהלת), רכז פדגוגי, רכזת חניכות · מטרה: פתיחת שנה, השתלמות מוסדית ותוכנית תלת שנתית<span class="src">מפתיחת הביקור</span></div>
+
+        <h4>2 · תחומי הביקור</h4>
+        <div class="auto"><b>השתלמות מוסדית</b><br>תוכנית השתלמות שנתית: יש תוכנית, 6 מפגשים, בלי תיעוד של מפגשים שכבר התקיימו.<br>מעבר מהדרכה ליישום: <span class="tag warn">נדרש בירור</span><span class="src">מהתשובות בביקור. שאלות שלא נשאלו לא מופיעות.</span></div>
+        <div class="auto"><b>חניכות</b><br>38 תלמידים משובצים ב-4 מקצועות, מודל יום בשבוע. ביקורי רכזת פעם בחודש, בלי שיחות משוב מתועדות.<span class="src">מהתשובות בביקור</span></div>
+
+        <h4>3 · תמונת מצב מקצועית</h4>
+        <textarea class="field" placeholder="חוזקות, אתגרים, פערים, מגמות. ריק בכוונה: שיקול הדעת שלך."></textarea>
+
+        <h4>4 · המלצות והמשך עבודה</h4>
+        <div class="auto">להמשך בירור: מעבר מהדרכה ליישום בהשתלמות המוסדית<span class="src">מסימון "נדרש בירור"</span></div>
+        <div class="auto">משימה: תיעוד מפגשי ההשתלמות · רכז פדגוגי · עד 15.10<span class="src">נוצרה בביקור, כבר במעקב</span></div>
+        <textarea class="field" placeholder="המלצות נוספות"></textarea>
+
+        <div class="row" style="margin-top:16px;gap:18px;font-size:15px">
+          <label><input type="checkbox"> יש סוגיה לעדכון המפקחת הארצית</label>
+          <label><input type="checkbox"> להוסיף רמזור לתחומים</label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">ארבעה חלקים לפי הנחיות הדוח הפדגוגי. ששת מצבי הדיווח למפקחת הארצית והרמזור נפתחים רק אם מסמנים. <b>בלי בינה:</b> הטיוטה היא סידור של מה שנרשם. אחרי "אשר דוח" הדוח ננעל ומופיע בתיק בית הספר עם שלושה כפתורים: העתקה למאנדיי או למייל, הורדה, ו"שפר ניסוח בצ'אט" שמעתיק את הטיוטה עם הנחיות הסוכן מהסדנה. המערכת לא שולחת דוח לאף אחד.</div>
+</section>
+
+<!-- ============ 7. TRACKING ============ -->
+<section class="screen" id="s7">
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>המעקב שלי</h2><p class="sub" style="margin:0">מי חייב לי מה · 11 פריטים פתוחים ב-6 בתי ספר</p></div>
+        <span class="btn p">+ משימה</span>
+      </div>
+      <div class="row" style="margin:14px 0 16px">
+        <span class="chip on">לפי בית ספר</span><span class="chip">לפי טופס מהמטה</span>
+        <span style="color:var(--line)">|</span>
+        <span class="chip">רק באיחור</span><span class="chip">בוצעו</span>
+      </div>
+
+      <div class="card blue" style="margin-bottom:14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <b style="font-family:'Rubik';font-weight:600;color:var(--navy)">ממתין לאישור שלך</b>
+        <span style="font-size:15px">עמל אשדוד · השתלמות בית ספרית "פדגוגיה דואלית בכיתה"</span>
+        <span class="btn sm p" style="margin-right:auto">לאישור</span>
+      </div>
+
+      <div class="grid g2" style="grid-template-columns:1.4fr 1fr;align-items:start">
+        <div>
+          <div class="school-row">
+            <div class="head"><b>תיכון החממה</b><span class="cnt">3 פתוחים</span><span class="tag bad">1 באיחור</span><span class="chev">▾</span></div>
+            <div class="body">
+              <div class="task" style="background:#fff5f5"><div>נספח בעלי התפקידים <span class="tag gray">מהמטה</span></div><div class="due">עד 20.9 · <span class="tag bad">3 ימים</span></div><span class="btn sm">תזכורת</span><span class="btn sm ghost">פרטים</span></div>
+              <div class="task"><div>תוכנית תלת שנתית</div><div class="due">עד 15.10</div><span class="btn sm">בוצע</span><span class="btn sm ghost">תזכורת</span></div>
+              <div class="task"><div>רישום להשתלמות מת"ליות <span class="tag gray">מהמטה</span></div><div class="due">עד 30.9</div><span class="btn sm">תזכורת</span><span class="btn sm ghost">פרטים</span></div>
+            </div>
+          </div>
+          <div class="school-row">
+            <div class="head"><b>עתיד פלמחים</b><span class="cnt">2 פתוחים</span><span class="tag warn">היום</span><span class="chev">▾</span></div>
+            <div class="body">
+              <div class="task"><div>תוכנית השתלמות מוסדית</div><div class="due">עד 23.9 · <span class="tag warn">היום</span></div><span class="btn sm">בוצע</span><span class="btn sm ghost">תזכורת</span></div>
+              <div class="task"><div>נספח בעלי התפקידים <span class="tag gray">מהמטה</span></div><div class="due">עד 20.9 · <span class="tag bad">3 ימים</span></div><span class="btn sm">תזכורת</span><span class="btn sm ghost">פרטים</span></div>
+            </div>
+          </div>
+          <div class="school-row"><div class="head"><b>אורט אורמת</b><span class="cnt">2 פתוחים</span><span class="chev">▸</span></div></div>
+          <div class="school-row"><div class="head"><b>דן גורמה</b><span class="cnt">1 פתוח</span><span class="chev">▸</span></div></div>
+          <div class="school-row"><div class="head"><b>קמ"ג דימונה</b><span class="cnt">1 פתוח · מהמטה</span><span class="chev">▸</span></div></div>
+          <div class="school-row"><div class="head"><b>עמל אשדוד</b><span class="cnt">1 פתוח · מהמטה</span><span class="chev">▸</span></div></div>
+          <div class="school-row" style="opacity:.6"><div class="head"><b>6 בתי ספר נוספים</b><span class="cnt">לא חייבים כלום</span></div></div>
+        </div>
+
+        <div class="drawer">
+          <h3 style="font-size:16px">נספח בעלי התפקידים</h3>
+          <div style="font-size:14px;color:var(--muted)">תיכון החממה · טופס מהמטה, נשלח 10.9 · עד 20.9</div>
+          <div style="font-size:14px;margin-top:8px">מצב חי מהטופס: <span class="tag bad">טרם הוגש</span>. ייסגר לבד כשהמנהלת תשלח את הטופס.</div>
+          <label>תזכורת</label>
+          <div class="toggle"><span class="sw"></span>גם למנהלת, לא רק לי</div>
+          <div style="font-size:13.5px;color:var(--muted);margin-top:4px">יוצאת במייל בבוקר עם קישור לטופס עצמו. נשלחה 21.9. לך: תמיד, בתקציר הבוקר.</div>
+          <label>הערה</label>
+          <textarea class="field" style="min-height:52px" placeholder="לא חובה"></textarea>
+          <div class="row" style="margin-top:14px"><span class="btn sm">תזכורת עכשיו</span><span class="btn sm ghost">העתקת קישור לטופס</span></div>
+        </div>
+      </div>
+
+      <div class="card soft" style="margin-top:16px;max-width:600px">
+        <h3>המבט "לפי טופס מהמטה"</h3>
+        <div style="font-size:15px">נספח בעלי התפקידים · עד 20.9</div>
+        <div class="progress"><i></i></div>
+        <div class="row" style="font-size:14.5px"><span>9 מתוך 12 הגישו</span><span class="tag bad">3 טרם: החממה, פלמחים, דימונה</span><a href="#" style="margin-right:auto">העתקת מי טרם</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="note"><b>רשימה אחת.</b> משימה שהמפקח יצר וטופס שרויטל שלחה יושבים באותה שורה של בית הספר, כי לשניהם אותה שאלה: מה בית הספר הזה חייב לי. ההבדל היחיד: פריט "מהמטה" מגיע חי מהמערכת של הטופס, נסגר לבד כשהמנהל שולח, ואי אפשר לסמן לו "בוצע" ביד. "לפי טופס מהמטה" הוא מבט משני לאותם פריטים, בשביל "9 מתוך 12 הגישו". "ממתין לאישור שלך" למעלה, כי זה הדבר היחיד כאן שהמפקח עצמו חייב. טופס חדש נוסף בשורה אחת בגיליון, בלי קוד.</div>
+</section>
+
+<!-- ============ 10. CALENDAR ============ -->
+<section class="screen" id="s10">
+  <style>
+    .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;font-size:13.5px}
+    .cal .h{font-family:'Rubik';font-weight:600;color:var(--muted);text-align:center;padding:4px 0}
+    .cal .d{min-height:78px;border:1px solid var(--line);border-radius:10px;padding:4px 6px;background:#fff}
+    .cal .d.off{background:#f3f5fa;color:#b7bfd2}
+    .cal .d.today{border-color:var(--blue);box-shadow:0 0 0 2px var(--blue-soft) inset}
+    .cal .d .n{font-weight:700;color:var(--muted);font-size:12.5px}
+    .ev{display:block;border-radius:6px;padding:1px 6px;margin-top:3px;font-size:12.5px;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ev.v{background:var(--blue-soft);color:var(--navy);font-weight:600}
+    .ev.t{background:#fff1e0;color:var(--amber)}
+    .ev.m{background:#e3f7f3;color:#0b7f70}
+    .ev.o{background:#eef1f7;color:var(--muted);border-right:3px solid #b7bfd2}
+    .legend span{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;margin-left:14px}
+    .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
+  </style>
+  <div class="app">
+    <aside class="side">
+      <div class="who"><div class="av">ס</div><div>סיגלית דאי<small>מפקחת פדגוגית</small></div></div>
+      <nav>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>על השולחן</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>בתי הספר שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>הביקור שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><path d="M6 3h9l5 5v13H6z"/><path d="M14 3v6h6M9 13h7M9 17h7"/></svg>הדוח שלי</a>
+        <a><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>המעקב שלי</a>
+        <a class="on"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>היומן שלי</a>
+      </nav>
+    </aside>
+    <div class="main">
+      <div class="row" style="justify-content:space-between">
+        <div><h2>היומן שלי · ספטמבר 2026</h2><p class="sub" style="margin:0">ביקורים, מועדי משימות וטפסים, ומה שיובא מהאאוטלוק</p></div>
+        <div class="row"><span class="btn s sm">ייבוא מהאאוטלוק</span><span class="btn s sm">הוספה לאאוטלוק שלי</span><span class="btn p sm">+ ביקור</span></div>
+      </div>
+      <div class="legend" style="margin:12px 0 10px">
+        <span><i style="background:var(--blue-soft);border:1px solid #d3ddff"></i>ביקור במערכת</span>
+        <span><i style="background:#fff1e0"></i>מועד משימה</span>
+        <span><i style="background:#e3f7f3"></i>מועד טופס מהמטה</span>
+        <span><i style="background:#eef1f7;border-right:3px solid #b7bfd2"></i>מהאאוטלוק</span>
+      </div>
+      <div class="cal">
+        <div class="h">א</div><div class="h">ב</div><div class="h">ג</div><div class="h">ד</div><div class="h">ה</div><div class="h">ו</div><div class="h">ש</div>
+        <div class="d off"><span class="n">30</span></div><div class="d off"><span class="n">31</span></div>
+        <div class="d"><span class="n">1</span></div><div class="d"><span class="n">2</span><span class="ev v">ביקור · תיכון החממה</span></div><div class="d"><span class="n">3</span></div><div class="d"><span class="n">4</span></div><div class="d off"><span class="n">5</span></div>
+        <div class="d"><span class="n">6</span></div><div class="d"><span class="n">7</span><span class="ev o">יום צוות פיקוח</span></div><div class="d"><span class="n">8</span></div><div class="d"><span class="n">9</span><span class="ev v">ביקור · דן גורמה</span></div><div class="d"><span class="n">10</span></div><div class="d"><span class="n">11</span></div><div class="d off"><span class="n">12</span></div>
+        <div class="d"><span class="n">13</span></div><div class="d"><span class="n">14</span><span class="ev o">השתלמות מפקחים</span></div><div class="d"><span class="n">15</span><span class="ev v">ביקור · עתיד פלמחים</span></div><div class="d"><span class="n">16</span></div><div class="d"><span class="n">17</span></div><div class="d"><span class="n">18</span><span class="ev v">ביקור · עמל אשדוד</span></div><div class="d off"><span class="n">19</span></div>
+        <div class="d"><span class="n">20</span><span class="ev m">נספח בעלי תפקידים</span></div><div class="d"><span class="n">21</span><span class="ev o">ועדה מלווה · צור ברק</span></div><div class="d"><span class="n">22</span></div><div class="d today"><span class="n">23</span><span class="ev v">ביקור · אורט אורמת</span><span class="ev t">פלמחים · השתלמות</span></div><div class="d"><span class="n">24</span></div><div class="d"><span class="n">25</span></div><div class="d off"><span class="n">26</span></div>
+        <div class="d"><span class="n">27</span><span class="ev t">דן גורמה · סטאז'רים</span></div><div class="d"><span class="n">28</span><span class="ev o">פגישה עם רויטל</span></div><div class="d"><span class="n">29</span></div><div class="d"><span class="n">30</span><span class="ev t">אורמת · גאנט חברתי</span><span class="ev m">השתלמות בית ספרית</span></div><div class="d off"><span class="n">1</span></div><div class="d off"><span class="n">2</span></div><div class="d off"><span class="n">3</span></div>
+      </div>
+
+      <div class="grid g2" style="margin-top:18px">
+        <div class="card soft">
+          <h3>ייבוא מהאאוטלוק · איך זה עובד</h3>
+          <div style="font-size:14.5px">
+            <b>דרך א, קובץ (עובדת תמיד):</b> באאוטלוק: קובץ ← שמירת לוח שנה ← טווח תאריכים ← שמירה כ-ics. במערכת: "ייבוא מהאאוטלוק" ← בחירת הקובץ. האירועים מופיעים באפור. ליד אירוע שהוא ביקור לוחצים "זה ביקור", והוא הופך לביקור במערכת עם בית הספר והתאריך.<br>
+            <b>דרך ב, קישור (אם המשרד מאפשר):</b> באאוטלוק ברשת: הגדרות ← לוח שנה ← לוחות שנה משותפים ← פרסום לוח שנה ← העתקת קישור ICS. מדביקים פעם אחת במערכת, והיא מתעדכנת לבד כל כמה שעות.
+          </div>
+        </div>
+        <div class="card soft">
+          <h3>הוספה לאאוטלוק שלי · הכיוון ההפוך</h3>
+          <div style="font-size:14.5px">
+            לכל מפקח כתובת יומן אישית של המערכת (עם מפתח, כמו הקישורים האישיים שלנו). באאוטלוק: הוספת לוח שנה ← הרשמה מהאינטרנט ← הדבקת הכתובת. מאותו רגע כל ביקור, מועד משימה ומועד טופס מהמטה מופיעים ביומן הרגיל שלו, ומתעדכנים לבד. עובד גם ביומן גוגל וביומן הטלפון.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="note">היומן במערכת מציג ארבעה סוגי פריטים, שלושה מהמערכת עצמה ואחד מיובא. <b>הייבוא מהאאוטלוק לא דורש חיבור, הרשאה או אישור של אבטחת המידע:</b> דרך א היא קובץ שהמפקח מייצא בעצמו, דרך ב היא קישור שהוא מפרסם בעצמו, ותלויה בהגדרות המשרד. הכיוון ההפוך, מנוי על יומן המערכת מתוך האאוטלוק, מותר כמעט בכל ארגון, וזה בדיוק מה שעשינו ליומן זימוני התקשוב. אירוע מיובא לא הופך לביקור לבד, רק בלחיצה של המפקח, כי לא כל פגישה בבית ספר היא ביקור פיקוח.</div>
+</section>
+
+<div class="credit">מוקאפ לאישור · גרסה 2 · 23.9.2026 · <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+
+<script>
+/* inject the school picker above every screen's main area */
+var SCHOOLS=['אורט אורמת','אורט תל נוף','אורט תעשייה אווירית','דן גורמה','עמל אשדוד','עמל טק אין','עמל רהט','עתיד באר שבע','עתיד פלמחים','צור ברק','קמ"ג דימונה','תיכון החממה'];
+var HINT={s2:'בחירה מסננת את שלוש הקבוצות לבית ספר אחד',s3:'בחירה פותחת ישר את התיק',s4:'לאיזה בית ספר הביקור',s5:'לאיזה בית ספר הביקור',s6:'הדוחות של בית הספר הזה',s7:'המשימות של בית הספר הזה',s10:'רק האירועים של בית הספר הזה'};
+document.querySelectorAll('.screen').forEach(function(sec){
+  var app=sec.querySelector('.app'); if(!app) return;
+  var main=app.querySelector('.main'); if(!main) return;
+  var wrap=document.createElement('div'); wrap.className='mainwrap';
+  var bar=document.createElement('div'); bar.className='pick';
+  var sel='<label>בית ספר</label><select><option>כל בתי הספר שלי</option>'+SCHOOLS.map(function(s){return '<option>'+s+'</option>'}).join('')+'</select>';
+  bar.innerHTML=sel+'<span class="hint">'+(HINT[sec.id]||'')+'</span>';
+  app.insertBefore(wrap, main); wrap.appendChild(bar); wrap.appendChild(main);
+  if(sec.id==='s4'||sec.id==='s5'||sec.id==='s6') bar.querySelector('select').value='אורט אורמת';
+  if(sec.id==='s3') bar.querySelector('select').value='אורט אורמת';
+});
+
+document.querySelectorAll('#screens button').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('#screens button').forEach(x=>x.classList.remove('on'));
+    document.querySelectorAll('.screen').forEach(x=>x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById(b.dataset.s).classList.add('on');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+</script>
+</body>
+</html>
