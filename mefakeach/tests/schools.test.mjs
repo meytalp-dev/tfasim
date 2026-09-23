@@ -31,6 +31,11 @@ t("fileHtml: לשונית פרטים מציגה מנהל/ת עם נייד ומי
   const out = SCHOOLS.fileHtml({ id: "1", name: "א", principal_name: "רונית", principal_phone: "050-1", principal_email: "r@x" }, [], "details");
   assert.match(out, /רונית/); assert.match(out, /tel:050-1/); assert.match(out, /mailto:r@x/);
 });
+t("fileHtml: קישורי המעקב בפרטים מסוננים לשם בית הספר (?q=), גם עם גרשיים", () => {
+  const out = SCHOOLS.fileHtml({ id: "82921", name: 'קמ"ג דימונה' }, [], "details");
+  assert.match(out, /sikum-nispach-tafkidim\.html\?q=%D7%A7%D7%9E%22%D7%92%20%D7%93%D7%99%D7%9E%D7%95%D7%A0%D7%94/);
+  assert.match(out, /sikum-hishtalmuyot\.html\?q=/);
+});
 t("fileHtml: לשונית ביקורים ריקה מציגה 'עדיין אין ביקורים'", () => { assert.match(SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "visits"), /עדיין אין ביקורים/); });
 t("הדף כולל noindex, auth.js של האתר במרחב pikuah, וקרדיט impactos", () => {
   assert.match(html, /name="robots" content="noindex/); assert.match(html, /pedagogiamh\.co\.il\/auth\.js" data-space="pikuah"/); assert.match(html, /impact-os\.app/);

@@ -24,12 +24,15 @@
   var M = w.MEF, E = M.escapeHtml;
   var state = { me: null, schools: [], school: null, docs: [], tab: "details" };
   var DOC_TYPES = ["תוכנית עבודה", "דוח", "בעלי תפקידים", "אחר"];
+  /* דפי המעקב באתר. filtered=true — הדף יודע להיפתח מסונן לבית ספר (?q=<שם>). השאר נפתחים כלליים עד שלב 3,
+     שבו המצב של בית הספר עצמו יוצג כאן חי במקום קישור. */
   var TRACK_LINKS = [
-    ["https://pedagogiamh.co.il/sikum-hishtalmuyot.html", "השתלמות בית ספרית"],
-    ["https://pedagogiamh.co.il/sikum-nispach-tafkidim.html", "נספח בעלי התפקידים"],
-    ["https://pedagogiamh.co.il/sikum-matzevet.html", "מצבת תלמידים"],
-    ["https://pedagogiamh.co.il/hadrachot/", "מצפן ההדרכות"]
+    ["https://pedagogiamh.co.il/sikum-hishtalmuyot.html", "השתלמות בית ספרית", true],
+    ["https://pedagogiamh.co.il/sikum-nispach-tafkidim.html", "נספח בעלי התפקידים", true],
+    ["https://pedagogiamh.co.il/sikum-matzevet.html", "מצבת תלמידים", false],
+    ["https://pedagogiamh.co.il/hadrachot/", "מצפן ההדרכות", false]
   ];
+  function trackLink(l, s) { return l[2] ? l[0] + "?q=" + encodeURIComponent(s.name || "") : l[0]; }
 
   /* ---- רינדור טהור (נבדק ב-tests/schools.test.mjs) ---- */
   function cardsHtml(schools) {
@@ -52,7 +55,7 @@
         (s.principal_email2 ? "<tr><th>מייל נוסף</th><td>" + E(s.principal_email2) + "</td></tr>" : "") +
         (s.school_email ? "<tr><th>מייל המוסד</th><td>" + E(s.school_email) + "</td></tr>" : "") + "</table>" +
         '<h3 style="margin-top:20px;font-size:16px">דפי המעקב הקיימים</h3><ul class="list">' +
-        TRACK_LINKS.map(function (l) { return '<li><a target="_blank" rel="noopener" href="' + l[0] + '">' + l[1] + "</a></li>"; }).join("") + "</ul>";
+        TRACK_LINKS.map(function (l) { return '<li><a target="_blank" rel="noopener" href="' + E(trackLink(l, s)) + '">' + l[1] + "</a>" + (l[2] ? ' <span class="hint">מסונן לבית הספר</span>' : ' <span class="hint">כללי</span>') + "</li>"; }).join("") + "</ul>";
     } else if (tab === "docs") {
       var live = docs.filter(function (x) { return !x.superseded; }), old = docs.filter(function (x) { return x.superseded; });
       h += '<div class="row" style="margin-bottom:10px"><button class="btn s sm" id="upBtn" type="button">העלאת מסמך</button><span class="hint">עד 8MB · PDF, Word, Excel, PowerPoint, תמונה</span></div>';
