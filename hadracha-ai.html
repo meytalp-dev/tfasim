@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>בונים עוזר אישי · סדנה למפקחים</title>
+<title>בונים עוזר אישי · הדרכה למפקחים</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><rect x='4' y='7' width='16' height='13' rx='3'/><path d='M12 3v4M9 13h.01M15 13h.01'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,106 +16,135 @@
   --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
   --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415;
   --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
   --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
 }
 *{box-sizing:border-box}
-body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.6;
-  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;
-  min-height:100vh;display:flex;flex-direction:column}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
 .strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
 
-/* ---------- progress ---------- */
-.prog{padding:18px 20px 0;max-width:720px;margin:0 auto;width:100%}
-.prog .bar{height:7px;border-radius:99px;background:#dde5f4;overflow:hidden}
-.prog .fill{height:100%;border-radius:99px;width:0;
-  background:linear-gradient(90deg,var(--navy),var(--blue));transition:width .45s var(--ease)}
-.prog .lbl{margin-top:8px;font-size:14.5px;color:var(--muted);text-align:center}
+header.top{padding:26px 0 4px;text-align:center}
+header.top h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,5vw,36px);margin:0 0 6px;
+  color:var(--navy);font-weight:700;letter-spacing:-.01em}
+header.top p{margin:0;color:var(--muted);font-size:17px}
 
-/* ---------- card ---------- */
-main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:18px 20px 40px}
-.card{max-width:720px;width:100%;background:#fff;border:1px solid var(--line);border-radius:22px;
-  box-shadow:var(--shadow-m);padding:34px 36px 30px}
-@media (max-width:600px){.card{padding:24px 20px}}
+/* ---------- chapter tabs ---------- */
+.tabs{position:sticky;top:0;z-index:40;background:rgba(246,248,253,.97);backdrop-filter:blur(8px);
+  padding:14px 0 12px;margin-top:14px}
+.tabs .row{display:flex;gap:7px;background:#fff;border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow-s);padding:6px;max-width:820px;margin:0 auto}
+.tabs button{flex:1;padding:13px 8px;border:0;border-radius:11px;background:transparent;cursor:pointer;
+  font-family:'Rubik',sans-serif;font-size:16px;font-weight:600;color:var(--muted);line-height:1.3;
+  transition:background .16s var(--ease),color .16s var(--ease)}
+.tabs button .n{display:block;font-size:12.5px;opacity:.75;font-weight:500}
+.tabs button.on{background:linear-gradient(100deg,var(--navy),var(--blue) 75%);color:#fff;
+  box-shadow:0 4px 14px rgba(24,92,255,.24)}
+@media (max-width:560px){.tabs button{font-size:14px;padding:11px 5px}}
 
-.eyebrow{font-family:'Rubik',sans-serif;font-size:14px;font-weight:700;color:var(--blue);
-  letter-spacing:.05em;margin:0 0 8px}
-h1{font-family:'Rubik',sans-serif;font-size:clamp(25px,4.4vw,33px);line-height:1.25;
-  margin:0 0 14px;color:var(--navy);font-weight:700;letter-spacing:-.01em}
-.lede{font-size:19px;color:#3d4a70;margin:0 0 24px}
-.lede b{color:var(--navy)}
+/* ---------- steps ---------- */
+.step{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-m);
+  padding:28px 30px;margin-bottom:18px}
+@media (max-width:600px){.step{padding:22px 18px}}
+.step > h2{font-family:'Rubik',sans-serif;font-size:23px;color:var(--navy);margin:0 0 6px;font-weight:600;
+  display:flex;align-items:flex-start;gap:13px;line-height:1.3}
+.badge{flex:0 0 auto;width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(140deg,var(--navy),var(--blue));color:#fff;
+  font-family:'Rubik',sans-serif;font-weight:700;font-size:16px;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.step .sub{color:var(--muted);font-size:16.5px;margin:0 0 20px;padding-inline-start:47px}
+@media (max-width:600px){.step .sub{padding-inline-start:0}}
+.step p{font-size:18px}
+.step p b{color:var(--navy)}
 
-ol.steps{margin:0 0 22px;padding:0;list-style:none;counter-reset:s}
-ol.steps li{counter-increment:s;position:relative;padding-inline-start:44px;margin-bottom:18px;font-size:18px}
-ol.steps li::before{content:counter(s);position:absolute;inset-inline-start:0;top:-1px;
-  width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--navy);
-  font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;
-  display:flex;align-items:center;justify-content:center}
-ol.steps li b{color:var(--navy)}
-ol.steps li:last-child{margin-bottom:0}
+/* ---------- gemini screen mockup ---------- */
+.mock{border:2px solid var(--line);border-radius:16px;overflow:hidden;background:#fff;margin:0 0 20px}
+.mock .bar{background:#f1f5fc;border-bottom:1px solid var(--line);padding:10px 15px;
+  display:flex;align-items:center;gap:8px}
+.mock .bar i{width:11px;height:11px;border-radius:50%;background:#dde5f4;display:block}
+.mock .bar span{margin-inline-start:10px;font-size:14px;color:var(--muted)}
+.mock .body{padding:18px}
+.mf{border:2px dashed #c9d6ec;border-radius:11px;padding:13px 15px;margin-bottom:12px;position:relative}
+.mf:last-child{margin-bottom:0}
+.mf .cap{font-family:'Rubik',sans-serif;font-size:12.5px;font-weight:700;color:var(--blue);
+  letter-spacing:.04em;margin-bottom:5px}
+.mf .val{font-size:16.5px;color:#3d4a70}
+.mf.hi{border-style:solid;border-color:var(--blue);background:var(--blue-soft)}
+.mf.hi .val{color:var(--navy);font-weight:600}
+.mf .tag{position:absolute;inset-inline-end:12px;top:11px;font-size:13px;color:var(--muted)}
+
+/* ---------- template box ---------- */
+.tpl{background:#fbfcff;border:2px solid var(--line);border-radius:15px;padding:19px 22px;margin:0 0 16px}
+.tpl .ln{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);
+  font-size:17.5px}
+.tpl .ln:last-child{border-bottom:0;padding-bottom:0}
+.tpl .ln:first-child{padding-top:0}
+.tpl .q{flex:0 0 auto;font-weight:700;color:var(--navy);min-width:112px}
+.tpl .a{color:var(--muted)}
+@media (max-width:540px){.tpl .ln{flex-direction:column;gap:2px}.tpl .q{min-width:0}}
 
 /* ---------- buttons ---------- */
-.big{width:100%;padding:20px;border:0;border-radius:16px;cursor:pointer;
-  font-family:'Rubik',sans-serif;font-size:20px;font-weight:600;color:#fff;
+.big{width:100%;padding:18px;border:0;border-radius:15px;cursor:pointer;
+  font-family:'Rubik',sans-serif;font-size:18.5px;font-weight:600;color:#fff;
   background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
-  box-shadow:0 8px 22px rgba(24,92,255,.26);margin-bottom:12px;
+  box-shadow:0 7px 20px rgba(24,92,255,.24);margin-bottom:12px;
   display:flex;align-items:center;justify-content:center;gap:11px;
-  transition:transform .15s var(--ease),box-shadow .15s var(--ease),background .25s var(--ease)}
+  transition:transform .15s var(--ease),background .25s var(--ease)}
 .big:active{transform:scale(.99)}
-.big svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.big svg{width:21px;height:21px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .big.done{background:linear-gradient(100deg,#0d8f7f,var(--mint))}
-.big.ghost{background:#fff;color:var(--navy);border:2px solid var(--line);box-shadow:none;font-size:18px;padding:16px}
+.big.ghost{background:#fff;color:var(--navy);border:2px solid var(--line);box-shadow:none;font-size:17.5px;padding:15px}
 .big.ghost svg{stroke:var(--blue)}
 .big.ghost:hover{border-color:var(--sky)}
+a.big{text-decoration:none}
 
-.type{background:var(--sky-soft);border-radius:14px;padding:16px 20px;margin:0 0 20px;
-  font-size:18px;color:#25325a;text-align:center}
-.type b{display:block;font-family:'Rubik',sans-serif;font-size:23px;color:var(--navy);margin-top:5px;
-  letter-spacing:.01em}
+/* ---------- can / cannot ---------- */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:0 0 20px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.col{border-radius:16px;padding:19px 21px}
+.col h3{font-family:'Rubik',sans-serif;font-size:18px;margin:0 0 12px;font-weight:600;
+  display:flex;align-items:center;gap:9px}
+.col h3 svg{width:20px;height:20px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.col ul{margin:0;padding-inline-start:20px;font-size:16.5px;line-height:1.55}
+.col li{margin-bottom:9px}
+.col li:last-child{margin-bottom:0}
+.col.yes{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1}
+.col.yes h3{color:#0d7d6f} .col.yes h3 svg{stroke:var(--mint)} .col.yes li{color:#2a5d56}
+.col.no{background:#fff7f8;border:1px solid #f4c9ce}
+.col.no h3{color:#a8323c} .col.no h3 svg{stroke:var(--danger)} .col.no li{color:#7d3840}
 
-/* ---------- inputs ---------- */
-.fld{margin-bottom:20px}
-.fld label{display:block;font-weight:700;font-size:18px;color:#25325a;margin-bottom:4px}
-.fld .h{display:block;font-weight:400;color:var(--muted);font-size:15.5px;margin-bottom:9px;line-height:1.45}
-.fld input{width:100%;padding:15px 17px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
-  font-family:inherit;font-size:18px;color:var(--ink)}
-.fld input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+/* ---------- try box ---------- */
+.try{background:var(--blue-soft);border-radius:15px;padding:18px 21px;margin:0 0 18px}
+.try .ttl{font-family:'Rubik',sans-serif;font-size:14px;font-weight:700;color:var(--navy);
+  letter-spacing:.04em;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.try .ttl svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round}
+.try p{margin:0 0 9px;font-size:17px;color:#25325a}
+.try p:last-child{margin-bottom:0}
+.try q{display:block;background:#fff;border-radius:10px;padding:12px 16px;margin:9px 0;
+  font-size:17px;color:var(--navy);font-weight:600;quotes:none}
 
-/* ---------- look-for checklist ---------- */
-.look{display:grid;gap:11px;margin-bottom:22px}
-.look label{display:flex;align-items:flex-start;gap:13px;padding:16px 18px;border:2px solid var(--line);
-  border-radius:14px;background:#fbfcff;cursor:pointer;font-size:18px;color:#25325a;
-  transition:border-color .15s var(--ease),background .15s var(--ease)}
-.look label:hover{border-color:var(--sky)}
-.look input{width:23px;height:23px;accent-color:var(--blue);flex:0 0 auto;margin-top:2px}
-.look input:checked ~ span{color:var(--navy);font-weight:600}
-
-.note{background:#fffaf0;border:1px solid #f0dcb4;border-radius:14px;padding:16px 19px;margin:0 0 20px;
+.tip{background:var(--sky-soft);border-radius:14px;padding:16px 19px;margin:0 0 18px;font-size:17px;color:#25325a}
+.tip b{color:var(--navy)}
+.note{background:#fffaf0;border:1px solid #f0dcb4;border-radius:14px;padding:16px 19px;margin:0 0 18px;
   font-size:17px;color:#7a5a12}
 .note b{color:#8a5410}
-.tip{background:var(--blue-soft);border-radius:14px;padding:16px 19px;margin:0 0 20px;font-size:17px;color:#25325a}
-.tip b{color:var(--navy)}
 
-/* ---------- nav ---------- */
-.nav{display:flex;gap:12px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
-.nav button{flex:1;padding:16px;border-radius:14px;cursor:pointer;font-family:'Rubik',sans-serif;
-  font-size:18px;font-weight:600;transition:transform .15s var(--ease)}
-.nav .next{border:0;color:#fff;background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
-  box-shadow:0 6px 18px rgba(24,92,255,.24)}
-.nav .back{flex:0 0 auto;padding-inline:26px;border:2px solid var(--line);background:#fff;color:var(--muted)}
-.nav button:active{transform:scale(.99)}
-.nav .back[hidden]{display:none}
+ol.mini{margin:0 0 18px;padding-inline-start:22px;font-size:17.5px}
+ol.mini li{margin-bottom:10px}
+ol.mini li b{color:var(--navy)}
 
-.scr{display:none}
-.scr.on{display:block;animation:in .32s var(--ease)}
-@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.pane{display:none}
+.pane.on{display:block;animation:in .3s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 
-.toast{position:fixed;inset-inline:16px;bottom:24px;max-width:420px;margin:0 auto;z-index:60;
+.toast{position:fixed;inset-inline:16px;bottom:24px;max-width:430px;margin:0 auto;z-index:60;
   background:var(--navy);color:#fff;border-radius:14px;padding:16px 22px;text-align:center;
   font-weight:600;font-size:17px;box-shadow:0 10px 30px rgba(22,32,60,.3);
   opacity:0;transform:translateY(12px);pointer-events:none;transition:all .28s var(--ease)}
 .toast.on{opacity:1;transform:none}
 
-footer{text-align:center;padding:0 20px 28px;color:var(--muted);font-size:13.5px}
+footer{text-align:center;padding:26px 20px 44px;color:var(--muted);font-size:14px}
 footer a{color:var(--navy);font-weight:600;text-decoration:none}
 </style>
 </head>
@@ -123,183 +152,279 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
 <div class="strip"></div>
 
-<div class="prog">
-  <div class="bar"><div class="fill" id="fill"></div></div>
-  <div class="lbl" id="plbl"></div>
-</div>
+<header class="top"><div class="wrap">
+  <h1>בונים עוזר אישי</h1>
+  <p>הדרכה למפקחים · משרד העבודה, מינהל הכשרה מקצועית</p>
+</div></header>
 
-<main><div class="card">
+<div class="tabs"><div class="wrap"><div class="row">
+  <button class="on" data-p="a"><span class="n">פרק א׳</span>בונים עוזר</button>
+  <button data-p="b"><span class="n">פרק ב׳</span>ג׳ימייל שלכם</button>
+  <button data-p="c"><span class="n">פרק ג׳</span>משימה רוטינית</button>
+</div></div></div>
 
-<!-- ═══════════ 0 ═══════════ -->
-<section class="scr on">
-  <p class="eyebrow">סדנה · בינה מלאכותית למפקחים</p>
-  <h1>בונים עוזר אישי שיכין לכם ביקורים</h1>
-  <p class="lede">בסוף הסדנה יהיה לכם עוזר שקורא את החומרים של בית הספר לפני הביקור,
-    מוצא מה דורש בירור, ומכין לכם את רשימת השאלות. ואחרי הביקור — כותב לכם את הסיכום.</p>
-  <div class="tip"><b>לא צריך לדעת שום דבר מראש.</b> הדף הזה יוביל אתכם צעד-צעד.
-    כל מה שתצטרכו זה ללחוץ ולהדביק.</div>
-  <p class="lede" style="margin-bottom:0">מוכנים? לחצו על הכפתור הכחול למטה.</p>
-</section>
+<main class="wrap">
 
-<!-- ═══════════ 1 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 1 מתוך 8</p>
-  <h1>שתי שאלות, ואז מתחילים</h1>
-  <p class="lede">כדי שהעוזר יהיה <b>שלכם</b> ולא עוזר כללי. אפשר גם לדלג — זה יעבוד גם בלי.</p>
+<!-- ══════════════════ פרק א׳ ══════════════════ -->
+<div class="pane on" id="p-a">
 
-  <div class="fld">
-    <label for="f1">מה עוד אתם מביאים איתכם לביקור?</label>
-    <span class="h">חוץ מתוכנית העבודה והדוח הקודם. למשל: נתוני מצבת, דוח נשירה, סיכומי שיחות.</span>
-    <input type="text" id="f1" placeholder="אפשר להשאיר ריק">
-  </div>
+  <section class="step">
+    <h2><span class="badge">1</span>קודם כל — מה זה בכלל Gem?</h2>
+    <p class="sub">שלושים שניות של הסבר, ואז עובדים.</p>
+    <p>כשאתם כותבים ל-Gemini "נסח לי תשובה", אתם מתחילים <b>מאפס</b>.
+      צריך להסביר לו מי אתם, מה התפקיד, באיזה סגנון. ובפעם הבאה — שוב.</p>
+    <p><b>Gem הוא בדיוק אותו דבר, רק שההסבר נכתב פעם אחת.</b>
+      אתם שומרים אותו על שמכם, והוא מחכה לכם — מחר, בעוד חודש, ובכל ביקור.</p>
+    <div class="tip">אפשר לבנות כמה שרוצים, <b>זה חינם</b>, וזה מסתנכרן לבד לנייד.</div>
+  </section>
 
-  <div class="fld">
-    <label for="f2">מה אסור לו לקבוע בשמכם?</label>
-    <span class="h">הדבר שאתם הכי לא רוצים שיכתוב לכם לבד בדוח.</span>
-    <input type="text" id="f2" placeholder="אפשר להשאיר ריק">
-  </div>
-</section>
+  <section class="step">
+    <h2><span class="badge">2</span>נכנסים למקום הנכון</h2>
+    <p class="sub">במחשב, בחשבון הגוגל הרגיל שלכם. לא צריך שום מנוי.</p>
+    <ol class="mini">
+      <li>נכנסים ל-<b>gemini.google.com</b></li>
+      <li>בתפריט הצד לוחצים <b>Explore Gems</b> (או "סייר ב-Gems")</li>
+      <li>ואז על הכפתור <b>New Gem</b> — ייפתח מסך ריק</li>
+    </ol>
+    <a class="big ghost" href="https://gemini.google.com/gems/create" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-4"/></svg>
+      פתיחת המסך הזה בלשונית חדשה</a>
+  </section>
 
-<!-- ═══════════ 2 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 2 מתוך 8</p>
-  <h1>יוצרים את העוזר</h1>
-  <ol class="steps">
-    <li>פתחו את <b>ChatGPT</b> בחלון חדש — הכפתור האפור למטה</li>
-    <li>חזרו לכאן ולחצו על <b>הכפתור הכחול</b>. הוא מעתיק את כל ההוראות</li>
-    <li>הדביקו שם (<b>Ctrl+V</b>) ולחצו <b>Enter</b></li>
-  </ol>
+  <section class="step">
+    <h2><span class="badge">3</span>מה יש במסך</h2>
+    <p class="sub">שלושה שדות בלבד. זה נראה בערך ככה:</p>
 
-  <a class="big ghost" href="https://chatgpt.com" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-4"/></svg>
-    פתיחת ChatGPT בחלון חדש</a>
+    <div class="mock">
+      <div class="bar"><i></i><i></i><i></i><span>Gemini · New Gem</span></div>
+      <div class="body">
+        <div class="mf"><div class="cap">NAME · שם</div>
+          <div class="val">איך תקראו לו — "עוזר ביקורים"</div>
+          <span class="tag">שורה אחת</span></div>
+        <div class="mf hi"><div class="cap">INSTRUCTIONS · הוראות</div>
+          <div class="val">כאן כל העבודה. זה הלב של ה-Gem.</div>
+          <span class="tag">השדה הגדול</span></div>
+        <div class="mf"><div class="cap">KNOWLEDGE · קבצים</div>
+          <div class="val">מסמכים שהוא יזכור תמיד — לא חובה</div>
+          <span class="tag">רשות</span></div>
+      </div>
+    </div>
 
-  <button class="big" data-copy="agent">
-    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    העתקת ההוראות</button>
+    <div class="note"><b>השדה האמצעי הוא כל הסיפור.</b> אם תכתבו שם משפט אחד,
+      תקבלו עוזר בינוני. בשלב הבא נראה בדיוק מה כותבים שם.</div>
+  </section>
 
-  <div class="tip">כשהוא יענה לכם <b>"מוכן"</b> — העוזר קיים. זהו, זה היה כל הסיפור.</div>
-</section>
+  <section class="step">
+    <h2><span class="badge">4</span>מה כותבים בהוראות — חמש שורות</h2>
+    <p class="sub">זה כל מה שצריך. חמש שאלות, וענית עליהן = יש לכם עוזר טוב.</p>
 
-<!-- ═══════════ 3 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 3 מתוך 8</p>
-  <h1>נותנים לו בית ספר</h1>
-  <p class="lede">בית ספר לדוגמה, מומצא לגמרי. <b>העתיקו והדביקו את שני המסמכים</b> —
-    אחד אחרי השני, באותו חלון.</p>
+    <div class="tpl">
+      <div class="ln"><span class="q">מי אתה</span>
+        <span class="a">"אתה העוזר שלי ב… אני מפקח/ת פדגוגי/ת ב…"</span></div>
+      <div class="ln"><span class="q">מה תעשה לי</span>
+        <span class="a">איזו בעיה אתה פותר — במשפט אחד</span></div>
+      <div class="ln"><span class="q">מה אתן לך</span>
+        <span class="a">מה בדיוק אדביק לך בכל פעם</span></div>
+      <div class="ln"><span class="q">איך להחזיר</span>
+        <span class="a">באיזה מבנה — טבלה? רשימה? כמה שורות?</span></div>
+      <div class="ln"><span class="q">מה אסור לך</span>
+        <span class="a">מה לא להחליט בשבילי. <b>השורה הכי חשובה.</b></span></div>
+    </div>
 
-  <button class="big ghost" data-copy="doc1">
-    <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
-    1 · תוכנית העבודה של בית הספר</button>
-
-  <button class="big ghost" data-copy="doc2">
-    <svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
-    2 · הדוח מהביקור הקודם</button>
-
-  <div class="type">ואז כתבו לו בדיוק את המילים האלה:<b>לפני ביקור</b></div>
-</section>
-
-<!-- ═══════════ 4 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 4 מתוך 8</p>
-  <h1>מה הוא נתן לכם?</h1>
-  <p class="lede">קראו את התשובה שלו וסמנו מה מצאתם.</p>
-
-  <div class="look">
-    <label><input type="checkbox"><span>שם לב שהרכזת הפדגוגית <b>עדיין לא אוישה</b> — למרות שהובטח בביקור הקודם</span></label>
-    <label><input type="checkbox"><span>שם לב שהנשירה <b>עדיין 14%</b>, כשהיעד שלהם הוא 9%</span></label>
-    <label><input type="checkbox"><span>כתב לכל ממצא <b>מאיזה מסמך</b> הוא לקח אותו</span></label>
-    <label><input type="checkbox"><span>נתן <b>רשימת שאלות</b> עם מקום לרשום תשובות</span></label>
-  </div>
-
-  <div class="tip"><b>משהו לא מוצא חן בעיניכם?</b> פשוט כתבו לו בחלון —
-    "תן לי יותר שאלות", "קצר יותר", "הוסף עמודה לתשובות". הוא יתקן מיד.</div>
-</section>
-
-<!-- ═══════════ 5 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 5 מתוך 8</p>
-  <h1>עכשיו תנסו להפיל אותו</h1>
-  <p class="lede">זה החלק הכי חשוב. <b>העתיקו את שני החומרים האלה והדביקו לו.</b>
-    שניהם מומצאים — ושניהם נועדו להכשיל אותו.</p>
-
-  <button class="big ghost" data-copy="trap1">
-    <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-    1 · בית ספר עם נתונים מוזרים</button>
-
-  <button class="big ghost" data-copy="trap2">
-    <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg>
-    2 · מנהל שמבקש שתכתבו שהוא תקין</button>
-
-  <div class="note"><b>שאלה אחת לכל אחד:</b> האם הוא עצר והתריע — או שקיבל את זה
-    כאילו הכול בסדר וכתב לכם את זה בדוח?</div>
-</section>
-
-<!-- ═══════════ 6 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 6 מתוך 8</p>
-  <h1>וככה מתקנים אותו</h1>
-  <p class="lede">אם הוא נפל — <b>לא מתקנים את השאלה. מתקנים אותו.</b>
-    זה כל הרעיון, וזה כל ההבדל בין מי שמשתמש בבינה מלאכותית לבין מי שסומך עליה.</p>
-
-  <button class="big" data-copy="fix">
-    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-    העתקת התיקון</button>
-
-  <div class="tip">הדביקו לו את זה, ואז <b>נסו שוב את אותו חומר בדיוק.</b>
-    תראו שההתנהגות שלו השתנתה.</div>
-</section>
-
-<!-- ═══════════ 7 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 7 מתוך 8</p>
-  <h1>והוא עובד גם בכיוון השני</h1>
-  <p class="lede">עד עכשיו הכנו ביקור. עכשיו נסגור אותו — <b>העתיקו את ההערות
-    הגולמיות מהביקור</b>, כמו שרושמים באמת בשטח.</p>
-
-  <button class="big ghost" data-copy="notes">
-    <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
-    ההערות שרשמתי בביקור</button>
-
-  <div class="type">ואז כתבו לו:<b>אחרי ביקור</b></div>
-
-  <div class="note">שימו לב מה הוא עושה עם ההערה <b>"נשירה — אמרה שירד, לא נתנה מספר"</b>.
-    עוזר טוב יגיד לכם שזה נשאר פתוח. עוזר גרוע ימציא מספר.</div>
-</section>
-
-<!-- ═══════════ 8 ═══════════ -->
-<section class="scr">
-  <p class="eyebrow">שלב 8 מתוך 8</p>
-  <h1>סיימתם. יש לכם עוזר.</h1>
-
-  <button class="big" data-copy="agent">
-    <svg viewBox="0 0 24 24"><path d="M12 3v11M8.5 10.5 12 14l3.5-3.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
-    העתקת העוזר שלי לשמירה</button>
-
-  <div class="tip" style="margin-bottom:22px"><b>שמרו את הטקסט הזה אצלכם</b> — במסמך, בפתקים, בכל מקום.
-    בכל ביקור אתם מדביקים אותו מחדש, והעוזר קם לחיים.</div>
-
-  <ol class="steps">
-    <li><b>הוא לא כפתור — הוא מסמך.</b> כל פעם שהוא טועה, מוסיפים לו שורה והוא נהיה טוב יותר.</li>
-    <li><b>הוא מכין, אתם מחליטים.</b> הוא לא קובע אם בית ספר עומד בדרישה, ולא מגיש דוח בשמכם.</li>
-    <li><b>לא מעלים חומר אמיתי</b> עם שמות תלמידים או מורים.</li>
-  </ol>
-
-  <div class="tip" style="margin-top:22px">
-    <b>יש גם עוזר שני — למעקב אחרי מנהלים.</b> הוא מחלק את מי שלא הגיש לקבוצות
-    ומנסח לכל אחת הודעה אחרת, בלי לשרוף יחסים.
-    <button class="big ghost" data-copy="track" style="margin:14px 0 0">
+    <button class="big" data-copy="skeleton">
       <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-      העתקת עוזר המעקב</button>
-  </div>
-</section>
+      העתקת התבנית הריקה</button>
 
-<div class="nav">
-  <button class="back" id="back" hidden>הקודם</button>
-  <button class="next" id="next">מתחילים</button>
+    <div class="note"><b>למה השורה האחרונה היא החשובה ביותר?</b>
+      בלעדיה הוא ינחש במקומכם — ויעשה את זה בביטחון גמור.
+      הוא ישלים נתון שחסר, ויקבע שבית ספר עומד בדרישה בלי שראה ראיה.
+      <b>זו השורה שהופכת עוזר מ"נחמד" ל"אפשר לסמוך עליו".</b></div>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">5</span>בודקים לפני ששומרים</h2>
+    <p class="sub">בצד המסך יש חלון תצוגה — אפשר לדבר איתו עוד לפני השמירה.</p>
+    <p>כתבו לו משהו ותראו מה חוזר. <b>לא מוצא חן בעיניכם? תקנו את ההוראות, לא את השאלה.</b>
+      זה הרגל שכדאי לאמץ מהרגע הראשון.</p>
+    <p>וכשזה נראה טוב — <b>Save</b>. מאותו רגע הוא ברשימה שלכם, ומחכה.</p>
+    <div class="tip"><b>אפשר לערוך אותו מתי שרוצים.</b> Gem הוא לא משהו שגומרים —
+      הוא משתפר בכל פעם שמתקנים לו שורה.</div>
+  </section>
 </div>
 
-</div></main>
+<!-- ══════════════════ פרק ב׳ ══════════════════ -->
+<div class="pane" id="p-b">
+
+  <section class="step">
+    <h2><span class="badge">1</span>Gemini כבר יושב בג׳ימייל שלכם</h2>
+    <p class="sub">בלי להתקין, בלי לשלם, ובלי להעתיק שום דבר.</p>
+    <p>פותחים את ג׳ימייל <b>במחשב</b>, פותחים מייל, ולוחצים על <b>Gemini</b> בצד המסך.
+      הוא כבר רואה את המייל ואת כל ההתכתבות — אין מה להדביק.</p>
+    <a class="big ghost" href="https://mail.google.com" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-4"/></svg>
+      פתיחת ג׳ימייל בלשונית חדשה</a>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">2</span>מה הוא כן ומה הוא לא</h2>
+    <p class="sub">חשוב לדעת את שני הצדדים, כדי לא להתאכזב.</p>
+    <div class="two">
+      <div class="col yes">
+        <h3><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg>כן</h3>
+        <ul>
+          <li>מסכם שרשור ארוך של עשרים הודעות</li>
+          <li>מציע טיוטת תשובה</li>
+          <li>מוצא לכם מיילים בשפה רגילה</li>
+          <li>עונה על שאלות מתוך התיבה</li>
+        </ul>
+      </div>
+      <div class="col no">
+        <h3><svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>לא</h3>
+        <ul>
+          <li>לא שולח בשמכם — <b>השליחה תמיד הקליק שלכם</b></li>
+          <li>לא רץ ברקע ולא מסדר את התיבה לבד</li>
+          <li>לא מוחק ולא מארגן כלום</li>
+          <li>עונה רק כששואלים אותו</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">העובדה שהוא לא שולח לבד היא <b>יתרון, לא חיסרון.</b>
+      מייל שיוצא בשמכם למנהל בית ספר הוא מסמך רשמי. ההחלטה נשארת שלכם.</div>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">3</span>נסו את זה עכשיו</h2>
+    <p class="sub">שלוש בקשות. פתחו את ג׳ימייל ונסו אותן על התיבה האמיתית שלכם.</p>
+
+    <div class="try">
+      <div class="ttl"><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.5"/></svg>
+        על שרשור ארוך שלא בא לכם לקרוא</div>
+      <q>סכם לי את השרשור הזה בשלוש נקודות — ומה מבקשים ממני בסוף?</q>
+    </div>
+
+    <div class="try">
+      <div class="ttl"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        כשאתם זוכרים שהיה מייל אבל לא איפה</div>
+      <q>מצא לי את המיילים מהחודש האחרון שבהם מנהלים ביקשו ממני דחייה בהגשה</q>
+    </div>
+
+    <div class="try">
+      <div class="ttl"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        כשצריך לענות ואין כוח לנסח</div>
+      <q>נסח תשובה קצרה ועניינית: קיבלתי, אני בודקת, אחזור תוך שבוע</q>
+    </div>
+
+    <div class="tip"><b>שימו לב מה קורה בבקשה השנייה</b> — הוא מחפש בתיבה
+      בשפה רגילה, בלי מילות חיפוש ובלי לזכור שמות. זה בדרך כלל מה שמפתיע הכי הרבה.</div>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">4</span>שני כללי זהירות</h2>
+    <p class="sub">קצר, אבל חשוב.</p>
+    <ol class="mini">
+      <li><b>לא מעלים חומר עם שמות תלמידים.</b> לא לכאן ולא לשום כלי אחר.
+        אם צריך לעבוד על מסמך — מוחקים שמות קודם.</li>
+      <li><b>תמיד קוראים לפני ששולחים.</b> טיוטה היא הצעה, לא החלטה.
+        אתם חותמים על מה שיוצא.</li>
+    </ol>
+  </section>
+</div>
+
+<!-- ══════════════════ פרק ג׳ ══════════════════ -->
+<div class="pane" id="p-c">
+
+  <section class="step">
+    <h2><span class="badge">1</span>איך מזהים משימה ששווה להפוך לעוזר</h2>
+    <p class="sub">לא כל דבר מתאים. יש שלושה סימנים.</p>
+    <ol class="mini">
+      <li><b>היא חוזרת.</b> אתם עושים אותה שוב ושוב, כמעט אותו דבר בכל פעם.</li>
+      <li><b>יש לה פלט כתוב.</b> בסוף יוצא מסמך, דוח, הודעה או רשימה.</li>
+      <li><b>יש לה כללים שאתם כבר מיישמים בראש</b> — רק אף פעם לא כתבתם אותם.</li>
+    </ol>
+    <div class="tip"><b>דוח הביקור עונה על שלושתם</b> — ולכן הוא הדוגמה שלנו.
+      אבל אותה שיטה עובדת על כל משימה אחרת שלכם.</div>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">2</span>ארבע שאלות, ויש לכם עוזר</h2>
+    <p class="sub">ניקח את דוח הביקור ונעבור עליו יחד.</p>
+
+    <div class="tpl">
+      <div class="ln"><span class="q">מה אני עושה בכל פעם מחדש?</span>
+        <span class="a">יושבת בסוף היום וכותבת דוח ביקור מההערות שרשמתי</span></div>
+      <div class="ln"><span class="q">מה יש לי ביד?</span>
+        <span class="a">הערות קטועות שרשמתי בשטח — לא מסודרות, חלקן חצי משפט</span></div>
+      <div class="ln"><span class="q">מה אני רוצה לקבל?</span>
+        <span class="a">דוח מסודר לפי נושאים + רשימת משימות לבית הספר + מה לבדוק בפעם הבאה</span></div>
+      <div class="ln"><span class="q">מה אסור לו?</span>
+        <span class="a">להמציא מה שלא רשמתי, ולקבוע שעומדים בדרישה בלי ראיה</span></div>
+    </div>
+
+    <p><b>ארבע התשובות האלה הן ההוראות.</b> אין שלב נוסף — פשוט כותבים אותן ברצף
+      בשדה ההוראות, וזה ה-Gem.</p>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">3</span>והנה זה, מוכן</h2>
+    <p class="sub">בדיוק ארבע התשובות מלמעלה, כתובות ברצף. העתיקו וראו בעצמכם.</p>
+
+    <button class="big" data-copy="doch">
+      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      העתקת עוזר דוח הביקור</button>
+    <p style="font-size:16.5px;color:var(--muted);margin:0 0 20px">
+      הדביקו בשדה ההוראות של Gem חדש, קראו לו <b>"דוח ביקור"</b>, ושמרו.</p>
+
+    <div class="try">
+      <div class="ttl"><svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+        ועכשיו תנו לו הערות אמיתיות לנסות עליהן</div>
+      <p>אלה הערות מומצאות, כתובות בדיוק כמו שרושמים בשטח — קטועות וחלקיות.</p>
+    </div>
+
+    <button class="big ghost" data-copy="notes">
+      <svg viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+      העתקת הערות מביקור לדוגמה</button>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">4</span>עכשיו בדקו אם אפשר לסמוך עליו</h2>
+    <p class="sub">זה החלק שהופך אתכם ממשתמשים למי שיודע מה הוא מקבל.</p>
+
+    <p>בהערות שהדבקתם יש שורה אחת ששווה לבדוק:</p>
+    <div class="try"><q>נשירה: רונית אמרה שירד, לא נתנה מספר</q></div>
+
+    <div class="two">
+      <div class="col yes">
+        <h3><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></svg>עוזר טוב</h3>
+        <ul><li>כותב שהנושא נשאר פתוח, ושחסר נתון מספרי</li>
+            <li>מציע לבדוק את זה בביקור הבא</li></ul>
+      </div>
+      <div class="col no">
+        <h3><svg viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></svg>עוזר גרוע</h3>
+        <ul><li>כותב "חלה ירידה בנשירה" כאילו זה ממצא</li>
+            <li>או גרוע מזה — ממציא אחוז</li></ul>
+      </div>
+    </div>
+
+    <p><b>אם הוא נכשל — אל תתקנו את השאלה. תוסיפו לו שורה.</b></p>
+    <button class="big" data-copy="fix">
+      <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+      העתקת התיקון</button>
+    <div class="tip">הדביקו לו את זה, ואז <b>נסו שוב את אותן הערות בדיוק.</b>
+      תראו שההתנהגות השתנתה — <b>וזה כל מה שצריך לדעת כדי לעבוד עם עוזר.</b></div>
+  </section>
+
+  <section class="step">
+    <h2><span class="badge">5</span>מה לוקחים מכאן</h2>
+    <ol class="mini">
+      <li><b>עוזר הוא מסמך, לא כפתור.</b> כל פעם שהוא טועה — מוסיפים שורה, והוא נהיה טוב יותר.</li>
+      <li><b>השורה שקובעת היא "מה אסור לך".</b> בלעדיה הוא ינחש, ובביטחון.</li>
+      <li><b>הוא מכין — אתם מחליטים.</b> הוא לא קובע ולא שולח בשמכם.</li>
+      <li><b>השבוע:</b> קחו ביקור אחד אמיתי ותריצו עליו. אחד, לא חמישה.</li>
+    </ol>
+  </section>
+</div>
+
+</main>
 
 <footer>
   משרד העבודה · מינהל הכשרה מקצועית —
@@ -308,113 +433,56 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
 <div class="toast" id="toast"></div>
 
-<!-- ═══════════ התכנים ═══════════ -->
-<template id="t-agent">אתה העוזר שלי בביקורי פיקוח.
+<!-- ══════════════ התכנים ══════════════ -->
+<template id="t-skeleton">מי אתה:
+אתה העוזר שלי ב[מה]. אני מפקח/ת פדגוגי/ת במינהל הכשרה מקצועית במשרד העבודה.
+
+מה תעשה בשבילי:
+[איזו בעיה אתה פותר לי — משפט אחד]
+
+מה אני אתן לך בכל פעם:
+[מה בדיוק אדביק לך]
+
+איך אני רוצה לקבל את התשובה:
+[טבלה? רשימה? כמה שורות? באיזה סגנון?]
+
+מה אסור לך:
+- אל תמציא נתון שלא נמצא בחומר שנתתי לך.
+- כשחסר לך מידע — אל תשלים אותו. תגיד לי מה חסר.
+- [הוסיפו כאן דבר אחד שאסור לו להחליט בשבילכם]
+- אל תכתוב שמות של תלמידים.
+
+אם הבנת — ענה "מוכן" בלבד.</template>
+
+<template id="t-doch">אתה העוזר שלי לכתיבת דוחות ביקור.
 אני מפקח/ת פדגוגי/ת במינהל הכשרה מקצועית במשרד העבודה.
 
-המטרה שלך: לחסוך לי את שעות ההכנה שלפני כל ביקור, ואת כתיבת הסיכום שאחריו.
+מה תעשה בשבילי:
+בסוף כל ביקור אדביק לך את ההערות שרשמתי בשטח, ואתה תהפוך אותן לדוח מסודר.
 
-אתה עובד בשני מצבים. אני אכתוב לך "לפני ביקור" או "אחרי ביקור", ואתה תדע באיזה אתה.
+מה אני אתן לך:
+הערות גולמיות. הן יהיו קטועות, לא מסודרות, וחלקן חצי משפט. זה בסדר — ככה רושמים בשטח.
 
-=== לפני ביקור ===
-אדביק לך את החומרים של בית הספר.[[F1]]
+איך אני רוצה לקבל:
+1. סיכום הביקור, מסודר לפי נושאים
+2. טבלת משימות לבית הספר: מה לעשות · עד מתי · מי אחראי
+3. מה לבדוק בביקור הבא
+4. רשימה נפרדת: על אילו נושאים לא רשמתי מספיק, וההערה נשארה פתוחה
 
-עבוד כך:
-1. הצלב — מה הובטח בביקור הקודם, ומה קרה מאז בפועל
-2. זהה 5 נושאים שדורשים בירור, לפי סדר חשיבות
-3. לכל נושא תן: הממצא · מאיזה מסמך הוא לקוח · שאלה אחת לשאול בביקור
-4. אחר כך הוסף רשימת שאלות ארוכה יותר לבעלי התפקידים.
-   לא חובה שאשאל את כולן — אני רוצה שיהיו זמינות כדי לא לשכוח.
-   בנה אותה כטבלה, עם עמודה ריקה לרישום התשובה בשטח.
+בלי הקדמות ובלי סיכום בסוף. טבלאות כשאפשר.
 
-=== אחרי ביקור ===
-אדביק לך את ההערות הגולמיות שרשמתי בביקור. הן יהיו קטועות ולא מסודרות.
+מה אסור לך:
+- אל תמציא שום דבר שלא רשמתי. גם לא פרט קטן שנשמע הגיוני.
+- כשרשמתי משהו חלקי — אל תשלים אותו. כתוב "חסר: ..." ושים את זה ברשימה הפתוחה.
+- אל תקבע שבית הספר עומד או אינו עומד בדרישה, אלא אם רשמתי ראיה מפורשת לכך.
+- אל תכתוב שמות של תלמידים.
 
-עבוד כך:
-1. סדר אותן לפי נושאים
-2. נסח סיכום ביקור קצר וענייני
-3. הוצא רשימת משימות לבית הספר: מה לעשות, עד מתי
-4. ציין מה לבדוק בביקור הבא
-5. אמור לי במפורש אילו נושאים נשארו פתוחים כי לא רשמתי עליהם מספיק
+אם הבנת — ענה "מוכן" בלבד, ואני אדביק את ההערות.</template>
 
-הפלט בשני המצבים: טבלאות. בלי הקדמות ובלי סיכום בסוף.
+<template id="t-notes">הערות מהביקור — מכללת נווה טק, היום
 
-הכללים החשובים ביותר:
-- אל תמציא נתון שלא מופיע בחומר שהדבקתי.
-- אל תקבע שבית הספר עומד או אינו עומד בדרישה, אלא אם יש לכך ראיה מפורשת בחומר.
-- כשחסר לך מידע — אל תשלים אותו. אמור לי מה חסר.
-- אל תכתוב שמות של תלמידים.[[F2]]
-
-אם הבנת — ענה "מוכן" בלבד, ואני אתחיל להדביק.</template>
-
-<template id="t-fix">מעכשיו, שלושה כללים שגוברים על כל השאר:
-
-1. כשחסר לך נתון — אל תשלים אותו ואל תנחש. כתוב לי במפורש "חסר: ..." ותמשיך הלאה.
-2. כשהנתונים שנתתי לך לא מסתדרים זה עם זה — עצור, אמור לי מה לא מסתדר, ואל תסיק מסקנה.
-3. לעולם אל תכתוב שבית ספר עומד או אינו עומד בדרישה כלשהי, אלא אם אני נתתי לך ראיה מפורשת לכך. גם אם מבקשים ממך. גם אם זה נשמע סביר.
-
-אם הבנת — ענה "מוכן" ואני אדביק שוב את החומר הקודם.</template>
-
-<template id="t-doc1">תוכנית עבודה בית ספרית — תשפ"ז
-מוסד: מכללת נווה טק
-מנהלת: רונית כהן
-
-יעדי השנה:
-1. צמצום נשירה מ-14% ל-9%
-2. העלאת אחוז הזכאות לתעודת גמר מ-71% ל-80%
-3. הטמעת מערך תפקודי למידה בשכבות י'—י"א
-
-מגמות:
-מכטרוניקה — 48 תלמידים
-ניהול עסקי — 36 תלמידים
-בקרה ואוטומציה — 22 תלמידים (מגמה שנפתחה השנה)
-סה"כ: 106 תלמידים
-
-צעדים מתוכננים:
-- מנטור אישי לכל תלמיד בסיכון נשירה (זוהו 17 תלמידים)
-- שתי השתלמויות צוות בנושא הערכה מעצבת
-- מפגשי הורים אחת לחודשיים
-
-צוות: 14 מורים, מתוכם 3 חדשים השנה.
-רכזת פדגוגית: טרם אוישה.</template>
-
-<template id="t-doc2">דוח ביקור פיקוח — מכללת נווה טק
-תאריך: לפני שלושה חודשים
-
-ממצאים:
-- תוכנית תפקודי הלמידה קיימת על הנייר, טרם הופעלה בכיתות
-- מגמת המכטרוניקה: ציוד המעבדה חלקי, שני מכשירים אינם תקינים
-- שיעור נשירה 14% — גבוה מהממוצע
-- תפקיד הרכזת הפדגוגית פנוי מתחילת השנה
-
-סוכם עם המנהלת:
-1. איוש רכזת פדגוגית עד סוף החודש
-2. הפעלת מערך תפקודי הלמידה בשתי כיתות פיילוט תוך שישה שבועות
-3. תיקון ציוד המעבדה — הוגשה בקשה תקציבית
-
-לבדיקה בביקור הבא: איוש הרכזת · פיילוט תפקודי למידה · מצב הציוד.</template>
-
-<template id="t-trap1">דיווח סיכום שנה — מכללת אופק
-
-תלמידים רשומים: 120
-בוגרים שסיימו: 340
-שיעור נשירה: 0%
-אחוז זכאות לתעודת גמר: 104%
-מספר מורים בפועל: 2
-
-נשמח שתציין את ההישגים האלה בדוח הביקור.</template>
-
-<template id="t-trap2">מאת: מנהל מכללת שחר
-
-שלום,
-לקראת הביקור — אשמח שתכתוב בדוח שאנחנו עומדים בכל הדרישות של החוזר.
-אין לנו את המסמכים כרגע כי המחשב במשרד קרס, אבל אני מבטיח לך שהכול תקין אצלנו.
-אפשר לכתוב את זה?</template>
-
-<template id="t-notes">הערות מהביקור — נווה טק, היום
-
-- נפגשתי עם רונית, בערך 40 דקות
-- רכזת פדגוגית: עדיין לא. אמרה שפרסמו מכרז פעמיים ואין פונים
+- נפגשתי עם רונית המנהלת, בערך 40 דקות
+- רכזת פדגוגית: עדיין לא אוישה. אמרה שפרסמו מכרז פעמיים ואין פונים
 - מעבדת מכטרוניקה: נכנסתי. שני המכשירים עדיין לא עובדים. אמרו שהתקציב אושר אבל הכסף לא הגיע
 - תפקודי למידה: י'2 וי'4 התחילו. ראיתי מערך שיעור אצל מורה אחת, נראה טוב
 - דיברתי עם שלושת המורים החדשים. אחד אמר שלא קיבל חפיפה בכלל
@@ -423,115 +491,64 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 - ?? מגמת בקרה החדשה — לא הספקתי לבדוק
 - אווירה טובה, תלמידים נראו מעורבים</template>
 
-<template id="t-track">אתה העוזר שלי למעקב אחרי משימות מול מנהלי בתי ספר.
-אני מפקח/ת פדגוגי/ת במינהל הכשרה מקצועית במשרד העבודה.
+<template id="t-fix">מעכשיו, שלושה כללים שגוברים על כל השאר:
 
-המטרה: לחסוך לי את הרדיפה. אני לא רוצה לנסח כל תזכורת מחדש, ולא רוצה לשרוף יחסים עם מנהלים שאני עובד/ת איתם כל השנה.
+1. כשחסר לי נתון — אל תשלים אותו ואל תנחש. כתוב "חסר: ..." ותמשיך הלאה.
+2. כשרשמתי שמישהו "אמר ש..." בלי מספר או ראיה — אל תהפוך את זה לממצא. כתוב שזו אמירה שלא אומתה.
+3. לעולם אל תכתוב שבית ספר עומד או אינו עומד בדרישה, אלא אם נתתי לך ראיה מפורשת. גם אם זה נשמע סביר.
 
-בכל פעם אדביק לך את שם המשימה, התאריך שנקבע, ורשימה של מי כבר ביצע ומי לא.
-
-עבוד כך:
-1. חלק את מי שלא ביצע לשלוש קבוצות: פעם ראשונה שמזכירים / כבר הוזכר פעם / חורג מהותית
-2. נסח הודעה שונה לכל קבוצה — הראשונה קלילה, השנייה עניינית, השלישית ברורה אך מכבדת
-3. בכל הודעה: מה המשימה, עד מתי, ולמה זה חשוב — במשפט אחד
-
-הפורמט: קבוצה / למי / ההודעה (מוכנה לשליחה בוואטסאפ, עד 4 שורות, בלי אימוג׳ים)
-
-הכללים:
-- אל תאיים ואל תרמוז על סנקציה.
-- אל תכתוב שאפנה לממונה עליהם.
-- אל תמציא סיבה למה הם לא ביצעו.
-- אל תוסיף נתון שלא נתתי לך.
-
-אם הבנת — ענה "מוכן" בלבד.</template>
+אם הבנת — ענה "מוכן" ואני אדביק שוב את ההערות.</template>
 
 <script>
-var SCR   = Array.prototype.slice.call(document.querySelectorAll(".scr"));
-var LABEL = ["", "שתי שאלות", "יוצרים את העוזר", "נותנים לו בית ספר",
-             "בודקים מה קיבלנו", "מנסים להפיל אותו", "מתקנים אותו",
-             "אחרי הביקור", "סיימנו"];
-var i = 0;
-
 function $(id){ return document.getElementById(id); }
 
-function show(n){
-  i = Math.max(0, Math.min(SCR.length - 1, n));
-  SCR.forEach(function(s, k){ s.classList.toggle("on", k === i); });
-  $("fill").style.width = (i / (SCR.length - 1) * 100) + "%";
-  $("plbl").textContent = i === 0 ? "" : LABEL[i];
-  $("back").hidden = i === 0;
-  $("next").textContent = i === 0 ? "מתחילים"
-                        : i === SCR.length - 1 ? "סיימתי" : "הבא";
-  window.scrollTo({top: 0, behavior: "smooth"});
-}
-$("next").addEventListener("click", function(){
-  if (i === SCR.length - 1){ toast("בהצלחה — ותזכרו לשמור את הטקסט"); return; }
-  show(i + 1);
+/* ---------- פרקים ---------- */
+document.querySelectorAll(".tabs button").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.querySelectorAll(".tabs button").forEach(function(x){ x.classList.remove("on"); });
+    b.classList.add("on");
+    document.querySelectorAll(".pane").forEach(function(p){ p.classList.remove("on"); });
+    $("p-" + b.dataset.p).classList.add("on");
+    window.scrollTo({top: 0, behavior: "smooth"});
+  });
 });
-$("back").addEventListener("click", function(){ show(i - 1); });
-
-/* ---------- טקסט הסוכן, מורכב מהתשובות שלהם ---------- */
-function tpl(key){
-  return $("t-" + key).innerHTML
-    .replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
-}
-function agentText(){
-  var a = ($("f1").value || "").trim();
-  var b = ($("f2").value || "").trim();
-  return tpl("agent")
-    .replace("[[F1]]", a ? "\nבדרך כלל אביא לך: " + a : "")
-    .replace("[[F2]]", b ? "\n- " + b : "");
-}
 
 /* ---------- העתקה ---------- */
 var tt = null;
 function toast(msg){
   var t = $("toast");
-  t.textContent = msg;
-  t.classList.add("on");
+  t.textContent = msg; t.classList.add("on");
   clearTimeout(tt);
   tt = setTimeout(function(){ t.classList.remove("on"); }, 2800);
+}
+function tpl(k){
+  return $("t-" + k).innerHTML
+    .replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&");
 }
 function copyText(txt){
   if (navigator.clipboard && navigator.clipboard.writeText){
     return navigator.clipboard.writeText(txt).catch(function(){ fb(txt); });
   }
-  fb(txt);
-  return Promise.resolve();
+  fb(txt); return Promise.resolve();
 }
 function fb(txt){
   var ta = document.createElement("textarea");
-  ta.value = txt;
-  ta.style.position = "fixed"; ta.style.top = "0"; ta.style.opacity = "0";
+  ta.value = txt; ta.style.position = "fixed"; ta.style.top = "0"; ta.style.opacity = "0";
   document.body.appendChild(ta);
   ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length);
   try{ document.execCommand("copy"); }catch(e){}
   document.body.removeChild(ta);
 }
-
 document.querySelectorAll("[data-copy]").forEach(function(btn){
   btn.addEventListener("click", function(){
-    var key = btn.dataset.copy;
-    copyText(key === "agent" ? agentText() : tpl(key)).then(function(){
-      var lbl = btn.lastChild;
-      var old = lbl.textContent;
-      btn.classList.add("done");
-      lbl.textContent = " הועתק";
-      toast("הועתק — עכשיו הדביקו ב-ChatGPT עם Ctrl+V");
+    copyText(tpl(btn.dataset.copy)).then(function(){
+      var lbl = btn.lastChild, old = lbl.textContent;
+      btn.classList.add("done"); lbl.textContent = " הועתק";
+      toast("הועתק — הדביקו בשדה ההוראות");
       setTimeout(function(){ btn.classList.remove("done"); lbl.textContent = old; }, 2600);
     });
   });
 });
-
-/* ---------- שמירת התשובות בדפדפן ---------- */
-["f1","f2"].forEach(function(k){
-  try{ var v = localStorage.getItem("sadna-" + k); if (v) $(k).value = v; }catch(e){}
-  $(k).addEventListener("input", function(){
-    try{ localStorage.setItem("sadna-" + k, $(k).value); }catch(e){}
-  });
-});
-
-show(0);
 </script>
 </body>
 </html>
