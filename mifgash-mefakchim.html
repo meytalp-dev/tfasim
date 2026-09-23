@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>מפגש מפקחים 23.9.2026 · עדכונים וקישורים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --sky-soft:#e7f4fc; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.6;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:0 20px}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+
+header.top{padding:26px 0 6px;text-align:center}
+header.top h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,5vw,36px);margin:0 0 5px;
+  color:var(--navy);font-weight:700}
+header.top p{margin:0;color:var(--muted);font-size:16.5px}
+.stamp{display:inline-flex;align-items:center;gap:8px;margin-top:11px;background:#fff;
+  border:1px solid var(--line);box-shadow:var(--shadow-s);border-radius:999px;
+  padding:6px 16px;font-size:14px;color:var(--muted)}
+.stamp .dot{width:8px;height:8px;border-radius:50%;background:var(--mint)}
+
+/* ---------- nav ---------- */
+.jump{position:sticky;top:0;z-index:40;background:rgba(246,248,253,.97);backdrop-filter:blur(8px);
+  padding:13px 0;margin-top:14px;border-bottom:1px solid var(--line)}
+.jump .row{display:flex;gap:7px;flex-wrap:wrap;justify-content:center}
+.jump a{padding:9px 17px;border-radius:11px;background:#fff;border:1px solid var(--line);
+  color:var(--navy);text-decoration:none;font-weight:600;font-size:15.5px;
+  transition:border-color .16s var(--ease),transform .16s var(--ease)}
+.jump a:hover{border-color:var(--sky);transform:translateY(-1px)}
+
+/* ---------- card ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-m);
+  padding:28px 30px;margin-top:20px;scroll-margin-top:80px}
+@media (max-width:600px){.card{padding:22px 18px}}
+.card > h2{font-family:'Rubik',sans-serif;font-size:23px;color:var(--navy);margin:0 0 6px;
+  font-weight:600;display:flex;align-items:flex-start;gap:12px;line-height:1.3}
+.num{flex:0 0 auto;width:33px;height:33px;border-radius:50%;
+  background:linear-gradient(140deg,var(--navy),var(--blue));color:#fff;
+  font-family:'Rubik',sans-serif;font-weight:700;font-size:15.5px;
+  display:flex;align-items:center;justify-content:center;margin-top:2px}
+.card .sub{color:var(--muted);font-size:16.5px;margin:0 0 20px;padding-inline-start:45px}
+@media (max-width:600px){.card .sub{padding-inline-start:0}}
+
+.say{background:var(--sky-soft);border-radius:14px;padding:16px 19px;margin:0 0 16px}
+.say .k{font-family:'Rubik',sans-serif;font-size:13px;font-weight:700;color:var(--navy);
+  letter-spacing:.05em;margin-bottom:8px}
+.say p{margin:0 0 8px;font-size:17px;color:#25325a}
+.say p:last-child{margin-bottom:0}
+
+.links{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 16px}
+.lk{display:inline-flex;align-items:center;gap:9px;padding:13px 20px;border-radius:13px;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);color:#fff;text-decoration:none;
+  font-family:'Rubik',sans-serif;font-weight:600;font-size:16.5px;
+  box-shadow:0 5px 16px rgba(24,92,255,.22);transition:transform .15s var(--ease)}
+.lk:hover{transform:translateY(-2px)}
+.lk svg{width:18px;height:18px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lk.g{background:#fff;color:var(--navy);border:2px solid var(--line);box-shadow:none}
+.lk.g svg{stroke:var(--blue)}
+.lk.g:hover{border-color:var(--sky)}
+
+/* ---------- stats ---------- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:0 0 18px}
+.kpi{background:#fbfcff;border:1px solid var(--line);border-radius:15px;padding:16px 18px;text-align:center}
+.kpi .n{font-family:'Rubik',sans-serif;font-size:31px;font-weight:700;color:var(--navy);line-height:1.1}
+.kpi .l{color:var(--muted);font-size:14.5px;margin-top:2px}
+.kpi.w .n{color:var(--amber)}
+.kpi.d .n{color:var(--danger)}
+
+.namelist{background:#fbfcff;border:1px solid var(--line);border-radius:14px;padding:16px 19px;
+  max-height:270px;overflow-y:auto;margin:0 0 14px}
+.namelist ol{margin:0;padding-inline-start:24px;font-size:16.5px;columns:2;column-gap:28px}
+@media (max-width:620px){.namelist ol{columns:1}}
+.namelist li{margin-bottom:7px;break-inside:avoid}
+.namelist li b{color:var(--navy)}
+.namelist li span{color:var(--muted);font-size:15px}
+
+.note{background:#fffaf0;border:1px solid #f0dcb4;border-radius:14px;padding:16px 19px;margin:0 0 16px;
+  font-size:16.5px;color:#7a5a12}
+.note b{color:#8a5410}
+.tip{background:var(--blue-soft);border-radius:14px;padding:16px 19px;margin:0 0 16px;font-size:16.5px;color:#25325a}
+.tip b{color:var(--navy)}
+.todo{background:#fff;border:2px dashed var(--amber);border-radius:14px;padding:16px 19px;margin:0 0 16px;
+  font-size:16.5px;color:#8a5410}
+.todo b{color:var(--amber)}
+
+ol.mini{margin:0 0 16px;padding-inline-start:22px;font-size:17px}
+ol.mini li{margin-bottom:8px}
+ol.mini li b{color:var(--navy)}
+
+.btn{padding:11px 20px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;
+  color:var(--navy);font-family:inherit;font-weight:700;font-size:15.5px}
+.btn:hover{border-color:var(--sky)}
+.btn.done{border-color:var(--mint);color:#0d7d6f}
+
+footer{text-align:center;padding:30px 20px 46px;color:var(--muted);font-size:14px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.toast{position:fixed;inset-inline:16px;bottom:24px;max-width:420px;margin:0 auto;z-index:60;
+  background:var(--navy);color:#fff;border-radius:14px;padding:15px 22px;text-align:center;
+  font-weight:600;font-size:16.5px;box-shadow:0 10px 30px rgba(22,32,60,.3);
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:all .28s var(--ease)}
+.toast.on{opacity:1;transform:none}
+.card.sos{border:2px solid var(--amber);background:#fffdf8}
+.card.sos > h2{color:var(--amber)}
+.card.sos .num{background:linear-gradient(140deg,#b06510,var(--amber))}
+.card.sos .lk{background:linear-gradient(100deg,#b06510,var(--amber) 70%);box-shadow:0 5px 16px rgba(200,116,21,.22)}
+.card.sos .lk.g{background:#fff;color:#8a5410;border-color:#f0dcb4}
+.card.sos .lk.g svg{stroke:var(--amber)}
+.row-tpl{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+  margin:0 0 12px;font-size:15.5px;color:#3d4a70;overflow-x:auto;white-space:nowrap;
+  font-family:'Assistant',monospace}
+.row-tpl b{color:var(--navy)}
+table.miss{width:100%;border-collapse:collapse;font-size:16px;margin:0 0 12px}
+table.miss td{border-top:1px solid var(--line);padding:11px 12px;vertical-align:top}
+table.miss tr:first-child td{border-top:0}
+table.miss .ins{font-weight:700;color:var(--navy);white-space:nowrap;width:1%}
+table.miss .cnt{color:var(--amber);font-family:'Rubik',sans-serif;font-weight:700;
+  text-align:center;width:1%;white-space:nowrap}
+table.miss b{color:#25325a;font-weight:600}
+.mbrow{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 14px}
+.mb{display:inline-block;padding:11px 19px;border-radius:12px;background:#fff;
+  border:2px solid var(--line);color:var(--navy);text-decoration:none;
+  font-weight:700;font-size:16px;transition:border-color .15s var(--ease),transform .15s var(--ease)}
+.mb:hover{border-color:var(--sky);transform:translateY(-1px)}
+@media print{.jump,.toast{display:none}body{background:#fff}.card{break-inside:avoid;box-shadow:none}}
+
+/* אקורדיונים — הדף מקופל כברירת מחדל */
+details.card>summary{list-style:none;cursor:pointer;position:relative;padding-inline-start:34px}
+details.card>summary::-webkit-details-marker{display:none}
+details.card>summary::before{content:"";position:absolute;inset-inline-start:6px;top:14px;width:11px;height:11px;
+  border-inline-end:2.5px solid var(--navy);border-bottom:2.5px solid var(--navy);transform:rotate(-135deg);transition:transform .2s}
+details.card[open]>summary::before{transform:rotate(45deg);top:10px}
+details.card>summary h2{margin:0}
+details.card>summary .sub{margin:4px 0 0}
+details.card[open]>summary{margin-bottom:18px}
+details.acc{background:#fbfcff;border:1px solid var(--line);border-radius:15px;padding:12px 18px;margin:0 0 12px}
+details.acc>summary{list-style:none;cursor:pointer;font-weight:700;color:var(--navy);position:relative;padding-inline-start:26px}
+details.acc>summary::-webkit-details-marker{display:none}
+details.acc>summary::before{content:"";position:absolute;inset-inline-start:4px;top:9px;width:8px;height:8px;
+  border-inline-end:2px solid var(--navy);border-bottom:2px solid var(--navy);transform:rotate(-135deg);transition:transform .2s}
+details.acc[open]>summary::before{transform:rotate(45deg);top:6px}
+details.acc[open]>summary{margin-bottom:10px}
+</style>
+</head>
+<body>
+
+<div class="strip"></div>
+
+<header class="top"><div class="wrap">
+  <h1>מפגש מפקחים 23.9.2026 — עדכונים וקישורים</h1>
+  <p>כל מה שעלה במפגש, במקום אחד. לחיצה על כותרת פותחת את הסעיף.</p>
+  <div class="stamp"><span class="dot"></span><span id="stamp">טוען נתונים…</span></div>
+</div></header>
+
+<div class="jump"><div class="wrap"><div class="row">
+  <a href="#c1">תוכניות ההדרכה</a>
+  <a href="#c2">האתר ואזור הפיקוח</a>
+  <a href="#c3">מדידה ולמידה מהאתר</a>
+  <a href="#c4">הופה</a>
+  <a href="#c5">רכזי תקשוב</a>
+</div></div></div>
+
+<main class="wrap">
+
+<!-- ═══════════ 1 ═══════════ -->
+<details class="card" id="c1">
+  <summary><h2><span class="num">1</span>תוכניות ההדרכה של המדריכות</h2>
+  <p class="sub">תוכנית שנתית לכל מדריכה — חיה באתר, לא קובץ בדרייב.</p></summary>
+
+  <div class="say">
+    <p>בנינו השנה תוכנית עבודה שנתית לכל מדריכה בתחומי הדעת — כל מפגש עם התאריך,
+      השעה, הנושא והמטרה. <b>שמונה תוכניות כבר בפנים</b>: מתמטיקה, אנגלית, עברית,
+      היסטוריה, ספרות, ערבית, אזרחות ותנ״ך.</p>
+    <p>וזה לא קובץ ששוכב בדרייב ומתיישן. <b>זה חי באתר</b> —
+      המדריכה רואה את התוכנית שלה, המורים רואים את המפגשים שלהם,
+      <b>ולכם יש מסך משלכם שמראה מה קורה בתחומי הדעת שבפיקוחכם.</b></p>
+  </div>
+
+  <div class="links">
+    <a class="lk g" href="https://pedagogiamh.co.il/hadrachot/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 6-4 2 2-6z"/></svg>
+      מצפן ההדרכות</a>
+    <a class="lk g" href="https://pedagogiamh.co.il/hishtalmuyot.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg>
+      עמוד ההשתלמויות</a>
+  </div>
+
+
+
+  <p style="font-weight:700;color:var(--navy);margin:14px 0 6px">
+    ההשתלמות המוסדית מול אלנט — 17 בקשות ממתינות לאישורכם</p>
+  <div class="say">
+    <p>כל מנהל/ת בחר/ה השתלמות בית ספרית אחת בטופס. הבקשה הגיעה למייל של המפקח/ת
+      עם <b>קישור אישור אישי</b> — ורק אחרי הלחיצה שלכם אלנט מקבלת אותה ופותחת את ההשתלמות.
+      <b>7 כבר אושרו ונשלחו. 17 ממתינות</b>, חלקן מ-8 בספטמבר. בית ספר שממתין — לא מתחיל.</p>
+    <p>המייל נקרא <b>"אישור השתלמות בית ספרית תשפ״ז — שם בית הספר"</b>. חיפוש אחד בתיבה,
+      לחיצה אחת, וזה יורד מהרשימה.</p>
+  </div>
+  <div class="links">
+    <a class="lk" href="https://pedagogiamh.co.il/sikum-hishtalmuyot.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 20V10"/></svg>
+      מעקב ההשתלמויות — מי ממתין ומי אושר</a>
+  </div>
+<div class="sealed" data-iv="hI5Ry--HiO1hxP63" data-ct="NQ8LP5R1UMMukSFOV3Kf38ZZSs1sv7_YiyAe_MyDPsuEoO_MUXkbsKe8UW-UaQ0H3VyxIA9Jz6xXZD42Pj3gyEVJeI_G_up_25F2y-TzCkmVfeETQXoNHxzXO5_Jb5Lgs-XJV1Kj1DHSf_RjCxrnWE8sV7MJdUY8KrVJhL5s1CEsPRu_GrtF5Wh9peQfkUuYalQAo70F1e43WLDxYEGAkUihTDRxYvAw-YF3NsNDa7f5-XnJBuuu8h38op6R6OEw3zM3-kg7hvDJJRu_SxPlmmSAS7OaAD722FWfQLeipC1bTitIhleQjAlHKVcQUBclFhJl6iOUCk3VpATuH1PfBlwUNZ-dIPlTEcukLPmzvQwOSIs4nNBTe7-PBfcwvwKalyYeQWsPUd29XUuMIGbkhCio1XvQtgycALID_mWHWwggpl8olHU4dXzRwo7_v5ggYGnzTMVLz8cpNaZrJ0V_4YqJp4LqO4UWt2PDgCuq4nVqfS1zqASaiiYuEbpwjUg1JqvUjlxBWVa9LqwsZMIwhnooyt-pq6wThJ8wrADuQszo2wKjYBgxAvLekbqUEx-Ujpj-0wuWRzStgXMMpuxykLHeEfbPHUFM5aRmGBU_wIJV2VBnTkXhRKh3BkE7K18uR3cvv0aXF9JjzCk_Y-3EQO7uRqWByOX--9J4JkWZ1nzlgA51odgehmcCTm0oSFZaxPSgj2amGT1j2DUDi6D7SunmZAiFIS5-I1BYRJ2jXvZogfo5PI3t7gTxFKAroSwM0vo48Pkeal99Zh_zSfJlOJHc0XONqHqTEfcKvuUvxX1xZTG7ydiduXUkkdMR94JbwbunY6YEPenNTouJ_Ci9fyYBlg2524svCs7ttzRO0aA054MRznZz5_I5CYQXiGkMKACNTKGFOeZ8y6GyKI2-nthbm55ljK4Cxc4he4oVl1yGSF8yknU2PH_rXaxqLY9fdhLt_dE5Y8HUUJROByg2bLv6xddKo4opzpfrAaMRLWUry1ifGxmqfT_RUedNnp8Jutk7k3r6DexNwF68G9Be-zdLiZ-z3xpjxCxtVdQRUKUj0CgcsYpklRb0iDtpX2I4AVq7mIwgAHKBW4CfvMwIxEak4AZaXmc99XpIq1TpVWWDuPjPtc_QrOycZgcxYujEBflRod-pnGUlAk7N3bGel8efF8KdICs3SqDkTM7FD6YwbwP73G-2V2_40rpvGamf7t9KvjafXDGpWzEQmqR_7seYg5jzM70B1tLl1TtibxTyGn0sFG9j1jkhwdEfe3fFxRdNonTRTX1fZ-CyDYOisFboaFDY3cICJfiWaPVT5DybobYF9fnuhqPZq9rj70uz3Dvf9E1P2ccFLaJQWheGOUmfvVOlXw0Hk_wa0Phq5jnfJPMDvQCaXAczdhsnT_c-lJoiseGf122Kj9KNtFdDUg4xnHYijnt09Q8IKIlJgnjPilt_Cv6mvQ5AsD8W1aViwYTGblyNu-G57Kjr1vH8l0XBVVZVY10LiVOQ_nIuUUdNWIiW4bgIeybjGm4KeUTcNRdbMqf_G_ogiWV2AAZ2_0LPD5kr7MP2aWxdGcv7xwSnRTYdqLvLEf9IZuPYVM1HKD7783EYnQ_XIOmuIcjgk9En3rDVFnBrIjDTkTrqUVOjhqiR5uIbaGDfGtROf249ovDeUqq2KeTc90bY6KKLehv_GVTdX3UyOqH92aQYRq8-DTIgU3GjEALa_jiAkevXhQfDdgJj0gCX7RUGJAx41Z3fAi5MHsuJsOSqKvRQci6pqZU-r5Vf9tUGVJwhLuKfFTk2mGQHgqMkOuXDHGT7NyTw8rIlVy8vo2xQJxrNijGzCkry4H2-zogxRMTMIRmT-Jd7-Axu6vRUQY2Yqb_tdGacoDd07qRl7qnWFNOExyPHfLd4pkU_Z2trI6jc9mdxqSvwPDzaca93qWb8eCvLZa3W00EXk_ywlK3G0KY8KyakkV73l8dAI3HgzRYRivxDy1RS_Hpa6Hpi06RkmJRwIJ5CRksoByW5fejsh93SRkk7qU2wSfQGg1-8SH7pbBIT6wMkhfrUT1se4YvpZuR-L-yqt5oLvxk54K01WdGcwrPyoR43P1G6PaNFXgXW59QEsZFIhsl1GvO5oE6MeDjcheamoD1UoLRKn1ynifC4-yesX__S5TmEt0d954yoYtD1N67_3AGmF6L1oGmv7iQTLTEBkj9MFFR5ND63r8we9jOmoLBzNk57ir2Xjau3Ko_05uJ0WXYGA1ih8HhVYXbzAYOF6FmLU8PQVc3a4DHBvOEwBnugcYfyHIKP01FJp7IdUMO97mdHma-bDu_SzI2SLVexFiaSZFCPQ0VWh574iWjGeY23OX5_VB-YLGFIeJiQfLFU781Bf5FUXLXLB_yTJhWs_Bpy1gjsYQunNr1-KIfC_2M1ZQUpc9pSnmQWM14Xd28NWuxGFV0VbpOpECHBwJZudb06QRBUdd1R6wi_R_mq0kpVnIZUrPTeEXQsbNf9Vc-R2wK60tt__0sBVTBBfLl6ujMybo117rM9cIieeHV5fNbHtGYQg-ZNw5sjI87DpTybA5YG-F5YYghBcZenf8SsIn7Xv6PhchNuaF7iqBEmr98Lk4isWwZCTN2TRrHc5BM8m28So6g3bkiWJQtmwAwUG02QsYDCLK_uRzT0c9amz5sv8JYyfsLHIHOkrjGV-hWR8Z4IDjtlCEDBa2gH1A-FJ6WVwCZweUKZpxX8nefLbPgwKEqccV4Zhax6bSiQKKJss6XSzoqwAHmLoEpHoRu2nkjUHSH4hsob7Oldu6KRfxUidWXJQZCXPo8Hxj-1d2XhY9_QEu2YsJ5t3g4NLvkbTpLTGllB7DPgg8GfIewC5-vNI6UrYASZn6lOm-bOwTMN5ObT2VlTRHT3P4RPsF_4kIpkKUL51-OmY7b12qh60kLrmHVIvXZTwp23yE0bDlf7MaiF9vpDnBzeqwcXeRqwmxvZ7DYh-KYhJ73pCKJj2Pkkbs3tZhy3MM_c6xZPiPSYvem5Rbyjh7TtmLhIIIhDfXQX7UzQj6VyeNxpoZ9lB-hNgGP8sYMKjGP72xggPnL9D5__Q8Ff3eb_Xkl3QzD9VGWVOc2EstiTXwK45ElJEPcSRyFWVtuyp22uDGg-lKRLmHvd2b7V_BKYZdia4QEHyJQMdSoLgLE4ULjVUdaSvI25KB7N8VncAf2R87b8ouIx2A6Pz6b-vQjLkOzDWYNsvtBExcBn1L58A7W0ocWmkeSfqcrOIV9CsCC66Iiog6KVB20qo_Uc43MVY-I4ZiibJptjYw2YL_cW6FqrjfAH26M885n7qmLa5Yv7m4x2niEw-JeBALe68a8w_EPaU_knuXDMoMpFNFocIb5EQd28Y2ThnZKY1zzNHK27a01DRqW8FxGeteopziMs1zg54Sv3NJVUY7vvc6Sm7cVJ2epYu28l5ih4y4pIxeDeNIJRHVQFoSlOjvPexEQ7oXx-dDJpW_PalWX5rrvdrq9yQdXbu48LNz5fiNfwz2G9PNUkoC_ZzzgJLc-mz_wEhgGOxnJDG-67raWm7MjeDLBmYG9J5DUrCsiV4C0p1qGdAHj-MliZEUW4EzWCL42FugWgW5BZzHbXCGI30YiBuMSrxMEar2i9EHu-SSZYyPvL_l-Dfrbac85DJ8IV1XOaZk7MG1JuQYXVrZvzgeqgQdiNxGkPs2OkZ1cMnp0Z-dgTjA2UbghdkVLdQEpzJ56mj-dfaLWT-8A4E7OY7UTJPtb83CCSR8aC0TwxhZfWTony3wNddAiWbvT6cJxokCBIvjgUS2QlcnUHcQrF5E-C68qW5IdtsRmgOPHGn9cd7CQmTtddghNmyblakdbgS3jHN3caj2TFwvr0S17mVOncq8a5p7MqnXAI0cxNNzAgd8Tk1DTmxL9LYFU3K3DXpaEo_x5Q1ojO9Pp0VKGwdUBt3AwQuA64W_aoES4BqNeimSTAR10hrpqqIRkG5Vou-StQAz6yWWYeptwTBvcOqQfCclc1pqHKPtSpJhRvTZgbAo71RgFl9Up_QUuzxySaSxTizdBisCoDuOGSDV9BqXCrTO0UdYTttmvQPmIpPyAzwjgr5M9BrLX7dyZA3B5HEZIJwYTC24BWgEbNJdjivUNWUlPRPYDG9edXgG7FYowblXaVDODubDQJiZEsvn_pGeKXQbiQQWBppEjRnQxHiDjUT6hqjKEbF5xHWJvtDRgeTPW5lb4XUh9RQuzsoAacL4of-FVZOczYBGPllVPR52ohfPPm8xkv7LiqOoWtFdMRlLHJoSdIFmlFBV6VgGzU5danA576i8sw8DfsooWFMgqkc_tgPnmsTUJQ79RzQWNrpSWSmKiYF04Eu6CnaTVwPLiqWjAkvxU-3wBJdUpYyO7MZWiaI8lCkZnxA8wKpIeFLXK4rNZpSXBD4jJIRARlvxeqP1VVSRKtx9bK3hqIi_YFc-JeYQt27fmGFTXMr0Hv5ruo1-sBdWO9Az1iT4kzj01kxFxI8P3Bh1CadYmI4YCPWMMJ5cjVGTut57UP1vSVEaW3pdHVflcaMH_GTxZHvaXKj6srPaTSJS351128R_EI7d7qDruGN27LzIj0uvVoElxFQ8FBe2Vzf8gNEkD3-LIC_HanCHWcW1mPdIV17IxSGt4Jto8mSFc2Zaod91ALFi8xIhgTALg0FpczfJ9UkIylEgQK7KIBbK94XhFR4PAToICRKCvvxXxSe5wf1CsD4pG6UuZxhtfJMSOU_68JfE28HwX80rxvHIx5LboKiYuwq7ww0HGTITYMOrT9Cqj5lgNrlOmNMgpQrDRY6AZi8kXjpUARaEnvx1DrVC0c-HUBIGrIOwF2g6lNmULl48jrSHcnts3R7wRFmBWRcqQZgEhBdz5_C16SzUokiFj-pxAOerEwH-BxcD3jpM5y7LtCeuW1fCSHZFEqjlyM1Hd3kRtWUdddzb6BKDWnBKAWSYX65gPuStyRSYSv_linP5H9ZOFysHS_1NHVGp_wJQNJ6EKSHrbm0Cjqsb5JDCttiAAUcTIFAhicjsYb3P8dY-1OeMu8RL8L10XD_I5Etv8tp_OyTOGZBHz_jNSN0ZsEkkVd5xkaPj4Lo9nOFWQirztKBNZmATVuyxC1WQB3hFv8ZlVauBrufmyZmgMmImPJlYzCyRjRfRbphqdyJcZ8l0P087jVnxCmMGG2ZGjEU041ALjV28xR4rV4_aK9gxj8KXOkDekVO47FZ3fdK3v1SAb-zTieIL0TE5bqIQpI3SocAlTDs8_W1msw8aG9FCcbnzuf7M1o6FqLSOfklIlGAYELumcG-D8K6v35cSecqr-h5UDE2w6-nqfaooP2vf8SdimAYm8G41swuFb6fApIs2TpmTjwDyp36SxPBpQz8gSDdOdOnwSdaJ4FaosMFOSxVUhacdaXCV3Ke4dIfqwxa-wyRcAouy0PG9rW3AMDwKOt0LO60QRxCpLfTHRepybEALbwRY3oF3J1Ox2BAdPfapwqUej2sEIf8CSUSyvxVhu4247g1O01Eu1R-fZ-6Y0JdT8FLqCoKowS5_ayb5ljTQ4deeZNISj5LxYGHJHhBOESzMjq0NiLKEm2PH4MbmfZgPwjXpoKhGCcxc1Ibivr5ZipIQ6wwNQyBHMlm4VHw7a2MiuMznxY3Z56l2eo-FVRnqdjnjanncjoQM6vEkOGcPQakx4wwyBfiA90UsqcnG2qgsGzC3CMq8HmMhhWzbDShMbR_tjYllxlguGurc_pVr8JVrQ5gN4qCXTGMdD4UrWlJ1wj-I4oYHbg-RMfs53jgaPDLY4BgAmOcNbG53XMRxdBoxcYIZU33Y0NzyY9wpL2eBHMcd3le8hFfP5RPvTxr7klps7OPETiSeEBuyYjw0vJHdIzH7DRKeKaTUoZAJFohSHqupPwWPTxWtM-BKTuUhGrTI55FGk7vUC-1NEoLmVqNJJPslpa8jSqKXqDcz3lUWXObJtKKaMYP-fBVTYomORqOGNVvYE0BC6ZX1CRPY0RygfjDBUribqdV23TW8fyLC3WXkHciYZsVaBuueZRSrI_cDPLFu8BAQKSAu_Swp12yRu2AHIDxz_oJvyOWLe1mwrUhsHPSId858SDmieIMCpPA0p1BMhCZGJS7BOSqE0IlsjkFVfU29882DinzqUiNSUzYNDH1lwGE8yr8A_iKStB4m98vE_IQ0oHpTq1vz7ld9CrC7rSuN9j9bttdG7s2ckaDgr7_4N0p3y2HrDO00X_7lnMtc62b2D8YwsbV3UzlhXE-S-YNFTvHfsrGE9GHc5xRxcsbGISftpsKcOcvgPNzSqqIyLMoW1TeZvfcRNPLChaTzCSMzZmIPUIGfN_xgeNfNIFWs0TQovqoIymkuZ198TJLCAaGuedVaPu5xCFBVcPRpbGc9ZSIXNSPVFOO2LR8sX2BFhCcR7yuF7b5bWkiCubY1-_ixUyKwUtQlR0ku4B3AjWe1OJKZwPqoroXTlnePzyVCUBAk1G5gzBYNKYtgNiesD_FLQyPMBHLbw7f98mxUubrUxN3OO1cQeLsWtjUBKSpDBLxwG0vb9PydTIzJZN2Bd15ZNI5cUfsPiFYlVs1PNwWPS-QLO5Pgal5vcSNesq7MPOFsn4OnIGNCoTSUK1MyO7l-1ZqE3D7W2klJ7m0wk5VEJ2X0HLyZ5bxSYq1TKtityEk4np0WP7fAUsIaj5BG_vw32S7QGfttGP8h3KN-un0Wia5iHg7eBeIQnlbFigGEqPJR2Tth9TVO9tP1wBTykP_zie9fgrKnOvUMuDJBaKF6TYG0E5wcVJ4iLZIxW5-a0ggiWunmln6EQlgc8xJLk0MOiBZXx-oL3-oSFjU-Mk1RHYp31_CfwKVPI6rS7GD8OBWwOrkg3MXb22X-E0c3NvRWlMe4ZH2IIeFX4E4onAjdy24nhP2l2sMijP4oVb08kvPP4ixvfNJ2N6O5IDI-rAQIJiVww4lEvlKuMjjqkWDmRiAsnR4QPd5tb7GQLss6fcfc60Rp4a_RqDgeHLmM_85k_fiBsAZGjwuJ5yDEYXOxG5cnNdW78OQBv6IF3_nMDoAzwcAiY__1a7BoYj8vv6aZ1vTVDaXsq2XjfQDHhQMly6kBpwXeeQ3vdEHq5rOYeUp-40cKqdhMv20q7ZblvuVQb1bBCvY2_Ebaa-vlZIlAx0KtgFjQzxL5kTxYY8t4gTq6koLGAi8dQ5lA4Yhq7z-cEFfMb0ATm9v_IVWdiIuTJQxhyAnWcVa-pwKix2C1kDc69lluclVYIKVMDi2HUnLGK0Unz25ySreUw4KubmOye3yF9EO8YKpuV5ECXSpXHltFNNbNC8ZYU6keiauq_Aor1lv5b6fx5UxJpIK25hl7g04noOUg5Il--G0wu5uLCwRIgUNwFzXF9lrDVF_I1nRqpNdcek8goAFlv7bPG_4bq9Z62sAQE7rqOc4G8USaOsUQVAVWc32YtAW0z8w-8bQM0nBK8XHMwz4qYbHpc1WyPjUjw_fBUh67cLX7i0nGBNFwjfLmKogsOTAofA0m5opwa3Y827TLlfHXu9RXtbu0uuXp3FnXJxGIwUhWKHWeWPjr92w21Jw6M0dE-JzEt3J4xWMt3q-ZCo6dKRGrb2ER7yuIYXHqqzf9x8TPvmBtfq8eAe_GrkO4JhZnvpqP8FIWhRRpUe2pzPu9UGJSz33MBdJYIHuETEYzjH5AU_IgLMBZSZTSucygOAWs5FpiqN3f1UyVip3YdXvfvVKf-QaJTPm3U7p437kOXvS-S3acXsU6k7EanR8v39mhqYeZyu8QvehDZxzMDvWCvyXydr2iqz9Vts6tP20NFK_E-8Ip_SOYKXlp-Je5Pl4M62BPnEPyIYSO7y7p7kudWT2XmhfD2FTCXSWgSJneF7Fvm3IjdzpQVLHteBwXcJ-d-BrLGFefg0naW-Soh9o99eafrYssbEZmxoic8wOjWzaykQGeUOCmEtYMtcWeszSc3c7TEEWy27qXO3OfH6mptkEbt0_e_6xhSco0p-Ez67H748e8AWw-YrZoenDNEVMI2BSdQJRU7GZXsoWKrmHUau4G6wl33AonJ2djITJ1VaXVdaxe5k1hb25H4DfTzFTsTKeIgvbz4AUTBN0hLFr-zwJ7s7XqGVV1L4ObAnNXw5owB9f1f2hNkHAbh0q5XBFnWbLgv_eccWXaYqtp0xAnbX00tEwArwB91YF0JnFTy4Cc6DyBSS53Og98KUYX9U9Ea1StNxzPbgvVWASNpBVZ9KJETTvGKKT-VQsMwfB4Se3oc-SSOnNjqLzXzVC2CfRcLqwSaqKetxx-rKAqDvhqjPm36v3HZJnu-T-qyTH3Io7XUvaRo6pmmLHrODpvkREz-aBy84-fcVBzWjG32OJh1TRFqVvLSsqvG6Ko6zcYTkKGaOaGCZ5P2xArje6oztVHGUScZa28UswrCcrEqXXYdU4CmwIKrKns5bggy5eWCwHVFOt2EebKjXEezbvvEALnFIfKkoKQ_BtomPUTrj1vay-pWKj-CbgUTxUHmjluGnWC-sI9qNA2udyUP7yYUh69u1sZA9_P3lIbEpMcuUwMAvOIbEJjTJ9rbLf-yvUMqU0epMxC40IEhkkutyL9RK8irXpDlG5tnpxM9_HNkqOE-_6SmEciHJOhLMjK9iPlZbxLfKDNVrt0vf4HrxAY3sfrnRGDjNRg0viEYdzTHouATLWwUiPMEI2vJEDW0UTwtGr_gGpSgNIOU_PdeDjB3sWAgrALsvkrxjRVTa_HEHuRfUm1-TSAmjMpWwcY10_EDzLXuOovbFTSP3tS1JQUnqAje2RyuPRjNM5f9jugBK9Mo81BTSvdPCeirwj37ZmUtXHHNUCzBUw3dDQyZfeezqXXRL83tVlXH4yIjJukGSkwvd2EMMdMVErEmLp1LjPRKbTogSstOwcHs1pfqixRnOH0BUanZKwus_0ZjufxBPBeojmdativzF8nVK6Z8-N2E4wPpMO2uTR7nW_p8eqs7_nSpCxs_Us06KqHg135wB2etnqW4ObM0rrUNs0ej6KBz9sI7CHDKcUEsiV__88Gy5fQOS2EN0_P15MfVJwSt20id6LY3vZC7kVWkUAbQcFqd6QW2n0gWhkKhAL3mHkqBWgnAlaaDoZ_xu-yHwANBrOM2RQn4Dzd0_vFi4w12EbJ7-sFZdGAUf2K8wqx3BPi4RwG6d2Sy6RxtHzEoW4IBUaKAg4EINi43ffgH4Koh1ZDTRIBTMbrU69Xeldo9jjuGfWXpMh758SnfP5LF8m9qng7DQQDScDW1vKiW3UIYJGRjj8sBa-k16Rozn0hrLF4otVDWk6VdRn2XTgmb2RRgvbl-z9c1PJT28qOwkaBqAqSVLAOtNfrhjNhJOCTroNKywAKGpwhdhYxLcmd9Ho4_LAXssV8PBRwFpZ1gZTuAMd40LvKvPG0aCFaJ1rxclabDCj7CUTBUOw-LBDjgwbJ_3xUCfScwXHeaPEXKfZcB-2ZZSUsg8wRBFlHvdzr_IJArqILycWBypdf9_mix8IX4e13d6xQhqmasyI79_HDBVP5uUuFIGBjk_87TrAFQ56unxuewNFRIvZR0CNmA2_hIBUs-shTueyw3yzwu3dD3j-KXIGiUlo_Bf6LSE2lwZe7ZwYAUyBW1oFhtIcKHb-lXZwRNqZcAIpSovOZoI2cXardDL3r_xfju9MDJ-n9jCCxpql5cGhfLJk8X6ZKMjhnHTNfgNDXIT72h6E5EZI5itAi8DHNHkWpY_qdzcyuW08QtiGWQTuNCob7UiRVX85IuGBcUn-A27snBf8U6YZHNmBceJe_9kQBlNvvAfB9g0__ND_2q27dKSCfCwJplgyXhdwI_wYLqlZHbmddX93YVAra52wmB3hjfI9BFqdklzAkEO4JR6wVi-AcNbcMucpNWC5umd96u7-_VcaODzOGsmatoUjjOWn82lA-cD4FWdVUr9J2bgWxFd2IJbXjEEpo6lHJ8lCHwkKeR8eFk5ClTVxWUnE7gCuO0aeRhi-SyBpIOgTyXArN7DONAnWOmz1T03WX73DCL-nVyqo7QajHRPbKEMOzOQQZH-9KpQlL5BBFdS0hrf7-SOH13mRVrJvzWA1BETgPCJE6TajgWZCm_-tttjrqPIZhIywf5NJtMCbuLupaVQoITvNAq246Vo96P85ig7YEhXBVNqApN7TqouKyPxxVmTvmYkKN2DTOcVZBYRpXtnEm_t5YX9ikgrPK28W-zUH02hJ9rSY6XGu7EHJFNTr72ryph0BLiOyBgf12aE1pmhWao4Rj-Ilz4pEV-x8wo2h2C0Vhu2rBKu2f6L0tKCXlEs4YOFTrxKbwUdXfClQJYNt9jHzLXb4UdeWpVJrv6of7acm-Ztvrqo0CtPmMvItJsTW7NSt9I2mUUnLMyY5UtVryDjPtD4C1EY966_nRqDTS13ZxJwJ0kagyNkfCwjrxbgx5HZW8XeWspcl_ntS-sBhJgvB1ESjc926Ic6lZuaHQKYCTX0qxwrhvSs1uCGp6yzZ15vf0mV3X4rCsCzTqOZnAEVO7cNFX5G7M9n-hmg3sfWpwtPD6aWoIDfnIpR418P-hK8ojcjWQ_VWw-S2fzUBrGPLY0si0ccY3PTwFbXAL0KRr8HGehuzRGs4Co4l-Kguk6SEpsYWUWm29AiCP-HrUGIrLiEe2hUJJjda352PpSewTmuTFf389Utg4yXcxLCGkJsuOF551RjHRvTEDh1iU6KgfgBipOG187ITsn7BZ_APQE06mN5rweCaDs25TAEC-kWFen9nFOAO8Qb4Ls1idzjyWrUDpndnF70bxhWDPSxf4SfgbMPVSoyMDm1XoI21OZgZEJRNtxMUdvYzJSlnVNs6SJ2q5qEVT16Dg7gPsBa28LUZrJx5UmA7CFcCm0qunsNq_21Kj_ndOVAjOcoUqzImhj9jZsFc26OcJ-V8RC43kSS--jgQ2zdEynToX6ujhKGnXeyMowTzdpTVNO9j7d9sbTgwmRcLqxr"><div class="tip">הקישורים האישיים נפתחים רק מהקישור המלא שנשלח אליכם.</div></div>
+
+
+  <p style="font-weight:700;color:var(--navy);margin:14px 0 6px">
+    תוכניות הלימודים של הגמר — הטופס של כל מדריך/ה</p>
+  <div class="say">
+    <p>כל מדריך/ה קיבל/ה דף משלו/ה עם תוכנית הלימודים של הגמר בתחום שלו/ה:
+      עוברים על הידע, המיומנויות, החניכות, ההערכה והשעות, מתאימים לשכבות ט׳–י״ב,
+      מאשרים את המחוון ומצרפים קבצים. <b>זו תוכנית הלימודים שהמורים יעבדו לפיה</b>.</p>
+  </div>
+<div class="sealed" data-iv="D3Sj5bQgIe_cPC1_" data-ct="yPEPII6CqCSGNe-lL-OIaODDcSuSwlTpmAxBazhvGDqXI-C29Qnx5FejaS6ieF4wBDsQnMAYHfabSF49Bi4SO7Vp75FbePNe5KJZvcsLmW0HfprPgyzcQNyVe7GXrJ7L7Dm9hzWalPjdawd08peJMb2Ia_IvdUIwT0ath1GcIg-ubnKIjmqCjtOxUAIIBtZbPPUULxYDjfdmI7EXmsJpcTmrY_2cujaEvl6qvgfNOD0qS1bUrMhscSg5VpQqiDg4BqoSnPN_kPSi5brRTefSjKKY4Yflo2lZJKJRSm9okC24Q3MOk6TGEmI0Bb4l2DgAfGn78jH4iBQheJ4K0G4gTzC-epdZabgRBmrgd6UagbnN539bZ4rvfxW0Z-O5qK2JwTDhnAiRZp-2xw6kgjgyaVYBrGeYLGysYSXp3Qk70LM_SOGzURwFxODUfMmN94VWyhHcakMI8RGb2bNbPpAwvhyNeuN1R61xUNvjeZ55rqwl-_K3qpkyS7o_F0smRDqIZP7c3YD1-q_I0ym5U6-kufEr2fFfLlJVn4mXdfv-PfDEwZpa4Ct3Bg5jdQii96Xw6aAI1vfIV7kMyadHmkqlqlnlyTd5WXED8cqmEVcfiZk-s6uF3pg33aVYcfHeb8lIGn22YE_aKM2cW1qKaUk6-0kcYbVw1paozdxKIy36eV48R1tvbZ6pUEkWSr-EQZaM3e98yFa653wol6IztzUG_lNkO6GyqiM1SlP2SwEBSOIyaFkwaSLvTNvLbgfzSc3oqay31CZ3IM6Ipm9zAScx2QIChMX3F1E-ZFqFjU3tpHkifMhguAOOuFVR1buehLc0ZHW54w9Rkn0W5qLQ-T5ee80d_A4z6Dr2tDxMgGJgt5kjyg1h7FY9u9CWoZ2TDBq-3BfuwnU3-a52X4RgecnKFesLSiROBO-a12vU1axaVoY7lS2OjegtyLEpH4M2lCn1YPHognOPFpUuFpzeHx54eK82-PX0VTpECBL-1Ykk1l_usmjRZVcb8oicsOl_TLO2yLwqaVHPIw4V0d3QPSuQMsVJdFV93qlWL-RGSxjycSreos1Gy3eJncciOgGT4B0aMW-8tydzGnTzaaJop2scqOHLynLvZdQdmDuzNKST1spuURYqH_g_3NITKN502aMbcmzRtFosAY7nYDjY1Qtt3JZZxZir2jI5xm_16MFksZcuBfI2d3KhCG51xnM8EQtoedauGGPg4_Dghv9QdIpk6oy4SKtmgRDY-PPtB1cQ0S8vVkS9nrGmzU2eEHgTzaKAvVVik9sXOJTaEevIXLWziEduWlaUfBCN9P9SYb8HEPnnWtLUtGTQNdKVZ3UEg4Em8CfTdNBRLuujsG_AVEfnbon1ty_QuLJarfeVuv-TWiykd_TK82ACZ6ZojIlt0_XsLUWE2CSrt1uI0FZ28Mo7bwQVtQvwPfV_smNSVO6B1FB86AhMJt3kIMJ_OJBUdKgFmJZjCWh5WW4C3ukZYggFN6i0Z20x5PSVxwl5oKz1Tutcq658lo9flfmphs_hMjRTrElI9byXcK-MEnFFP1mBMFJQvyDFIEX3P8mzFmELQxyryZ-5qZj-8-i-SLsz8j2F-pfjw-LzMDpag9Hxj2YzafXPopQCOWd8UbhpH_HclK28Faf9gX0ooB7ziBC-dg9E53BVsW4fh4bNV-UKiGcKtE7zADTP6Zw3SvQ6RYMw0GwIfz-mKhSDH9-baZHB4dW-A_7ikcAEQ-CsW_7_LvPMFM1LvrAjAe7pq-MqSKF20tsiQje7cBKoRmc7KdsqNbjeQcnWxJBHn6IoXy4jpG4g8-cHu5Zbzq-XnTWSkrq9VLDMQYEA2qMn2AnUvsKS0dg7lIRfMXjdzkHxBPi1Ln5TZvZ9kbOWB8wi9jDqBBW0l3oiZ1RUdUkGnXZQ_3JHaTNEE8VNzdgVy94YFD2T8HEIuwrBNnLwpSe7Cct84mYasdgElv6GpiuRTGP6CQtPtAemucMcz78hCGgIA7H5Qfsnz4szdVmRJgLe8dwC8-YoDyJBHTTovAS64qSSbamSRIofWAGZByhNHva5CxpuWC8V_NBEoaAxyk6aTcy5UnLiSJTk1zpfslTtlb1JbWKnHwwGYHpeH3FinoAORsattGcr1tfum3dofZsboI63vooI_AjKg9_YPWk5E4TZFn-lqL6E5KKd909J_HWOXg_tPzjfyiVnCkiBR5zbp2jsiw-qdcWEsjVb5y4HGVXhdg9rfcYYFEgrGWF31fcRUnmji0H8V-AmexGxiTEO7DWcdkyFllb3BSCHC9MlUyjXF6Xr20LLlzWaxUKwbZupLpvsGq7N1OuvZvAjjVA4WwUcn2tfa4oIQMfapaxjyRtsVsTl7_NgvmQbx6crQu-kZdR8Fp2Il3W26U_5Oz5skt5PSo6zWNVY2iz3WphAGUt6oYcDfrYxuKCGYVDafeCkpa-cJIWfOHCGRsr_D75uPtcaaGA34Znn64ElWoq6o5NMikaLotVaihdtNJTJsaQVWzfAZYmEYn4JXeWzE6YfDZdKdH2w2nqike1_HUGGuMr9Rb9ZscbotSEYupoHSjhyMQd5dfif-sfWM4fqyGDJN2Z4giwd_xwzeOcPLQn1j-qK_9PNorXccVNy3_plBSjp6aTTzJv5owA4ESc7DBuHmgLX8rZtEo7xk0lWSl7OoZ_31T98ri5aE3xga-VFRM6rlhCiNG2OhM8hpgqRW8ci14QseS6fBpWfVyEcmdf21dNsrzCS7BDE6XdLqxDrCBOgfTrIW3sUsl--ZSbxjmHA_RX0s85O4mqbT2n8mIUhLT9Edm8RuMtE08zX6U_HV582QntXp_ETu0f3T8CXrurNwy9IlV3-ojCbVzLKppp89WA7OLD-Y0qlKcOXi8gDYAzDye1y2zEqs7IwnJgWpYYVjVo8bpRzZi-jQzIcWcAVzJR4J8pUnOAoXJvohBcmlRTlWZijm7jbRTyCMwr0GFP3MtOd6On6cAv-ZxoNUJdFv1DN3Jhtw7-3p6nCXASZ0lIR50OgqJIGasdNM_2Iv-tmG58n16H8WmDch6H5PUkvQRkElTXKBIceio6ewAL_8TpGHCCCZgY-BZLDdxeRZRluAzvyswKfety-OzmXGcvVB2l56DyJD_NCnARUP9iTGJ4JJnbpLs0treSc7LBeSK-GOm7I12g7wlMsXN-gcZFdoLLO3EprI-LCJ6uwkXz8TJrWTDvwYchIo0LjdRs-XkydiQyuWpyjngotvGW7vpF0xJB8QARjHNmjvh1A9MPQZZrqDJ0GWfV6_6qgpLnt3xRbkHd1F5TG7As27buqlZMMgWbkp0L7f_zqhHZIvHSf3CgB-dr3eGCr2Q3jOCiS43bMW1IfZRPcKKsBYNiUVBT5U4UD7WVTM159D-ZciubnEI9BnrF87PttxlKnLuDwbejkcMEHSaX50SFm1FfeHESbKrRZQYnREjlm6gW5QKpWcYbr-6L-giDTSx-9Ve6wiPaOm4g3absWS5lBKSuGArZL4UHdis0UFHtpZAli4dn6hSrF-YbeRqvAcRIrovsHr9omfOihjtg7kRTSG7O4GZ2BspCtmbo7DQGJeSOjtnByfzbQNdpxUmzrrh4nvTVnzPCIgr0kORqJrYuyQX_7qvGoDchGH7AAQPYH0dSVqkhql6j3_AX0untM4c7Innbbf5ekG0PBQtHmL24OBRFIjyfARykx17Xp-BYZZO2yVV2R8Hf6N7AOyY2zK4pbpXy-ftg8cjMCoefpVFsphVYIL1lKNY-Mu1HNKmZVqzEqNP3_nEK4LxVV8zokD3bnC4xPcKDN_YSUU54LG2aVzapECNYWK8Y8fjusXqTYTuM1e0F6ZX-UYYAnq2jQQQJcf3jMRJIgT--ZiaIe5RSaQsjuhZxL9IJS3l4mSFodWooiCJNMF7ERCVfmPjZ8MCBDXqqALNBOqT1PLktHeGOZ_Rm8KBMb1DK5M38t23GzlRkollChC5uEqPXS-R0GCWMZE1pHVKSVeTGJAxWXJ5FKu5lq5LqXeXjggUeqUt8O0UFyTmYlnOEnEAwBT2ZL22y4unianbjJg9e-H1Alb6sF1NbpTjFBVchfE0-nZ8ieRuLgswP8RHaVKdFQvkQI6WlRJ_THWAndcbMhospi3oKY2QORoyynTPDMd1Dbm0R8mGY0ROXN_p-_ZWSLbe8hORUlZP0PgHvN7FedQ2sqTY6pBT8X3povhsizSKy0s7wZqmoes1b-tJPf0zTBEW2uiXm2eK4eyknWcg87sUxt4vs1l1_6wI3OYCiIYMICJ9elfTc77HRHzCkh_84HUY4y_kJiFMORKY5Wnj2RwJVnzha57vRPSAt6NfHMNSRtmwmfIuHRXHemFL8WWdi5EL6jh-vUBIcGOHKkPRflX0g37Z1v5G7fV900byeNFOKZuW3Iuzjun03JeulSOaWblzXDGOHmSUbMFqeKLV46QzYCmEnFXFZETbq3bqZ9nTR9ZaI2y_tJ8g8_-9V8LPGUo7rQXlBYWN99h5LD82klWtu_glybT-CjoWOiN1CU2Fm51GE2wizu6_GKTwQzyAc_y9L0ysN-Xl0JBblR8bh6YHnIt9nLKbmE1viaJHQohERb4U74zc9g1ClIgpMlRAfIIvu_tj8LzPryHz600AQsmZC8d2g1FqPoJbqMjngbsDEAjXKNJRs5-Ij89K6BWqj-1RcaRVZ9xvFQ3wkdK9lV64awR5QCHlgueVY59u_z8EX_MkvKNC_H1hrzXxMG_PioQXMhvN36gT4ABVKSqFXET31KM9A-VeGAjYoNTJCvUhocq9mX5uCV7qXSumYLMqaAh2Wm80S5_Cm1Kc-DfXp0oLE_nu4zuL-toiY1G5oiKuOWwbHEEw5cqfV71Ir2EfyRyd-x5dR9t2pkQ_cSr9-7_spxrusBVaCuCD_-fUqEZ6FZE48g3Q0KfE7gf98qyamZxQ_wfmaeYJj2P6yZoBim9aoXxD400zGIOiY1otAMGXmSg2f9Z5CytvVIAWPBKZq8CKwMExzcSRrDACt9nkVYFEni0sZdMArjkZ3gHZ4RGxS6elhFimsbghgXRYc8cIqrowgySF-EgaRr_1fy6nzv3q44Y_rcm2cOh87JncBGV_Rm2aWwXI2W_Doxj9p__qs2GbkMIEt4Ey6nZtyFTyK24MQkLQDtl7cnir4JaA_9ewUB46VFvi1j_SOs6zWP9rmsFqp5M2PL-I3sceB35IRO9lTUXWc1_G4KXCUPCLEgc_FNyR1Jxzy6sTY9RAKpu__8AZpjXdh4TG_FjPuNLC8vrYba-Tr7O5U3WA3a2RXasZU4v4RAF2qCVv6F1Jd3s6vb_mZuDzqYe6GOUHqeTd8JPt3R2n6zAc2KVaPIyGAhB2E8wUcVCpTH86RQFgeq8u5Hgx8ab9BlTHtPOw_i40ZCgKAwTUJLl8MV6lOaDDzPanYwe7-8JvtgDVHaDteZmAac_63Rj5mP3MEX83DNfnCbrgdjJ2Z_jR7z8cRHA4HW4Q-I5i0WyO4N0K_7u5YLwwXsT9w6zF_EURjO3IgQ62LEFGiPkua_FJjM9L1XhrtCuntFbnnl6CKEh5CXr7v09ggmwkMWMQ57J1Mo0UMbHeyCNkl9ywRaJjcyZOjvDd3wv_bxLLnP3FYI-LwIZRWK-J2mNIOTqxOKedsaA9dr0oA5Z_Rodz7TyuTlnLnvQnVlk1wbr2Wc3XlouWR7qKH5kP0TzgwVZoV3s-yPSQE5-C3tb0R7XNlLjUwcJL72j0RMYPknwlIUQ658FPQeMpa_jUMnTSTV3MG2ljqFK5AWa1wi34jSPxVmtvptyc25AMJYn47OWA13UCcJqzEjP4bZnofQbhSG5CVwIQK_2Va3h_Wiy1ypVxnfQ8w4OS2dHDxKI8UAWhz0uMeYtWd4DbazbmBa3pSIGqJdHk71BJ4witCGEoF4z0BCHmkVWtXcXLWlFpsBN5gQHiaL2mm-S-ng1ZPhQbQbAZOyOcgp9BDDOD-OaQGdC7KQxPzM95-QA1yvSnFvAhGdk-Lf9zta480Cm19JMj3i-tR9Hoz6INJO3DYvRSnrinc34FNy2fo0XRh2OATuokEDP3yK76WmPlOIFwyx6y6LFAIoXBROMhGRqlN3lmyjI63BYNhfRXLVoMiiwqqqAP14nXnWTkG8gwLpq2PW4tL9gOvH8f5Rdxi2EsUsezl_mMEuBXLF3i_zsnM"><div class="tip">הקישורים האישיים נפתחים רק מהקישור המלא שנשלח אליכם.</div></div>
+
+  <p style="font-weight:700;color:var(--navy);margin:0 0 9px">
+    מבט מפקח.ת — הקישור האישי של כל אחד/ת</p>
+  <div class="mbrow"><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=revital" target="_blank" rel="noopener">רויטל אמיר</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=liat" target="_blank" rel="noopener">ליאת צבר</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=sigalit" target="_blank" rel="noopener">סיגלית דאי</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=yisachar" target="_blank" rel="noopener">יששכר חפץ</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=wesam" target="_blank" rel="noopener">ויסאם סואלחה</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=yasmin" target="_blank" rel="noopener">יסמין אמון</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=raviv" target="_blank" rel="noopener">רביב שורץ</a><a class="mb" href="https://pedagogiamh.co.il/hadrachot/mabat/?i=sharona" target="_blank" rel="noopener">שרונה בלוך</a></div>
+
+  <div class="tip"><b>התנסות של 90 שניות:</b> פתחו את מבט מפקח.ת ותראו את המדריכות שבפיקוחכם ומתי המפגש הבא שלהן.
+    מי שרוצה לדעת מה קורה בתחום דעת מסוים — זה המסך.</div>
+
+
+</details>
+
+<!-- ═══════════ 2 ═══════════ -->
+<details class="card" id="c2">
+  <summary><h2><span class="num">2</span>האתר ואזור הפיקוח</h2>
+  <p class="sub">ערכת העבודה של המפקח.ת — אזור סגור באתר.</p></summary>
+
+  <div class="say">
+    <p>יש לכם אזור סגור באתר — ערכת העבודה של המפקח.ת. הנחיות התפקיד,
+      תוכנית עבודה שנתית, מבנה יום ביקור עם צ׳ק ליסט, הנחיות הדוח והוועדה המלווה.</p>
+    <p><b>הכניסה בקישור למטה, עם חשבון גוגל.</b></p>
+  </div>
+
+  <div class="links">
+    <a class="lk" href="https://pedagogiamh.co.il" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M14 5h5v5M19 5l-8 8M10 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-4"/></svg>
+      האתר</a>
+    <a class="lk" href="https://pedagogiamh.co.il/supervision.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      מרחב הפיקוח</a>
+  </div>
+
+
+  <div class="tip"><b>כדאי לנסות:</b> לפתוח את "מבנה יום ביקור", לסמן שני סעיפים בצ׳ק ליסט, ולראות שזה נשמר.</div>
+</details>
+
+<!-- ═══════════ 3 ═══════════ -->
+<details class="card" id="c3">
+  <summary><h2><span class="num">3</span>מדידה ולמידה מהאתר</h2>
+  <p class="sub">מה נמדד באתר ובעוגן — פתוח וחי.</p></summary>
+
+  <div class="say">
+    <p>אנחנו לא עובדים בעיוורון. יש מדידה: כמה נכנסו לאתר, לאילו עמודים,
+      ומה שואלים את עוגן — הצ׳אט של האתר.</p>
+    <p>זה מה שמאפשר לנו לדעת מה באמת חסר לכם, במקום לנחש.</p>
+  </div>
+
+  <div class="links">
+    <a class="lk" href="https://tfasim.pedagogiamh.co.il/sikum-ogen.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16V9M13 16V6M18 16v-4"/></svg>
+      דוח השימוש — אתר ועוגן</a>
+  </div>
+
+</details>
+
+<!-- ═══════════ 4 ═══════════ -->
+<details class="card" id="c4">
+  <summary><h2><span class="num">4</span>הופה — רכזי הבוגרים</h2>
+  <p class="sub">איפה עומדים בתי הספר ברשימות הבוגרים, ומה בונים איתם השנה.</p></summary>
+
+  <div class="say">
+    <p>משרד העבודה הקצה השנה <b>שעתיים שבועיות לכל רכז/ת חברתי/ת לליווי בוגרים</b> —
+      כ-70 שעות בשנה. זה כבר בתפקיד וכבר מתוקצב. מתוך 64 הרכזים החברתיים,
+      <b>25 נמצאים בתוכנית הבוגרים של הופה</b>, שרצה ב-26 בתי ספר.</p>
+    <p>הבסיס הוא רשימת הבוגרים: בלי רשימה אין את מי ללוות. <b>2,481 בוגרים כבר
+      במערכת</b>, מ-20 בתי ספר. שישה עוד לא העבירו רשימה.</p>
+  </div>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n">26</div><div class="l">בתי ספר בתוכנית</div></div>
+    <div class="kpi"><div class="n">2,481</div><div class="l">בוגרים במערכת</div></div>
+    <div class="kpi d"><div class="n">6</div><div class="l">עוד בלי רשימת בוגרים</div></div>
+    <div class="kpi w"><div class="n">4</div><div class="l">תוכניות עבודה הוגשו מ-26</div></div>
+  </div>
+
+  <div class="tip"><b>בלי רשימת בוגרים (22.9.2026):</b> יוצר עתיד פלמחים · דרור גליל ·
+    עמל טכנולוגי רהט · ח׳טוואת ירכא · תיכון חברתי חיפה (חדש) · התיכון החברתי מצפה רמון (אין רכז/ת).
+    הנתונים מלוח המעקב של הופה, לפי הייבוא האחרון למערכת ב-22.9. קבוצות בוגרים פעילות ב-8 בתי ספר.</div>
+
+  <div class="say">
+    <div class="k">מה מבקשים מכם</div>
+    <p><b>שני דברים:</b> ששת בתי הספר שעוד לא העבירו רשימה — שיעבירו, גם חלקית.
+      וכל בית ספר בתוכנית — <b>תוכנית עבודה</b> לשעתיים האלה. את התוכנית הרכזים
+      בונים בעצמם בשלושת המפגשים: <b>14.10 בזום · 21.10 בבני ברק · 4.11 בזום</b>.
+      מי שמגיע לשלושתם יוצא עם תוכנית כתובה וחתומה על ידי המנהל/ת.</p>
+  </div>
+
+  <div class="links">
+    <a class="lk" href="https://meytalp-dev.github.io/hopa-nihul/mifgashim-revital.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+      שלושת המפגשים — המסלול לתוכנית העבודה</a>
+    <a class="lk g" href="https://meytalp-dev.github.io/hopa-bogrim/%D7%A2%D7%A8%D7%9B%D7%AA-%D7%A8%D7%9B%D7%96-%D7%9E%D7%A7%D7%95%D7%A6%D7%A8%D7%AA-%D7%94%D7%95%D7%A4%D7%94.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg>
+      ערכת רכז/ת הבוגרים</a>
+    <a class="lk g" href="https://meytalp-dev.github.io/ort-training/presentations/bogrim-program/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>
+      תוכנית הבוגרים — המצגת למשרד העבודה</a>
+  </div>
+
+</details>
+
+<!-- ═══════════ 5 ═══════════ -->
+<details class="card" id="c5">
+  <summary><h2><span class="num">5</span>רכזי התקשוב</h2>
+  <p class="sub">התפקיד, ההשתלמות, ואיפה אנחנו עומדים.</p></summary>
+
+  <details class="acc">
+    <summary>א. למה התפקיד הזה קיים</summary>
+    <div class="say" style="margin-top:8px">
+    <p>רכז/ת תקשוב הוא לא מי שמתקן מקרנים. זה בעל תפקיד פדגוגי —
+      מי שמוביל את השימוש בטכנולוגיה בהוראה, מלווה את הצוות, ומייצר שינוי בכיתה.</p>
+    <p>ולכן השנה בנינו את התפקיד מחדש: הגדרה ברורה, הכשרה מחייבת, וקהילה מקצועית.</p>
+    </div>
+  </details>
+
+  <details class="acc">
+    <summary>ב. ההשתלמות — חובה לכולם</summary>
+    <div class="say" style="margin-top:8px">
+    <p>שגרירי חדשנות טכנולוגית — <b>30 שעות אקדמיות, 10 מפגשים</b>, אחת לשבועיים 13:45–16:00.
+      שבעה מפגשי זום ושלוש יחידות א-סינכרוניות.</p>
+    <p><b>שני מסלולים:</b> מסלול הכלים בימי שני, ומסלול ההובלה בימי רביעי.
+      השיבוץ נעשה לפי שאלון וסקר הצרכים של המנהלים — לא באקראי.</p>
+    <p>כלים: 5.10.26–8.2.27. הובלה: 7.10.26–10.2.27.</p>
+    </div>
+  </details>
+
+  <p style="font-weight:700;color:var(--navy);margin:0 0 10px">איפה אנחנו עומדים — נכון לרגע זה</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="n" id="kTotal">—</div><div class="l">רכזים משובצים</div></div>
+    <div class="kpi"><div class="n" id="kOk">—</div><div class="l">אישרו מסלול</div></div>
+    <div class="kpi w"><div class="n" id="kPend">—</div><div class="l">טרם אישרו</div></div>
+    <div class="kpi d"><div class="n">8</div><div class="l">בתי ספר בלי רכז</div></div>
+  </div>
+
+
+
+
+
+  <div class="links">
+    <a class="lk" href="https://pedagogiamh.co.il/tikshuv-rashima.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 9h16M9 9v11"/></svg>
+      רשימת הרכזים ומצב האישורים</a>
+    <a class="lk g" href="https://pedagogiamh.co.il/tikshuv-mekav.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16V9M13 16V6M18 16v-4"/></svg>
+      מעקב האישורים</a>
+    <a class="lk g" href="https://pedagogiamh.co.il/hishtalmuyot.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 3 2 8l10 5 10-5z"/><path d="M6 10.5V16c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg>
+      עמוד ההשתלמויות</a>
+  </div>
+
+</details>
+
+
+
+</main>
+
+<footer>
+  מפגש מפקחים 23.9.2026 · המרחב הפדגוגי —
+  <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function $(id){ return document.getElementById(id); }
+// מספרי רכזי התקשוב נכון למפגש 23.9.2026 (בגרסה הפנימית הם נטענים חיים)
+if ($("kTotal")) $("kTotal").textContent = "58";
+if ($("kOk"))    $("kOk").textContent    = "35";
+if ($("kPend"))  $("kPend").textContent  = "19";
+if ($("stamp"))  $("stamp").textContent  = "נכון ל-23.9.2026";
+</script>
+
+<script>
+// קישור מהניווט העליון פותח את הסעיף המקופל
+document.querySelectorAll('.jump a[href^="#"]').forEach(function(a){
+  a.addEventListener('click', function(){ var d=document.querySelector(a.getAttribute('href')); if(d && d.tagName==='DETAILS') d.open=true; });
+});
+if (/^#c[0-9]$/.test(location.hash)) { var d0=document.querySelector(location.hash); if (d0 && d0.tagName==='DETAILS') d0.open=true; }
+</script>
+
+<script>
+// פענוח הקטעים האישיים לפי המפתח שבכתובת (#k=...). בלי מפתח — נשארת ההודעה.
+(async function(){
+  var m = location.hash.match(/k=([A-Za-z0-9_-]+)/); if (!m) return;
+  var un = function(b){ b=b.replace(/-/g,'+').replace(/_/g,'/'); while(b.length%4) b+='='; var bin=atob(b), u=new Uint8Array(bin.length); for(var i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; };
+  try {
+    var key = await crypto.subtle.importKey('raw', un(m[1]), 'AES-GCM', false, ['decrypt']);
+    var els = document.querySelectorAll('.sealed');
+    for (var i=0;i<els.length;i++){
+      var el = els[i];
+      var buf = await crypto.subtle.decrypt({name:'AES-GCM', iv: un(el.dataset.iv)}, key, un(el.dataset.ct));
+      el.outerHTML = new TextDecoder().decode(buf);
+    }
+  } catch(e) { /* מפתח שגוי — נשארת ההודעה */ }
+})();
+</script>
+</body>
+</html>
