@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>העוזר האישי שלי · מפקחים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><rect x='4' y='7' width='16' height='13' rx='3'/><path d='M12 3v4M9 13h.01M15 13h.01'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --sky-soft:#e7f4fc; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.6;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;
+  min-height:100vh;display:flex;flex-direction:column}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+
+.prog{padding:18px 20px 0;max-width:760px;margin:0 auto;width:100%}
+.prog .bar{height:7px;border-radius:99px;background:#dde5f4;overflow:hidden}
+.prog .fill{height:100%;border-radius:99px;width:0;
+  background:linear-gradient(90deg,var(--navy),var(--blue));transition:width .45s var(--ease)}
+.prog .lbl{margin-top:8px;font-size:14.5px;color:var(--muted);text-align:center}
+
+main{flex:1;display:flex;align-items:flex-start;justify-content:center;padding:18px 20px 40px}
+.card{max-width:760px;width:100%;background:#fff;border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow-m);padding:34px 36px 30px}
+@media (max-width:600px){.card{padding:24px 19px}}
+
+.eyebrow{font-family:'Rubik',sans-serif;font-size:14px;font-weight:700;color:var(--blue);
+  letter-spacing:.05em;margin:0 0 8px}
+h1{font-family:'Rubik',sans-serif;font-size:clamp(25px,4.4vw,33px);line-height:1.25;
+  margin:0 0 14px;color:var(--navy);font-weight:700;letter-spacing:-.01em}
+.lede{font-size:19px;color:#3d4a70;margin:0 0 24px}
+.lede b{color:var(--navy)}
+
+.fld{margin-bottom:22px}
+.fld label.t{display:block;font-weight:700;font-size:18.5px;color:#25325a;margin-bottom:4px}
+.fld .h{display:block;font-weight:400;color:var(--muted);font-size:15.5px;margin-bottom:10px;line-height:1.45}
+select,input[type=text]{width:100%;padding:15px 17px;border:2px solid var(--line);border-radius:14px;
+  background:#fbfcff;font-family:inherit;font-size:18px;color:var(--ink)}
+select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2' stroke-linecap='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat:no-repeat;background-position:left 15px center;background-size:20px;padding-left:46px}
+select:focus,input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+
+/* schools */
+.schools{border:2px solid var(--line);border-radius:14px;background:#fbfcff;max-height:240px;
+  overflow-y:auto;padding:8px}
+.schools label{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:9px;cursor:pointer;
+  font-size:16.5px;color:#25325a}
+.schools label:hover{background:var(--sky-soft)}
+.schools input{width:20px;height:20px;accent-color:var(--blue);flex:0 0 auto}
+.schools .net{margin-inline-start:auto;font-size:13.5px;color:var(--muted)}
+.cnt{margin-top:9px;font-size:15.5px;color:var(--muted);text-align:center}
+.cnt b{color:var(--navy)}
+
+/* pains */
+.pains{display:grid;gap:12px}
+.pains label{display:flex;align-items:flex-start;gap:14px;padding:17px 19px;border:2px solid var(--line);
+  border-radius:15px;background:#fbfcff;cursor:pointer;
+  transition:border-color .15s var(--ease),background .15s var(--ease)}
+.pains label:hover{border-color:var(--sky);background:#fff}
+.pains input{width:23px;height:23px;accent-color:var(--blue);flex:0 0 auto;margin-top:2px}
+.pains .tx{font-size:18px;font-weight:600;color:#25325a}
+.pains .sb{display:block;font-weight:400;font-size:15.5px;color:var(--muted);margin-top:2px;line-height:1.45}
+.pains input:checked ~ div .tx{color:var(--navy)}
+
+/* kit cards */
+.kit{border:2px solid var(--line);border-radius:18px;padding:22px 24px;margin-bottom:16px;background:#fbfcff}
+.kit h2{font-family:'Rubik',sans-serif;font-size:21px;color:var(--navy);margin:0 0 5px;font-weight:600;
+  display:flex;align-items:center;gap:11px}
+.kit h2 svg{width:21px;height:21px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kit .w{color:var(--muted);font-size:16px;margin:0 0 16px}
+.kit .extra{background:var(--sky-soft);border-radius:12px;padding:14px 17px;margin-top:13px;font-size:16px;color:#25325a}
+.kit .extra b{color:var(--navy)}
+
+.big{width:100%;padding:18px;border:0;border-radius:15px;cursor:pointer;
+  font-family:'Rubik',sans-serif;font-size:18.5px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
+  box-shadow:0 7px 20px rgba(24,92,255,.24);
+  display:flex;align-items:center;justify-content:center;gap:11px;
+  transition:transform .15s var(--ease),background .25s var(--ease)}
+.big:active{transform:scale(.99)}
+.big svg{width:21px;height:21px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.big.done{background:linear-gradient(100deg,#0d8f7f,var(--mint))}
+.big.ghost{background:#fff;color:var(--navy);border:2px solid var(--line);box-shadow:none;font-size:17.5px;padding:15px}
+.big.ghost svg{stroke:var(--blue)}
+.big.ghost:hover{border-color:var(--sky)}
+
+ol.how{margin:13px 0 0;padding:0;list-style:none;counter-reset:h}
+ol.how li{counter-increment:h;position:relative;padding-inline-start:38px;margin-bottom:11px;font-size:16.5px;color:#3d4a70}
+ol.how li::before{content:counter(h);position:absolute;inset-inline-start:0;top:1px;width:25px;height:25px;
+  border-radius:50%;background:var(--blue-soft);color:var(--navy);font-family:'Rubik',sans-serif;
+  font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center}
+ol.how li b{color:var(--navy)}
+ol.how li:last-child{margin-bottom:0}
+
+.tip{background:var(--blue-soft);border-radius:14px;padding:16px 19px;margin:0 0 20px;font-size:17px;color:#25325a}
+.tip b{color:var(--navy)}
+.note{background:#fffaf0;border:1px solid #f0dcb4;border-radius:14px;padding:16px 19px;margin:0 0 20px;
+  font-size:16.5px;color:#7a5a12}
+.note b{color:#8a5410}
+
+.link{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1;border-radius:16px;
+  padding:20px 22px;margin-top:22px}
+.link h3{font-family:'Rubik',sans-serif;font-size:19px;color:var(--navy);margin:0 0 6px;font-weight:600}
+.link p{margin:0 0 13px;font-size:16.5px;color:#3d4a70}
+
+.nav{display:flex;gap:12px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.nav button{flex:1;padding:16px;border-radius:14px;cursor:pointer;font-family:'Rubik',sans-serif;
+  font-size:18px;font-weight:600}
+.nav .next{border:0;color:#fff;background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
+  box-shadow:0 6px 18px rgba(24,92,255,.24)}
+.nav .next:disabled{opacity:.45;cursor:default}
+.nav .back{flex:0 0 auto;padding-inline:26px;border:2px solid var(--line);background:#fff;color:var(--muted)}
+.nav .back[hidden]{display:none}
+
+.scr{display:none}
+.scr.on{display:block;animation:in .32s var(--ease)}
+@keyframes in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.toast{position:fixed;inset-inline:16px;bottom:24px;max-width:430px;margin:0 auto;z-index:60;
+  background:var(--navy);color:#fff;border-radius:14px;padding:16px 22px;text-align:center;
+  font-weight:600;font-size:17px;box-shadow:0 10px 30px rgba(22,32,60,.3);
+  opacity:0;transform:translateY(12px);pointer-events:none;transition:all .28s var(--ease)}
+.toast.on{opacity:1;transform:none}
+
+footer{text-align:center;padding:0 20px 28px;color:var(--muted);font-size:13.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+
+<div class="strip"></div>
+<div class="prog">
+  <div class="bar"><div class="fill" id="fill"></div></div>
+  <div class="lbl" id="plbl"></div>
+</div>
+
+<main><div class="card">
+
+<!-- ════════ 0 ════════ -->
+<section class="scr on">
+  <p class="eyebrow">משרד העבודה · מינהל הכשרה מקצועית</p>
+  <h1>בונים לכם עוזר אישי</h1>
+  <p class="lede">שתי שאלות, ואתם מקבלים <b>עוזר שמכיר אתכם</b> — את בתי הספר שבפיקוחכם
+    ואת מה שבאמת מעיק עליכם. שמור על שמכם, מחכה לכם גם מחר.</p>
+  <div class="tip"><b>לא צריך לדעת כלום מראש</b> ולא צריך לשלם על כלום.
+    כל מה שתצטרכו זה חשבון גוגל.</div>
+  <p class="lede" style="margin:0">שלוש דקות. מתחילים?</p>
+</section>
+
+<!-- ════════ 1 ════════ -->
+<section class="scr">
+  <p class="eyebrow">שלב 1</p>
+  <h1>מי אתם?</h1>
+
+  <div class="fld">
+    <label class="t" for="sup">שם</label>
+    <span class="h">נבחר את בתי הספר שלכם לבד — תוכלו לתקן.</span>
+    <select id="sup">
+      <option value="">— בחירה —</option>
+    </select>
+  </div>
+
+  <div class="fld" id="schWrap" hidden>
+    <label class="t">בתי הספר שבפיקוחי</label>
+    <span class="h">העוזר יכיר אותם בשמם, לפי רשת ומגזר. אפשר להוסיף או להוריד.</span>
+    <div class="schools" id="schools"></div>
+    <div class="cnt"><b id="schCnt">0</b> בתי ספר נבחרו</div>
+  </div>
+
+  <div class="fld">
+    <label class="t" for="style">איך אתם אוהבים שהדוחות שלכם נראים?</label>
+    <select id="style">
+      <option value="קצר וענייני, בלי מילים מיותרות">קצר וענייני</option>
+      <option value="מפורט, עם הסבר לכל ממצא">מפורט ומנומק</option>
+      <option value="בנקודות קצרות ובטבלאות">בנקודות ובטבלאות</option>
+    </select>
+  </div>
+</section>
+
+<!-- ════════ 2 ════════ -->
+<section class="scr">
+  <p class="eyebrow">שלב 2</p>
+  <h1>מה מעיק עליכם?</h1>
+  <p class="lede">סמנו כל מה שרלוונטי. <b>לכל סימון תקבלו עוזר משלו</b> — אל תסמנו הכול,
+    סמנו את מה שבאמת כואב.</p>
+  <div class="pains" id="pains"></div>
+</section>
+
+<!-- ════════ 3 ════════ -->
+<section class="scr">
+  <p class="eyebrow">שלב 3 · הערכה שלכם</p>
+  <h1 id="kitTitle">העוזרים שלכם מוכנים</h1>
+  <p class="lede" id="kitLede"></p>
+
+  <div class="note"><b>איפה בונים אותם:</b> ב-Gemini, בחשבון הגוגל הרגיל שלכם.
+    זה חינם, וזה נשמר אצלכם לתמיד.
+    <a href="https://gemini.google.com/gems/create" target="_blank" rel="noopener"
+       style="color:#8a5410;font-weight:700">פתחו את המסך ליצירת Gem בלשונית חדשה ←</a></div>
+
+  <div id="kits"></div>
+
+  <div class="link">
+    <h3>הקישור האישי שלכם</h3>
+    <p>שמרו אותו. הוא מחזיר אתכם בדיוק לכאן, עם כל העוזרים שלכם, מכל מכשיר.</p>
+    <button class="big" id="copyLink">
+      <svg viewBox="0 0 24 24"><path d="M15 7a4 4 0 1 1-3.5 5.9L7 17.4V21H3v-4l8.1-8.1A4 4 0 0 1 15 7z"/></svg>
+      העתקת הקישור שלי</button>
+  </div>
+</section>
+
+<div class="nav">
+  <button class="back" id="back" hidden>הקודם</button>
+  <button class="next" id="next">מתחילים</button>
+</div>
+
+</div></main>
+
+<footer>
+  משרד העבודה · מינהל הכשרה מקצועית —
+  <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script type="application/json" id="schoolData">[{"n": "בית חנינה בנות", "net": "סכנין", "s": "ערבי", "c": "ירושלים", "d": "ירושלים", "sup": ["ויסאם סואלחה"]}, {"n": "בית חנינה בנים", "net": "סכנין", "s": "ערבי", "c": "ירושלים", "d": "ירושלים", "sup": ["ויסאם סואלחה"]}, {"n": "כפר עקב", "net": "סכנין", "s": "ערבי", "c": "", "d": "ירושלים", "sup": ["ויסאם סואלחה"]}, {"n": "סור באהר", "net": "סכנין", "s": "ערבי", "c": "", "d": "ירושלים", "sup": ["ויסאם סואלחה"]}, {"n": "עמל טייבה ב'", "net": "עמל", "s": "ערבי", "c": "טייבה", "d": "תל אביב", "sup": ["ויסאם סואלחה"]}, {"n": "ערערה", "net": "סכנין", "s": "ערבי", "c": "ערערה", "d": "חיפה", "sup": ["ויסאם סואלחה"]}, {"n": "אורט כרמל", "net": "אורט", "s": "ערבי", "c": "חיפה", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "אכסאל", "net": "סכנין", "s": "ערבי", "c": "אכסאל", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "אל אמאני סכנין", "net": "סכנין", "s": "ערבי", "c": "סכנין", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "אלחכמה כסרא-סמיע", "net": "סכנין", "s": "ערבי", "c": "כסרא-סמיע", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "ג'וליס בנות", "net": "עתיד", "s": "ערבי", "c": "ג'וליס", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "טורען", "net": "סכנין", "s": "ערבי", "c": "טורען", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "כפר יסיף", "net": "סכנין", "s": "ערבי", "c": "כפר יאסיף", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "נצרת", "net": "עמל", "s": "ערבי", "c": "נצרת", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "עתיד גליל מערבי ירכא בנים", "net": "עתיד", "s": "ערבי", "c": "ירכא", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "עתיד טק ביר אל מכסור", "net": "עתיד", "s": "ערבי", "c": "ביר אל מכסור", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "תיכון טכנולוגי אי טק סקול (מסעדה)", "net": "עתיד", "s": "ערבי", "c": "מסעדה", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "תפן ליזמות", "net": "עתיד", "s": "כללי", "c": "כפר ורדים", "d": "חיפה", "sup": ["יסמין אמון"]}, {"n": "עמל רהט", "net": "עמל", "s": "ערבי", "c": "רהט", "d": "באר שבע", "sup": ["יסמין אמון", "סיגלית דאי"]}, {"n": "אור דניאל", "net": "עתיד", "s": "חרדי", "c": "", "d": "תל אביב", "sup": ["יששכר חפץ"]}, {"n": "אור העתיד תורני מקצועי", "net": "עתיד", "s": "חרדי", "c": "גן יבנה", "d": "ירושלים", "sup": ["יששכר חפץ"]}, {"n": "בית דוד", "net": "עתיד", "s": "כללי", "c": "ק.גת", "d": "באר שבע", "sup": ["יששכר חפץ"]}, {"n": "הדר", "net": "בית שולמית", "s": "חרדי", "c": "ירושלים", "d": "ירושלים", "sup": ["יששכר חפץ"]}, {"n": "הקמפוס התורני עתיד", "net": "עתיד", "s": "חרדי", "c": "אשקלון", "d": "באר שבע", "sup": ["יששכר חפץ"]}, {"n": "טל חרמון", "net": "טל חרמון", "s": "חרדי", "c": "גולן", "d": "חיפה", "sup": ["יששכר חפץ"]}, {"n": "ישיבת חנוך לנער", "net": "ישיבת חנוך לנער", "s": "חרדי", "c": "צפת", "d": "חיפה", "sup": ["יששכר חפץ"]}, {"n": "כפר זיתים", "net": "כפר זיתים", "s": "חרדי", "c": "גליל תחתון", "d": "חיפה", "sup": ["יששכר חפץ"]}, {"n": "מרחביה/מעיינות", "net": "עמל", "s": "חרדי", "c": "צפת", "d": "חיפה", "sup": ["יששכר חפץ"]}, {"n": "נחלים", "net": "נחלים", "s": "חרדי", "c": "חבל מודיעין", "d": "תל אביב", "sup": ["יששכר חפץ"]}, {"n": "עתיד בת עמי", "net": "עתיד", "s": "חרדי", "c": "מרום הגליל", "d": "חיפה", "sup": ["יששכר חפץ"]}, {"n": "עתיד כפר חב\"ד", "net": "עתיד", "s": "חרדי", "c": "שדות דן", "d": "תל אביב", "sup": ["יששכר חפץ"]}, {"n": "אבו סנאן", "net": "סכנין", "s": "ערבי", "c": "אבו סנאן", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "אום אל פחם בנות", "net": "סכנין", "s": "ערבי", "c": "אום אל פחם", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "אנרג'י טק", "net": "עמל", "s": "כללי", "c": "חדרה", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "בית אל", "net": "בית אל", "s": "כללי", "c": "זכרון יעקב", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "דרור גליל", "net": "דרור", "s": "כללי", "c": "גליל תחתון", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "התיכון החברתי חיפה", "net": "דרור", "s": "כללי", "c": "חיפה", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "צור ים", "net": "עתיד", "s": "כללי", "c": "חיפה", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "רימונים", "net": "רימונים", "s": "כללי", "c": "טבריה", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "רמת דוד", "net": "עמל", "s": "כללי", "c": "עמק יזרעאל", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "תיכון חברתי ת\"א", "net": "דרור", "s": "כללי", "c": "תל אביב-יפו", "d": "תל אביב", "sup": ["ליאת צבר"]}, {"n": "תיכון עוצמ\"ה עתיד זוקו", "net": "עתיד", "s": "כללי", "c": "קרית ביאליק", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "תיכון שיח", "net": "עמל", "s": "כללי", "c": "מטה אשר", "d": "חיפה", "sup": ["ליאת צבר"]}, {"n": "אורט אורמת", "net": "אורט", "s": "כללי", "c": "יבנה", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "אורט תל נוף", "net": "אורט", "s": "כללי", "c": "ברנר", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "אורט תעשייה אווירית", "net": "אורט", "s": "כללי", "c": "מודיעין", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "דן גורמה", "net": "אורט", "s": "כללי", "c": "תל אביב", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "עמל אשדוד", "net": "עמל", "s": "כללי", "c": "אשדוד", "d": "ירושלים", "sup": ["סיגלית דאי"]}, {"n": "עמל טק אין", "net": "עמל", "s": "כללי", "c": "שוהם", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "עתיד באר שבע", "net": "עתיד", "s": "כללי", "c": "באר שבע", "d": "באר שבע", "sup": ["סיגלית דאי"]}, {"n": "עתיד פלמחים", "net": "עתיד", "s": "כללי", "c": "שורק", "d": "תל אביב", "sup": ["סיגלית דאי"]}, {"n": "צור ברק", "net": "אורט", "s": "כללי", "c": "קריית מלאכי", "d": "ירושלים", "sup": ["סיגלית דאי"]}, {"n": "קמ\"ג דימונה", "net": "עמל", "s": "כללי", "c": "דימונה", "d": "באר שבע", "sup": ["סיגלית דאי"]}, {"n": "תיכון החממה", "net": "עמל", "s": "כללי", "c": "הוד השרון", "d": "תל אביב", "sup": ["סיגלית דאי", "רויטל אמיר"]}, {"n": "אום אל פחם בנים", "net": "סכנין", "s": "ערבי", "c": "אום אל פחם", "d": "חיפה", "sup": ["רביב שורץ"]}, {"n": "מצפה רמון", "net": "דרור", "s": "כללי", "c": "מצפה רמון", "d": "באר שבע", "sup": ["רביב שורץ"]}, {"n": "עתיד כרמיאל", "net": "עתיד", "s": "כללי", "c": "כרמיאל", "d": "חיפה", "sup": ["רביב שורץ"]}, {"n": "שפרעם", "net": "סכנין", "s": "ערבי", "c": "שפרעם", "d": "חיפה", "sup": ["רביב שורץ"]}, {"n": "אורט בית הערבה", "net": "אורט", "s": "כללי", "c": "ירושלים", "d": "ירושלים", "sup": ["רויטל אמיר"]}, {"n": "חוש\"ן", "net": "דרור", "s": "כללי", "c": "ירושלים", "d": "ירושלים", "sup": ["רויטל אמיר"]}, {"n": "דרור נווה מדבר", "net": "דרור", "s": "ערבי", "c": "נווה מדבר", "d": "באר שבע", "sup": ["שרונה בלוך"]}, {"n": "לקייה", "net": "סכנין", "s": "ערבי", "c": "לקייה", "d": "באר שבע", "sup": ["שרונה בלוך"]}, {"n": "סכנין תל שבע", "net": "סכנין", "s": "ערבי", "c": "סכנין", "d": "באר שבע", "sup": ["שרונה בלוך"]}, {"n": "שגב שלום", "net": "סכנין", "s": "ערבי", "c": "שגב שלום", "d": "באר שבע", "sup": ["שרונה בלוך"]}]</script>
+
+<script>
+/* ═══════════ הכאבים והעוזרים ═══════════ */
+var PAINS = [
+  {id:"prep", t:"ההכנה לביקור", s:"לקרוא ולהצליב חומרים לפני כל ביקור"},
+  {id:"doch", t:"הדוח אחרי הביקור", s:"לכתוב את הסיכום בסוף היום, מתוך הערות קטועות"},
+  {id:"mail", t:"עומס מיילים", s:"לקרוא, להחליט מה דחוף, ולנסח תשובות חוזרות"},
+  {id:"track", t:"לרדוף אחרי מנהלים", s:"מי הגיש, מי לא, ואיך מזכירים בלי לשרוף יחסים"},
+  {id:"tik",  t:"מידע מפוזר", s:"אין לי תיק מרוכז לכל בית ספר — הכול בקבצים נפרדים"},
+  {id:"time", t:"ניהול זמן ומשימות", s:"לזכור מה הטלתי, על מי, ומה התחייבתי אני"}
+];
+
+function ctx(d){
+  var s = "אני " + d.name + ", מפקח/ת פדגוגי/ת במינהל הכשרה מקצועית במשרד העבודה.";
+  if (d.schools && d.schools.length){
+    s += "\nבתי הספר שבפיקוחי:\n";
+    s += d.schools.map(function(x){
+      return "- " + x.n + " (רשת " + x.net + ", מגזר " + x.s + (x.c ? ", " + x.c : "") + ")";
+    }).join("\n");
+    s += "\nכשאזכיר בית ספר בשמו הקצר — תדע באיזה מדובר.";
+  }
+  return s;
+}
+
+var AGENTS = {
+prep: function(d){ return {
+  title:"עוזר ההכנה והדוח",
+  why:"קורא את החומרים לפני הביקור ומכין לכם את השאלות — ואחריו הופך את ההערות לסיכום.",
+  name:"עוזר ביקורים",
+  text:
+"אתה העוזר שלי בביקורי פיקוח.\n" + ctx(d) + "\n\n" +
+"המטרה שלך: לחסוך לי את שעות ההכנה שלפני כל ביקור, ואת כתיבת הסיכום שאחריו.\n\n" +
+"אתה עובד בשני מצבים. אכתוב לך \"לפני ביקור\" או \"אחרי ביקור\", ואתה תדע באיזה אתה.\n\n" +
+"=== לפני ביקור ===\n" +
+"אדביק לך את החומרים של בית הספר.\n\n" +
+"1. הצלב — מה הובטח בביקור הקודם ומה קרה מאז בפועל\n" +
+"2. זהה 5 נושאים שדורשים בירור, לפי סדר חשיבות\n" +
+"3. לכל נושא: הממצא · מאיזה מסמך הוא לקוח · שאלה אחת לשאול\n" +
+"4. אחר כך הוסף רשימת שאלות ארוכה יותר לבעלי התפקידים. לא חובה שאשאל את כולן —\n" +
+"   אני רוצה שיהיו זמינות כדי לא לשכוח. בנה אותה כטבלה עם עמודה ריקה לרישום התשובה בשטח.\n\n" +
+"=== אחרי ביקור ===\n" +
+"אדביק לך את ההערות הגולמיות שרשמתי. הן יהיו קטועות ולא מסודרות.\n\n" +
+"1. סדר אותן לפי נושאים\n" +
+"2. נסח סיכום ביקור\n" +
+"3. הוצא רשימת משימות לבית הספר: מה לעשות, עד מתי\n" +
+"4. ציין מה לבדוק בביקור הבא\n" +
+"5. אמור לי במפורש אילו נושאים נשארו פתוחים כי לא רשמתי עליהם מספיק\n\n" +
+"סגנון הכתיבה שלי: " + d.style + ".\n" +
+"הפלט: טבלאות. בלי הקדמות ובלי סיכום בסוף.\n\n" +
+"הכללים החשובים ביותר:\n" +
+"- אל תמציא נתון שלא מופיע בחומר שהדבקתי.\n" +
+"- אל תקבע שבית ספר עומד או אינו עומד בדרישה, אלא אם יש לכך ראיה מפורשת.\n" +
+"- כשחסר לך מידע — אל תשלים אותו. אמור לי מה חסר.\n" +
+"- אל תכתוב שמות של תלמידים.\n\n" +
+"אם הבנת — ענה \"מוכן\" בלבד."
+};},
+
+mail: function(d){ return {
+  title:"עוזר המיילים",
+  why:"מדרג מה דחוף, אומר לכם מה בעצם מבקשים, ומנסח טיוטת תשובה.",
+  name:"עוזר מיילים",
+  extra:'<b>ויש בונוס:</b> Gemini כבר יושב בתוך ג׳ימייל שלכם. פתחו את ג׳ימייל במחשב ' +
+        'ולחצו על הכוכב של Gemini בפינה — הוא יסכם לכם שרשור שלם ויציע תשובה, ' +
+        'בלי להעתיק כלום. <b>הוא לא שולח בשמכם — השליחה תמיד הקליק שלכם.</b>',
+  text:
+"אתה העוזר שלי לניהול תיבת המייל.\n" + ctx(d) + "\n\n" +
+"המטרה: לחסוך לי את הזמן שאני מבזבז/ת על קריאה, על החלטה מה דחוף, ועל ניסוח תשובות חוזרות.\n\n" +
+"בכל פעם אדביק לך מייל אחד או כמה ברצף. לכל אחד החזר לי בדיוק את זה:\n\n" +
+"דחיפות: דחוף היום / השבוע / לא דורש תשובה ממני\n" +
+"מה מבקשים ממני: משפט אחד\n" +
+"טיוטת תשובה: עד 5 שורות, " + d.style + "\n" +
+"מה חסר לי כדי לענות:\n\n" +
+"בלי הקדמות ובלי סיכומים.\n\n" +
+"הכללים:\n" +
+"- אל תמציא נתונים שלא מופיעים במייל.\n" +
+"- אל תתחייב בשמי לתאריך, לתקציב או להחלטה.\n" +
+"- אם המייל לא ברור או סותר את עצמו — אמור לי, אל תנחש.\n" +
+"- אל תכתוב שמות של תלמידים.\n\n" +
+"אם הבנת — ענה \"מוכן\" בלבד."
+};},
+
+track: function(d){ return {
+  title:"עוזר המעקב",
+  why:"מחלק את מי שלא הגיש לקבוצות ומנסח לכל אחת הודעה אחרת — בלי לשרוף יחסים.",
+  name:"עוזר מעקב",
+  text:
+"אתה העוזר שלי למעקב אחרי משימות מול מנהלי בתי הספר.\n" + ctx(d) + "\n\n" +
+"המטרה: לחסוך לי את הרדיפה. אני לא רוצה לנסח כל תזכורת מחדש,\n" +
+"ולא רוצה לשרוף יחסים עם מנהלים שאני עובד/ת איתם כל השנה.\n\n" +
+"בכל פעם אדביק לך את שם המשימה, התאריך שנקבע, ורשימה של מי ביצע ומי לא.\n\n" +
+"1. חלק את מי שלא ביצע לשלוש קבוצות: פעם ראשונה שמזכירים / כבר הוזכר פעם / חורג מהותית\n" +
+"2. נסח הודעה שונה לכל קבוצה — הראשונה קלילה, השנייה עניינית, השלישית ברורה אך מכבדת\n" +
+"3. בכל הודעה: מה המשימה, עד מתי, ולמה זה חשוב — במשפט אחד\n\n" +
+"הפורמט: קבוצה / למי / ההודעה (מוכנה לשליחה בוואטסאפ, עד 4 שורות, בלי אימוג׳ים)\n\n" +
+"הכללים:\n" +
+"- אל תאיים ואל תרמוז על סנקציה.\n" +
+"- אל תכתוב שאפנה לממונה עליהם.\n" +
+"- אל תמציא סיבה למה הם לא ביצעו.\n" +
+"- אל תוסיף נתון שלא נתתי לך.\n\n" +
+"אם הבנת — ענה \"מוכן\" בלבד."
+};},
+
+tik: function(d){ return {
+  title:"עוזר תיק בית הספר",
+  why:"מחזיק את כל מה שאתם יודעים על כל בית ספר, ומחזיר לכם תמונה מרוכזת בשאלה אחת.",
+  name:"תיק בתי הספר",
+  extra:'<b>זה העוזר שצריך זיכרון.</b> במסך יצירת ה-Gem יש אזור להעלאת קבצים — ' +
+        'העלו לשם את תוכניות העבודה, הדוחות והמסמכים של בתי הספר שלכם. ' +
+        'מאותו רגע הוא יודע עליהם, בלי שתדביקו כלום. אפשר להוסיף קבצים מתי שרוצים.',
+  text:
+"אתה מנהל עבורי תיק מידע על בתי הספר שבפיקוחי.\n" + ctx(d) + "\n\n" +
+"המטרה: שתהיה לי תמונה מרוכזת על כל בית ספר, בלי לחפש בעשרה קבצים.\n\n" +
+"החומרים שהעליתי לך הם מקור האמת שלך.\n\n" +
+"כשאשאל אותך על בית ספר — החזר לי:\n" +
+"1. תמונת מצב קצרה: רשת, מגזר, מגמות, מספרים עיקריים\n" +
+"2. מה השתנה לאחרונה\n" +
+"3. מה פתוח — התחייבויות שניתנו ולא בוצעו\n" +
+"4. מה כדאי לבדוק בפעם הבאה\n" +
+"5. על מה אין לי מידע עדכני\n\n" +
+"סגנון: " + d.style + ".\n\n" +
+"הכללים:\n" +
+"- כל עובדה שאתה מוסר — ציין מאיזה מסמך היא.\n" +
+"- אל תמציא נתון שלא נמצא בחומרים שהעליתי.\n" +
+"- כשאין לך מידע על משהו — אמור זאת במפורש. זה חשוב לי יותר מתשובה מלאה.\n" +
+"- אל תכתוב שמות של תלמידים.\n\n" +
+"אם הבנת — ענה \"מוכן\" בלבד."
+};},
+
+time: function(d){ return {
+  title:"עוזר המשימות",
+  why:"מסדר לכם מה הטלתם על מי, מה הוטל עליכם, ומה בוער השבוע.",
+  name:"עוזר משימות",
+  text:
+"אתה העוזר שלי לניהול משימות.\n" + ctx(d) + "\n\n" +
+"המטרה: שלא אאבד משימות, ושלא אצטרך לזכור בראש מה הטלתי על מי ומתי.\n\n" +
+"אדביק לך טקסט חופשי — סיכום פגישה, הערות מביקור, או פשוט מה שעבר לי בראש.\n\n" +
+"הוצא מזה שלוש רשימות:\n" +
+"1. מה אני צריך/ה לעשות — משימה, עד מתי, ומה הצעד הראשון\n" +
+"2. מה הטלתי על אחרים — על מי, מה, עד מתי\n" +
+"3. מה לא ברור — משימות שהוזכרו בלי תאריך או בלי אחראי\n\n" +
+"אחר כך אמור לי מה משלוש הרשימות בוער השבוע, ומה יכול לחכות.\n\n" +
+"הפלט: טבלאות. " + d.style + ".\n\n" +
+"הכללים:\n" +
+"- אל תמציא תאריכים שלא נאמרו. אם אין תאריך — כתוב \"לא נקבע\".\n" +
+"- אל תמציא אחראי. אם לא ברור על מי — כתוב \"לא ברור\".\n" +
+"- אל תוסיף משימות שלא הזכרתי, גם אם הן נשמעות הגיוניות.\n\n" +
+"אם הבנת — ענה \"מוכן\" בלבד."
+};}
+};
+AGENTS.doch = AGENTS.prep;   /* ההכנה והדוח הם אותו עוזר, בשני מצבים */
+
+/* ═══════════ מצב ═══════════ */
+var SCHOOLS = JSON.parse(document.getElementById("schoolData").textContent);
+var SUPS = (function(){
+  var m = {};
+  SCHOOLS.forEach(function(s){ (s.sup||[]).forEach(function(n){ m[n] = 1; }); });
+  return Object.keys(m).sort(function(a,b){ return a.localeCompare(b,"he"); });
+})();
+var LABEL = ["", "מי אתם", "מה מעיק", "הערכה שלכם"];
+var i = 0;
+function $(id){ return document.getElementById(id); }
+
+/* ---------- בנייה ---------- */
+(function(){
+  $("sup").innerHTML = '<option value="">— בחירה —</option>' +
+    SUPS.map(function(n){ return "<option>" + esc(n) + "</option>"; }).join("") +
+    '<option value="__other">שם אחר…</option>';
+
+  $("schools").innerHTML = SCHOOLS.map(function(s, k){
+    return '<label><input type="checkbox" data-k="' + k + '">' +
+           '<span>' + esc(s.n) + '</span>' +
+           '<span class="net">' + esc(s.net) + ' · ' + esc(s.s) + '</span></label>';
+  }).join("");
+
+  $("pains").innerHTML = PAINS.map(function(p){
+    return '<label><input type="checkbox" value="' + p.id + '">' +
+           '<div><span class="tx">' + esc(p.t) + '</span>' +
+           '<span class="sb">' + esc(p.s) + '</span></div></label>';
+  }).join("");
+})();
+
+$("sup").addEventListener("change", function(){
+  var v = this.value;
+  if (v === "__other"){
+    var n = prompt("השם שלך:");
+    if (n){
+      var o = document.createElement("option");
+      o.textContent = n; o.selected = true;
+      this.insertBefore(o, this.lastChild);
+    } else { this.value = ""; }
+  }
+  var name = this.value === "__other" ? "" : this.value;
+  $("schWrap").hidden = !name;
+  $("schools").querySelectorAll("input").forEach(function(c){
+    c.checked = (SCHOOLS[+c.dataset.k].sup || []).indexOf(name) > -1;
+  });
+  countSchools();
+  gate();
+});
+$("schools").addEventListener("change", countSchools);
+$("pains").addEventListener("change", gate);
+
+function countSchools(){
+  $("schCnt").textContent = $("schools").querySelectorAll("input:checked").length;
+}
+function gate(){
+  if (i === 1) $("next").disabled = !$("sup").value;
+  if (i === 2) $("next").disabled = !$("pains").querySelector("input:checked");
+}
+
+/* ---------- איסוף ---------- */
+function collect(){
+  var picked = [];
+  $("schools").querySelectorAll("input:checked").forEach(function(c){
+    picked.push(SCHOOLS[+c.dataset.k]);
+  });
+  var pains = [];
+  $("pains").querySelectorAll("input:checked").forEach(function(c){ pains.push(c.value); });
+  return {
+    name: $("sup").value,
+    style: $("style").value,
+    schools: picked,
+    pains: pains
+  };
+}
+
+/* ---------- הערכה ---------- */
+function buildKit(){
+  var d = collect();
+  var seen = {}, cards = [];
+  d.pains.forEach(function(p){
+    var fn = AGENTS[p];
+    if (!fn) return;
+    var a = fn(d);
+    if (seen[a.title]) return;
+    seen[a.title] = 1;
+    cards.push(a);
+  });
+
+  $("kitLede").innerHTML = "שלום " + esc(d.name.split(" ")[0]) + " — הכנו לכם <b>" +
+    cards.length + (cards.length === 1 ? " עוזר" : " עוזרים") + "</b>" +
+    (d.schools.length ? ", והם כבר מכירים את " + d.schools.length + " בתי הספר שלכם." : ".");
+
+  $("kits").innerHTML = cards.map(function(a, k){
+    return '<div class="kit">' +
+      '<h2><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/>' +
+      '<path d="M12 3v4M9 13h.01M15 13h.01"/></svg>' + esc(a.title) + '</h2>' +
+      '<p class="w">' + esc(a.why) + '</p>' +
+      '<button class="big" data-k="' + k + '">' +
+      '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/>' +
+      '<path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתקת ההוראות</button>' +
+      '<ol class="how">' +
+      '<li>פתחו <b>gemini.google.com</b> במחשב והיכנסו לחשבון גוגל שלכם</li>' +
+      '<li>בתפריט הצד: <b>Explore Gems</b> ואז <b>New Gem</b></li>' +
+      '<li>בשדה השם כתבו: <b>' + esc(a.name) + '</b></li>' +
+      '<li>הדביקו את ההוראות שהעתקתם בשדה הגדול, ולחצו <b>Save</b></li>' +
+      '</ol>' +
+      (a.extra ? '<div class="extra">' + a.extra + '</div>' : '') +
+      '</div>';
+  }).join("");
+
+  $("kits").querySelectorAll(".big[data-k]").forEach(function(b){
+    b.addEventListener("click", function(){
+      copyText(cards[+b.dataset.k].text).then(function(){
+        var lbl = b.lastChild, old = lbl.textContent;
+        b.classList.add("done"); lbl.textContent = "הועתק";
+        toast("הועתק — הדביקו בשדה ההוראות של ה-Gem");
+        setTimeout(function(){ b.classList.remove("done"); lbl.textContent = old; }, 2600);
+      });
+    });
+  });
+
+  saveState(d);
+}
+
+/* ---------- קישור אישי ---------- */
+function saveState(d){
+  var mini = {
+    n: d.name, y: d.style,
+    s: d.schools.map(function(x){ return x.n; }),
+    p: d.pains
+  };
+  var enc = btoa(unescape(encodeURIComponent(JSON.stringify(mini))))
+              .replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+  history.replaceState(null, "", "#k=" + enc);
+  try{ localStorage.setItem("ozer", enc); }catch(e){}
+}
+function loadState(){
+  var m = location.hash.match(/[#&]k=([A-Za-z0-9\-_]+)/);
+  var enc = m ? m[1] : null;
+  if (!enc){ try{ enc = localStorage.getItem("ozer"); }catch(e){} }
+  if (!enc) return false;
+  try{
+    var j = JSON.parse(decodeURIComponent(escape(
+      atob(enc.replace(/-/g,"+").replace(/_/g,"/")))));
+    if (!j.n) return false;
+    if (SUPS.indexOf(j.n) < 0){
+      var o = document.createElement("option");
+      o.textContent = j.n;
+      $("sup").insertBefore(o, $("sup").lastChild);
+    }
+    $("sup").value = j.n;
+    $("style").value = j.y || $("style").value;
+    $("schWrap").hidden = false;
+    $("schools").querySelectorAll("input").forEach(function(c){
+      c.checked = (j.s || []).indexOf(SCHOOLS[+c.dataset.k].n) > -1;
+    });
+    countSchools();
+    $("pains").querySelectorAll("input").forEach(function(c){
+      c.checked = (j.p || []).indexOf(c.value) > -1;
+    });
+    return true;
+  }catch(e){ return false; }
+}
+
+$("copyLink").addEventListener("click", function(){
+  copyText(location.href).then(function(){
+    var lbl = this.lastChild, old = lbl.textContent;
+    this.classList.add("done"); lbl.textContent = "הועתק";
+    toast("הקישור הועתק — שמרו אותו אצלכם");
+    setTimeout(function(){ this.classList.remove("done"); lbl.textContent = old; }.bind(this), 2800);
+  }.bind(this));
+});
+
+/* ---------- ניווט ---------- */
+var SCR = Array.prototype.slice.call(document.querySelectorAll(".scr"));
+function show(n){
+  i = Math.max(0, Math.min(SCR.length - 1, n));
+  SCR.forEach(function(s, k){ s.classList.toggle("on", k === i); });
+  $("fill").style.width = (i / (SCR.length - 1) * 100) + "%";
+  $("plbl").textContent = i === 0 ? "" : LABEL[i];
+  $("back").hidden = i === 0;
+  $("next").textContent = i === 0 ? "מתחילים" : i === SCR.length - 1 ? "סיימתי" : "הבא";
+  $("next").disabled = false;
+  gate();
+  if (i === SCR.length - 1) buildKit();
+  window.scrollTo({top: 0, behavior: "smooth"});
+}
+$("next").addEventListener("click", function(){
+  if (i === SCR.length - 1){ toast("בהצלחה — ואל תשכחו לשמור את הקישור"); return; }
+  show(i + 1);
+});
+$("back").addEventListener("click", function(){ show(i - 1); });
+
+/* ---------- עזרים ---------- */
+var tt = null;
+function toast(msg){
+  var t = $("toast");
+  t.textContent = msg; t.classList.add("on");
+  clearTimeout(tt);
+  tt = setTimeout(function(){ t.classList.remove("on"); }, 2800);
+}
+function copyText(txt){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    return navigator.clipboard.writeText(txt).catch(function(){ fb(txt); });
+  }
+  fb(txt); return Promise.resolve();
+}
+function fb(txt){
+  var ta = document.createElement("textarea");
+  ta.value = txt; ta.style.position = "fixed"; ta.style.top = "0"; ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus(); ta.select(); ta.setSelectionRange(0, txt.length);
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+}
+function esc(s){
+  return String(s == null ? "" : s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+if (loadState()) show(3); else show(0);
+</script>
+</body>
+</html>
