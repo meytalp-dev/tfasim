@@ -55,7 +55,7 @@
   function shell(opts) {
     opts = opts || {};
     var me = opts.me || {}; var initial = (me.name || "?").charAt(0);
-    var available = opts.available || ["schools.html"];
+    var available = opts.available || ["schools.html", "visit.html", "report.html"];
     var links = NAV.map(function (n) {
       var here = w.location.pathname.indexOf(n[0]) > -1 || (n[0] === "index.html" && /\/mefakeach\/?$/.test(w.location.pathname));
       var soon = available.indexOf(n[0]) < 0;

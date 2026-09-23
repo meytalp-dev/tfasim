@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>הביקור שלי · הבית של המפקח</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M9 11l3 3 7-7'/><rect x='3' y='4' width='18' height='16' rx='3'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+.q{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.q .t{display:flex;flex-direction:column;gap:2px;margin-bottom:8px}
+.q .t b{font-weight:600;color:var(--ink);line-height:1.45}
+.q .who{color:var(--muted);font-size:13.5px}
+.q .st{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.stb{border:1px solid var(--line);border-radius:99px;padding:2px 11px;font-size:13.5px;cursor:pointer;color:var(--muted);user-select:none;background:#fbfcff}
+.stb.on{background:#e3f7f3;color:#0b7f70;border-color:#bfe9e0}
+.stb.on.w{background:#fff1e0;color:var(--amber);border-color:#f3d7b0}
+.stb[data-state="na"].on{background:#eef1f7;color:var(--muted);border-color:var(--line)}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:14px;color:var(--ink);background:#fbfcff;cursor:pointer;font-weight:400}
+.card.soft{background:var(--sky-soft);border-color:#cfe8f7}
+#saveState{white-space:nowrap}
+@media (max-width:820px){.grid.g3{grid-template-columns:1fr}}
+</style>
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap"><div class="app" id="app"><div class="empty" style="grid-column:1/-1">טוען…</div></div></div>
+<div id="toast" hidden></div>
+<div class="credit"><a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+<script src="app.js"></script>
+<script src="queue.js"></script>
+<script id="page">
+(function (w, d) {
+  "use strict";
+  var M = w.MEF, E = M.escapeHtml;
+  var ROLES = ["מנהל/ת", "רכז/ת פדגוגי/ת", "רכז/ת חניכות", "רכז/ת חברתי/ת", "מת\"לית", "רכז/ת תקשוב", "הכלה ושילוב"];
+  var STATES = [["answered", "נענתה"], ["clarify", "נדרש בירור"], ["na", "לא רלוונטית"]];
+  var MONTHS = ["", "ינואר", "פברואר", "מרץ", "אפריל", "מאי", "יוני", "יולי", "אוגוסט", "ספטמבר", "אוקטובר", "נובמבר", "דצמבר"];
+  var state = { me: null, schools: [], visits: [], g: null, questions: [], answersById: {}, filters: { role: "", month: new Date().getMonth() + 1, all: false, q: "" }, queue: null, lastSaved: "" };
+
+  /* ---- רינדור טהור (נבדק ב-tests/visit.test.mjs) ---- */
+  function listHtml(visits) {
+    if (!visits.length) return '<div class="empty">עדיין אין ביקורים. פתחי את הראשון מהכפתור למעלה.</div>';
+    return '<ul class="list">' + visits.map(function (v) {
+      var act;
+      if (v.status === "open") act = '<a class="btn sm p" href="visit.html?id=' + E(v.id) + '&mode=q">המשך הביקור</a>';
+      else if (v.hasReport) act = '<a class="btn sm" href="report.html?id=' + E(v.reportId) + '">דוח מאושר</a>';
+      else act = '<a class="btn sm" href="report.html?visit=' + E(v.id) + '">השלמת הדוח</a>';
+      return "<li><b>" + E(v.school_name) + "</b><span class=\"hint\">" + E(M.fmtDate(v.date)) + (v.status === "open" ? ' · <span class="tag info">פתוח</span>' : "") + '</span><span class="m">' + act + "</span></li>";
+    }).join("") + "</ul>";
+  }
+  function openFormHtml(schools, preId, roles) {
+    var today = new Date(); var iso = today.getFullYear() + "-" + ("0" + (today.getMonth() + 1)).slice(-2) + "-" + ("0" + today.getDate()).slice(-2);
+    return '<form id="openForm" class="card" style="max-width:560px"><h3>פתיחת ביקור</h3><label for="oSchool">בית ספר</label><select class="field" id="oSchool" name="school_id" required>' +
+      schools.map(function (s) { return '<option value="' + E(s.id) + '"' + (String(s.id) === String(preId) ? " selected" : "") + ">" + E(s.name) + "</option>"; }).join("") +
+      '</select><label for="oDate">תאריך</label><input class="field" type="date" id="oDate" name="date" value="' + iso + '" required><label>משתתפים</label><div class="row">' +
+      roles.map(function (r) { return '<label class="chip" style="margin:0"><input type="checkbox" name="participants" value="' + E(r) + '"> ' + E(r) + "</label>"; }).join("") +
+      '</div><label for="oPurpose">מטרת הביקור</label><input class="field" id="oPurpose" name="purpose" maxlength="300" placeholder="למשל: פתיחת שנה, השתלמות מוסדית"><div class="row" style="margin-top:12px"><button class="btn p" type="submit">פתיחה והכנה</button><a class="btn" href="visit.html">ביטול</a></div></form>';
+  }
+  function prepHtml(g) {
+    var p = g.prep || {}, cards = [];
+    if (p.lastReport) cards.push('<div class="card soft"><h3>מהדוח הקודם · ' + E(M.fmtDate(p.lastReport.date)) + '</h3><ul class="list">' + (p.lastReport.recommendations || []).map(function (r) { return "<li>" + E(r) + "</li>"; }).join("") + (p.lastReport.clarify || []).map(function (r) { return "<li>לבירור: " + E(r) + "</li>"; }).join("") + "</ul></div>");
+    if (p.openTasks && p.openTasks.length) cards.push('<div class="card"><h3>פתוח מול בית הספר</h3><ul class="list">' + p.openTasks.map(function (t) { return "<li>" + E(t.title) + '<span class="m">' + (t.owner_role ? E(t.owner_role) + " · " : "") + (t.due ? '<span class="tag warn">' + E(M.fmtDate(t.due)) + "</span>" : "") + "</span></li>"; }).join("") + "</ul></div>");
+    if (p.newDocs && p.newDocs.length) cards.push('<div class="card"><h3>נוסף מאז הביקור הקודם</h3><ul class="list">' + p.newDocs.map(function (x) { return "<li>" + E(x.title) + '<span class="m">' + E(x.type || "") + " · " + E(M.fmtDate(x.uploaded_at)) + "</span></li>"; }).join("") + "</ul></div>");
+    if (!cards.length) cards.push('<div class="empty">אין עדיין דוח קודם, משימות פתוחות או מסמכים חדשים לבית הספר הזה.</div>');
+    return '<div class="grid g3">' + cards.join("") + "</div>";
+  }
+  function inMonth(months, m) { if (!months) return true; return months.split(",").map(Number).indexOf(m) > -1; }
+  function questionCard(q, a) {
+    a = a || {};
+    return '<div class="q" data-qid="' + E(q.id) + '" data-role="' + E(q.role) + '"><div class="t"><b>' + E(q.text) + '</b><span class="who">' + E(q.topic) + " · " + E(q.role) + (q.mine ? ' · <span class="tag info">שלי</span>' : "") + "</span></div>" +
+      '<input class="field ans" value="' + E(a.answer || "") + '" placeholder="תשובה קצרה" maxlength="2000"><div class="st">' +
+      STATES.map(function (s) { return '<span data-state="' + s[0] + '" class="stb' + (a.state === s[0] ? " on" + (s[0] === "clarify" ? " w" : "") : "") + '">' + s[1] + "</span>"; }).join("") +
+      '<a href="#" class="addTask" style="margin-right:auto;font-size:13.5px">+ משימה</a></div></div>';
+  }
+  function questionsHtml(questions, answers, f) {
+    var by = {}; (answers || []).forEach(function (a) { by[a.question_id] = a; });
+    var list = questions.filter(function (q) { return (!f.role || q.role === f.role) && (f.all || inMonth(q.months || "", f.month)) && (!f.q || (q.text + q.topic).toLowerCase().indexOf(f.q.toLowerCase()) > -1); });
+    if (!list.length) return '<div class="empty">אין שאלות לסינון הזה. אפשר לבחור "כל השנה" או להוסיף שאלה משלך.</div>';
+    return list.map(function (q) { return questionCard(q, by[q.id]); }).join("");
+  }
+  /* הערה חופשית לבעל תפקיד — רק כשמסנן תפקיד פעיל (מפרט 3.4) */
+  function roleNoteHtml(role, notes, ro) {
+    if (!role) return "";
+    return '<div class="card" style="margin-top:12px"><label for="roleNote" style="margin-top:0">הערה חופשית · ' + E(role) + '</label><textarea class="field" id="roleNote" maxlength="4000"' + (ro ? " readonly" : "") + ' placeholder="מה עוד עלה בשיחה, מעבר לשאלות">' + E((notes || {})[role] || "") + "</textarea></div>";
+  }
+  w.VISIT = { listHtml: listHtml, openFormHtml: openFormHtml, prepHtml: prepHtml, questionsHtml: questionsHtml, questionCard: questionCard, roleNoteHtml: roleNoteHtml };
+
+  /* ---- חיווט (רץ רק בדפדפן) ---- */
+  if (!d.getElementById("app")) return;
+  var qs = new URLSearchParams(w.location.search);
+  function params() { return { id: qs.get("id") || "", open: qs.get("open") || "", mode: qs.get("mode") || "prep" }; }
+  function isRo() { return state.g.readOnly || state.g.visit.status !== "open"; }
+  function answersList() { return Object.keys(state.answersById).map(function (k) { return state.answersById[k]; }); }
+
+  function renderList() {
+    var m = d.getElementById("main"), pick = M.pickedSchool();
+    var vs = pick ? state.visits.filter(function (v) { return String(v.school_id) === pick; }) : state.visits;
+    m.innerHTML = '<div class="row" style="justify-content:space-between"><div><h2>הביקור שלי</h2><p class="sub" style="margin:0">' + vs.length + ' ביקורים</p></div><a class="btn p" href="visit.html?open=' + E(pick) + '">+ פתיחת ביקור</a></div>' + listHtml(vs);
+  }
+  function renderOpen(pre) {
+    d.getElementById("main").innerHTML = "<h2>הביקור שלי</h2>" + openFormHtml(state.schools, pre || M.pickedSchool(), ROLES);
+    d.getElementById("openForm").addEventListener("submit", function (e) {
+      e.preventDefault(); var f = e.target, btn = f.querySelector("button[type=submit]");
+      var parts = Array.prototype.map.call(f.querySelectorAll("input[name=participants]:checked"), function (x) { return x.value; });
+      btn.disabled = true;
+      M.api("visit.open", { school_id: f.school_id.value, date: f.date.value, participants: parts, purpose: f.purpose.value }).then(function (r) {
+        if (!r.ok) { btn.disabled = false; M.toast(r.error === "network" ? "אין חיבור לשרת" : "הפתיחה נכשלה"); return; }
+        M.setPicked(f.school_id.value); w.location.href = "visit.html?id=" + encodeURIComponent(r.visit.id) + "&mode=prep";
+      });
+    });
+  }
+  function header(g, mode) {
+    var v = g.visit;
+    return '<a href="visit.html" class="back">→ כל הביקורים</a><div class="row" style="justify-content:space-between"><div><h2>' + E(v.school_name) + " · " + E(M.fmtDate(v.date)) + '</h2><p class="sub" style="margin:0">' + (v.purpose ? E(v.purpose) + " · " : "") + (v.participants ? E(v.participants) + " · " : "") + (v.status === "open" ? "ביקור פתוח" : "ביקור סגור" + (v.reportId ? ' · <a href="report.html?id=' + E(v.reportId) + '">לדוח</a>' : "")) + '</p></div><span id="saveState" class="hint"></span></div>' +
+      '<div class="tabs"><span class="' + (mode === "prep" ? "on" : "") + '" data-mode="prep">הכנה</span><span class="' + (mode === "q" ? "on" : "") + '" data-mode="q">שאלות</span></div>';
+  }
+  function renderVisit(mode) {
+    var g = state.g, m = d.getElementById("main");
+    if (mode === "prep") {
+      m.innerHTML = header(g, "prep") + prepHtml(g) + '<div class="row" style="margin-top:18px"><a class="btn p" href="visit.html?id=' + E(g.visit.id) + '&mode=q">לשאלות הביקור</a></div>';
+    } else {
+      var f = state.filters;
+      m.innerHTML = header(g, "q") + '<div class="row" style="margin:0 0 14px"><select class="field" id="fMonth" style="width:180px"><option value="cur"' + (!f.all ? " selected" : "") + ">" + E(MONTHS[f.month]) + '</option><option value="all"' + (f.all ? " selected" : "") + '>כל השנה</option></select><select class="field" id="fRole" style="width:200px"><option value="">כל בעלי התפקידים</option>' + ROLES.map(function (r) { return '<option value="' + E(r) + '"' + (f.role === r ? " selected" : "") + ">" + E(r) + "</option>"; }).join("") + '</select><input class="field" id="fQ" style="width:180px" placeholder="חיפוש" value="' + E(f.q) + '"></div>' +
+        '<div id="qlist" style="max-width:760px">' + questionsHtml(state.questions, answersList(), f) + roleNoteHtml(f.role, g.notes, isRo()) + "</div>" +
+        (isRo() ? "" : '<div class="row" style="justify-content:space-between;margin-top:14px;max-width:760px"><button class="btn ghost sm" id="addQ" type="button">+ שאלה משלי</button><button class="btn p" id="closeV" type="button">סיים ביקור</button></div>');
+      wireQuestions();
+    }
+    d.querySelectorAll(".tabs span").forEach(function (el) { el.addEventListener("click", function () { renderVisit(el.getAttribute("data-mode")); }); });
+    updateSaveState();
+  }
+  function updateSaveState() {
+    var el = d.getElementById("saveState"); if (!el) return;
+    if (state.queue && state.queue.pending()) { el.textContent = "ממתין לשליחה"; el.style.color = "var(--amber)"; }
+    else if (state.lastSaved) { el.textContent = "נשמר " + state.lastSaved; el.style.color = "var(--mint)"; }
+    else el.textContent = "";
+  }
+  d.addEventListener("mefq:state", updateSaveState);
+  w.addEventListener("online", function () { if (state.queue && state.queue.pending()) state.queue.flush(); });
+  var debounce = {};
+  function queueAnswer(card) {
+    var qid = card.getAttribute("data-qid"), role = card.getAttribute("data-role");
+    var st = card.querySelector(".stb.on"); var a = { k: qid, question_id: qid, role: role, answer: card.querySelector(".ans").value, state: st ? st.getAttribute("data-state") : "" };
+    state.answersById[qid] = a;
+    var el = d.getElementById("saveState"); if (el) { el.textContent = "שומר…"; el.style.color = ""; }
+    clearTimeout(debounce[qid]); debounce[qid] = setTimeout(function () { state.queue.push(a); }, 600);
+  }
+  function wireQuestions() {
+    var ro = isRo();
+    d.querySelectorAll("#qlist .q").forEach(function (card) {
+      if (ro) { card.querySelector(".ans").disabled = true; card.querySelector(".addTask").remove(); return; }
+      card.querySelector(".ans").addEventListener("input", function () { queueAnswer(card); });
+      card.querySelectorAll(".stb").forEach(function (b) { b.addEventListener("click", function () {
+        var on = b.classList.contains("on"); card.querySelectorAll(".stb").forEach(function (x) { x.classList.remove("on", "w"); });
+        if (!on) { b.classList.add("on"); if (b.getAttribute("data-state") === "clarify") b.classList.add("w"); }
+        queueAnswer(card);
+      }); });
+      card.querySelector(".addTask").addEventListener("click", function (e) { e.preventDefault(); addTaskFor(card); });
+    });
+    ["fMonth", "fRole"].forEach(function (id) { var el = d.getElementById(id); if (el) el.addEventListener("change", applyFilters); });
+    var fq = d.getElementById("fQ"); if (fq) fq.addEventListener("input", applyFilters);
+    var rn = d.getElementById("roleNote"); if (rn && !ro) rn.addEventListener("change", saveRoleNote);
+    var aq = d.getElementById("addQ"); if (aq) aq.addEventListener("click", addMyQuestion);
+    var cv = d.getElementById("closeV"); if (cv) cv.addEventListener("click", closeVisit);
+  }
+  function applyFilters() {
+    var f = state.filters, fq = d.getElementById("fQ"), keepFocus = d.activeElement === fq, pos = fq ? fq.selectionStart : 0;
+    f.all = d.getElementById("fMonth").value === "all"; f.role = d.getElementById("fRole").value; f.q = fq.value;
+    d.getElementById("qlist").innerHTML = questionsHtml(state.questions, answersList(), f) + roleNoteHtml(f.role, state.g.notes, isRo());
+    wireQuestions();
+    if (keepFocus) { fq = d.getElementById("fQ"); fq.focus(); try { fq.setSelectionRange(pos, pos); } catch (e) {} }
+  }
+  function saveRoleNote() {
+    var role = state.filters.role, note = d.getElementById("roleNote").value;
+    state.g.notes[role] = note;
+    M.api("notes.save", { visit_id: state.g.visit.id, role: role, note: note }).then(function (r) { M.toast(r.ok ? "ההערה נשמרה" : "ההערה לא נשמרה. נסי שוב כשיש רשת."); });
+  }
+  function addTaskFor(card) {
+    var title = w.prompt("משימה לבית הספר (מה צריך לקרות?)", card.querySelector("b").textContent); if (!title) return;
+    var due = w.prompt("עד מתי? (YYYY-MM-DD, אפשר ריק)", "") || "";
+    M.api("tasks.add", { school_id: state.g.visit.school_id, title: title, owner_role: card.getAttribute("data-role"), due: due.trim(), source: "question", source_ref: state.g.visit.id + "/" + card.getAttribute("data-qid") }).then(function (r) {
+      if (!r.ok) { M.toast(r.error === "badrequest" ? "תאריך לא תקין (YYYY-MM-DD)" : "המשימה לא נשמרה"); return; }
+      M.toast("נוצרה משימה");
+      /* הקישור לתשובה דורש שהתשובה כבר בשרת; אם היא עוד בתור, מקשרים אחרי ה-flush */
+      var link = function () { return M.api("answers.link_task", { visit_id: state.g.visit.id, question_id: card.getAttribute("data-qid"), task_id: r.task.id }); };
+      if (state.answersById[card.getAttribute("data-qid")]) state.queue.flush().then(link); else link();
+    });
+  }
+  function addMyQuestion() {
+    var text = w.prompt("נוסח השאלה"); if (!text) return;
+    var role = state.filters.role || w.prompt("לאיזה בעל תפקיד? (" + ROLES.join(" / ") + ")", ROLES[0]); if (!role) return;
+    M.api("questions.add", { text: text, role: role.trim() }).then(function (r) { if (!r.ok) { M.toast(r.error === "badrequest" ? "בעל התפקיד לא מוכר" : "לא נשמר"); return; } state.questions.push(r.question); state.filters.all = true; applyFilters(); M.toast("נוספה"); });
+  }
+  function closeVisit() {
+    if (!w.confirm("לסיים את הביקור ולעבור לדוח? אחרי הסיום לא עורכים תשובות.")) return;
+    state.queue.flush().then(function (clean) {
+      if (!clean) { M.toast("יש תשובות שעוד לא נשלחו. חכי לרשת ונסי שוב."); return; }
+      M.api("visit.close", { id: state.g.visit.id }).then(function (r) { if (!r.ok) { M.toast("הסגירה נכשלה"); return; } w.location.href = "report.html?id=" + encodeURIComponent(r.reportId); });
+    });
+  }
+  function loadVisit(id, mode) {
+    return M.api("visit.get", { id: id }).then(function (g) {
+      if (!g.ok) { d.getElementById("main").innerHTML = '<div class="empty">' + (g.error === "network" ? "השרת לא זמין כרגע." : "הביקור לא נמצא.") + "</div>"; return; }
+      state.g = g; g.notes = g.notes || {}; state.answersById = {}; g.answers.forEach(function (a) { state.answersById[a.question_id] = { k: a.question_id, question_id: a.question_id, role: a.role, answer: a.answer, state: a.state }; });
+      state.queue = w.MEFQ.make(g.visit.id, function (items) { return M.api("answers.save", { visit_id: g.visit.id, answers: items }).then(function (r) { if (r.ok) { state.lastSaved = new Date().toTimeString().substring(0, 5); } return !!r.ok; }); });
+      if (state.queue.pending()) state.queue.flush();
+      return M.api("questions.list", { all: true }).then(function (q) { state.questions = q.questions || []; renderVisit(mode); });
+    });
+  }
+  function boot() {
+    if (boot._done) return; boot._done = true;
+    M.api("me").then(function (me) {
+      if (!me || !me.ok) {
+        var msg = { network: "השרת לא זמין כרגע. נסי שוב בעוד דקה.", notregistered: "החשבון שלך מאושר באתר, אבל עדיין לא רשום בהבית של המפקח. פני למיטל." };
+        if (me && msg[me.error]) d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">' + E(msg[me.error]) + "</div>";
+        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">משהו השתבש (' + E(me.error) + "). נסי לרענן.</div>";
+        return;
+      }
+      state.me = me;
+      return M.api("schools.list").then(function (r) {
+        state.schools = (r && r.schools) || []; M.shell({ me: me, count: state.schools.length }); M.picker(state.schools, function () { if (!params().id) renderList(); });
+        var p = params();
+        if (p.id) return loadVisit(p.id, p.mode === "q" ? "q" : "prep");
+        if (qs.has("open")) return renderOpen(p.open);
+        return M.api("visit.list").then(function (l) { state.visits = (l && l.visits) || []; renderList(); });
+      });
+    });
+  }
+  if (M.token()) boot(); else d.addEventListener("pmh:in", boot);
+})(window, document);
+</script>
+</body>
+</html>
