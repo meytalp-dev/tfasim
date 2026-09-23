@@ -152,8 +152,10 @@
     if (boot._done) return; boot._done = true;
     M.api("me").then(function (me) {
       if (!me || !me.ok) {
-        if (me && me.error === "network") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">השרת לא זמין כרגע. נסי שוב בעוד דקה.</div>';
-        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">החשבון שלך לא רשום במערכת הזו. פני למיטל.</div>';
+        /* unauthorized כבר צויר ע"י M.api → sessionExpired; כאן רק שני המצבים האחרים */
+        var msg = { network: "השרת לא זמין כרגע. נסי שוב בעוד דקה.", notregistered: "החשבון שלך מאושר באתר, אבל עדיין לא רשום בהבית של המפקח. פני למיטל." };
+        if (me && msg[me.error]) d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">' + E(msg[me.error]) + "</div>";
+        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">משהו השתבש (' + E(me.error) + "). נסי לרענן.</div>";
         return;
       }
       state.me = me;

@@ -37,9 +37,10 @@
     el.textContent = msg; el.hidden = false;
     clearTimeout(toast._t); toast._t = setTimeout(function () { el.hidden = true; }, 2600);
   }
+  /* לפני shell() עוד אין #main — אז מציירים לתוך #app, כדי שהמסך לא יישאר על "טוען…" */
   function sessionExpired() {
-    var m = d.getElementById("main"); if (!m) return;
-    m.innerHTML = '<div class="card" style="max-width:480px;margin:40px auto;text-align:center"><h3>הסשן פג</h3><p>כניסה מחדש ואז חוזרים לאותו מקום.</p><button class="btn p" onclick="location.reload()">כניסה מחדש</button></div>';
+    var m = d.getElementById("main") || d.getElementById("app"); if (!m) return;
+    m.innerHTML = '<div class="card" style="max-width:480px;margin:40px auto;text-align:center;grid-column:1/-1"><h3>הסשן פג</h3><p>כניסה מחדש ואז חוזרים לאותו מקום.</p><button class="btn p" onclick="location.reload()">כניסה מחדש</button></div>';
   }
 
   var NAV = [

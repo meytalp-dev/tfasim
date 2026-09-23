@@ -25,4 +25,11 @@ t("escapeHtml מטפל בגרשיים ולוכסן", () => { assert.equal(MEF.es
 t("fmtDate: ISO → יום.חודש.שנה", () => { assert.equal(MEF.fmtDate("2026-09-23T10:00:00.000Z"), "23.9.2026"); assert.equal(MEF.fmtDate(""), ""); });
 t("statusTag מחזיר מחלקה לפי kind", () => { assert.match(MEF.statusTag({ kind: "bad", text: "1 באיחור" }), /class="tag bad"/); });
 t("בורר בית ספר נשמר ב-localStorage", () => { MEF.setPicked("45005"); assert.equal(MEF.pickedSchool(), "45005"); MEF.setPicked(""); assert.equal(MEF.pickedSchool(), ""); });
+t("sessionExpired מצייר לתוך #app כשעוד אין #main (לפני shell)", () => {
+  const app = { innerHTML: "טוען…" };
+  win.document.getElementById = id => (id === "app" ? app : null);
+  MEF.sessionExpired();
+  assert.match(app.innerHTML, /כניסה מחדש/);
+  win.document.getElementById = () => null;
+});
 console.log(`\n${n} עברו`);
