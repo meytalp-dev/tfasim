@@ -89,7 +89,14 @@
     if (!role) return "";
     return '<div class="card" style="margin-top:12px"><label for="roleNote" style="margin-top:0">הערה חופשית · ' + E(role) + '</label><textarea class="field" id="roleNote" maxlength="4000"' + (ro ? " readonly" : "") + ' placeholder="מה עוד עלה בשיחה, מעבר לשאלות">' + E((notes || {})[role] || "") + "</textarea></div>";
   }
-  w.VISIT = { listHtml: listHtml, openFormHtml: openFormHtml, prepHtml: prepHtml, questionsHtml: questionsHtml, questionCard: questionCard, roleNoteHtml: roleNoteHtml };
+  /* תשובות השרת + מה שעוד ממתין בתור המקומי (אחרי רענון): הפריט בתור גובר, כי הוא החדש יותר */
+  function mergeAnswers(serverAnswers, queued) {
+    var by = {};
+    (serverAnswers || []).forEach(function (a) { by[a.question_id] = { k: a.question_id, question_id: a.question_id, role: a.role, answer: a.answer, state: a.state }; });
+    (queued || []).forEach(function (a) { if (a && a.question_id) by[a.question_id] = { k: a.question_id, question_id: a.question_id, role: a.role, answer: a.answer, state: a.state }; });
+    return by;
+  }
+  w.VISIT = { listHtml: listHtml, openFormHtml: openFormHtml, prepHtml: prepHtml, questionsHtml: questionsHtml, questionCard: questionCard, roleNoteHtml: roleNoteHtml, mergeAnswers: mergeAnswers };
 
   /* ---- חיווט (רץ רק בדפדפן) ---- */
   if (!d.getElementById("app")) return;
@@ -206,8 +213,16 @@
   function loadVisit(id, mode) {
     return M.api("visit.get", { id: id }).then(function (g) {
       if (!g.ok) { d.getElementById("main").innerHTML = '<div class="empty">' + (g.error === "network" ? "השרת לא זמין כרגע." : "הביקור לא נמצא.") + "</div>"; return; }
-      state.g = g; g.notes = g.notes || {}; state.answersById = {}; g.answers.forEach(function (a) { state.answersById[a.question_id] = { k: a.question_id, question_id: a.question_id, role: a.role, answer: a.answer, state: a.state }; });
-      state.queue = w.MEFQ.make(g.visit.id, function (items) { return M.api("answers.save", { visit_id: g.visit.id, answers: items }).then(function (r) { if (r.ok) { state.lastSaved = new Date().toTimeString().substring(0, 5); } return !!r.ok; }); });
+      state.g = g; g.notes = g.notes || {};
+      state.queue = w.MEFQ.make(g.visit.id, function (items) {
+        return M.api("answers.save", { visit_id: g.visit.id, answers: items }).then(function (r) {
+          if (r.ok) { state.lastSaved = new Date().toTimeString().substring(0, 5); return true; }
+          if (r.error === "locked") { M.toast("הביקור כבר נסגר (אולי במכשיר אחר). התשובות האחרונות לא נשמרו."); setTimeout(function () { w.location.reload(); }, 3000); return "drop"; }
+          if (r.error === "badrequest" || r.error === "notfound") { M.toast("השרת דחה את התשובות האחרונות. רענני ונסי שוב."); return "drop"; }
+          return false;   /* רשת — נשאר בתור */
+        });
+      });
+      state.answersById = mergeAnswers(g.answers, state.queue.items());
       if (state.queue.pending()) state.queue.flush();
       return M.api("questions.list", { all: true }).then(function (q) { state.questions = q.questions || []; renderVisit(mode); });
     });

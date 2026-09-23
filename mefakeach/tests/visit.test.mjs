@@ -50,4 +50,8 @@ t("roleNoteHtml: שדה הערה לבעל תפקיד רק כשמסנן תפקי�
 t("הדף כולל noindex, auth.js במרחב pikuah, queue.js וקרדיט impactos", () => {
   assert.match(html, /name="robots" content="noindex/); assert.match(html, /pedagogiamh\.co\.il\/auth\.js" data-space="pikuah"/); assert.match(html, /queue\.js/); assert.match(html, /impact-os\.app/);
 });
+t("סקירה: mergeAnswers — פריט מהתור גובר על תשובת השרת לאותה שאלה", () => {
+  const m = VISIT.mergeAnswers([{ question_id: "Q1", role: "מנהל/ת", answer: "ישן", state: "answered" }, { question_id: "Q2", role: "מנהל/ת", answer: "ב", state: "" }], [{ k: "Q1", question_id: "Q1", role: "מנהל/ת", answer: "חדש", state: "clarify" }, { k: "Q3", question_id: "Q3", role: "מת\"לית", answer: "ג", state: "answered" }]);
+  assert.equal(m.Q1.answer, "חדש"); assert.equal(m.Q1.state, "clarify"); assert.equal(m.Q2.answer, "ב"); assert.equal(m.Q3.answer, "ג"); assert.equal(m.Q1.k, "Q1");
+});
 console.log(`\n${n} עברו`);

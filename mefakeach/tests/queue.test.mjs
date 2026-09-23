@@ -44,4 +44,23 @@ await t("push בזמן שליחה: הפריט החדש נשמר ונשלח בס�
   resolveFirst(true); await p1; await q.flush();
   assert.equal(q.size(), 0); assert.deepEqual(sent, [["Q1"], ["Q2"]]);
 });
+await t("סקירה: פריט שנדחף בזמן שליחה נשלח לבד אחרי שהשליחה מסתיימת, בלי flush ידני", async () => {
+  let resolveFirst; const sent = [];
+  const q = MEFQ.make("k8", items => { sent.push(items.map(i => i.k)); return new Promise(r => { if (!resolveFirst) resolveFirst = r; else r(true); }); });
+  const p1 = q.push({ k: "Q1" }); await q.push({ k: "Q2" });
+  resolveFirst(true); await p1;
+  assert.equal(q.size(), 0); assert.deepEqual(sent, [["Q1"], ["Q2"]]); assert.equal(q.pending(), false);
+});
+await t("סקירה: sender שמחזיר 'drop' (ביקור נעול) מנקה את התור ולא מנסה שוב", async () => {
+  let calls = 0; const q = MEFQ.make("k9", () => { calls++; return Promise.resolve("drop"); });
+  await q.push({ k: "Q1", answer: "א" });
+  assert.equal(q.size(), 0); assert.equal(q.pending(), false); assert.equal(local["mefakeach.q.k9"], undefined);
+  await q.flush(); assert.equal(calls, 1);
+});
+await t("סקירה: items() חושף את הפריטים הממתינים למיזוג אחרי רענון", async () => {
+  local["mefakeach.q.k10"] = JSON.stringify([{ k: "Q9", answer: "ישן", state: "answered" }]);
+  const q = MEFQ.make("k10", () => Promise.resolve(false));
+  assert.deepEqual(q.items().map(i => i.k), ["Q9"]);
+  q.items().push({ k: "X" }); assert.equal(q.size(), 1, "items() מחזיר עותק");
+});
 console.log(`\n${n} עברו`);
