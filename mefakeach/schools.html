@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>בתי הספר שלי · הבית של המפקח</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M4 21V8l8-5 8 5v13'/><path d='M9 21v-6h6v6'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap"><div class="app" id="app"><div class="empty" style="grid-column:1/-1">טוען…</div></div></div>
+<div id="toast" hidden></div>
+<div class="credit"><a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+<script src="app.js"></script>
+<script id="page">
+(function (w, d) {
+  "use strict";
+  var M = w.MEF, E = M.escapeHtml;
+  var state = { me: null, schools: [], school: null, docs: [], tab: "details" };
+  var DOC_TYPES = ["תוכנית עבודה", "דוח", "בעלי תפקידים", "אחר"];
+  var TRACK_LINKS = [
+    ["https://pedagogiamh.co.il/sikum-hishtalmuyot.html", "השתלמות בית ספרית"],
+    ["https://pedagogiamh.co.il/sikum-nispach-tafkidim.html", "נספח בעלי התפקידים"],
+    ["https://pedagogiamh.co.il/sikum-matzevet.html", "מצבת תלמידים"],
+    ["https://pedagogiamh.co.il/hadrachot/", "מצפן ההדרכות"]
+  ];
+
+  /* ---- רינדור טהור (נבדק ב-tests/schools.test.mjs) ---- */
+  function cardsHtml(schools) {
+    if (!schools.length) return '<div class="empty">לא משויכים לך בתי ספר. פני למיטל כדי לעדכן את פריסת הפיקוח.</div>';
+    return '<div class="grid g3">' + schools.map(function (s) {
+      return '<div class="card school" data-id="' + E(s.id) + '" role="button" tabindex="0"><h3>' + E(s.name) + '</h3><div class="meta">' + E(s.city) + " · " + E(s.net) + '</div><div style="margin-top:6px">' + M.statusTag(s.status) + "</div></div>";
+    }).join("") + "</div>";
+  }
+  function fileHtml(s, docs, tab) {
+    docs = docs || [];
+    var tabs = [["details", "פרטים"], ["docs", "מסמכים"], ["tasks", "משימות"], ["visits", "ביקורים ודוחות"]];
+    var h = '<h2 class="file-title">' + E(s.name) + '</h2><p class="sub">' + E(s.city || "") + (s.net ? " · " + E(s.net) : "") + '</p>' +
+      '<div class="tabs">' + tabs.map(function (t) { return '<span data-tab="' + t[0] + '" class="' + (t[0] === tab ? "on" : "") + '">' + t[1] + "</span>"; }).join("") + "</div>";
+    if (tab === "details") {
+      h += "<table><tr><th>סמל מוסד</th><td>" + E(s.id) + "</td></tr>" +
+        "<tr><th>מחוז · מגזר</th><td>" + E(s.district || "") + " · " + E(s.sector || "") + "</td></tr>" +
+        "<tr><th>מנהל/ת</th><td>" + E(s.principal_name || "") +
+        (s.principal_phone ? ' · <a href="tel:' + E(s.principal_phone) + '">' + E(s.principal_phone) + "</a>" : "") +
+        (s.principal_email ? ' · <a href="mailto:' + E(s.principal_email) + '">' + E(s.principal_email) + "</a>" : "") + "</td></tr>" +
+        (s.principal_email2 ? "<tr><th>מייל נוסף</th><td>" + E(s.principal_email2) + "</td></tr>" : "") +
+        (s.school_email ? "<tr><th>מייל המוסד</th><td>" + E(s.school_email) + "</td></tr>" : "") + "</table>" +
+        '<h3 style="margin-top:20px;font-size:16px">דפי המעקב הקיימים</h3><ul class="list">' +
+        TRACK_LINKS.map(function (l) { return '<li><a target="_blank" rel="noopener" href="' + l[0] + '">' + l[1] + "</a></li>"; }).join("") + "</ul>";
+    } else if (tab === "docs") {
+      var live = docs.filter(function (x) { return !x.superseded; }), old = docs.filter(function (x) { return x.superseded; });
+      h += '<div class="row" style="margin-bottom:10px"><button class="btn s sm" id="upBtn" type="button">העלאת מסמך</button><span class="hint">עד 8MB · PDF, Word, Excel, PowerPoint, תמונה</span></div>';
+      h += '<form id="upForm" class="card" hidden style="max-width:560px;margin-bottom:16px">' +
+        '<label for="upType">סוג</label><select class="field" id="upType" name="type">' + DOC_TYPES.map(function (t) { return "<option>" + t + "</option>"; }).join("") + "</select>" +
+        '<label for="upTitle">כותרת</label><input class="field" id="upTitle" name="title" required maxlength="120">' +
+        '<label for="upFile">קובץ</label><input class="field" id="upFile" type="file" name="file" required accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv">' +
+        '<label for="upRep">גרסה חדשה של</label><select class="field" id="upRep" name="replaces"><option value="">לא, מסמך חדש</option>' +
+        live.map(function (x) { return '<option value="' + E(x.id) + '">' + E(x.title) + "</option>"; }).join("") + "</select>" +
+        '<div class="row" style="margin-top:12px"><button class="btn p" type="submit">שמירה</button><button class="btn" type="button" id="upCancel">ביטול</button></div></form>';
+      h += live.length
+        ? "<table><tr><th>מסמך</th><th>סוג</th><th>הועלה</th><th></th></tr>" + live.map(function (x) {
+            return "<tr><td>" + E(x.title) + (x.replaces ? ' <span class="tag gray">גרסה חדשה</span>' : "") + "</td><td>" + E(x.type) + "</td><td>" + M.fmtDate(x.uploaded_at) + '</td><td><a href="#" class="open" data-id="' + E(x.id) + '">פתיחה</a></td></tr>';
+          }).join("") + "</table>"
+        : '<div class="empty">עדיין אין מסמכים בתיק הזה.</div>';
+      if (old.length) h += '<details style="margin-top:12px"><summary>גרסאות קודמות (' + old.length + ')</summary><ul class="list">' +
+        old.map(function (x) { return "<li>" + E(x.title) + ' <span class="tag gray">גרסה קודמת</span><span class="m">' + M.fmtDate(x.uploaded_at) + ' · <a href="#" class="open" data-id="' + E(x.id) + '">פתיחה</a></span></li>'; }).join("") + "</ul></details>";
+    } else if (tab === "tasks") {
+      h += '<div class="empty">עדיין אין משימות. המעקב נפתח בשלב הבא.</div>';
+    } else {
+      h += '<div class="empty">עדיין אין ביקורים. הביקור הראשון ייפתח מ"הביקור שלי".</div>';
+    }
+    return h;
+  }
+  w.SCHOOLS = { cardsHtml: cardsHtml, fileHtml: fileHtml };
+
+  /* ---- חיווט (רץ רק בדפדפן) ---- */
+  if (!d.getElementById("app")) return;
+
+  function render() {
+    var main = d.getElementById("main");
+    if (state.school) {
+      main.innerHTML = '<a href="#" id="back" class="back">→ כל בתי הספר</a>' + fileHtml(state.school, state.docs, state.tab);
+      wireFile();
+    } else {
+      main.innerHTML = "<h2>בתי הספר שלי</h2><p class=\"sub\">" + state.schools.length + " בתי ספר</p>" + cardsHtml(state.schools);
+      wireCards();
+    }
+  }
+  function wireCards() {
+    d.querySelectorAll(".school").forEach(function (el) {
+      var go = function () { openSchool(el.getAttribute("data-id")); };
+      el.addEventListener("click", go);
+      el.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  }
+  function openSchool(id) {
+    if (!id) { state.school = null; M.setPicked(""); syncPicker(""); render(); return; }
+    M.api("school.get", { id: id }).then(function (r) {
+      if (!r.ok) { M.toast(r.error === "network" ? "אין חיבור לשרת" : "התיק לא נמצא"); return; }
+      state.school = r.school; state.docs = r.docs || []; if (!state.tab) state.tab = "details";
+      M.setPicked(id); syncPicker(id); render();
+    });
+  }
+  function syncPicker(id) { var sel = d.getElementById("pickSel"); if (sel && sel.value !== id) sel.value = id; }
+  function wireFile() {
+    d.getElementById("back").addEventListener("click", function (e) { e.preventDefault(); state.tab = "details"; openSchool(""); });
+    d.querySelectorAll(".tabs span").forEach(function (el) { el.addEventListener("click", function () { state.tab = el.getAttribute("data-tab"); render(); }); });
+    var up = d.getElementById("upBtn"); if (up) up.addEventListener("click", function () { d.getElementById("upForm").hidden = false; d.getElementById("upTitle").focus(); });
+    var cancel = d.getElementById("upCancel"); if (cancel) cancel.addEventListener("click", function () { d.getElementById("upForm").hidden = true; });
+    var form = d.getElementById("upForm"); if (form) form.addEventListener("submit", upload);
+    d.querySelectorAll("a.open").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); openDoc(a.getAttribute("data-id")); }); });
+  }
+  function upload(e) {
+    e.preventDefault();
+    var f = e.target, file = f.file.files[0];
+    if (!file) return;
+    if (file.size > 8 * 1024 * 1024) { M.toast("הקובץ גדול מ-8MB"); return; }
+    var btn = f.querySelector("button[type=submit]");
+    var rd = new FileReader();
+    rd.onload = function () {
+      var data = String(rd.result).split(",")[1];
+      btn.disabled = true;
+      M.api("docs.upload", { school_id: state.school.id, type: f.type.value, title: f.title.value, name: file.name, mime: file.type || "application/octet-stream", data: data, replaces: f.replaces.value })
+        .then(function (r) {
+          if (!r.ok) {
+            M.toast({ badmime: "סוג קובץ לא נתמך", toolarge: "הקובץ גדול מדי", badtype: "סוג מסמך לא תקין", network: "אין חיבור לשרת" }[r.error] || "השמירה נכשלה");
+            btn.disabled = false; return;
+          }
+          M.toast("נשמר"); state.tab = "docs"; openSchool(state.school.id);
+        });
+    };
+    rd.readAsDataURL(file);
+  }
+  function openDoc(id) {
+    M.toast("טוען…");
+    M.api("docs.get", { id: id }).then(function (r) {
+      if (!r.ok) { M.toast("לא הצלחנו לפתוח את הקובץ"); return; }
+      var bytes = atob(r.data), arr = new Uint8Array(bytes.length);
+      for (var i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
+      var url = URL.createObjectURL(new Blob([arr], { type: r.mime }));
+      var a = d.createElement("a"); a.href = url; a.target = "_blank"; a.rel = "noopener"; a.download = r.name || ""; if (/^(application\/pdf|image\/|text\/)/.test(r.mime)) a.removeAttribute("download");
+      d.body.appendChild(a); a.click(); a.remove();
+    });
+  }
+  function boot() {
+    if (boot._done) return; boot._done = true;
+    M.api("me").then(function (me) {
+      if (!me || !me.ok) {
+        if (me && me.error === "network") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">השרת לא זמין כרגע. נסי שוב בעוד דקה.</div>';
+        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">החשבון שלך לא רשום במערכת הזו. פני למיטל.</div>';
+        return;
+      }
+      state.me = me;
+      return M.api("schools.list").then(function (r) {
+        state.schools = (r && r.schools) || [];
+        M.shell({ me: me, count: state.schools.length, available: ["schools.html"] });
+        M.picker(state.schools, openSchool);
+        var pre = M.pickedSchool();
+        if (pre && state.schools.some(function (s) { return String(s.id) === pre; })) openSchool(pre); else render();
+      });
+    });
+  }
+  /* auth.js חושף את הדף אחרי כניסה; אם אין סשן עדיין, מחכים לאירוע pmh:in */
+  if (M.token()) boot(); else d.addEventListener("pmh:in", boot);
+})(window, document);
+</script>
+</body>
+</html>
