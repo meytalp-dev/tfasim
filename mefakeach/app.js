@@ -3,7 +3,7 @@
    הטוקן נקרא מהסשן של auth.js (sessionStorage.pmh_auth) ונשלח לשרת בכל קריאה. */
 (function (w, d) {
   "use strict";
-  var EXEC = "PASTE_EXEC_URL";
+  var EXEC = "https://script.google.com/macros/s/AKfycbxyhvbkVUtydT70TH5Q2fYXu-MpFfAv0qxX7K-RzsSvt7UWXoxwjHun1zwK6MJQj6_K/exec";
   var PICK_KEY = "mefakeach.school";
 
   function token() {
