@@ -81,6 +81,14 @@ select:focus,input:focus{outline:none;border-color:var(--blue);background:#fff;b
 .kit .w{color:var(--muted);font-size:16px;margin:0 0 16px}
 .kit .extra{background:var(--sky-soft);border-radius:12px;padding:14px 17px;margin-top:13px;font-size:16px;color:#25325a}
 .kit .extra b{color:var(--navy)}
+.kit .first{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1;
+  border-radius:12px;padding:15px 18px;margin:0 0 15px;font-size:16.5px;color:#25325a;line-height:1.6}
+.kit .first b{color:#0d7d6f}
+.kit .use{border-inline-start:4px solid var(--sky);background:#fff;border-radius:0 12px 12px 0;
+  padding:13px 17px;margin:0 0 16px;font-size:16.5px;color:#3d4a70;line-height:1.55}
+.kit .use .ttl{display:block;font-family:'Rubik',sans-serif;font-size:13.5px;font-weight:700;
+  color:var(--navy);letter-spacing:.04em;margin-bottom:5px}
+.kit .use b{color:var(--navy)}
 
 .big{width:100%;padding:18px;border:0;border-radius:15px;cursor:pointer;
   font-family:'Rubik',sans-serif;font-size:18.5px;font-weight:600;color:#fff;
@@ -263,6 +271,8 @@ prep: function(d){ return {
   title:"עוזר ההכנה והדוח",
   why:"קורא את החומרים לפני הביקור ומכין לכם את השאלות — ואחריו הופך את ההערות לסיכום.",
   name:"עוזר ביקורים",
+  use:'<b>לפני ביקור:</b> מדביקים לו את תוכנית העבודה ואת הדוח הקודם, וכותבים "לפני ביקור".<br>' +
+      '<b>אחרי ביקור:</b> מדביקים את ההערות שרשמתם בשטח, וכותבים "אחרי ביקור".',
   text:
 "אתה העוזר שלי בביקורי פיקוח.\n" + ctx(d) + "\n\n" +
 "המטרה שלך: לחסוך לי את שעות ההכנה שלפני כל ביקור, ואת כתיבת הסיכום שאחריו.\n\n" +
@@ -295,9 +305,13 @@ mail: function(d){ return {
   title:"עוזר המיילים",
   why:"מדרג מה דחוף, אומר לכם מה בעצם מבקשים, ומנסח טיוטת תשובה.",
   name:"עוזר מיילים",
-  extra:'<b>ויש בונוס:</b> Gemini כבר יושב בתוך ג׳ימייל שלכם. פתחו את ג׳ימייל במחשב ' +
-        'ולחצו על הכוכב של Gemini בפינה — הוא יסכם לכם שרשור שלם ויציע תשובה, ' +
-        'בלי להעתיק כלום. <b>הוא לא שולח בשמכם — השליחה תמיד הקליק שלכם.</b>',
+  first:'<b>למיילים יש קיצור דרך — ואין צורך להעתיק כלום.</b><br>' +
+        'פתחו את ג׳ימייל <u>במחשב</u>, פתחו מייל, ולחצו על Gemini בצד. ' +
+        'הוא כבר רואה את המייל ואת כל השרשור — בקשו ממנו לסכם או להציע תשובה. ' +
+        'השליחה תמיד נשארת קליק שלכם.<br><br>' +
+        '<b>ואז למה בכל זאת לבנות Gem?</b> בשביל שני דברים שג׳ימייל לא עושה: ' +
+        'לעבור על עשרה מיילים בבת אחת, ולקבל תשובה תמיד באותו פורמט ולפי הכללים שלכם.',
+  use:'מעתיקים מייל מג׳ימייל ומדביקים לו — אפשר גם כמה ברצף.',
   text:
 "אתה העוזר שלי לניהול תיבת המייל.\n" + ctx(d) + "\n\n" +
 "המטרה: לחסוך לי את הזמן שאני מבזבז/ת על קריאה, על החלטה מה דחוף, ועל ניסוח תשובות חוזרות.\n\n" +
@@ -319,6 +333,7 @@ track: function(d){ return {
   title:"עוזר המעקב",
   why:"מחלק את מי שלא הגיש לקבוצות ומנסח לכל אחת הודעה אחרת — בלי לשרוף יחסים.",
   name:"עוזר מעקב",
+  use:'מדביקים לו את שם המשימה, התאריך, ורשימה של מי הגיש ומי לא — והוא מחזיר הודעות מוכנות לשליחה.',
   text:
 "אתה העוזר שלי למעקב אחרי משימות מול מנהלי בתי הספר.\n" + ctx(d) + "\n\n" +
 "המטרה: לחסוך לי את הרדיפה. אני לא רוצה לנסח כל תזכורת מחדש,\n" +
@@ -340,6 +355,8 @@ tik: function(d){ return {
   title:"עוזר תיק בית הספר",
   why:"מחזיק את כל מה שאתם יודעים על כל בית ספר, ומחזיר לכם תמונה מרוכזת בשאלה אחת.",
   name:"תיק בתי הספר",
+  use:'<b>כאן לא מדביקים כלום.</b> אחרי שהעליתם את הקבצים פעם אחת — פשוט שואלים אותו ' +
+      '"מה המצב בנווה טק?" והוא עונה מהחומרים.',
   extra:'<b>זה העוזר שצריך זיכרון.</b> במסך יצירת ה-Gem יש אזור להעלאת קבצים — ' +
         'העלו לשם את תוכניות העבודה, הדוחות והמסמכים של בתי הספר שלכם. ' +
         'מאותו רגע הוא יודע עליהם, בלי שתדביקו כלום. אפשר להוסיף קבצים מתי שרוצים.',
@@ -366,6 +383,7 @@ time: function(d){ return {
   title:"עוזר המשימות",
   why:"מסדר לכם מה הטלתם על מי, מה הוטל עליכם, ומה בוער השבוע.",
   name:"עוזר משימות",
+  use:'מדביקים לו סיכום פגישה, הערות מביקור, או סתם מה שעבר לכם בראש — והוא מוציא מזה רשימת משימות.',
   text:
 "אתה העוזר שלי לניהול משימות.\n" + ctx(d) + "\n\n" +
 "המטרה: שלא אאבד משימות, ושלא אצטרך לזכור בראש מה הטלתי על מי ומתי.\n\n" +
@@ -482,6 +500,8 @@ function buildKit(){
       '<h2><svg viewBox="0 0 24 24"><rect x="4" y="7" width="16" height="13" rx="3"/>' +
       '<path d="M12 3v4M9 13h.01M15 13h.01"/></svg>' + esc(a.title) + '</h2>' +
       '<p class="w">' + esc(a.why) + '</p>' +
+      (a.first ? '<div class="first">' + a.first + '</div>' : '') +
+      (a.use ? '<div class="use"><span class="ttl">איך משתמשים בו</span>' + a.use + '</div>' : '') +
       '<button class="big" data-k="' + k + '">' +
       '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/>' +
       '<path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתקת ההוראות</button>' +
