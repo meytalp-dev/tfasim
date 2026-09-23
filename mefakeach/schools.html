@@ -22,7 +22,7 @@
 (function (w, d) {
   "use strict";
   var M = w.MEF, E = M.escapeHtml;
-  var state = { me: null, schools: [], school: null, docs: [], tab: "details" };
+  var state = { me: null, schools: [], school: null, docs: [], extra: { visits: [], tasks: [] }, tab: "details" };
   var DOC_TYPES = ["תוכנית עבודה", "דוח", "בעלי תפקידים", "אחר"];
   /* דפי המעקב באתר. filtered=true — הדף יודע להיפתח מסונן לבית ספר (?q=<שם>). השאר נפתחים כלליים עד שלב 3,
      שבו המצב של בית הספר עצמו יוצג כאן חי במקום קישור. */
@@ -32,6 +32,7 @@
     ["https://pedagogiamh.co.il/sikum-matzevet.html", "מצבת תלמידים", false],
     ["https://pedagogiamh.co.il/hadrachot/", "מצפן ההדרכות", false]
   ];
+  function today() { var t = new Date(); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
   function trackLink(l, s) { return l[2] ? l[0] + "?q=" + encodeURIComponent(s.name || "") : l[0]; }
 
   /* ---- רינדור טהור (נבדק ב-tests/schools.test.mjs) ---- */
@@ -41,8 +42,9 @@
       return '<div class="card school" data-id="' + E(s.id) + '" role="button" tabindex="0"><h3>' + E(s.name) + '</h3><div class="meta">' + E(s.city) + " · " + E(s.net) + '</div><div style="margin-top:6px">' + M.statusTag(s.status) + "</div></div>";
     }).join("") + "</div>";
   }
-  function fileHtml(s, docs, tab) {
-    docs = docs || [];
+  /* extra = {visits, tasks} מ-school.get (שלב 2); אופציונלי כדי שקריאות ישנות ימשיכו לעבוד */
+  function fileHtml(s, docs, tab, extra) {
+    docs = docs || []; extra = extra || {}; var visits = extra.visits || [], tasks = extra.tasks || [];
     var tabs = [["details", "פרטים"], ["docs", "מסמכים"], ["tasks", "משימות"], ["visits", "ביקורים ודוחות"]];
     var h = '<h2 class="file-title">' + E(s.name) + '</h2><p class="sub">' + E(s.city || "") + (s.net ? " · " + E(s.net) : "") + '</p>' +
       '<div class="tabs">' + tabs.map(function (t) { return '<span data-tab="' + t[0] + '" class="' + (t[0] === tab ? "on" : "") + '">' + t[1] + "</span>"; }).join("") + "</div>";
@@ -74,9 +76,26 @@
       if (old.length) h += '<details style="margin-top:12px"><summary>גרסאות קודמות (' + old.length + ')</summary><ul class="list">' +
         old.map(function (x) { return "<li>" + E(x.title) + ' <span class="tag gray">גרסה קודמת</span><span class="m">' + M.fmtDate(x.uploaded_at) + ' · <a href="#" class="open" data-id="' + E(x.id) + '">פתיחה</a></span></li>'; }).join("") + "</ul></details>";
     } else if (tab === "tasks") {
-      h += '<div class="empty">עדיין אין משימות. המעקב נפתח בשלב הבא.</div>';
+      var open = tasks.filter(function (t) { return t.status !== "done"; }), done = tasks.filter(function (t) { return t.status === "done"; });
+      h += open.length
+        ? "<table><tr><th>משימה</th><th>אחראי</th><th>עד</th></tr>" + open.map(function (t) {
+            var late = t.due && t.due < today();
+            return "<tr><td>" + E(t.title) + (t.source === "visit" || t.source === "question" ? ' <span class="tag gray">מביקור</span>' : "") + "</td><td>" + E(t.owner_role || "") + "</td><td>" + (t.due ? '<span class="tag ' + (late ? "bad" : "gray") + '">' + M.fmtDate(t.due) + "</span>" : "") + "</td></tr>";
+          }).join("") + "</table>"
+        : '<div class="empty">אין משימות פתוחות לבית הספר הזה.</div>';
+      if (done.length) h += '<details style="margin-top:12px"><summary>בוצעו (' + done.length + ')</summary><ul class="list">' + done.map(function (t) { return "<li>" + E(t.title) + '<span class="m">' + (t.done_at ? M.fmtDate(t.done_at) : "") + "</span></li>"; }).join("") + "</ul></details>";
+      h += '<p class="hint" style="margin-top:14px">כאן רואים בלבד. המעקב המלא, עם "בוצע" ותזכורות, בשלב הבא.</p>';
     } else {
-      h += '<div class="empty">עדיין אין ביקורים. הביקור הראשון ייפתח מ"הביקור שלי".</div>';
+      h += '<div class="row" style="margin-bottom:10px"><a class="btn s sm" href="visit.html?open=' + E(s.id) + '">+ פתיחת ביקור</a></div>';
+      h += visits.length
+        ? '<ul class="list">' + visits.map(function (v) {
+            var act;
+            if (v.status === "open") act = '<a class="btn sm p" href="visit.html?id=' + E(v.id) + '&mode=q">המשך</a>';
+            else if (v.hasReport) act = '<a class="btn sm" href="report.html?id=' + E(v.reportId) + '">דוח</a>';
+            else act = '<a class="btn sm" href="report.html?visit=' + E(v.id) + '">השלמת הדוח</a>';
+            return "<li><b>" + M.fmtDate(v.date) + "</b>" + (v.purpose ? '<span class="hint">' + E(v.purpose) + "</span>" : "") + (v.status === "open" ? ' <span class="tag info">פתוח</span>' : v.hasReport ? ' <span class="tag ok">דוח מאושר</span>' : ' <span class="tag warn">דוח ממתין</span>') + '<span class="m">' + act + "</span></li>";
+          }).join("") + "</ul>"
+        : '<div class="empty">עדיין אין ביקורים. פתחי את הראשון מהכפתור למעלה.</div>';
     }
     return h;
   }
@@ -88,7 +107,7 @@
   function render() {
     var main = d.getElementById("main");
     if (state.school) {
-      main.innerHTML = '<a href="#" id="back" class="back">→ כל בתי הספר</a>' + fileHtml(state.school, state.docs, state.tab);
+      main.innerHTML = '<a href="#" id="back" class="back">→ כל בתי הספר</a>' + fileHtml(state.school, state.docs, state.tab, state.extra);
       wireFile();
     } else {
       main.innerHTML = "<h2>בתי הספר שלי</h2><p class=\"sub\">" + state.schools.length + " בתי ספר</p>" + cardsHtml(state.schools);
@@ -106,7 +125,7 @@
     if (!id) { state.school = null; M.setPicked(""); syncPicker(""); render(); return; }
     M.api("school.get", { id: id }).then(function (r) {
       if (!r.ok) { M.toast(r.error === "network" ? "אין חיבור לשרת" : "התיק לא נמצא"); return; }
-      state.school = r.school; state.docs = r.docs || []; if (!state.tab) state.tab = "details";
+      state.school = r.school; state.docs = r.docs || []; state.extra = { visits: r.visits || [], tasks: r.tasks || [] }; if (!state.tab) state.tab = "details";
       M.setPicked(id); syncPicker(id); render();
     });
   }
@@ -164,7 +183,7 @@
       state.me = me;
       return M.api("schools.list").then(function (r) {
         state.schools = (r && r.schools) || [];
-        M.shell({ me: me, count: state.schools.length, available: ["schools.html"] });
+        M.shell({ me: me, count: state.schools.length });
         M.picker(state.schools, openSchool);
         var pre = M.pickedSchool();
         if (pre && state.schools.some(function (s) { return String(s.id) === pre; })) openSchool(pre); else render();

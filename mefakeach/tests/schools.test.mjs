@@ -40,4 +40,13 @@ t("fileHtml: לשונית ביקורים ריקה מציגה 'עדיין אין 
 t("הדף כולל noindex, auth.js של האתר במרחב pikuah, וקרדיט impactos", () => {
   assert.match(html, /name="robots" content="noindex/); assert.match(html, /pedagogiamh\.co\.il\/auth\.js" data-space="pikuah"/); assert.match(html, /impact-os\.app/);
 });
+t("fileHtml visits: ביקור סגור בלי דוח מקבל 'השלמת הדוח', מאושר 'דוח'", () => {
+  const h = SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "visits", { visits: [{ id: "V1", date: "2026-09-18", status: "closed", hasReport: false, reportId: "R1" }, { id: "V2", date: "2026-08-07", status: "closed", hasReport: true, reportId: "R2" }, { id: "V3", date: "2026-09-23", status: "open" }], tasks: [] });
+  assert.match(h, /השלמת הדוח/); assert.match(h, /report\.html\?id=R2/); assert.match(h, /פתיחת ביקור/); assert.match(h, /visit\.html\?open=1/); assert.match(h, /visit\.html\?id=V3&mode=q/);
+});
+t("fileHtml visits ריק — 'עדיין אין ביקורים' וכפתור פתיחה", () => { const h = SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "visits", { visits: [], tasks: [] }); assert.match(h, /עדיין אין ביקורים/); assert.match(h, /פתיחת ביקור/); });
+t("fileHtml tasks: פתוחות ובוצעו, קריאה בלבד", () => {
+  const h = SCHOOLS.fileHtml({ id: "1", name: "א" }, [], "tasks", { visits: [], tasks: [{ id: "T1", title: "גאנט", owner_role: "רכז/ת חברתי/ת", due: "2026-09-30", status: "open" }, { id: "T2", title: "ישן", due: "", status: "done" }] });
+  assert.match(h, /גאנט/); assert.match(h, /בוצעו \(1\)/); assert.match(h, /המעקב המלא/); assert.match(h, /רכז\/ת חברתי\/ת/);
+});
 console.log(`\n${n} עברו`);

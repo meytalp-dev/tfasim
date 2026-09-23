@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>הדוח שלי · הבית של המפקח</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M6 3h9l5 5v13H6z'/><path d='M14 3v6h6M9 13h7M9 17h7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<style>
+.report h4{font-size:16px;margin:18px 0 6px;display:flex;align-items:center;gap:8px}
+.report h4 .lbl{font-family:'Assistant';font-weight:400;font-size:12.5px;color:var(--muted);background:#eef1f7;border-radius:99px;padding:0 9px}
+.report textarea.sec{min-height:120px;line-height:1.55}
+.report textarea[readonly]{background:#fbfcff;color:var(--ink)}
+.report table th{width:46%}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:99px;padding:4px 12px;font-size:14px;color:var(--ink);background:#fbfcff;cursor:pointer;font-weight:400}
+select.light{width:auto;min-width:130px}
+#saveState{white-space:nowrap}
+</style>
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap"><div class="app" id="app"><div class="empty" style="grid-column:1/-1">טוען…</div></div></div>
+<div id="toast" hidden></div>
+<div class="credit"><a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+<script src="app.js"></script>
+<script id="page">
+(function (w, d) {
+  "use strict";
+  var M = w.MEF, E = M.escapeHtml;
+  var FLAGS = ["מוגנות", "תפקוד ניהולי מדאיג", "פערים פדגוגיים משמעותיים", "תחושת בטן מקצועית", "אירוע חריג", "החלטה מערכתית"];
+  var AREAS = ["פדגוגיה דואלית וחניכות", "אקלים", "נוכחות והתמדה", "השתלמויות ופיתוח צוות", "הנהלה ובעלי תפקידים", "נתונים ובקרה"];
+  var LIGHTS = [["", "לא סומן"], ["green", "ירוק"], ["yellow", "צהוב"], ["red", "אדום"]];
+  /* ההנחיות לצ'אט הפרטי — מותאמות מסוכן הביקור של הסדנה: שיפור ניסוח בלבד, בלי ממצאים חדשים */
+  var CHAT_HEAD = "אתה העוזר שלי לניסוח דוחות ביקור. אני מפקח/ת פדגוגי/ת במינהל הכשרה מקצועית במשרד העבודה.\n\nמה תעשה: שפר ניסוח בלבד. הדוח למטה כבר כתוב; תחזיר אותו באותו מבנה (4 חלקים), בעברית מקצועית, מכבדת ועניינית, בלי הקדמות.\n\nמה אסור לך:\n- אל תמציא שום ממצא, נתון, שם או מסקנה שלא כתובים בדוח.\n- אל תוסיף המלצות שאין להן בסיס בטקסט.\n- אל תקבע שבית הספר עומד או לא עומד בדרישה אם לא כתוב כך במפורש.\n- אל תכתוב שמות של תלמידים.\n- מה שחסר — השאר חסר, וציין בסוף רשימה קצרה של מה שנשאר פתוח.\n\nהדוח:\n\n";
+  function chatText(text) { return CHAT_HEAD + text; }
+  function ta(name, val, ro, ph) { return '<textarea class="field sec" name="' + name + '"' + (ro ? " readonly" : "") + ' placeholder="' + E(ph || "") + '">' + E(val) + "</textarea>"; }
+
+  /* ---- רינדור טהור (נבדק ב-tests/report.test.mjs) ---- */
+  /* readOnly=true מגיע מהשרת גם לעמית (טיוטה לא נראית לו) וגם לבעלים על דוח מאושר; "תיקון" רק על מאושר */
+  function formHtml(r, v, readOnly) {
+    var approved = r.status === "approved", ro = readOnly || approved;
+    var head = '<a href="report.html" class="back">→ כל הדוחות</a><div class="row" style="justify-content:space-between"><div><h2>דוח פדגוגי · ' + E(v.school_name) + " · " + E(M.fmtDate(v.date)) + '</h2><p class="sub" style="margin:0">' + (approved ? '<span class="tag ok">מאושר</span> גרסה ' + r.version + (r.approved_at ? " · " + E(M.fmtDate(r.approved_at)) : "") : '<span class="tag warn">טיוטה</span>' + (r.version > 1 ? " גרסה " + r.version : "") + ' <span id="saveState" class="hint"></span>') + "</p></div>" +
+      (ro ? '<div class="row"><button class="btn sm" id="copyBtn" type="button">העתקה</button><button class="btn sm" id="dlBtn" type="button">הורדה</button><button class="btn sm" id="chatBtn" type="button">שפר ניסוח בצ\'אט</button>' + (approved ? '<button class="btn sm ghost" id="reviseBtn" type="button">תיקון (גרסה חדשה)</button>' : "") + "</div>"
+          : '<div class="row"><button class="btn sm" id="chatBtn" type="button">שפר ניסוח בצ\'אט</button><button class="btn p" id="approveBtn" type="button">אשר דוח</button></div>') + "</div>";
+    var body = '<form id="rep" class="report" style="max-width:800px"><h4>1 · פרטי הביקור <span class="lbl">מהפתיחה</span></h4>' + ta("sec1", r.sec1, ro) +
+      '<h4>2 · תחומי הביקור <span class="lbl">מהתשובות בביקור</span></h4>' + ta("sec2", r.sec2, ro, "לא נרשמו תשובות בביקור. אפשר לכתוב כאן ביד.") + '<div class="hint">נבנה מהתשובות בביקור, לפי נושא. שאלות שלא נשאלו לא מופיעות. אפשר לערוך הכול.</div>' +
+      "<h4>3 · תמונת מצב מקצועית</h4>" + ta("sec3", r.sec3, ro, "חוזקות, אתגרים, פערים, מגמות. ריק בכוונה: זה שיקול הדעת שלך, לא סיכום מכני.") +
+      '<h4>4 · המלצות והמשך עבודה <span class="lbl">בירורים ומשימות מהביקור</span></h4>' + ta("sec4", r.sec4, ro, "המלצות אופרטיביות, משימות, גורמים מלווים, לוחות זמנים") +
+      '<details style="margin-top:14px"' + (r.national_flags.length ? " open" : "") + '><summary>יש סוגיה לעדכון המפקחת הארצית</summary><div class="row" style="margin-top:8px">' + FLAGS.map(function (f) { return '<label class="chip" style="margin:0"><input type="checkbox" name="flag" value="' + E(f) + '"' + (r.national_flags.indexOf(f) > -1 ? " checked" : "") + (ro ? " disabled" : "") + "> " + E(f) + "</label>"; }).join("") + "</div></details>" +
+      '<details style="margin-top:8px"' + (Object.keys(r.traffic).length ? " open" : "") + '><summary>רמזור לתחומים (לא חובה)</summary><table style="margin-top:8px">' + AREAS.map(function (a) { return "<tr><th>" + E(a) + '</th><td><select class="field light" name="' + E(a) + '"' + (ro ? " disabled" : "") + ">" + LIGHTS.map(function (l) { return '<option value="' + l[0] + '"' + ((r.traffic[a] || "") === l[0] ? " selected" : "") + ">" + l[1] + "</option>"; }).join("") + "</select></td></tr>"; }).join("") + "</table></details></form>";
+    return head + body;
+  }
+  function listHtml(reports) {
+    if (!reports.length) return '<div class="empty">עדיין אין דוחות. דוח נוצר כשסוגרים ביקור.</div>';
+    return '<ul class="list">' + reports.map(function (r) { return "<li><b>" + E(r.school_name) + '</b><span class="hint">' + E(M.fmtDate(r.date)) + " · " + (r.status === "approved" ? '<span class="tag ok">מאושר</span> גרסה ' + r.version : '<span class="tag warn">טיוטה</span>' + (r.version > 1 ? " גרסה " + r.version : "")) + '</span><span class="m"><a class="btn sm" href="report.html?id=' + E(r.id) + '">פתיחה</a></span></li>'; }).join("") + "</ul>";
+  }
+  function printHtml(text, schoolName, date) {
+    return '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>דוח פדגוגי · ' + E(schoolName) + " · " + E(date) + '</title></head><body style="font-family:Arial,sans-serif;white-space:pre-wrap;max-width:800px;margin:30px auto;line-height:1.6;padding:0 16px">' + E(text) + "</body></html>";
+  }
+  w.REPORT = { formHtml: formHtml, listHtml: listHtml, chatText: chatText, printHtml: printHtml };
+
+  /* ---- חיווט (רץ רק בדפדפן) ---- */
+  if (!d.getElementById("app")) return;
+  var qs = new URLSearchParams(w.location.search), state = { r: null, v: null, readOnly: false, timer: null };
+  function collect() {
+    var f = d.getElementById("rep"), o = { id: state.r.id };
+    ["sec1", "sec2", "sec3", "sec4"].forEach(function (k) { o[k] = f[k].value; });
+    o.national_flags = Array.prototype.map.call(f.querySelectorAll("input[name=flag]:checked"), function (x) { return x.value; });
+    o.traffic = {}; Array.prototype.forEach.call(f.querySelectorAll("select.light"), function (s) { if (s.value) o.traffic[s.name] = s.value; });
+    return o;
+  }
+  function save() {
+    var st = d.getElementById("saveState"); if (st) st.textContent = "שומר…";
+    return M.api("report.save", collect()).then(function (r) {
+      if (st) st.textContent = r.ok ? "נשמר " + new Date().toTimeString().substring(0, 5) : { locked: "הדוח נעול", network: "אין רשת — לא נשמר" }[r.error] || "לא נשמר";
+      return r;
+    });
+  }
+  function copy(text, msg) { (navigator.clipboard ? navigator.clipboard.writeText(text) : Promise.reject()).then(function () { M.toast(msg); }, function () { w.prompt("העתיקי ידנית:", text); }); }
+  function withText(fn) { M.api("report.text", { id: state.r.id }).then(function (r) { if (r.ok) fn(r.text); else M.toast("לא הצלחנו להביא את הטקסט"); }); }
+  function render() {
+    d.getElementById("main").innerHTML = formHtml(state.r, state.v, state.readOnly);
+    var f = d.getElementById("rep");
+    if (!state.readOnly && state.r.status !== "approved") {
+      f.addEventListener("input", function () { clearTimeout(state.timer); state.timer = setTimeout(save, 800); });
+      f.addEventListener("change", function () { clearTimeout(state.timer); state.timer = setTimeout(save, 300); });
+      w.addEventListener("beforeunload", function () { if (state.timer) { clearTimeout(state.timer); save(); } });
+      d.getElementById("approveBtn").addEventListener("click", function () {
+        if (!w.confirm("לאשר את הדוח? אחרי האישור הוא ננעל, ותיקון יוצר גרסה חדשה.")) return;
+        clearTimeout(state.timer); state.timer = null;
+        save().then(function (s) { if (!s.ok) { M.toast("השמירה נכשלה, הדוח לא אושר"); return null; } return M.api("report.approve", { id: state.r.id }); })
+          .then(function (r) { if (!r) return; if (!r.ok) { M.toast("האישור נכשל"); return; } state.r = r.report; state.readOnly = true; render(); M.toast("הדוח אושר"); });
+      });
+    }
+    var cb = d.getElementById("copyBtn"); if (cb) cb.addEventListener("click", function () { withText(function (t) { copy(t, "הדוח הועתק"); }); });
+    var dl = d.getElementById("dlBtn"); if (dl) dl.addEventListener("click", function () { withText(function (t) {
+      var a = d.createElement("a"); a.href = URL.createObjectURL(new Blob([printHtml(t, state.v.school_name, state.v.date)], { type: "text/html" })); a.download = "דוח-" + state.v.school_name + "-" + state.v.date + ".html"; d.body.appendChild(a); a.click(); a.remove();
+    }); });
+    var ch = d.getElementById("chatBtn"); if (ch) ch.addEventListener("click", function () {
+      var go = function () { withText(function (t) { copy(chatText(t), "הועתק. הדביקי בצ'אט הפרטי שלך."); }); };
+      if (state.r.status === "approved" || state.readOnly) go(); else { clearTimeout(state.timer); save().then(go); }
+    });
+    var rv = d.getElementById("reviseBtn"); if (rv) rv.addEventListener("click", function () {
+      if (!w.confirm("ליצור גרסה חדשה לתיקון? הגרסה המאושרת נשארת.")) return;
+      M.api("report.revise", { id: state.r.id }).then(function (r) { if (r.ok) w.location.href = "report.html?id=" + encodeURIComponent(r.report.id); else M.toast(r.error === "notfound" ? "רק מי שכתב את הדוח יכול לתקן אותו" : "לא נוצרה גרסה"); });
+    });
+  }
+  function loadOne() {
+    var q = qs.get("id") ? { id: qs.get("id") } : { visit_id: qs.get("visit") };
+    return M.api("report.get", q).then(function (g) {
+      if (!g.ok) { d.getElementById("main").innerHTML = '<div class="empty">' + (g.error === "network" ? "השרת לא זמין כרגע." : "הדוח לא נמצא.") + "</div>"; return; }
+      state.r = g.report; state.v = g.visit; state.readOnly = g.readOnly; render();
+    });
+  }
+  function loadList() { var pick = M.pickedSchool(); return M.api("report.list", pick ? { school_id: pick } : {}).then(function (l) { var list = (l && l.reports) || []; d.getElementById("main").innerHTML = "<h2>הדוח שלי</h2><p class=\"sub\">" + list.length + " דוחות</p>" + listHtml(list); }); }
+  function boot() {
+    if (boot._done) return; boot._done = true;
+    M.api("me").then(function (me) {
+      if (!me || !me.ok) {
+        var msg = { network: "השרת לא זמין כרגע. נסי שוב בעוד דקה.", notregistered: "החשבון שלך מאושר באתר, אבל עדיין לא רשום בהבית של המפקח. פני למיטל." };
+        if (me && msg[me.error]) d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">' + E(msg[me.error]) + "</div>";
+        else if (me && me.error !== "unauthorized") d.getElementById("app").innerHTML = '<div class="empty" style="grid-column:1/-1">משהו השתבש (' + E(me.error) + "). נסי לרענן.</div>";
+        return;
+      }
+      return M.api("schools.list").then(function (r) {
+        var schools = (r && r.schools) || [];
+        M.shell({ me: me, count: schools.length }); M.picker(schools, function () { if (!qs.get("id") && !qs.get("visit")) loadList(); });
+        if (qs.get("id") || qs.get("visit")) return loadOne();
+        return loadList();
+      });
+    });
+  }
+  if (M.token()) boot(); else d.addEventListener("pmh:in", boot);
+})(window, document);
+</script>
+</body>
+</html>
