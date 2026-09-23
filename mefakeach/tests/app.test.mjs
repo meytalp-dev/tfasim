@@ -41,4 +41,15 @@ await (async () => {
     const r2 = await MEF.api("me"); assert.equal(r2.ok, true); assert.equal(calls, 2);
   });
 })();
+await (async () => {
+  const ta = async (name, fn) => { try { await fn(); n++; console.log("  ✓ " + name); } catch (e) { console.log("  ✗ " + name + "\n      " + String(e.message).split("\n")[0]); process.exitCode = 1; } };
+  await ta("סקירה: api לא מנסה שוב פעולות כתיבה (tasks.add, docs.upload, visit.open) — קריאה אחת ואז network", async () => {
+    for (const a of ["tasks.add", "docs.upload", "visit.open", "answers.save", "report.approve", "task.principal_done"]) {
+      let calls = 0; ctx.fetch = () => { calls++; return Promise.reject(new Error("down")); };
+      const r = await MEF.api(a, {}); assert.equal(r.error, "network"); assert.equal(calls, 1, a);
+    }
+    let calls = 0; ctx.fetch = () => { calls++; return Promise.reject(new Error("down")); };
+    await MEF.api("tracking.list"); assert.equal(calls, 3);
+  });
+})();
 console.log(`\n${n} עברו`);
