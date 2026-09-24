@@ -355,7 +355,8 @@ function showErr(code) {
   var m = {
     rate: "הרבה הגשות בשעה האחרונה. נסו שוב בעוד כמה דקות.",
     type: "אחד הקבצים לא בפורמט הנכון או גדול מ-20MB.", size: "אחד הקבצים לא בפורמט הנכון או גדול מ-20MB.",
-    token: "עבר יותר מדי זמן. שלחו שוב."
+    token: "עבר יותר מדי זמן. שלחו שוב.",
+    busy: "השרת עמוס כרגע. נסו לשלוח שוב בעוד דקה."
   }[code] || "משהו השתבש בשליחה. נסו שוב, ואם זה חוזר, שלחו לנו הודעה בכפתור למטה.";
   $("errBox").textContent = m; $("errBox").classList.add("on");
 }
@@ -372,7 +373,7 @@ $("form").addEventListener("submit", async function (e) {
   var f = collect(); if (!validate(f)) return;
   $("send").disabled = true; progress("שולחים את הפרטים…");
   try {
-    var s = await post({ action: "submit", f: f });
+    var s = await post({ action: "submit", f: f }, 0);   // בלי ניסיון חוזר — שלא ייווצרו טיוטות כפולות
     if (!s.ok) throw s;
     var sent = [];
     for (var i = 0; i < KINDS.length; i++) {

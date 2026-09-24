@@ -109,7 +109,8 @@ var FLAG = { "megama-unlisted": "לבדיקה · מגמה לא ברשימה", "n
 var DOCI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
 function $(id) { return document.getElementById(id); }
 function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
-function toast(t) { var x = $("toast"); x.textContent = t; x.classList.add("on"); setTimeout(function () { x.classList.remove("on"); }, 2600); }
+var toastT;
+function toast(t, ms) { var x = $("toast"); x.textContent = t; x.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { x.classList.remove("on"); }, ms || 2600); }
 function grades(g) { return g === "all" ? "כל השכבות ט׳–י״ב" : "שכבות " + String(g).split(",").map(function (x) { return GL[x] || x; }).join(", "); }
 function when(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }); }
 function megTitle(r) { return r.code ? esc(r.megamaName) + " · " + esc(r.code) : "&quot;" + esc(r.freeMegama) + "&quot;"; }
@@ -194,7 +195,11 @@ $("list").addEventListener("click", async function (e) {
     if (d.code) { var r0 = D.approved[0]; r0.code = d.code; r0.megamaName = sel.options[sel.selectedIndex].text.split(" · ")[0]; r0.freeMegama = ""; }
     (res.retired || []).forEach(function (rid) { move(rid, "approved", null); });
     el.remove(); render();
-    toast("פורסם" + (res.retired && res.retired.length ? " · הוחלפו " + res.retired.length + " גרסאות קודמות" : ""));
+    var note = "פורסם";
+    if (res.retired && res.retired.length) note += " · הוחלפו " + res.retired.length + " גרסאות קודמות";
+    if (res.kept && res.kept.length) note += " · שימי לב: גרסה קודמת לחלק מהשכבות נשארה באתר (אפשר להסיר אותה בלשונית מאושרות)";
+    if (res.shareErrors && res.shareErrors.length) note += " · השיתוף נכשל ל: " + res.shareErrors.map(function (k) { return KIND[k] || k; }).join(", ") + " — לבדוק בדרייב";
+    toast(note, (res.kept && res.kept.length) || (res.shareErrors && res.shareErrors.length) ? 9000 : 2600);
   } else if (b.classList.contains("fix") || b.classList.contains("no")) {
     var kind = b.classList.contains("fix") ? "requestFix" : "reject";
     var old = el.querySelector(".msg"); if (old) old.remove();
@@ -227,7 +232,8 @@ $("list").addEventListener("click", async function (e) {
     b.disabled = true;
     var ru = await post({ action: "unpublish", id: id }).catch(function () { return { ok: false }; });
     if (!ru.ok) { b.disabled = false; return toast("ההסרה נכשלה"); }
-    move(id, "approved", null); el.remove(); render(); toast("הוסר מהאתר");
+    move(id, "approved", null); el.remove(); render();
+    toast(ru.shareErrors && ru.shareErrors.length ? "הוסר מהאתר, אבל סגירת השיתוף נכשלה — לבדוק בדרייב" : "הוסר מהאתר", ru.shareErrors && ru.shareErrors.length ? 9000 : 2600);
   }
 });
 $("copyMissing").addEventListener("click", function () {
