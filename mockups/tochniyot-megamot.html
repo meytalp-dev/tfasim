@@ -232,6 +232,13 @@ svg{width:18px;height:18px;flex:none}
             </div>
           </div>
           <div class="f">
+            <label class="l">אישור הפעלה למגמה</label>
+            <div class="drop" style="padding:14px"><svg style="width:22px;height:22px"><use href="#i-up"/></svg><b style="font-size:.9rem">העלאת מסמך אישור ההפעלה</b>PDF או תמונה · לא חובה</div>
+            <div class="file"><svg style="color:var(--accent)"><use href="#i-doc"/></svg><span>אישור הפעלה עיצוב שיער תשפז.pdf</span><small>310KB</small><svg class="x"><use href="#i-x"/></svg></div>
+            <div class="hint">מספר האישור (אם יש)</div>
+            <input class="in" value="4417/26" style="max-width:200px">
+          </div>
+          <div class="f">
             <label class="l">הערות</label>
             <textarea class="in" rows="2" placeholder="למשל: זו גרסה מעודכנת לתוכנית הקודמת"></textarea>
           </div>
@@ -248,7 +255,7 @@ svg{width:18px;height:18px;flex:none}
           <div class="card done">
             <div class="ic"><svg><use href="#i-ok"/></svg></div>
             <h2 style="margin:0 0 6px;color:var(--navy)">התוכנית התקבלה, תודה</h2>
-            <p style="margin:0 0 16px;color:var(--text2)">עיצוב שיער · 603 · כל השכבות<br>תוכנית + מבחן לדוגמה + מחוון<br>התוכנית תפורסם באתר לאחר אישור.</p>
+            <p style="margin:0 0 16px;color:var(--text2)">עיצוב שיער · 603 · כל השכבות<br>תוכנית + מבחן לדוגמה + מחוון + אישור הפעלה<br>התוכנית תפורסם באתר לאחר אישור.</p>
             <button class="btn" style="background:var(--blue-100);color:var(--navy)"><svg><use href="#i-up"/></svg>העלאת תוכנית נוספת</button>
             <div class="hint" style="margin-top:8px;font-size:.8rem;color:var(--text2)">השם, המייל והטלפון יישארו ממולאים</div>
           </div>
@@ -283,7 +290,7 @@ svg{width:18px;height:18px;flex:none}
             <div class="meta">ישראלה ישראלי · israela@example.com · 050-0000000 · כל השכבות ט׳–י״ב · תשפ״ז · הוגש היום 10:42</div>
           </div>
         </div>
-        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · תוכנית עיצוב שיער ט-יב.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מבחן לדוגמה.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מחוון.docx</span></div>
+        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · תוכנית עיצוב שיער ט-יב.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מבחן לדוגמה.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מחוון.docx</span><span class="fl"><svg><use href="#i-doc"/></svg>אישור הפעלה 4417/26</span></div>
         <div class="actions">
           <button class="b ok"><svg><use href="#i-ok"/></svg>אישור ופרסום</button>
           <button class="b fix"><svg><use href="#i-edit"/></svg>בקשת תיקון</button>
@@ -299,7 +306,7 @@ svg{width:18px;height:18px;flex:none}
           </div>
         </div>
         <div class="assign"><b>שיוך לפני אישור:</b><div class="in sel" style="background:#fff"><span>בחרו סמל מגמה קיים או השאירו כמגמה חדשה…</span><svg><use href="#i-down"/></svg></div></div>
-        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · סילבוס רובוטיקה.pdf</span><span class="fl" style="opacity:.55">אין מבחן לדוגמה</span><span class="fl" style="opacity:.55">אין מחוון</span></div>
+        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · סילבוס רובוטיקה.pdf</span><span class="fl" style="opacity:.55">אין מבחן לדוגמה</span><span class="fl" style="opacity:.55">אין מחוון</span><span class="fl" style="opacity:.55">אין אישור הפעלה</span></div>
         <div class="actions">
           <button class="b ok"><svg><use href="#i-ok"/></svg>אישור ופרסום</button>
           <button class="b fix"><svg><use href="#i-edit"/></svg>בקשת תיקון</button>
@@ -354,7 +361,7 @@ svg{width:18px;height:18px;flex:none}
         <div class="search"><svg><use href="#i-search"/></svg>חיפוש לפי שם מגמה או סמל…</div>
         <div class="chips"><span class="chip on">כל השכבות</span><span class="chip">ט׳</span><span class="chip">י׳</span><span class="chip">י״א</span><span class="chip">י״ב</span></div>
       </div>
-      <div class="chips" style="margin:-6px 0 16px"><span class="chip">יש מבחן לדוגמה</span><span class="chip">יש מחוון</span></div>
+      <div class="chips" style="margin:-6px 0 16px"><span class="chip">יש מבחן לדוגמה</span><span class="chip">יש מחוון</span><span class="chip">יש אישור הפעלה</span></div>
       <div class="grid">
         <div class="mg">
           <span class="code">603</span>
@@ -365,6 +372,7 @@ svg{width:18px;height:18px;flex:none}
             <a href="#"><svg><use href="#i-doc"/></svg>תוכנית לימודים מלאה</a>
             <a href="#"><svg><use href="#i-doc"/></svg>מבחן לדוגמה</a>
             <a href="#"><svg><use href="#i-doc"/></svg>מחוון</a>
+            <a href="#"><svg><use href="#i-doc"/></svg>אישור הפעלה · 4417/26</a>
           </div>
         </div>
         <div class="mg">
@@ -409,7 +417,7 @@ svg{width:18px;height:18px;flex:none}
   <div class="ann">
     <div><b>·</b>שם המגיש ופרטי הקשר לא מוצגים באתר.</div>
     <div><b>·</b>מגמה בלי תוכנית מאושרת לא מופיעה בעמוד.</div>
-    <div><b>·</b>כל כפתור פותח את הקובץ בדרייב לצפייה. מבחן לדוגמה ומחוון מופיעים רק אם הועלו.</div>
+    <div><b>·</b>כל כפתור פותח את הקובץ בדרייב לצפייה. מבחן לדוגמה, מחוון ואישור הפעלה מופיעים רק אם הועלו.</div>
   </div>
 </section>
 
