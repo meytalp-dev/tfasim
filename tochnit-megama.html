@@ -373,7 +373,7 @@ $("form").addEventListener("submit", async function (e) {
   var f = collect(); if (!validate(f)) return;
   $("send").disabled = true; progress("שולחים את הפרטים…");
   try {
-    var s = await post({ action: "submit", f: f }, 0);   // בלי ניסיון חוזר — שלא ייווצרו טיוטות כפולות
+    var s = await post({ action: "submit", f: f });   // ניסיון חוזר אחד — במקרה הגרוע נשארת טיוטה יתומה ב"לא הושלמו"
     if (!s.ok) throw s;
     var sent = [];
     for (var i = 0; i < KINDS.length; i++) {
