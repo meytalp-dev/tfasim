@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>הודעות למדריכים — תוכנית שנתית</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   הודעות וואטסאפ קצרות למדריכים שטרם הגישו תוכנית שנתית (24.9.26).
+   בלי מספרי טלפון בכוונה — מיטל מעתיקה ושולחת מהנייד בעצמה.
+   הסימון "נשלח" נשמר רק במכשיר הזה (localStorage).
+   ============================================================ */
+:root{
+  --bg:#F4F6F9; --card:#fff; --ink:#1B2B3A; --ink2:#51606E; --line:#E1E6EC;
+  --navy:#1D3F6E; --green:#1F8A4C; --green-bg:#E6F4EC;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#121820; --card:#1B2430; --ink:#E8EDF2; --ink2:#9AA8B6; --line:#2B3645;
+         --navy:#8FB4E8; --green:#4CC47F; --green-bg:#16301F; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Assistant,Heebo,sans-serif;font-size:16px;line-height:1.6}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 40px}
+h1{font-family:Rubik,Assistant,sans-serif;font-size:22px;color:var(--navy);margin:4px 0 4px}
+.sub{color:var(--ink2);font-size:14px;margin:0 0 6px}
+.count{font-size:14px;font-weight:700;color:var(--ink2);margin:0 0 16px}
+.grp{font-size:13px;font-weight:800;color:var(--ink2);margin:22px 2px 8px;letter-spacing:.02em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;transition:opacity .2s}
+.card.sent{opacity:.5}
+.top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.name{font-weight:800;font-size:17px}
+.tag{font-size:12px;font-weight:700;color:var(--ink2);background:var(--bg);border-radius:999px;padding:2px 10px;white-space:nowrap}
+.tag.warn{color:#9A3A1C}
+.msg{white-space:pre-line;font-size:15px;background:var(--bg);border-radius:10px;padding:10px 12px;margin:0 0 10px}
+.acts{display:flex;gap:8px}
+button{font-family:inherit;font-size:15px;font-weight:700;border-radius:10px;min-height:46px;cursor:pointer;border:none}
+.cp{flex:1;background:var(--navy);color:#fff}
+.cp.ok{background:var(--green)}
+.done{flex:0 0 auto;padding:0 16px;background:transparent;color:var(--ink2);border:1px solid var(--line)}
+.card.sent .done{background:var(--green-bg);color:var(--green);border-color:transparent}
+.reset{display:block;margin:18px auto 0;background:none;border:none;color:var(--ink2);text-decoration:underline;font-size:13px;min-height:auto}
+footer{text-align:center;color:var(--ink2);font-size:12.5px;padding:10px 16px 28px}
+footer a{color:var(--navy)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>הודעות למדריכים</h1>
+  <p class="sub">מי שטרם העביר תוכנית שנתית · להעתיק ולשלוח בוואטסאפ</p>
+  <p class="count" id="count"></p>
+  <div id="list"></div>
+  <button class="reset" type="button" onclick="resetAll()">איפוס סימוני "נשלח"</button>
+</div>
+<footer>משרד העבודה · מינהל הכשרה מקצועית — <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></footer>
+
+<script>
+/* g: f = שתעבירי · m = שתעביר · '' = שתעביר/י (לא ידוע) */
+const GUIDES = [
+  { id:'nira',     name:'נירה הראל',      first:'נירה',     g:'f', subj:'ספרות',          sector:'החברה היהודית' },
+  { id:'dana',     name:'דנה ברצורי',     first:'דנה',      g:'f', subj:'היסטוריה',       sector:'החברה היהודית' },
+  { id:'elisheva', name:'אלישבע',         first:'אלישבע',   g:'f', subj:'אזרחות',         sector:'החברה היהודית', note:'אין טלפון — מייל' },
+  { id:'gal',      name:'גל',             first:'גל',       g:'',  subj:'מתמטיקה',        sector:'החברה היהודית + המגזר החרדי' },
+  { id:'dina',     name:'דינה רוט',       first:'דינה',     g:'f', subj:'תנ"ך',           sector:'המגזר החרדי', note:'אין טלפון — מייל' },
+  { id:'suha',     name:'סוהא ערדה',      first:'סוהא',     g:'f', subj:'עברית',          sector:'החברה הערבית' },
+  { id:'wael',     name:'ואאל טאהא',      first:'ואאל',     g:'m', subj:'ערבית',          sector:'החברה הערבית' },
+  { id:'rima',     name:'רימה',           first:'רימה',     g:'f', subj:'ספרות',          sector:'החברה הערבית' },
+  { id:'moshe',    name:'משה עשור',       first:'משה',      g:'m', subj:'מתמטיקה',        sector:'החברה הערבית' },
+  { id:'suliman',  name:'סולימאן ברייה',  first:'סולימאן',  g:'m', subj:'מתמטיקה',        sector:'החברה הערבית' },
+  { id:'mansour',  name:'מנסור עתאמנה',   first:'מנסור',    g:'m', subj:'מורשת אסלאמית',  sector:'החברה הערבית', note:'אין פרטי קשר' },
+  { id:'muzna',    name:'מזנה סלאלחה',    first:'מזנה',     g:'f', subj:'מורשת דרוזית',   sector:'החברה הערבית' }
+];
+const ORDER = ['החברה היהודית', 'החברה היהודית + המגזר החרדי', 'המגזר החרדי', 'החברה הערבית'];
+const KEY = 'tfasim.hodaot-silabus.sent.v1';
+
+function msg(x) {
+  const verb = 'תעביר' + ({ f:'י', m:'' }[x.g] ?? '/י');
+  return 'הי ' + x.first + ', גמר חתימה טובה!\n' +
+         'אשמח ש' + verb + ' לי את התוכנית השנתית שלך ב' + x.subj + ' (' + x.sector + ').\n' +
+         'תודה!';
+}
+function sentGet(){ try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ return {}; } }
+function sentSet(m){ try { localStorage.setItem(KEY, JSON.stringify(m)); } catch(e){} }
+function esc(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function render() {
+  const sent = sentGet();
+  const n = GUIDES.filter(x => sent[x.id]).length;
+  document.getElementById('count').textContent = 'נשלחו ' + n + ' מתוך ' + GUIDES.length;
+  document.getElementById('list').innerHTML = ORDER.map(sec => {
+    const items = GUIDES.filter(x => x.sector === sec);
+    if (!items.length) return '';
+    return '<div class="grp">' + esc(sec) + '</div>' + items.map(x =>
+      '<div class="card' + (sent[x.id] ? ' sent' : '') + '">' +
+        '<div class="top"><span class="name">' + esc(x.name) + '</span>' +
+        '<span class="tag' + (x.note ? ' warn' : '') + '">' + esc(x.note || x.subj) + '</span></div>' +
+        '<p class="msg">' + esc(msg(x)) + '</p>' +
+        '<div class="acts">' +
+          '<button class="cp" type="button" onclick="copyMsg(this,\'' + x.id + '\')">העתקת ההודעה</button>' +
+          '<button class="done" type="button" onclick="toggle(\'' + x.id + '\')">' + (sent[x.id] ? '✓ נשלח' : 'נשלח?') + '</button>' +
+        '</div>' +
+      '</div>').join('');
+  }).join('');
+}
+
+function copyMsg(btn, id) {
+  const x = GUIDES.find(g => g.id === id), text = msg(x);
+  const ok = () => { btn.textContent = '✓ הועתק'; btn.classList.add('ok');
+                     setTimeout(() => { btn.textContent = 'העתקת ההודעה'; btn.classList.remove('ok'); }, 1800); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, () => fallback(text, ok));
+  else fallback(text, ok);
+}
+function fallback(text, ok) {
+  const t = document.createElement('textarea');
+  t.value = text; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0';
+  document.body.appendChild(t); t.select(); t.setSelectionRange(0, text.length);
+  try { document.execCommand('copy'); ok(); } catch(e) {}
+  t.remove();
+}
+function toggle(id){ const m = sentGet(); if (m[id]) delete m[id]; else m[id] = Date.now(); sentSet(m); render(); }
+function resetAll(){ if (confirm('לאפס את כל הסימונים?')) { sentSet({}); render(); } }
+render();
+</script>
+</body>
+</html>
