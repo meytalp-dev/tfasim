@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>אישור תוכניות מגמות</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D3B66' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m5 12.5 4.5 4.5L19 7.5'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D3B66;--navy-800:#124D7A;--accent:#0A7799;--blue-100:#E8F2FF;
+  --canvas:#F4F8FC;--soft:#F2F7FC;--text:#102A43;--text2:#52687A;
+  --border:#D8E6F2;--border-strong:#BED4E7;--grad:linear-gradient(135deg,#124D7A,#087B9C);
+  --green:#1F7A42;--green-bg:#E6F4EA;--yellow:#8A6209;--yellow-bg:#FDF4DC;--red:#B42318;--red-bg:#FDECEA;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Assistant,'Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.55;background:var(--canvas);color:var(--text)}
+svg{width:17px;height:17px;flex:none}
+.hero{background:var(--grad);color:#fff;padding:24px 16px}
+.w{max-width:980px;margin:0 auto}
+.hero .kick{font-size:.82rem;opacity:.85;font-weight:600}
+.hero h1{margin:2px 0 0;font-size:1.6rem}
+main{padding:22px 16px 40px}
+#state{padding:40px 10px;text-align:center;color:var(--text2);font-weight:600}
+#stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+.stat .n{font-size:1.8rem;font-weight:800;color:var(--navy);line-height:1}
+.stat .t{font-size:.85rem;color:var(--text2);margin-top:4px}
+#tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:16px;overflow-x:auto}
+#tabs button{border:0;background:none;padding:9px 14px;font:700 .95rem Assistant,sans-serif;color:var(--text2);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+#tabs button.on{color:var(--navy);border-color:var(--navy)}
+.sub{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.sub h3{margin:0;font-size:1.1rem;color:var(--navy)}
+.meta{font-size:.9rem;color:var(--text2);margin-top:3px;overflow-wrap:anywhere}
+.notes{font-size:.92rem;background:var(--soft);border-radius:8px;padding:8px 10px;margin-top:8px}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-start:6px;vertical-align:middle}
+.tag.warn{background:var(--yellow-bg);color:var(--yellow)}
+.tag.info{background:var(--blue-100);color:var(--navy-800)}
+.files{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.fl{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.88rem;font-weight:600;color:var(--navy);background:var(--soft);text-decoration:none}
+a.fl:hover{border-color:var(--accent)}
+.fl.off{opacity:.55;font-weight:500}
+.assign{background:var(--yellow-bg);border-radius:9px;padding:10px 12px;margin-top:10px;font-size:.9rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.assign select{flex:1;min-width:200px;border:1px solid var(--border-strong);border-radius:8px;padding:6px 8px;font:500 .92rem Assistant,sans-serif;background:#fff}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--soft);padding-top:12px}
+.b{display:inline-flex;gap:6px;align-items:center;border-radius:8px;padding:8px 14px;font:700 .9rem Assistant,sans-serif;border:1px solid var(--border-strong);background:#fff;color:var(--text);cursor:pointer;text-decoration:none}
+.b:disabled{opacity:.55;cursor:wait}
+.b.ok{background:var(--green);border-color:var(--green);color:#fff}
+.b.fix{color:var(--yellow);border-color:#E9CF8B}
+.b.no,.b.unpub{color:var(--red);border-color:#F2B8B2}
+.msg{margin-top:10px;background:var(--soft);border-radius:9px;padding:10px 12px}
+.msg textarea{width:100%;border:1px solid var(--border-strong);border-radius:8px;padding:8px;font:500 .95rem Assistant,sans-serif;margin:6px 0}
+.ready{margin-top:10px;background:var(--yellow-bg);border-radius:9px;padding:10px 12px;font-size:.92rem;white-space:pre-line}
+.ready .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;white-space:normal}
+.muted{color:var(--text2);font-size:.9rem}
+.grp{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:12px}
+.grp h3{margin:0 0 6px;font-size:1rem;color:var(--navy)}
+.mrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--soft);font-size:.93rem}
+.mrow:last-child{border:0}
+.mrow small{color:var(--text2);white-space:nowrap}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+#toast{position:fixed;bottom:18px;inset-inline:0;margin:auto;width:max-content;max-width:90vw;background:var(--navy);color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+footer{text-align:center;padding:10px 16px 30px;color:var(--text2);font-size:.8rem}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+@media(max-width:640px){#stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="w">
+  <div class="kick">ניהול · פנימי</div>
+  <h1>אישור תוכניות מגמות</h1>
+</div></header>
+
+<main class="w">
+  <div id="state">טוען…</div>
+  <div id="app" hidden>
+    <div id="stats"></div>
+    <div id="tabs" role="tablist">
+      <button data-tab="pending" class="on">ממתינות</button>
+      <button data-tab="approved">מאושרות</button>
+      <button data-tab="returned">הוחזרו / נדחו</button>
+      <button data-tab="incomplete">לא הושלמו</button>
+      <button data-tab="missing">מי עוד לא הגיש</button>
+    </div>
+    <div id="list"></div>
+    <div id="missingWrap" hidden>
+      <div class="bar"><span class="muted">מגמות שעוד אין להן תוכנית ממתינה או מאושרת, לפי מפקח.ת מקצועי.ת בטבלת הפיקוח</span>
+        <button class="b" id="copyMissing"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>העתקת הרשימה</button></div>
+      <div id="missing"></div>
+    </div>
+  </div>
+</main>
+<div id="toast" role="status"></div>
+<footer>נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></footer>
+
+<script src="megamot-list.js"></script>
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbzn2IAI0ZHHPgBAJa5_mKQ9bFNoZaaUq95h4LCPTeiG6OSUxpVuLvnSL-XMQISnP1e7cA/exec";
+var K = new URLSearchParams(location.hash.slice(1)).get("k") || "";
+var D = null, TAB = "pending";
+var KIND = { program: "תוכנית", exam: "מבחן לדוגמה", rubric: "מחוון", approval: "אישור הפעלה" };
+var DOC = { "מלאה": "תוכנית מלאה", "שנתית": "תוכנית שנתית", "סילבוס": "סילבוס", "אחר": "אחר" };
+var GL = { "ט": "ט׳", "י": "י׳", "יא": "י״א", "יב": "י״ב" };
+var FLAG = { "megama-unlisted": "לבדיקה · מגמה לא ברשימה", "name-unmatched": "לבדיקה · שם לא מוכר" };
+var DOCI = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>';
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+function toast(t) { var x = $("toast"); x.textContent = t; x.classList.add("on"); setTimeout(function () { x.classList.remove("on"); }, 2600); }
+function grades(g) { return g === "all" ? "כל השכבות ט׳–י״ב" : "שכבות " + String(g).split(",").map(function (x) { return GL[x] || x; }).join(", "); }
+function when(iso) { var d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("he-IL") + " " + d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" }); }
+function megTitle(r) { return r.code ? esc(r.megamaName) + " · " + esc(r.code) : "&quot;" + esc(r.freeMegama) + "&quot;"; }
+
+function get(tries) {
+  return fetch(API_URL + "?mode=admin&k=" + encodeURIComponent(K)).then(function (r) { return r.json(); })
+    .catch(function (e) { if (tries > 0) return get(tries - 1); throw e; });
+}
+function post(d) {
+  d.k = K;
+  return fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) })
+    .then(function (r) { return r.json(); });
+}
+
+function card(r) {
+  var files = Object.keys(KIND).map(function (k) {
+    var lab = KIND[k] + (k === "approval" && r.approvalNo ? " " + r.approvalNo : "");
+    return r.files[k] ? '<a class="fl" href="' + esc(r.files[k]) + '" target="_blank" rel="noopener">' + DOCI + esc(lab) + "</a>"
+                      : '<span class="fl off">אין ' + esc(KIND[k]) + "</span>";
+  }).join("");
+  var assign = !r.code && TAB !== "approved" && TAB !== "incomplete" ? '<div class="assign"><b>שיוך לפני אישור:</b><select><option value="">להשאיר כמגמה חדשה</option>' +
+    (window.MEGAMOT_LIST || []).map(function (m) { return '<option value="' + esc(m.code) + '">' + esc(m.name) + " · " + esc(m.code) + "</option>"; }).join("") + "</select></div>" : "";
+  var btns = {
+    pending: '<button class="b ok">אישור ופרסום</button><button class="b fix">בקשת תיקון</button><button class="b no">דחייה</button>',
+    approved: '<button class="b unpub">הסרה מהאתר</button>',
+    returned: '<button class="b ok">אישור בכל זאת</button>',
+    incomplete: '<span class="muted">ההעלאה לא הושלמה, כנראה נקטעה באמצע</span>'
+  }[TAB];
+  var extra = TAB === "returned" && r.note ? '<div class="notes">' + (r.status === "נדחה" ? "נדחה: " : "תיקון: ") + esc(r.note) + "</div>" : "";
+  if (TAB === "approved" && r.approvedAt) extra = '<div class="muted" style="margin-top:4px">פורסם ' + esc(r.approvedAt) + "</div>";
+  return '<div class="sub" data-id="' + esc(r.id) + '"><h3>' + megTitle(r) + ' <span class="tag info">' + esc(DOC[r.docType] || r.docType) + "</span>" +
+    r.flags.map(function (f) { return '<span class="tag warn">' + esc(FLAG[f] || f) + "</span>"; }).join("") + "</h3>" +
+    '<div class="meta">' + esc(r.name) + " · " + esc(r.email) + " · " + (r.phone ? esc(r.phone) : "ללא טלפון") + " · " + esc(grades(r.grades)) +
+    " · " + esc(r.year) + " · הוגש " + esc(when(r.createdAt)) + "</div>" +
+    (r.notes ? '<div class="notes">' + esc(r.notes) + "</div>" : "") + extra + assign +
+    '<div class="files">' + files + '</div><div class="actions">' + btns + "</div></div>";
+}
+
+function render() {
+  var s = { pending: D.pending.length, approved: D.approved.length, returned: D.returned.length,
+            missing: D.missing.reduce(function (n, g) { return n + g.items.length; }, 0) };
+  $("stats").innerHTML = [["pending", "ממתינות לאישור"], ["approved", "מאושרות באתר"], ["returned", "הוחזרו / נדחו"], ["missing", "מגמות בלי תוכנית"]]
+    .map(function (x) { return '<div class="stat"><div class="n">' + s[x[0]] + '</div><div class="t">' + x[1] + "</div></div>"; }).join("");
+  document.querySelectorAll("#tabs button").forEach(function (b) {
+    var n = b.dataset.tab === "missing" ? s.missing : (D[b.dataset.tab] || []).length;
+    b.classList.toggle("on", b.dataset.tab === TAB);
+    b.textContent = b.textContent.replace(/ \(\d+\)$/, "") + " (" + n + ")";
+  });
+  $("missingWrap").hidden = TAB !== "missing";
+  $("list").hidden = TAB === "missing";
+  if (TAB === "missing") {
+    $("missing").innerHTML = D.missing.map(function (g) {
+      return '<div class="grp"><h3>' + esc(g.sups) + "</h3>" + g.items.map(function (i) {
+        return '<div class="mrow"><span>' + esc(i.megama) + " · " + esc(i.code) + "</span><small>" + i.schools + " מוסדות</small></div>";
+      }).join("") + "</div>";
+    }).join("") || '<p class="muted">לכל המגמות יש תוכנית.</p>';
+    return;
+  }
+  var rows = D[TAB];
+  $("list").innerHTML = rows.length ? rows.map(card).join("") : '<p class="muted">אין כאן כלום כרגע.</p>';
+}
+
+function move(id, from, to, status) {
+  var i = D[from].findIndex(function (r) { return r.id === id; }); if (i < 0) return;
+  var r = D[from].splice(i, 1)[0]; if (to) { r.status = status; D[to].unshift(r); }
+}
+
+$("tabs").addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return; TAB = b.dataset.tab; render();
+});
+$("list").addEventListener("click", async function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  var el = b.closest(".sub"), id = el.dataset.id;
+  if (b.classList.contains("ok")) {
+    if (!confirm("לפרסם באתר?")) return;
+    var d = { action: "approve", id: id }, sel = el.querySelector(".assign select");
+    if (sel && sel.value) d.code = sel.value;
+    b.disabled = true;
+    var res = await post(d).catch(function () { return { ok: false }; });
+    if (!res.ok) { b.disabled = false; return toast("האישור נכשל: " + (res.error || "רשת")); }
+    var from = TAB; move(id, from, "approved", "מאושר");
+    if (d.code) { var r0 = D.approved[0]; r0.code = d.code; r0.megamaName = sel.options[sel.selectedIndex].text.split(" · ")[0]; r0.freeMegama = ""; }
+    (res.retired || []).forEach(function (rid) { move(rid, "approved", null); });
+    el.remove(); render();
+    toast("פורסם" + (res.retired && res.retired.length ? " · הוחלפו " + res.retired.length + " גרסאות קודמות" : ""));
+  } else if (b.classList.contains("fix") || b.classList.contains("no")) {
+    var kind = b.classList.contains("fix") ? "requestFix" : "reject";
+    var old = el.querySelector(".msg"); if (old) old.remove();
+    var box = document.createElement("div"); box.className = "msg"; box.dataset.kind = kind;
+    box.innerHTML = "<b>" + (kind === "requestFix" ? "מה צריך לתקן?" : "סיבת הדחייה") + '</b><textarea rows="2"></textarea><button class="b send">שמירה והכנת הודעה</button>';
+    el.appendChild(box); box.querySelector("textarea").focus();
+  } else if (b.classList.contains("send")) {
+    var bx = b.closest(".msg"), note = bx.querySelector("textarea").value.trim();
+    if (!note) { bx.querySelector("textarea").focus(); return toast("צריך לכתוב הערה"); }
+    b.disabled = true;
+    var rs = await post({ action: bx.dataset.kind, id: id, note: note }).catch(function () { return { ok: false }; });
+    if (!rs.ok) { b.disabled = false; return toast("השמירה נכשלה"); }
+    var row = D[TAB].filter(function (r) { return r.id === id; })[0] || {};
+    move(id, TAB, "returned", bx.dataset.kind === "reject" ? "נדחה" : "תיקון");
+    row.note = note;
+    var meg = row.megamaName || row.freeMegama || "";
+    bx.outerHTML = '<div class="ready"><b>הודעה מוכנה לשליחה:</b>\n' + esc(rs.message) + '<div class="row">' +
+      '<button class="b copy">העתקה</button>' +
+      '<a class="b" target="_blank" rel="noopener" href="https://wa.me/?text=' + encodeURIComponent(rs.message) + '">וואטסאפ</a>' +
+      '<a class="b" href="mailto:' + encodeURIComponent(row.email || "") + "?subject=" + encodeURIComponent("תוכנית הלימודים ל" + meg) + "&body=" + encodeURIComponent(rs.message) + '">מייל</a></div></div>';
+    el.querySelector(".actions").remove();
+    el.querySelector(".ready").dataset.msg = rs.message;
+    render();
+    // הכרטיס עם ההודעה נשאר גלוי עד מעבר לשונית
+    $("list").insertAdjacentElement("afterbegin", el);
+  } else if (b.classList.contains("copy")) {
+    navigator.clipboard.writeText(b.closest(".ready").dataset.msg).then(function () { toast("הועתק"); });
+  } else if (b.classList.contains("unpub")) {
+    if (!confirm("להסיר מהאתר?")) return;
+    b.disabled = true;
+    var ru = await post({ action: "unpublish", id: id }).catch(function () { return { ok: false }; });
+    if (!ru.ok) { b.disabled = false; return toast("ההסרה נכשלה"); }
+    move(id, "approved", null); el.remove(); render(); toast("הוסר מהאתר");
+  }
+});
+$("copyMissing").addEventListener("click", function () {
+  var txt = D.missing.map(function (g) {
+    return g.sups + ":\n" + g.items.map(function (i) { return "- " + i.megama + " (" + i.code + ")"; }).join("\n");
+  }).join("\n\n");
+  navigator.clipboard.writeText(txt).then(function () { toast("הרשימה הועתקה"); });
+});
+
+if (!K) { $("state").textContent = "הקישור אינו תקין. חסר מפתח ניהול."; }
+else get(1).then(function (d) {
+  if (!d.ok) { $("state").textContent = d.error === "key" ? "הקישור אינו תקין." : "שגיאה בטעינה: " + d.error; return; }
+  D = d; $("state").hidden = true; $("app").hidden = false; render();
+}).catch(function () { $("state").textContent = "לא הצלחנו להתחבר לשרת. נסו לרענן בעוד רגע."; });
+</script>
+</body>
+</html>
