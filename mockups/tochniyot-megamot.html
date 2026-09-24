@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מוקאפ · תוכניות מגמות</title>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D3B66;--navy-800:#124D7A;--accent:#0A7799;--blue:#1677FF;--blue-100:#E8F2FF;
+  --canvas:#F8FBFF;--surface:#fff;--soft:#F2F7FC;--text:#102A43;--text2:#52687A;
+  --border:#D8E6F2;--border-strong:#BED4E7;--grad:linear-gradient(135deg,#124D7A,#087B9C);
+  --green:#1F7A42;--green-bg:#E6F4EA;--yellow:#8A6209;--yellow-bg:#FDF4DC;--red:#B42318;--red-bg:#FDECEA;
+  --sh:0 12px 34px rgba(13,59,102,.09);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Assistant,system-ui,sans-serif;background:#E9EFF6;color:var(--text);line-height:1.55}
+svg{width:18px;height:18px;flex:none}
+.bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--border);padding:12px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bar b{margin-left:12px;color:var(--navy)}
+.tab{border:1px solid var(--border-strong);background:#fff;border-radius:999px;padding:7px 16px;font:600 .92rem Assistant;color:var(--text2);cursor:pointer}
+.tab.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.note{font-size:.8rem;color:var(--text2);margin-inline-start:auto}
+.screen{display:none;padding:28px 16px 60px}
+.screen.on{display:block}
+.frame{max-width:980px;margin:0 auto;background:var(--canvas);border-radius:14px;box-shadow:var(--sh);overflow:hidden;border:1px solid var(--border)}
+.url{background:#fff;border-bottom:1px solid var(--border);padding:8px 14px;font:500 .8rem ui-monospace,monospace;color:var(--text2);direction:ltr;text-align:left}
+.hero{background:var(--grad);color:#fff;padding:30px 28px 26px}
+.hero .kick{font-size:.8rem;opacity:.85;font-weight:600;letter-spacing:.02em}
+.hero h1{margin:4px 0 6px;font-size:1.9rem;line-height:1.2}
+.hero p{margin:0;opacity:.9;max-width:640px}
+.wrap{padding:24px 28px 30px}
+.card{background:#fff;border:1px solid var(--border);border-radius:12px;padding:20px}
+/* form */
+.form{max-width:640px;margin:0 auto}
+.f{margin-bottom:18px}
+.f label.l{display:block;font-weight:700;margin-bottom:6px;font-size:.95rem}
+.f .req{color:var(--red)}
+.f .hint{font-size:.8rem;color:var(--text2);margin-top:4px}
+.in{width:100%;border:1px solid var(--border-strong);border-radius:9px;padding:10px 12px;font:500 1rem Assistant;background:#fff;color:var(--text)}
+.sel{display:flex;justify-content:space-between;align-items:center}
+.dd{border:1px solid var(--border-strong);border-radius:9px;margin-top:6px;background:#fff;box-shadow:var(--sh);overflow:hidden}
+.dd .s{padding:9px 12px;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center;color:var(--text2)}
+.dd .o{padding:9px 12px;display:flex;justify-content:space-between;border-bottom:1px solid var(--soft);font-size:.95rem}
+.dd .o small{color:var(--text2)}
+.dd .o.hl{background:var(--blue-100)}
+.dd .o.other{color:var(--accent);font-weight:700}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--border-strong);border-radius:999px;padding:7px 16px;font-weight:600;background:#fff}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.drop{border:2px dashed var(--border-strong);border-radius:12px;padding:22px;text-align:center;background:var(--soft);color:var(--text2)}
+.drop svg{width:30px;height:30px;color:var(--accent)}
+.drop b{display:block;color:var(--navy);margin:6px 0 2px}
+.file{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:9px;padding:9px 12px;margin-top:8px;background:#fff}
+.file span{flex:1;font-weight:600}
+.file small{color:var(--text2)}
+.file .x{color:var(--text2)}
+.check{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:9px;padding:12px}
+.box{width:20px;height:20px;border-radius:5px;background:var(--navy);flex:none;display:grid;place-items:center;color:#fff}
+.box svg{width:14px;height:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:0;border-radius:10px;padding:12px 22px;font:700 1rem Assistant;cursor:pointer}
+.btn.pri{background:var(--navy);color:#fff}
+.btn.full{width:100%;justify-content:center;padding:14px}
+.help{text-align:center;margin-top:18px;font-size:.9rem}
+.help a{color:var(--accent);font-weight:600;text-decoration:none;display:inline-flex;gap:6px;align-items:center}
+.credit{text-align:center;font-size:.78rem;color:var(--text2);padding:14px;border-top:1px solid var(--border);background:#fff}
+.credit a{color:var(--accent)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:22px;align-items:start}
+.cap{font-size:.8rem;font-weight:700;color:var(--accent);margin-bottom:8px}
+.done{text-align:center;padding:30px 20px}
+.done .ic{width:56px;height:56px;border-radius:50%;background:var(--green-bg);color:var(--green);display:grid;place-items:center;margin:0 auto 10px}
+.done .ic svg{width:28px;height:28px}
+/* admin */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px}
+.stat .n{font-size:1.8rem;font-weight:800;color:var(--navy);line-height:1}
+.stat .t{font-size:.85rem;color:var(--text2);margin-top:4px}
+.stabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:16px}
+.stabs span{padding:8px 14px;font-weight:700;color:var(--text2);border-bottom:3px solid transparent}
+.stabs span.on{color:var(--navy);border-color:var(--navy)}
+.sub{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+.sub .top{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.sub h3{margin:0;font-size:1.1rem;color:var(--navy)}
+.sub .meta{font-size:.88rem;color:var(--text2);margin-top:3px}
+.tag{display:inline-block;font-size:.75rem;font-weight:700;padding:2px 9px;border-radius:999px;margin-inline-start:6px;vertical-align:middle}
+.tag.warn{background:var(--yellow-bg);color:var(--yellow)}
+.tag.ok{background:var(--green-bg);color:var(--green)}
+.tag.info{background:var(--blue-100);color:var(--navy-800)}
+.files{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.fl{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-size:.88rem;font-weight:600;color:var(--navy);background:var(--soft)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--soft);padding-top:12px}
+.b{display:inline-flex;gap:6px;align-items:center;border-radius:8px;padding:8px 14px;font:700 .9rem Assistant;border:1px solid var(--border-strong);background:#fff;color:var(--text)}
+.b.ok{background:var(--green);border-color:var(--green);color:#fff}
+.b.fix{color:var(--yellow);border-color:#E9CF8B}
+.b.no{color:var(--red);border-color:#F2B8B2}
+.assign{background:var(--yellow-bg);border-radius:9px;padding:10px 12px;margin-top:10px;font-size:.9rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.assign .in{width:auto;flex:1;min-width:200px;padding:6px 10px;font-size:.9rem}
+.missing{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px}
+.missing h3{margin:0 0 10px;font-size:1.05rem;display:flex;justify-content:space-between;align-items:center}
+.mrow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--soft);font-size:.92rem}
+.mrow small{color:var(--text2)}
+/* site */
+.sitenav{background:#fff;border-bottom:1px solid var(--border);padding:12px 28px;display:flex;gap:22px;align-items:center;font-weight:600;font-size:.92rem;color:var(--text2)}
+.sitenav .logo{color:var(--navy);font-weight:800;margin-inline-end:auto}
+.sitenav .act{color:var(--navy);border-bottom:2px solid var(--navy);padding-bottom:2px}
+.crumbs{font-size:.82rem;color:var(--text2);margin-bottom:14px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.search{flex:1;min-width:220px;display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:10px;padding:10px 12px;background:#fff;color:var(--text2)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mg{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.mg .code{font:700 .78rem ui-monospace,monospace;color:var(--accent)}
+.mg h3{margin:0;font-size:1.1rem;color:var(--navy);line-height:1.3}
+.mg .row{font-size:.86rem;color:var(--text2);display:flex;gap:6px;align-items:center}
+.mg .row svg{width:15px;height:15px}
+.mg .open{margin-top:auto;display:flex;gap:6px;align-items:center;justify-content:center;border-radius:9px;padding:9px;background:var(--blue-100);color:var(--navy);font-weight:700;text-decoration:none}
+.mg .docs{display:flex;flex-direction:column;gap:6px;margin-top:auto}
+.mg .docs a{display:flex;gap:6px;align-items:center;border:1px solid var(--border);border-radius:8px;padding:7px 10px;font-weight:600;color:var(--navy);text-decoration:none;font-size:.9rem}
+.intro{background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:18px;display:flex;gap:12px;align-items:center;font-size:.93rem;color:var(--text2)}
+.intro svg{color:var(--accent);width:22px;height:22px}
+.ann{max-width:980px;margin:14px auto 0;font-size:.85rem;color:var(--text2);display:grid;gap:6px}
+.ann div{display:flex;gap:8px}
+.ann b{color:var(--navy);min-width:18px}
+@media(max-width:760px){
+  .split,.two,.grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .hero,.wrap{padding-inline:16px}
+  .sitenav{padding-inline:16px;overflow:hidden}
+  .sitenav span:not(.logo):not(.act){display:none}
+}
+</style>
+</head>
+<body>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m12 4 8 4-8 4-8-4z"/><path d="m4 12 8 4 8-4M4 16l8 4 8-4"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/></symbol>
+</svg>
+
+<div class="bar">
+  <b>מוקאפ · תוכניות לימודים למגמות</b>
+  <button class="tab on" data-s="s1">1 · טופס ההעלאה</button>
+  <button class="tab" data-s="s2">2 · דף האישור שלך</button>
+  <button class="tab" data-s="s3">3 · העמוד באתר</button>
+  <span class="note">מוקאפ לדיון · כל השמות וההגשות הם דוגמה</span>
+</div>
+
+<!-- ═══════════ 1. FORM ═══════════ -->
+<section class="screen on" id="s1">
+  <div class="frame">
+    <div class="url">tfasim.pedagogiamh.co.il/tochnit-megama.html</div>
+    <div class="hero">
+      <div class="kick">מינהל הכשרה מקצועית · מגמות מקצועיות</div>
+      <h1>העלאת תוכנית לימודים למגמה</h1>
+      <p>התוכנית תפורסם במרחב הפדגוגי לאחר אישור. אין צורך בהרשמה.</p>
+    </div>
+    <div class="wrap">
+      <div class="split">
+        <div class="card form">
+          <div class="f">
+            <label class="l">שם מלא <span class="req">*</span></label>
+            <div class="in sel"><span>ישראלה ישראלי</span><svg><use href="#i-down"/></svg></div>
+            <div class="hint">לא ברשימה? בחרו "אחר" בסוף הרשימה והקלידו את שמכם</div>
+          </div>
+          <div class="two">
+            <div class="f">
+              <label class="l">מייל <span class="req">*</span></label>
+              <input class="in" value="israela@example.com" dir="ltr" style="text-align:right">
+            </div>
+            <div class="f">
+              <label class="l">טלפון</label>
+              <input class="in" value="050-0000000" dir="ltr" style="text-align:right">
+            </div>
+          </div>
+          <div class="f">
+            <label class="l">מגמה <span class="req">*</span></label>
+            <div class="in sel"><span style="color:var(--text2)">בחרו מגמה…</span><svg><use href="#i-down"/></svg></div>
+            <div class="dd">
+              <div class="s"><svg><use href="#i-search"/></svg>עיצוב</div>
+              <div class="o hl"><span>עיצוב שיער</span><small>603</small></div>
+              <div class="o"><span>עיצוב שיער רמה א׳ ואיפור אומנותי</span><small>616</small></div>
+              <div class="o"><span>עיצוב תעשייתי</span><small>2381</small></div>
+              <div class="o"><span>עיצוב מדיה וקריאטייב</span><small>573</small></div>
+              <div class="o other"><span>המגמה שלי לא ברשימה</span><small>הקלדה חופשית</small></div>
+            </div>
+          </div>
+          <div class="f">
+            <label class="l">שכבות <span class="req">*</span></label>
+            <div class="chips"><span class="chip on">כל השכבות (ט׳–י״ב)</span><span class="chip">ט׳</span><span class="chip">י׳</span><span class="chip">י״א</span><span class="chip">י״ב</span></div>
+            <div class="hint">קובץ אחד שמרכז את כל השכבות? בחרו "כל השכבות"</div>
+          </div>
+          <div class="two">
+            <div class="f">
+              <label class="l">שנת התוכנית <span class="req">*</span></label>
+              <div class="in sel"><span>תשפ״ז</span><svg><use href="#i-down"/></svg></div>
+            </div>
+            <div class="f">
+              <label class="l">סוג המסמך <span class="req">*</span></label>
+              <div class="in sel"><span>תוכנית לימודים מלאה</span><svg><use href="#i-down"/></svg></div>
+            </div>
+          </div>
+          <div class="f">
+            <label class="l">תוכנית הלימודים <span class="req">*</span></label>
+            <div class="drop">
+              <svg><use href="#i-up"/></svg>
+              <b>גררו לכאן או לחצו לבחירת קובץ</b>
+              PDF · Word · PowerPoint · עד 20MB לקובץ
+            </div>
+            <div class="file"><svg style="color:var(--accent)"><use href="#i-doc"/></svg><span>תוכנית עיצוב שיער ט-יב.pdf</span><small>2.4MB</small><svg class="x"><use href="#i-x"/></svg></div>
+          </div>
+          <div class="two">
+            <div class="f">
+              <label class="l">מבחן לדוגמה</label>
+              <div class="drop" style="padding:14px"><svg style="width:22px;height:22px"><use href="#i-up"/></svg><b style="font-size:.9rem">העלאת קובץ</b>לא חובה</div>
+              <div class="file"><svg style="color:var(--accent)"><use href="#i-doc"/></svg><span>מבחן לדוגמה.pdf</span><svg class="x"><use href="#i-x"/></svg></div>
+            </div>
+            <div class="f">
+              <label class="l">מחוון</label>
+              <div class="drop" style="padding:14px"><svg style="width:22px;height:22px"><use href="#i-up"/></svg><b style="font-size:.9rem">העלאת קובץ</b>לא חובה</div>
+              <div class="file"><svg style="color:var(--accent)"><use href="#i-doc"/></svg><span>מחוון.docx</span><svg class="x"><use href="#i-x"/></svg></div>
+            </div>
+          </div>
+          <div class="f">
+            <label class="l">הערות</label>
+            <textarea class="in" rows="2" placeholder="למשל: זו גרסה מעודכנת לתוכנית הקודמת"></textarea>
+          </div>
+          <div class="f check">
+            <span class="box"><svg><use href="#i-ok"/></svg></span>
+            <span>אני מאשר.ת שהמסמך אינו כולל פרטים אישיים של תלמידים או מורים <span class="req">*</span></span>
+          </div>
+          <button class="btn pri full"><svg><use href="#i-up"/></svg>שליחת התוכנית</button>
+          <div class="help"><a href="#"><svg><use href="#i-msg"/></svg>נתקלתם בבעיה? שלחו הודעה</a></div>
+        </div>
+
+        <div>
+          <div class="cap">אחרי השליחה</div>
+          <div class="card done">
+            <div class="ic"><svg><use href="#i-ok"/></svg></div>
+            <h2 style="margin:0 0 6px;color:var(--navy)">התוכנית התקבלה, תודה</h2>
+            <p style="margin:0 0 16px;color:var(--text2)">עיצוב שיער · 603 · כל השכבות<br>תוכנית + מבחן לדוגמה + מחוון<br>התוכנית תפורסם באתר לאחר אישור.</p>
+            <button class="btn" style="background:var(--blue-100);color:var(--navy)"><svg><use href="#i-up"/></svg>העלאת תוכנית נוספת</button>
+            <div class="hint" style="margin-top:8px;font-size:.8rem;color:var(--text2)">השם, המייל והטלפון יישארו ממולאים</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="credit">נבנה ע״י <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+  </div>
+</section>
+
+<!-- ═══════════ 2. ADMIN ═══════════ -->
+<section class="screen" id="s2">
+  <div class="frame">
+    <div class="url">tfasim.pedagogiamh.co.il/tochniyot-megamot-admin.html#k=••••••</div>
+    <div class="hero" style="padding-block:22px">
+      <div class="kick">ניהול · פנימי</div>
+      <h1 style="font-size:1.6rem">אישור תוכניות מגמות</h1>
+    </div>
+    <div class="wrap">
+      <div class="stats">
+        <div class="stat"><div class="n">3</div><div class="t">ממתינות לאישור</div></div>
+        <div class="stat"><div class="n">12</div><div class="t">מאושרות באתר</div></div>
+        <div class="stat"><div class="n">1</div><div class="t">הוחזרו לתיקון</div></div>
+        <div class="stat"><div class="n">41</div><div class="t">מגמות בלי תוכנית</div></div>
+      </div>
+      <div class="stabs"><span class="on">ממתינות (3)</span><span>מאושרות (12)</span><span>הוחזרו / נדחו</span><span>מי עוד לא הגיש</span></div>
+
+      <div class="sub">
+        <div class="top">
+          <div>
+            <h3>עיצוב שיער · 603 <span class="tag info">תוכנית מלאה</span></h3>
+            <div class="meta">ישראלה ישראלי · israela@example.com · 050-0000000 · כל השכבות ט׳–י״ב · תשפ״ז · הוגש היום 10:42</div>
+          </div>
+        </div>
+        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · תוכנית עיצוב שיער ט-יב.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מבחן לדוגמה.pdf</span><span class="fl"><svg><use href="#i-doc"/></svg>מחוון.docx</span></div>
+        <div class="actions">
+          <button class="b ok"><svg><use href="#i-ok"/></svg>אישור ופרסום</button>
+          <button class="b fix"><svg><use href="#i-edit"/></svg>בקשת תיקון</button>
+          <button class="b no"><svg><use href="#i-x"/></svg>דחייה</button>
+        </div>
+      </div>
+
+      <div class="sub">
+        <div class="top">
+          <div>
+            <h3>"רובוטיקה ובקרה" <span class="tag warn">לבדיקה · מגמה לא ברשימה</span><span class="tag warn">שם "אחר"</span></h3>
+            <div class="meta">פלונית אלמונית · plonit@example.com · (ללא טלפון) · שכבות י״א–י״ב · תשפ״ז · הוגש אתמול</div>
+          </div>
+        </div>
+        <div class="assign"><b>שיוך לפני אישור:</b><div class="in sel" style="background:#fff"><span>בחרו סמל מגמה קיים או השאירו כמגמה חדשה…</span><svg><use href="#i-down"/></svg></div></div>
+        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>תוכנית · סילבוס רובוטיקה.pdf</span><span class="fl" style="opacity:.55">אין מבחן לדוגמה</span><span class="fl" style="opacity:.55">אין מחוון</span></div>
+        <div class="actions">
+          <button class="b ok"><svg><use href="#i-ok"/></svg>אישור ופרסום</button>
+          <button class="b fix"><svg><use href="#i-edit"/></svg>בקשת תיקון</button>
+          <button class="b no"><svg><use href="#i-x"/></svg>דחייה</button>
+        </div>
+      </div>
+
+      <div class="sub" style="border-color:#E9CF8B">
+        <div class="top">
+          <div>
+            <h3>חשמלאי מוסמך · 1401 <span class="tag info">תוכנית שנתית</span><span class="tag ok">מחליפה גרסה קיימת</span></h3>
+            <div class="meta">משה כהן · moshe@example.com · 052-0000000 · שכבות י׳–י״ב · תשפ״ז · הוגש 22.9</div>
+          </div>
+        </div>
+        <div class="files"><span class="fl"><svg><use href="#i-doc"/></svg>חשמלאי מוסמך תשפז.docx</span></div>
+        <div style="background:var(--yellow-bg);border-radius:9px;padding:10px 12px;font-size:.9rem;margin-bottom:10px">
+          <b>בקשת תיקון — הודעה מוכנה לשליחה:</b><br>
+          שלום משה, תודה על התוכנית לחשמלאי מוסמך. לפני הפרסום נבקש <u>לצרף את פירוט השעות לכל שכבה</u>. אפשר להעלות גרסה מתוקנת באותו טופס. יחידת הפיקוח על הדרכות מורים · משרד העבודה
+          <div style="margin-top:8px;display:flex;gap:8px"><button class="b"><svg><use href="#i-copy"/></svg>העתקה</button><button class="b">וואטסאפ</button><button class="b">מייל</button></div>
+        </div>
+      </div>
+
+      <div class="missing" style="margin-top:20px">
+        <h3>מגמות שעוד אין להן תוכנית · לפי מפקח.ת מקצועי.ת <button class="b"><svg><use href="#i-copy"/></svg>העתקת הרשימה</button></h3>
+        <div class="mrow"><span><b>מפקח.ת א׳</b> — אוטוטק/אוטוטרוניקה · 2249</span><small>21 מוסדות</small></div>
+        <div class="mrow"><span><b>מפקח.ת ב׳</b> — תפעול מערכות תקשוב · 3024</span><small>10 מוסדות</small></div>
+        <div class="mrow"><span><b>מפקח.ת ג׳</b> — מערכות תיכון וייצור באמצעות מחשב · 2341</span><small>10 מוסדות</small></div>
+        <div class="mrow"><span><b>מפקח.ת ד׳</b> — קולינריה · 1626</span><small>8 מוסדות</small></div>
+        <div class="mrow" style="border:0;color:var(--text2)">ועוד 37…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 3. SITE PAGE ═══════════ -->
+<section class="screen" id="s3">
+  <div class="frame">
+    <div class="url">pedagogiamh.co.il/tochniyot-megamot.html</div>
+    <div class="sitenav">
+      <span class="logo">הבית של המנהיגות הפדגוגית היוצרת</span>
+      <span class="act">מרחב פדגוגי</span><span>חניכות וקריירה</span><span>נהלים</span><span>בעלי תפקידים</span>
+    </div>
+    <div class="hero">
+      <div class="kick">מרחב פדגוגי · 05 תוכניות לימודים</div>
+      <h1>תוכניות לימודים · מגמות מקצועיות</h1>
+      <p>תוכניות הלימודים של המגמות המקצועיות, כפי שאושרו ע״י הפיקוח המקצועי.</p>
+    </div>
+    <div class="wrap">
+      <div class="crumbs">דף הבית ‹ מרחב פדגוגי ‹ תוכניות לימודים · מגמות מקצועיות</div>
+      <div class="intro"><svg><use href="#i-info"/></svg><span>12 מגמות עם תוכנית מאושרת לשנת תשפ״ז. התוכניות מתעדכנות כשהפיקוח המקצועי מעלה גרסה חדשה.</span></div>
+      <div class="filters">
+        <div class="search"><svg><use href="#i-search"/></svg>חיפוש לפי שם מגמה או סמל…</div>
+        <div class="chips"><span class="chip on">כל השכבות</span><span class="chip">ט׳</span><span class="chip">י׳</span><span class="chip">י״א</span><span class="chip">י״ב</span></div>
+      </div>
+      <div class="chips" style="margin:-6px 0 16px"><span class="chip">יש מבחן לדוגמה</span><span class="chip">יש מחוון</span></div>
+      <div class="grid">
+        <div class="mg">
+          <span class="code">603</span>
+          <h3>עיצוב שיער</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>כל השכבות ט׳–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 24.9.26</div>
+          <div class="docs">
+            <a href="#"><svg><use href="#i-doc"/></svg>תוכנית לימודים מלאה</a>
+            <a href="#"><svg><use href="#i-doc"/></svg>מבחן לדוגמה</a>
+            <a href="#"><svg><use href="#i-doc"/></svg>מחוון</a>
+          </div>
+        </div>
+        <div class="mg">
+          <span class="code">1401</span>
+          <h3>חשמלאי מוסמך</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>שכבות י׳–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 20.9.26</div>
+          <div class="docs"><a href="#"><svg><use href="#i-doc"/></svg>תוכנית שנתית</a></div>
+        </div>
+        <div class="mg">
+          <span class="code">1626</span>
+          <h3>קולינריה</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>שכבות י׳–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 18.9.26</div>
+          <div class="docs"><a href="#"><svg><use href="#i-doc"/></svg>סילבוס</a><a href="#"><svg><use href="#i-doc"/></svg>מחוון</a></div>
+        </div>
+        <div class="mg">
+          <span class="code">8122</span>
+          <h3>שיווק דיגיטלי</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>שכבות י״א–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 17.9.26</div>
+          <div class="docs"><a href="#"><svg><use href="#i-doc"/></svg>תוכנית לימודים מלאה</a></div>
+        </div>
+        <div class="mg">
+          <span class="code">2381</span>
+          <h3>עיצוב תעשייתי</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>שכבות י׳–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 15.9.26</div>
+          <div class="docs"><a href="#"><svg><use href="#i-doc"/></svg>תוכנית לימודים מלאה</a></div>
+        </div>
+        <div class="mg">
+          <span class="code">573</span>
+          <h3>עיצוב מדיה וקריאטייב</h3>
+          <div class="row"><svg><use href="#i-layers"/></svg>שכבות ט׳–י״ב</div>
+          <div class="row"><svg><use href="#i-cal"/></svg>תשפ״ז · עודכן 12.9.26</div>
+          <div class="docs"><a href="#"><svg><use href="#i-doc"/></svg>תוכנית לימודים מלאה</a></div>
+        </div>
+      </div>
+    </div>
+    <div class="credit">נבנה ע״י <a href="https://impact-os.app" target="_blank" rel="noopener">impactos</a></div>
+  </div>
+  <div class="ann">
+    <div><b>·</b>שם המגיש ופרטי הקשר לא מוצגים באתר.</div>
+    <div><b>·</b>מגמה בלי תוכנית מאושרת לא מופיעה בעמוד.</div>
+    <div><b>·</b>כל כפתור פותח את הקובץ בדרייב לצפייה. מבחן לדוגמה ומחוון מופיעים רק אם הועלו.</div>
+  </div>
+</section>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab,.screen').forEach(e=>e.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.s).classList.add('on');scrollTo(0,0);
+});
+</script>
+</body>
+</html>
