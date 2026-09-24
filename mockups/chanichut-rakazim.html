@@ -1,0 +1,925 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>מערכת רכזי חניכות · מוקאפ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D3B66;--blue:#14548C;--blue-soft:#E8F0F9;--bg:#F4F7FB;--card:#fff;
+  --text:#1B2A3A;--text2:#4A5B6E;--muted:#8A97A6;--border:#DCE4EE;--border-strong:#C3D0DE;
+  --ok:#1F7A4D;--ok-bg:#E6F4EC;--warn:#9A5B00;--warn-bg:#FFF4E0;--bad:#A32B2B;--bad-bg:#FDECEC;
+  --sh:0 1px 2px rgba(13,59,102,.06),0 4px 14px rgba(13,59,102,.06);--r:14px;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Heebo,system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hide{display:none!important}
+
+/* ── באנר מוקאפ ── */
+.mock-banner{background:#FFF4E0;color:#7A4A00;border-bottom:1px solid #F0D6A2;text-align:center;font-size:.82rem;font-weight:600;padding:6px 12px}
+
+/* ── מסך כניסה ── */
+.gate{min-height:calc(100vh - 34px);display:grid;place-items:center;padding:24px 16px}
+.gate-card{background:var(--card);border-radius:20px;box-shadow:var(--sh);width:100%;max-width:430px;padding:34px 30px;border:1px solid var(--border)}
+.gate-logo{width:52px;height:52px;border-radius:14px;background:var(--navy);color:#fff;display:grid;place-items:center;margin-bottom:16px}
+.gate-logo svg.i{width:28px;height:28px}
+.gate h1{margin:0 0 4px;font-size:1.45rem;color:var(--navy)}
+.gate p.sub{margin:0 0 22px;color:var(--text2);font-size:.92rem}
+.field{display:block;margin-bottom:14px}
+.field>span{display:block;font-weight:600;font-size:.86rem;color:var(--text2);margin-bottom:5px}
+.inp{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:10px 12px;background:#fff;outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--blue)}
+textarea.inp{resize:vertical;min-height:70px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:10px;padding:10px 18px;font-weight:700;cursor:pointer;transition:transform .12s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--navy);color:#fff}
+.btn-primary:hover{background:#0A3055}
+.btn-ghost{background:#fff;border:1.5px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--border-strong)}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-sm{padding:6px 12px;font-size:.84rem;border-radius:8px}
+.btn-block{width:100%}
+.code-row{display:flex;gap:8px;direction:ltr;justify-content:center;margin:6px 0 18px}
+.code-row input{width:46px;height:54px;text-align:center;font-size:1.4rem;font-weight:700;border:1.5px solid var(--border);border-radius:10px;outline:none}
+.code-row input:focus{border-color:var(--blue)}
+.masked{background:var(--blue-soft);border-radius:10px;padding:10px 12px;font-size:.9rem;color:var(--navy);margin-bottom:14px;direction:ltr;text-align:center;font-weight:600}
+.gate-note{display:flex;gap:8px;align-items:flex-start;font-size:.8rem;color:var(--muted);margin-top:18px;border-top:1px solid var(--border);padding-top:14px}
+
+/* ── מעטפת ── */
+.top{background:var(--navy);color:#fff}
+.top-in{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.top h1{margin:0;font-size:1.12rem;font-weight:700}
+.top .school{font-size:.86rem;opacity:.85}
+.top .sp{flex:1}
+.lock{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border-radius:999px;padding:4px 12px;font-size:.78rem;font-weight:600}
+.lock svg.i{width:14px;height:14px}
+.user{display:flex;align-items:center;gap:10px;font-size:.86rem}
+.avatar{width:32px;height:32px;border-radius:50%;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:.85rem}
+.logout{background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:.8rem}
+.tabs{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:5}
+.tabs-in{max-width:1180px;margin:0 auto;padding:0 12px;display:flex;gap:4px;overflow-x:auto}
+.tab{display:flex;align-items:center;gap:8px;border:0;background:none;padding:14px 16px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab.on{color:var(--navy);border-bottom-color:var(--navy)}
+.tab .cnt{background:var(--bad-bg);color:var(--bad);border-radius:999px;font-size:.72rem;padding:1px 8px;font-weight:700}
+main{max-width:1180px;margin:0 auto;padding:22px 20px 40px}
+.h2row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 14px}
+.h2row h2{margin:0;font-size:1.2rem;color:var(--navy)}
+.h2row .sp{flex:1}
+.hint{color:var(--text2);font-size:.88rem;margin:-8px 0 16px}
+
+/* ── מדדים ── */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:20px}
+.kpi{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh)}
+.kpi .lbl{font-size:.8rem;color:var(--text2);font-weight:600}
+.kpi .val{font-size:1.7rem;font-weight:800;color:var(--navy);line-height:1.2;font-variant-numeric:tabular-nums}
+.kpi .val small{font-size:.9rem;color:var(--muted);font-weight:600}
+
+/* ── כרטיסי מגמה ── */
+.mg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-bottom:24px}
+.mg-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;box-shadow:var(--sh);cursor:pointer;transition:border-color .15s,transform .15s}
+.mg-card:hover{border-color:var(--border-strong);transform:translateY(-1px)}
+.mg-card.on{border-color:var(--navy);box-shadow:0 0 0 2px var(--navy) inset}
+.mg-card h3{margin:0 0 2px;font-size:.98rem;color:var(--navy);line-height:1.35}
+.mg-card .code{font-size:.75rem;color:var(--muted)}
+.mg-stats{display:flex;gap:14px;margin:10px 0 8px;font-size:.84rem;color:var(--text2)}
+.mg-stats b{display:block;font-size:1.2rem;color:var(--text);font-variant-numeric:tabular-nums}
+.bar{height:6px;background:#EEF2F7;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:99px}
+.mg-foot{display:flex;justify-content:space-between;font-size:.76rem;color:var(--muted);margin-top:5px}
+
+/* ── טבלאות ── */
+.panel{background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden}
+.tools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;border-bottom:1px solid var(--border)}
+.search{position:relative;flex:1;min-width:200px}
+.search input{padding-inline-start:34px}
+.search svg.i{position:absolute;inset-inline-start:10px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th{background:#F7F9FC;color:var(--text2);font-weight:600;font-size:.8rem;text-align:start;padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid #EEF2F7;vertical-align:middle}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#FAFCFE}
+td.name{font-weight:700;color:var(--navy)}
+.days{display:flex;gap:3px}
+.day{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;font-size:.74rem;font-weight:700;background:#EEF2F7;color:#A9B6C2}
+.day.on{background:var(--blue-soft);color:var(--blue)}
+.tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 10px;font-size:.76rem;font-weight:700;white-space:nowrap}
+.tag.ok{background:var(--ok-bg);color:var(--ok)}
+.tag.warn{background:var(--warn-bg);color:var(--warn)}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}
+.tag.gray{background:#EEF2F7;color:var(--text2)}
+.ico-btn{border:0;background:none;color:var(--muted);cursor:pointer;padding:5px;border-radius:7px}
+.ico-btn:hover{background:#EEF2F7;color:var(--navy)}
+.note-cell{color:var(--text2);font-size:.84rem;max-width:220px}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+
+/* ── טופס שיבוץ (מגירה) ── */
+.drawer-bg{position:fixed;inset:0;background:rgba(13,30,50,.35);z-index:20}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(460px,100%);background:#fff;z-index:21;box-shadow:0 0 40px rgba(0,0,0,.2);display:flex;flex-direction:column}
+.drawer header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.drawer header h3{margin:0;color:var(--navy);flex:1}
+.drawer .body{padding:18px 22px;overflow-y:auto;flex:1}
+.drawer footer{padding:14px 22px;border-top:1px solid var(--border);display:flex;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.daypick{display:flex;gap:6px}
+.daypick label{flex:1}
+.daypick input{display:none}
+.daypick span{display:grid;place-items:center;height:40px;border:1.5px solid var(--border);border-radius:9px;font-weight:700;color:var(--text2);cursor:pointer;user-select:none}
+.daypick input:checked+span{background:var(--navy);border-color:var(--navy);color:#fff}
+.req{color:var(--bad)}
+
+/* ── תיק תלמיד ── */
+.files{display:grid;grid-template-columns:290px 1fr;gap:16px;align-items:start}
+.slist{max-height:640px;overflow-y:auto}
+.sitem{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #EEF2F7;cursor:pointer}
+.sitem:hover{background:#FAFCFE}
+.sitem.on{background:var(--blue-soft)}
+.sitem .av{width:34px;height:34px;border-radius:50%;background:#EEF2F7;color:var(--navy);display:grid;place-items:center;font-weight:800;font-size:.82rem;flex:none}
+.sitem.on .av{background:var(--navy);color:#fff}
+.sitem .nm{font-weight:700;font-size:.9rem}
+.sitem .mg{font-size:.76rem;color:var(--muted)}
+.sitem .dots{margin-inline-start:auto;display:flex;gap:4px}
+.dot{width:8px;height:8px;border-radius:50%;background:#DCE4EE}
+.dot.ok{background:var(--ok)}
+.sfile header{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.sfile header .av{width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.1rem}
+.sfile header h3{margin:0;font-size:1.25rem;color:var(--navy)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.84rem;color:var(--text2);margin-top:3px}
+.meta b{color:var(--text)}
+.sec{padding:18px 20px;border-bottom:1px solid var(--border)}
+.sec:last-child{border-bottom:0}
+.sec h4{margin:0 0 4px;display:flex;align-items:center;gap:8px;color:var(--navy);font-size:1rem}
+.sec .desc{font-size:.82rem;color:var(--muted);margin:0 0 12px}
+.drop{display:block;border:2px dashed var(--border-strong);border-radius:12px;padding:16px;text-align:center;color:var(--text2);font-size:.86rem;cursor:pointer;transition:background .15s,border-color .15s}
+.drop:hover{background:var(--blue-soft);border-color:var(--blue)}
+.drop b{color:var(--blue)}
+.flist{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.fitem{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:.86rem}
+.fitem .fic{width:32px;height:32px;border-radius:8px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center}
+.fitem .fn{font-weight:600}
+.fitem .fd{font-size:.76rem;color:var(--muted)}
+.fitem .sp{flex:1}
+.att-mini{width:100%}
+.att-mini td,.att-mini th{padding:8px 10px}
+
+/* ── נוכחות חודשית ── */
+.month-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{border:1.5px solid var(--border);background:#fff;border-radius:999px;padding:6px 14px;font-weight:600;font-size:.84rem;color:var(--text2);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.pill.on{background:var(--navy);border-color:var(--navy);color:#fff}
+.pill .st{width:8px;height:8px;border-radius:50%;background:#DCE4EE}
+.pill .st.ok{background:#3DBE7B}.pill .st.warn{background:#F0A94B}
+.missing{background:var(--warn-bg);border:1px solid #F0D6A2;border-radius:12px;padding:12px 14px;margin-bottom:14px;font-size:.86rem;color:#7A4A00;display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.missing b{white-space:nowrap}
+.missing .names{flex:1}
+.srow{border-bottom:1px solid var(--border)}
+.srow-head{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;flex-wrap:wrap}
+.srow-head:hover{background:#FAFCFE}
+.srow-head .nm{font-weight:700;color:var(--navy);min-width:140px}
+.srow-head .emp{font-size:.82rem;color:var(--text2);min-width:150px}
+.srow-head .sum{margin-inline-start:auto;display:flex;gap:10px;align-items:center;font-size:.84rem;color:var(--text2)}
+.srow-head .chev{transition:transform .2s;color:var(--muted)}
+.srow.open .chev{transform:rotate(180deg)}
+.srow-body{padding:0 16px 14px;display:none}
+.srow.open .srow-body{display:block}
+.dtable td,.dtable th{padding:7px 10px}
+.stt{display:inline-flex;border:1.5px solid var(--border);border-radius:9px;overflow:hidden}
+.stt button{border:0;background:#fff;padding:5px 11px;font-size:.8rem;font-weight:600;color:var(--text2);cursor:pointer}
+.stt button+button{border-inline-start:1.5px solid var(--border)}
+.stt button.p.on{background:var(--ok);color:#fff}
+.stt button.a.on{background:var(--bad);color:#fff}
+.stt button.x.on{background:#8A97A6;color:#fff}
+input[type=time].inp{padding:6px 8px;width:110px;direction:ltr}
+.locked .stt button,.locked input{pointer-events:none;opacity:.7}
+.submit-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;background:#F7F9FC;border-top:1px solid var(--border)}
+.submit-bar .sp{flex:1}
+
+/* ── רשימת מסמכים ── */
+.docs{display:flex;flex-direction:column;gap:6px}
+.doc{display:grid;grid-template-columns:34px 1fr auto auto;gap:10px;align-items:center;border:1px solid var(--border);border-radius:10px;padding:8px 12px}
+.doc .fic{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;background:#EEF2F7;color:var(--muted)}
+.doc.st-ok .fic{background:var(--ok-bg);color:var(--ok)}
+.doc.st-miss .fic{background:var(--bad-bg);color:var(--bad)}
+.doc.st-proc .fic{background:var(--warn-bg);color:var(--warn)}
+.doc .dn{font-weight:600;font-size:.9rem}
+.doc .dd{font-size:.76rem;color:var(--muted)}
+.doc select.inp{padding:6px 8px;width:auto;font-size:.84rem}
+.doc-prog{display:flex;align-items:center;gap:10px;margin-bottom:10px;font-size:.84rem;color:var(--text2)}
+.doc-prog .bar{flex:1;max-width:220px}
+.log{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.log-item{border-inline-start:3px solid var(--blue-soft);padding:2px 10px;font-size:.86rem}
+.log-item .ld{font-size:.74rem;color:var(--muted)}
+.log-add{display:flex;gap:8px}
+/* ── מעסיקים ── */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:12px}
+.emp-card{background:#fff;border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--sh);padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.emp-card h3{margin:0;font-size:1.05rem;color:var(--navy)}
+.emp-card .field-s{font-size:.8rem;color:var(--muted)}
+.contact{display:flex;flex-direction:column;gap:5px;font-size:.87rem}
+.contact a,.contact span{display:inline-flex;align-items:center;gap:7px;color:var(--text);text-decoration:none}
+.contact a:hover{color:var(--blue)}
+.contact svg.i{width:15px;height:15px;color:var(--muted)}
+.contact .empty-v{color:var(--bad);font-size:.82rem}
+.emp-stu{border-top:1px solid #EEF2F7;padding-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:5px;background:var(--blue-soft);color:var(--navy);border-radius:999px;padding:3px 11px;font-size:.8rem;font-weight:600;cursor:pointer;border:0}
+.chip small{color:var(--text2);font-weight:500}
+.emp-head{display:flex;align-items:flex-start;gap:10px}
+.emp-head .sp{flex:1}
+
+.opt{display:flex;gap:10px;align-items:flex-start;border:1.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;font-size:.86rem;color:var(--text2)}
+.opt input{margin-top:4px;width:17px;height:17px;accent-color:var(--navy)}
+.opt b{color:var(--navy)}
+/* מבט המנהל.ת: צפייה בלבד */
+.viewer #addBtn,.viewer #addEmp,.viewer .edit-only,.viewer [data-ed],.viewer #edStu,.viewer .drop,.viewer .doc label,.viewer .log-add,
+.viewer [data-del],.viewer [data-all],.viewer [data-add],.viewer #submitMg,.viewer #unlock{display:none!important}
+.viewer .doc select,.viewer .stt,.viewer input[type=time]{pointer-events:none}
+.viewer .top{background:#3A4F66}
+@media print{
+  .mock-banner,.top,.tabs,.help,.month-bar,.drawer,.drawer-bg,#t-shibutz,#t-maasikim,#t-tik,#t-nochechut{display:none!important}
+  #t-dochot{display:block!important} body{background:#fff} .panel{box-shadow:none}
+}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:600;opacity:0;transition:all .25s;z-index:40;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.help{max-width:1180px;margin:0 auto;padding:0 20px 8px;text-align:center}
+.help a{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-weight:600;font-size:.86rem;text-decoration:none;border:1.5px solid var(--border);border-radius:999px;padding:7px 16px;background:#fff}
+.foot{text-align:center;padding:14px 12px 26px;color:#8A97A6;font-size:.72rem}
+.foot a{color:#8A97A6}
+
+@media (max-width:860px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .files{grid-template-columns:1fr}
+  .slist{max-height:260px}
+  .grid2{grid-template-columns:1fr}
+  main{padding:16px 14px 30px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="2.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+  <symbol id="i-brief" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7M3 12.5h18"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.5h7.5A2.5 2.5 0 0 1 21 10v7.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M8 14h2M14 14h2M8 17.5h2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V5h5v2M6.5 7l1 13h9l1-13"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5M4.5 16v2.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V16"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3.5H7A2.5 2.5 0 0 0 4.5 6v12A2.5 2.5 0 0 0 7 20.5h10a2.5 2.5 0 0 0 2.5-2.5V9z"/><path d="M14 3.5V9h5.5M8.5 13h7M8.5 16.5h5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M12 20h8.5"/><path d="M16.5 4.5a2.1 2.1 0 0 1 3 3L8 19l-4 1 1-4z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M20.5 3.5 10 14M20.5 3.5 14 20.5l-4-6.5-6.5-4z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.1"/></symbol>
+  <symbol id="i-building" viewBox="0 0 24 24"><path d="M4 20.5V6.5L12 3.5v17M12 9.5h6.5a1.5 1.5 0 0 1 1.5 1.5v9.5M2.5 20.5h19M7 9h2M7 12.5h2M7 16h2M15 13h2M15 16.5h2"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M5 4h3.5l1.5 4.5-2.2 1.4a11 11 0 0 0 6.3 6.3l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16.5 16.5 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20.5h16M7 17V11M12 17V6.5M17 17v-8"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v12M7 11l5 5 5-5M4.5 16v2.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V16"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8.5V4h10v4.5M7 17H5a1.5 1.5 0 0 1-1.5-1.5v-5.5A1.5 1.5 0 0 1 5 8.5h14a1.5 1.5 0 0 1 1.5 1.5v5.5A1.5 1.5 0 0 1 19 17h-2"/><rect x="7" y="13.5" width="10" height="6.5" rx="1"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="17.5" cy="5.5" r="2.5"/><circle cx="6.5" cy="12" r="2.5"/><circle cx="17.5" cy="18.5" r="2.5"/><path d="m8.7 10.8 6.6-4M8.7 13.2l6.6 4"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></symbol>
+</svg>
+
+<div class="mock-banner">מוקאפ לאישור · הנתונים בדויים לדוגמה ושום דבר לא נשמר · המגמות הן המגמות האמיתיות של בית הספר מטבלת הפיקוח המקצועי</div>
+
+<!-- ═════════ מסך כניסה ═════════ -->
+<section class="gate" id="gate">
+  <div class="gate-card">
+    <div class="gate-logo"><svg class="i"><use href="#i-brief"/></svg></div>
+    <div id="g1">
+      <h1>מערכת רכזי החניכות</h1>
+      <p class="sub">שיבוץ תלמידים במקומות תעסוקה, תיק תלמיד ונוכחות חודשית. כל רכז.ת רואה רק את בית הספר שלו.</p>
+      <label class="field"><span>בית הספר</span>
+        <select class="inp" id="gSchool"></select></label>
+      <label class="field"><span>רכז.ת החניכות</span>
+        <select class="inp" id="gName"><option>יונתן א. (לדוגמה)</option></select></label>
+      <button class="btn btn-primary btn-block" id="gSend"><svg class="i"><use href="#i-mail"/></svg>שלחו לי קוד כניסה</button>
+    </div>
+    <div id="g2" class="hide">
+      <h1>הקלידו את הקוד</h1>
+      <p class="sub">שלחנו קוד בן 6 ספרות למייל שרשום בנספח בעלי התפקידים:</p>
+      <div class="masked">y•••••@a•••.org.il</div>
+      <div class="code-row" id="codeRow"></div>
+      <button class="btn btn-primary btn-block" id="gEnter">כניסה</button>
+      <p style="text-align:center;font-size:.8rem;color:var(--muted);margin:12px 0 0">במוקאפ כל קוד יעבוד · הכניסה נשמרת 30 יום במכשיר הזה</p>
+    </div>
+    <div class="gate-note"><svg class="i" style="width:16px;height:16px"><use href="#i-lock"/></svg>
+      <span>הכניסה מזוהה לפי המייל שבנספח בעלי התפקידים, כמו במבט המורה. שמות התלמידים והקבצים נשמרים בשרת סגור, ולא מופיעים באתר או בקישור פתוח.</span></div>
+  </div>
+</section>
+
+<!-- ═════════ האפליקציה ═════════ -->
+<div id="app" class="hide">
+  <div class="top"><div class="top-in">
+    <div>
+      <h1>מערכת רכזי החניכות</h1>
+      <div class="school" id="topSchool"></div>
+    </div>
+    <span class="lock"><svg class="i"><use href="#i-lock"/></svg>גישה לבית הספר שלך בלבד</span>
+    <div class="sp"></div>
+    <label class="lock" style="cursor:pointer;background:rgba(255,255,255,.2)"><input type="checkbox" id="asPrincipal" style="margin:0"><svg class="i"><use href="#i-eye"/></svg>מוקאפ: הצגה כמנהל.ת</label>
+    <div class="user"><div class="avatar">יא</div><span id="userLbl">יונתן א. · רכז חניכות</span>
+      <button class="logout" id="logout">יציאה</button></div>
+  </div></div>
+
+  <nav class="tabs"><div class="tabs-in">
+    <button class="tab on" data-tab="shibutz"><svg class="i"><use href="#i-brief"/></svg>מועסקים ושיבוץ מעסיקים</button>
+    <button class="tab" data-tab="maasikim"><svg class="i"><use href="#i-building"/></svg>מעסיקים</button>
+    <button class="tab" data-tab="tik"><svg class="i"><use href="#i-folder"/></svg>תיק תלמיד</button>
+    <button class="tab" data-tab="nochechut"><svg class="i"><use href="#i-cal"/></svg>נוכחות חודשית <span class="cnt" id="tabMissing"></span></button>
+    <button class="tab" data-tab="dochot"><svg class="i"><use href="#i-chart"/></svg>דוחות ושיתוף</button>
+  </div></nav>
+
+  <main>
+    <!-- טאב 1 -->
+    <section id="t-shibutz">
+      <div class="kpis" id="kpis"></div>
+      <div class="h2row"><h2>סטטוס מועסקים לפי מגמה</h2><div class="sp"></div>
+        <span style="font-size:.82rem;color:var(--muted)">לחיצה על מגמה מסננת את הטבלה</span></div>
+      <div class="mg-grid" id="mgGrid"></div>
+
+      <div class="h2row"><h2>שיבוץ מעסיקים</h2><div class="sp"></div>
+        <button class="btn btn-primary" id="addBtn"><svg class="i"><use href="#i-plus"/></svg>שיבוץ תלמיד.ה</button></div>
+      <div class="panel">
+        <div class="tools">
+          <div class="search"><svg class="i"><use href="#i-search"/></svg><input class="inp" id="q" placeholder="חיפוש תלמיד.ה או מעסיק"></div>
+          <select class="inp" id="fMg" style="width:auto;min-width:200px"></select>
+        </div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>שם התלמיד.ה</th><th>מגמה</th><th>מספר פעולה</th><th>כיתה</th><th>שם המעסיק</th><th>ימי עבודה</th><th>הערות</th><th></th></tr></thead>
+          <tbody id="tbody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- טאב מעסיקים -->
+    <section id="t-maasikim" class="hide">
+      <div class="h2row"><h2>מעסיקים</h2><div class="sp"></div>
+        <button class="btn btn-primary" id="addEmp"><svg class="i"><use href="#i-plus"/></svg>מעסיק חדש</button></div>
+      <p class="hint">פרטי הקשר של כל מקום תעסוקה והתלמידים שמועסקים בו. מעסיק שנכתב בשיבוץ ועוד לא קיים כאן נוסף לבד, וצריך להשלים לו פרטים.</p>
+      <div class="panel" style="margin-bottom:14px"><div class="tools">
+        <div class="search"><svg class="i"><use href="#i-search"/></svg><input class="inp" id="q3" placeholder="חיפוש מעסיק, איש קשר או תלמיד.ה"></div>
+        <select class="inp" id="fEmpMg" style="width:auto;min-width:200px"></select></div></div>
+      <div class="emp-grid" id="empGrid"></div>
+    </section>
+
+    <!-- טאב 2 -->
+    <section id="t-tik" class="hide">
+      <div class="h2row"><h2>תיק תלמיד</h2></div>
+      <p class="hint">לכל תלמיד.ה מועסק.ת: טפסי ההכנה לתעסוקה, הרפלקציה ונוכחות לאורך השנה. הנקודות ליד השם: טפסים · רפלקציה · נוכחות החודש.</p>
+      <div class="files">
+        <div class="panel">
+          <div class="tools"><div class="search"><svg class="i"><use href="#i-search"/></svg><input class="inp" id="q2" placeholder="חיפוש"></div></div>
+          <div class="slist" id="slist"></div>
+        </div>
+        <div class="panel sfile" id="sfile"></div>
+      </div>
+    </section>
+
+    <!-- טאב 3 -->
+    <section id="t-nochechut" class="hide">
+      <div class="h2row"><h2>נוכחות חודשית במקום התעסוקה</h2></div>
+      <p class="hint">פעם בחודש: לכל תלמיד.ה ימי העבודה לפי השיבוץ נפתחים לבד. מסמנים הגיע / לא הגיע ושעות, ומגישים לכל מגמה.</p>
+      <div class="month-bar">
+        <select class="inp" id="month" style="width:auto"></select>
+        <div class="pills" id="mgPills"></div>
+      </div>
+      <div id="missing"></div>
+      <div class="panel" id="attPanel"></div>
+    </section>
+    <!-- טאב דוחות -->
+    <section id="t-dochot" class="hide">
+      <div class="h2row"><h2>דוחות ושיתוף</h2><div class="sp"></div><span id="shareState"></span></div>
+      <p class="hint">בוחרים חתך ותקופה, ומורידים לאקסל, מדפיסים או משתפים עם המנהל.ת.</p>
+      <div class="month-bar">
+        <div class="pills" id="cutPills"></div>
+      </div>
+      <div class="month-bar">
+        <select class="inp" id="rPeriod" style="width:auto"></select>
+        <select class="inp" id="rMg" style="width:auto;min-width:200px"></select>
+        <div class="sp" style="flex:1"></div>
+        <button class="btn btn-ghost btn-sm" id="rCsv"><svg class="i"><use href="#i-down"/></svg>הורדה לאקסל</button>
+        <button class="btn btn-ghost btn-sm" id="rPrint"><svg class="i"><use href="#i-print"/></svg>הדפסה / PDF</button>
+        <button class="btn btn-primary btn-sm edit-only" id="rShare"><svg class="i"><use href="#i-share"/></svg>שיתוף עם המנהל.ת</button>
+      </div>
+      <div class="panel">
+        <div class="tools"><b id="rTitle" style="color:var(--navy)"></b></div>
+        <div class="tbl-wrap"><table id="rTable"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <div class="help"><a href="mailto:mlypeleg@gmail.com?subject=מערכת רכזי החניכות — תקלה"><svg class="i"><use href="#i-mail"/></svg>נתקלתם בבעיה? שלחו הודעה</a></div>
+  <div class="foot">המנהיגות הפדגוגית היוצרת · משרד העבודה<br>נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</div>
+
+<!-- מגירת שיבוץ -->
+<div class="drawer-bg hide" id="dBg"></div>
+<aside class="drawer hide" id="drawer">
+  <header><h3 id="dTitle">שיבוץ תלמיד.ה אצל מעסיק</h3><button class="ico-btn" id="dClose"><svg class="i"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <label class="field"><span>שם התלמיד.ה <b class="req">*</b></span><input class="inp" id="fName"></label>
+    <label class="field"><span>מגמה <b class="req">*</b></span><select class="inp" id="fMgSel"></select></label>
+    <div class="grid2">
+      <label class="field"><span>מספר פעולה <b class="req">*</b></span><input class="inp" id="fAct" inputmode="numeric" style="direction:ltr;text-align:right"></label>
+      <label class="field"><span>כיתה <b class="req">*</b></span><select class="inp" id="fClass"></select></label>
+    </div>
+    <label class="field"><span>שם המעסיק <b class="req">*</b></span><input class="inp" id="fEmp" list="empList" placeholder="בחירה מרשימת המעסיקים או שם חדש"><datalist id="empList"></datalist></label>
+    <div class="grid2">
+      <label class="field"><span>סטטוס תעסוקה</span><select class="inp" id="fStat"></select></label>
+      <label class="field"><span>טלפון התלמיד.ה</span><input class="inp" id="fPhone" inputmode="tel" style="direction:ltr;text-align:right"></label>
+    </div>
+    <div class="field"><span>ימי עבודה <b class="req">*</b></span>
+      <div class="daypick" id="fDays"></div></div>
+    <label class="field"><span>הערות</span><textarea class="inp" id="fNote"></textarea></label>
+  </div>
+  <footer><button class="btn btn-primary" id="dSave"><svg class="i"><use href="#i-check"/></svg>שמירה</button><button class="btn btn-ghost" id="dCancel">ביטול</button></footer>
+</aside>
+
+<!-- מגירת מעסיק -->
+<aside class="drawer hide" id="drawerE">
+  <header><h3 id="eTitle">מעסיק חדש</h3><button class="ico-btn" data-close-e><svg class="i"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <label class="field"><span>שם המעסיק / מקום העבודה <b class="req">*</b></span><input class="inp" id="eName"></label>
+    <label class="field"><span>איש.ת קשר</span><input class="inp" id="eContact"></label>
+    <div class="grid2">
+      <label class="field"><span>טלפון <b class="req">*</b></span><input class="inp" id="ePhone" inputmode="tel" style="direction:ltr;text-align:right"></label>
+      <label class="field"><span>מייל</span><input class="inp" id="eMail" type="email" style="direction:ltr;text-align:right"></label>
+    </div>
+    <label class="field"><span>כתובת</span><input class="inp" id="eAddr"></label>
+    <label class="field"><span>הערות</span><textarea class="inp" id="eNote" placeholder="למשל: הסעה, ביגוד, דרישות מיוחדות"></textarea></label>
+  </div>
+  <footer><button class="btn btn-primary" id="eSave"><svg class="i"><use href="#i-check"/></svg>שמירה</button><button class="btn btn-ghost" data-close-e>ביטול</button></footer>
+</aside>
+
+<!-- מגירת שיתוף -->
+<aside class="drawer hide" id="drawerS">
+  <header><h3>שיתוף עם המנהל.ת</h3><button class="ico-btn" data-close-s><svg class="i"><use href="#i-x"/></svg></button></header>
+  <div class="body">
+    <div class="masked" style="direction:rtl;text-align:right">מנהל.ת בית הספר לפי נספח בעלי התפקידים<br><span style="direction:ltr;display:inline-block">d•••••@•••.org.il</span></div>
+    <label class="opt"><input type="checkbox" id="sView"><span><b>גישת צפייה למערכת</b><br>המנהל.ת נכנס.ת עם המייל שלו/ה ורואה את כל הטאבים, בלי אפשרות לערוך.</span></label>
+    <label class="opt"><input type="checkbox" id="sMonthly"><span><b>דוח חודשי במייל</b><br>ב-1 לכל חודש: מועסקים, נוכחות לפי מגמה, טפסים חסרים ומי טרם הוגש.</span></label>
+    <label class="opt"><input type="checkbox" id="sSup"><span><b>גם למפקח.ת הפדגוגי.ת</b><br>אותו דוח חודשי, מסוכם לבית הספר ובלי שמות תלמידים.</span></label>
+    <button class="btn btn-ghost btn-block" id="sNow" style="margin-top:6px"><svg class="i"><use href="#i-send"/></svg>שליחת הדוח שעל המסך עכשיו</button>
+    <p id="sLast" style="font-size:.8rem;color:var(--muted);text-align:center;margin:8px 0 0"></p>
+  </div>
+  <footer><button class="btn btn-primary" id="sSave"><svg class="i"><use href="#i-check"/></svg>שמירה</button><button class="btn btn-ghost" data-close-s>ביטול</button></footer>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ── נתונים ── */
+const SCHOOLS = ["אבו סנאן", "אום אל פחם בנות", "אום אל פחם בנים", "אור דניאל", "אור העתיד תורני מקצועי", "אורט אורמת", "אורט בית הערבה", "אורט כרמל", "אורט תל נוף", "אורט תעשייה אווירית", "אכסאל", "אל אמאני סכנין", "אלחכמה כסרא-סמיע", "אנרג'י טק", "בית אל", "בית דוד", "בית חנינה בנות", "בית חנינה בנים", "ג'וליס בנות", "דן גורמה", "דרור גליל", "דרור נווה מדבר", "הדר", "הקמפוס התורני עתיד", "התיכון החברתי חיפה", "חוש\"ן", "טורען", "טל חרמון", "ישיבת חנוך לנער", "כפר זיתים", "כפר יסיף", "כפר עקב", "לקייה", "מצפה רמון", "מרחביה/מעיינות", "נחלים", "נצרת", "סור באהר", "סכנין תל שבע", "עמל אשדוד", "עמל טייבה ב'", "עמל טק אין", "עמל רהט", "ערערה", "עתיד באר שבע", "עתיד בת עמי", "עתיד גליל מערבי ירכא בנים", "עתיד טק ביר אל מכסור", "עתיד כפר חב\"ד", "עתיד כרמיאל", "עתיד פלמחים", "צור ברק", "צור ים", "קמ\"ג דימונה", "רימונים", "רמת דוד", "שגב שלום", "שפרעם", "תיכון החממה", "תיכון חברתי ת\"א", "תיכון טכנולוגי אי טק סקול (מסעדה)", "תיכון עוצמ\"ה עתיד זוקו", "תיכון שיח", "תפן ליזמות"];
+const MEGAMOT = {"עתיד פלמחים":["אוטוטק/אוטוטרוניקה (2249)","חשמל מעשי תלת-פאזי (3827)","עיצוב שיער - רמה א' ואיפור אומנותי (616)","עיצוב שיער רמה א' (603)","עיצוב שיער רמה ב' (617)"],"עתיד כפר חב\"ד":["אוטוטק/אוטוטרוניקה- התמחות כלי צמ\"ה (2355)","בניית אתרים ושיווק באינטרנט (2355)","חשמל מוסמך (1401)"],"תיכון חברתי ת\"א":["אקו-חקלאות (9942)","יוצרי תוכן במדיה חברתית (518)","עיצוב צליל (סאונד) (574)"],"תיכון החממה":["הייטק - תכנות וסייבר (1059)","הפקת במה ומסך (522)","עיצוב תעשייתי (2381)","תכנון ועיצוב סביבת אדם (3061)"],"עמל טייבה ב'":["אוטוטק/אוטוטרוניקה (2249)","חשמל מעשי תלת-פאזי (3827)","עיצוב שיער (603)","תפעול מערכות תקשוב (3024)"],"עמל טק אין":["אוטוטק/אוטוטרוניקה (2249)","חשמלאי מוסמך (1401)","לוגיטק - ניהול ותפעול חכם","שיווק דיגיטלי (8122)"],"אורט תעשייה אווירית":["חשמלאי מוסמך (4865)","מכטרוניקה (1122)","מערכות הנדסיות - התמחות כלי טיס (2385)"],"אורט תל נוף":["חשמלאי מוסמך וחשמל מערכות כלי טיס (3850)","מבנאות מטוסים (1115)","מכטרוניקה (1122)","מערכות הנדסיות - התמחות כלי טיס (2385)"],"אורט אורמת":["חשמלאי מוסמך (1401)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","עיצוב מדיה וקריאטייב (573)","ריתוך בשילוב עיצוב חומרים (2392)"],"דן גורמה":["קולינריה (1626)"],"נחלים":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3828)","חילוץ והצלה (726)"],"רימונים":["סייע קולינרי/עוזר טבח (1315)","קולינריה (1626)"],"עתיד כרמיאל":["איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","טכנאות שיניים (1703)","סייע קולינרי/עוזר טבח (1315)","ספורט רב תחומי - ב (5058)","עיצוב שיער (603)","עיצוב שיער - רמה א' ואיפור אומנותי (616)","קונדיטוריה ואפייה (1382)"],"תיכון טכנולוגי אי טק סקול (מסעדה)":["איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","בניית אתרים ושיווק באינטרנט (8222)","חשמל מוסמך (1401)"],"עתיד גליל מערבי ירכא בנים":["אוטוטק/אוטוטרוניקה (2249)","מבנאות אלומיניום (1104)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","עיצוב מדיה וקריאייטיב (573)","קונדיטאות ואפייה (1382)","תפעול מערכות תקשוב (3024)"],"ג'וליס בנות":["איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","מחנכת שנות ינקות לסוג 1 (915)","תפירת מוצרי אופנה וסטיילינג (1580)"],"תיכון עוצמ\"ה עתיד זוקו":["אוטוטק/אוטוטרוניקה- התמחות כלי צמ\"ה (2355)","אנרגיה ומערכות הנדסיות (2378)","עוזר מכונאי","עיצוב מדיה וקריאייטיב (573)"],"תפן ליזמות":["יוצרי תוכן במדיה חברתית (518)","עוזר לעובד תחזוקת מבנים (269)","עיצוב צליל (סאונד) (574)","עיצוב תעשייתי (2381)"],"צור ים":["חשמלאי מוסמך (1401)","מערכות הנדסיות ימיות (2380)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","תומך תהליכים לוגיסטים - קורס"],"עתיד טק ביר אל מכסור":["אוטוטק/אוטוטרוניקה - התמחות כלי צמ\"ה (2355)","שיווק דיגיטלי (8122)"],"עתיד בת עמי":["תפירה מוצרי אופנה וסטיילינג (1580)"],"התיכון החברתי חיפה":["אקו ים (9952)","יוצרי תוכן במדיה חברתית (518)","עיצוב תעשייתי (2381)"],"דרור גליל":["אקו-חקלאות (9942)","יוצרי תוכן במדיה חברתית (518)","עיצוב תעשייתי (2381)"],"מנו\"פ יד נתן (משרד החינוך)":["מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","עיצוב שיער (603)","קונדיטאות ואפייה (1382)"],"נצרת":["אוטוטק/אוטוטרוניקה (2249)","סייע קולינרי/עוזר טבח (1315)","עיצוב שיער - רמה א' ואיפור אומנותי (616)","עיצוב שיער רמה א' (603)","קולינריה (1626)","שיווק דיגיטלי (8122)","תפעול מערכות תקשוב (3024)"],"מרחביה/מעיינות":["שיווק דיגיטלי (8122)"],"רמת דוד":["בדק כלי טייס - ממס גוף (1182)","חשמלאי מוסמך וחשמל מערכות כלי טיס (3850)","מבנאות מטוסים (1115)","מערכות הנדסיות - התמחות כלי טיס (2385)"],"אנרג'י טק":["אנרגיה ומערכות הנדסיות (2378)","חשמלאי מוסמך (1401)"],"תיכון שיח":["עיצוב צליל (סאונד) (574)","עיצוב תעשייתי (2381)","צילום סטילס ווידיאו (564)"],"אל אמאני סכנין":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3735)","חשמלאי מוסמך (1401)","מבנאות אלומיניום (1104)","עיצוב שיער - רמה א' ואיפור אומנותי (616)","שיפוט ואימון כדורגל (18)"],"ערערה":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3735)","חשמלאי מוסמך (1401)"],"כפר יסיף":["אוטוטק/אוטוטרוניקה (2249)","ניהול לוגיסטיקה וטכנולוגיה (8155)","עיצוב שיער (603)","עיצוב שיער - רמה א' ואיפור אומנותי (616)","תפעול מערכות תקשוב (3024)","תפעול מערכות תקשוב וסלולר (3521)"],"אום אל פחם בנות":["איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","מחנכת שנות ינקות לסוג 1 (915)","קונדיטאות ואפייה (1382)","שיווק דיגיטלי (8122)"],"שפרעם":["אוטוטק/אוטוטרוניקה (2249)","איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","סייע קולינרי/עוזר טבח (1315)","קולינריה (1626)","תכנון ועיצוב סביבת אדם (3061)"],"אבו סנאן":["אוטוטק/אוטוטרוניקה (2249)","איפור מקצועי ואמנותי, עיצוב שיער רמה א' (639)","שיווק דיגיטלי (8122)"],"אלחכמה כסרא-סמיע":["אוטוטק/אוטוטרוניקה (2249)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","תפעול מערכות תקשוב (3024)"],"טורען":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3735)","חשמלאי מוסמך (1401)"],"אום אל פחם בנים":["אוטוטק/אוטוטרוניקה (2249)","חשמלאי מוסמך (1401)","קולינריה (1626)"],"אכסאל":["אוטוטק/אוטוטרוניקה (2249)","חשמלאי מוסמך (1401)","עיצוב שיער - רמה א' ואיפור אומנותי (616)"],"אורט כרמל":["אוטוטק/אוטוטרוניקה (2249)","חשמלאי מוסמך (1401)"],"ישיבת חנוך לנער":["חשמלאי מוסמך (1401)","תפעול מערכות תקשוב (3024)"],"כפר זיתים":["בניה חדשנית ואקולוגית (286)","חשמלאי מוסמך (1401)","מפעיל ומתכנת CNC בעץ (1679)"],"בית אל":["מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","ניהול מלאי ורכש (תעשיות בית אל) (8165)"],"טל חרמון":["אקו-ים (שימוש אקולוגי במשאבי ים) (9952)","בניה חדשנית ואקולוגית (286)","חשמל מעשי תלת-פאזי (3827)","ריתוך בשילוב עיצוב חומרים (2393)","תפעול מערכות תקשוב (3024)","תפעול מערכות תקשוב וסלולר (3521)"],"הדר":["אקו-חקלאות (9942)","בניית אתרים ושיווק באינטרנט (8222)","צילום סטילס ווידיאו (564)","תפירת מוצרי אופנה וסטיילינג (1580)"],"ויצ\"ו בית הכרם (משרד החינוך)":["טבחות (1301)","עיצוב צליל (סאונד) (574)","עיצוב שיער (603)"],"אור העתיד תורני מקצועי":["חשמלאי מוסמך (1401)","תפעול מערכות תקשוב (3024)"],"חוש\"ן":["עיצוב צליל (סאונד) (574)","צילום סטילס ווידיאו (564)","קולינריה (1626)","קוסמטיקה (615)"],"עמל אשדוד":["אוטוטק/אוטוטרוניקה (2249)","איפור מקצועי, עיצוב שיער רמה ב' (647)","איפור מקצועי,אמנו ,'עיצוב שיער רמה א (639)","סייע קולינרי/עוזר טבח (1315)","קולינריה (1626)"],"בית חנינה בנות":["אופטיקאות (1702)","איפור מקצועי,אמנו ,'עיצוב שיער רמה א (639)","מחנכת שנות ינקות לסוג 1 (915)","עיצוב מדיה וקריאייטיב (573)","עיצוב שיער - רמה א' ואיפור אומנותי (616)"],"בית חנינה בנים":["התקנה ושירות למתקני קירור ומיזוג אויר (3735)","חשמלאי מוסמך (1401)","קולינריה (1626)","תפעול מערכות תקשוב (3024)","תפעול מערכות תקשוב וסלולר (3521)"],"אורט בית הערבה":["אוטוטק/אוטוטרוניקה (2249)","עיצוב שיער (603)","תפעול מערכות תקשוב (3024)"],"צור ברק":["מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)","מפעיל ומתכנת CNC בעץ (1679)","ריתוך בשילוב עיצוב חומרים (2393)"],"עתיד באר שבע":["לוגיטק - ניהול ותפעול חכם","מערכות הנדסיות (2379)","ניהול לוגיסטיקה וטכנולוגיה (8155)"],"קמ\"ג דימונה":["חשמלאי מוסמך (1401)","מערכות תיכון וייצור באמצעות מחשב-התמ (2341)","ריתוך בשילוב עיצוב חומרים (2393)"],"הקמפוס התורני עתיד":["חשמל מעשי תלת-פאזי (3827)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)"],"בית דוד":["בניית אתרים ושיווק באינטרנט (8222)","עיצוב תעשייתי (2381)"],"מצפה רמון":["עתודה ניהולית במקצועות התיירות (1627)"],"דרור נווה מדבר":["יוצרי תוכן במדיה חברתית (518)","מחנכ/ת שנות ינקות לסוג (915)","תכנון ועיצוב סביבת אדם (3061)"],"עמל רהט":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3828)","חשמלאי מוסמך (1401)","מפעיל ומתכנת CNC בעץ (1679)","עיצוב שיער (603)","ריתוך בשילוב עיצוב חומרים (2393)"],"לקייה":["אוטוטק/אוטוטרוניקה (2249)","חשמלאי מוסמך (1401)","מערכות תיכון וייצור באמצעות מחשב-התמחויות (2341)"],"שגב שלום":["אוטוטק/אוטוטרוניקה (2249)","התקנה ושירות למתקני קירור ומיזוג אויר (3735)","חשמלאי מוסמך (1401)"],"סכנין תל שבע":["חשמל מעשי תלת-פאזי (3827)"],"אור דניאל":["אוטוטק/אוטוטרוניקה- התמחות כלי צמ\"ה (2355)","חשמל"],"סור באהר":["עיצוב מדיה וקריאטייב (573)","עיצוב שיער (603)","קונדיטאות ואפייה (1382)"],"כפר עקב":["חשמלאי מעשי תלת פאזי (3827)","עיצוב מדיה וקריאטייב (573)","עיצוב שיער (603)"]};
+const DAYS = ['א','ב','ג','ד','ה','ו'];
+const CLASSES = ["י'1","י'2","י'3","י״א1","י״א2","י״א3","י״ב1","י״ב2","י״ב3"];
+const MONTHS = [{y:2026,m:8,label:'ספטמבר 2026'},{y:2026,m:9,label:'אוקטובר 2026'}];
+let school = 'עתיד פלמחים';
+let megamot = [];
+let students = [];
+let att = {};          // att[monthKey][studentId][yyyy-mm-dd] = {s:'p'|'a'|'x', in, out}
+let submitted = {};    // submitted[monthKey][megama] = 'תאריך'
+let files = {};        // files[studentId] = {prep:[], refl:[]}
+let curMg = '';        // סינון בטאב 1
+let curStu = null;     // טאב 2
+let curMonth = 0, curAttMg = null;
+
+const FIRST = ['נועה','איתי','מאיה','עומר','שירה','דניאל','תמר','אלון','יעל','רון','הילה','אורי','ליאור','עדי','נועם','שחר','גלעד','רוני','אביב','ליה'];
+const LAST  = ['כהן','לוי','מזרחי','פרץ','ביטון','אברהם','פרידמן','דהן','אזולאי','גבאי','חדד','שפירא','מלכה','עמר','בן דוד'];
+// מעסיקים בדויים לדוגמה
+const EMP_SEED = [
+  {name:'מוסך אלון בע״מ',contact:'אלון ד.',phone:'050-0000001',mail:'office@alon-garage.example',addr:'רח׳ המלאכה 12, אזור התעשייה'},
+  {name:'חשמל הדרום',contact:'רינה ש.',phone:'052-0000002',mail:'rina@hadarom-elec.example',addr:'שד׳ התעשייה 4'},
+  {name:'תעשיות גל',contact:'משה ג.',phone:'054-0000003',mail:'',addr:'פארק תעסוקה צפוני, בניין 3'},
+  {name:'מרכז שירות אופק',contact:'דנה א.',phone:'053-0000004',mail:'dana@ofek.example',addr:''},
+  {name:'סטודיו קרן',contact:'קרן ל.',phone:'058-0000005',mail:'studio.keren@example.com',addr:'רח׳ הרצל 40'},
+  {name:'מספרת שני',contact:'שני מ.',phone:'',mail:'',addr:'מרכז מסחרי, חנות 7'},
+];
+const STATUS = [
+  {v:'work',t:'עובד.ת',c:'ok'},{v:'wait',t:'ממתין.ה להתחלה',c:'warn'},
+  {v:'pause',t:'בהפסקה זמנית',c:'gray'},{v:'stop',t:'הפסיק.ה לעבוד',c:'bad'},{v:'left',t:'עזב.ה את בית הספר',c:'bad'}];
+const stTag = v => {const s=STATUS.find(x=>x.v===v)||STATUS[0];return `<span class="tag ${s.c}">${s.t}</span>`};
+// ששת טפסי ההכנה לתעסוקה — מהטבלה של הרכזים
+const DOCS = ['צילום כרטיס קופת חולים','תמונת פספורט','צילום ת.ז + ספח פתוח','אישור ניהול חשבון','בדיקת שמיעה','אישור רפואי'];
+const DSTAT = [{v:'',t:'—'},{v:'ok',t:'הועבר',c:'st-ok'},{v:'miss',t:'חסר',c:'st-miss'},{v:'proc',t:'בתהליך / נקבע תור',c:'st-proc'},{v:'na',t:'אין צורך',c:''}];
+let employers = [];
+const docsDone = s => { const d=s.docs; return DOCS.filter((_,i)=>d[i].s==='ok'||d[i].s==='na').length };
+function rnd(seed){let x=seed;return()=>{x=(x*9301+49297)%233280;return x/233280}}
+
+function seed(){
+  const r = rnd(school.length*97+7);
+  megamot = (MEGAMOT[school]||['מגמה א','מגמה ב']).map(s=>{const m=s.match(/^(.*?)\s*\((\d+)\)$/);return m?{name:m[1],code:m[2]}:{name:s,code:''}});
+  students=[];let id=1;
+  employers = EMP_SEED.map((e,i)=>Object.assign({id:i+1,note:''},e));
+  const empPool = employers.map(e=>e.name);
+  megamot.forEach((mg,mi)=>{
+    const n = 3+Math.floor(r()*4);
+    for(let k=0;k<n;k++){
+      const d=[];const start=Math.floor(r()*3);d.push(start,start+2);if(r()>.5)d.push(start+1);
+      students.push({id:id++,name:FIRST[Math.floor(r()*FIRST.length)]+' '+LAST[Math.floor(r()*LAST.length)],
+        mg:mg.name,act:String(40000+Math.floor(r()*59999)),cls:CLASSES[3+Math.floor(r()*6)],
+        emp:empPool[(mi+k)%empPool.length],days:[...new Set(d)].sort(),inT:'08:00',outT:r()>.5?'14:00':'15:30',
+        note:k===1?'מגיע בהסעה של המעסיק':(k===3?'יחזור לעבודה באוקטובר':''),
+        status:k===3?'pause':(k===4&&mi===0?'wait':'work'),phone:'05X-000-00'+String(id).padStart(2,'0'),
+        docs:DOCS.map((_,di)=>{const x=r();
+          if(di===4) return {s:mi===0?(x<.5?'proc':'ok'):'na',f:''};      // בדיקת שמיעה — רק בחלק מהמגמות
+          if(k===2) return {s:'miss',f:''};
+          return {s:x<.72?'ok':(x<.88?'miss':''),f:''};}),
+        log:k===2?[{d:'18.8.26',t:'שוחחתי עם ההורים, יעבירו את הטפסים עד סוף השבוע'},{d:'29.8.26',t:'אין מענה בטלפון. נשלחה תזכורת בוואטסאפ'}]
+           :(k===0?[{d:'20.8.26',t:'העביר.ה את כל הטפסים'}]:[])});
+    }
+  });
+  // נוכחות ספטמבר: חלק מהמגמות הוגשו, חלק בטיוטה, אחת טרם
+  att={};submitted={};files={};
+  const mk=key(MONTHS[0]);att[mk]={};submitted[mk]={};
+  megamot.forEach((mg,mi)=>{
+    const done = mi%3!==2;
+    students.filter(s=>s.mg===mg.name).forEach((s,si)=>{
+      att[mk][s.id]={};
+      workDates(s,MONTHS[0]).forEach(dt=>{
+        if(!done && si>0) return;
+        if(dt>'2026-09-24') return;
+        const absent = r()<.1;
+        att[mk][s.id][dt]={s:absent?'a':'p',in:s.inT,out:s.outT};
+      });
+    });
+    if(mi%3===0) submitted[mk][mg.name]='23.9.26';
+  });
+  students.forEach((s,i)=>{
+    s.docs.forEach((d,di)=>{if(d.s==='ok'&&i%3!==1)d.f=DOCS[di].split(' ')[0]+'-'+(di+1)+'.pdf'});
+    files[s.id]={refl:i%2===0?[{n:'רפלקציה חודש ראשון.docx',d:'22.9.26'}]:[]};
+  });
+}
+const key = M => M.y+'-'+String(M.m+1).padStart(2,'0');
+function workDates(s,M){
+  const out=[];const d=new Date(M.y,M.m,1);
+  while(d.getMonth()===M.m){ if(s.days.includes(d.getDay())) out.push(M.y+'-'+String(M.m+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')); d.setDate(d.getDate()+1);}
+  return out;
+}
+const heDate = iso => {const [y,m,d]=iso.split('-');return +d+'.'+(+m)};
+const dayName = iso => 'יום '+DAYS[new Date(iso).getDay()]+"'";
+const initials = n => n.split(' ').map(w=>w[0]).join('').slice(0,2);
+const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function hrs(a,b){if(!a||!b)return 0;const [h1,m1]=a.split(':').map(Number),[h2,m2]=b.split(':').map(Number);return Math.max(0,(h2*60+m2-h1*60-m1)/60)}
+function toast(t){const e=document.getElementById('toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
+const icon = id => `<svg class="i"><use href="#i-${id}"/></svg>`;
+
+function monthStats(s,M){
+  const mk=key(M);const rec=(att[mk]||{})[s.id]||{};
+  const plan=workDates(s,M);let p=0,a=0,h=0,filled=0;
+  plan.forEach(d=>{const x=rec[d];if(!x)return;filled++;if(x.s==='p'){p++;h+=hrs(x.in,x.out)}else if(x.s==='a')a++;});
+  Object.keys(rec).filter(d=>!plan.includes(d)).forEach(d=>{const x=rec[d];filled++;if(x.s==='p'){p++;h+=hrs(x.in,x.out)}});
+  return {plan:plan.length,p,a,h,filled};
+}
+
+/* ── כניסה ── */
+const gS=document.getElementById('gSchool');
+gS.innerHTML=SCHOOLS.map(n=>`<option ${n===school?'selected':''}>${esc(n)}</option>`).join('');
+const cr=document.getElementById('codeRow');
+for(let i=0;i<6;i++){const inp=document.createElement('input');inp.maxLength=1;inp.inputMode='numeric';
+  inp.oninput=()=>{if(inp.value&&inp.nextElementSibling)inp.nextElementSibling.focus()};cr.appendChild(inp)}
+document.getElementById('gSend').onclick=()=>{school=gS.value;document.getElementById('g1').classList.add('hide');document.getElementById('g2').classList.remove('hide');cr.firstChild.focus()};
+document.getElementById('gEnter').onclick=enter;
+function enter(){seed();document.getElementById('gate').classList.add('hide');document.getElementById('app').classList.remove('hide');
+  document.getElementById('topSchool').textContent=school;renderAll()}
+document.getElementById('logout').onclick=()=>{document.getElementById('app').classList.add('hide');document.getElementById('gate').classList.remove('hide');
+  document.getElementById('g2').classList.add('hide');document.getElementById('g1').classList.remove('hide');[...cr.children].forEach(i=>i.value='')};
+
+/* ── טאבים ── */
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));
+  ['shibutz','maasikim','tik','nochechut','dochot'].forEach(t=>document.getElementById('t-'+t).classList.toggle('hide',t!==b.dataset.tab));
+  window.scrollTo({top:0});
+});
+
+function renderAll(){renderKpis();renderMg();renderTable();renderEmp();renderList();renderFile();renderAtt();renderReport()}
+
+/* ── טאב 1 ── */
+function renderKpis(){
+  const M=MONTHS[curMonth],mk=key(M);
+  const subm=megamot.filter(m=>(submitted[mk]||{})[m.name]).length;
+  const emps=new Set(students.map(s=>s.emp)).size;
+  let p=0,pl=0;students.forEach(s=>{const x=monthStats(s,MONTHS[0]);p+=x.p;pl+=x.p+x.a});
+  document.getElementById('kpis').innerHTML=`
+    <div class="kpi"><div class="lbl">תלמידים מועסקים</div><div class="val">${students.length}</div></div>
+    <div class="kpi"><div class="lbl">מעסיקים</div><div class="val">${emps}</div></div>
+    <div class="kpi"><div class="lbl">תיקי טפסים מלאים</div><div class="val">${students.filter(s=>docsDone(s)===DOCS.length).length}<small> / ${students.length}</small></div></div>
+    <div class="kpi"><div class="lbl">נוכחות ספטמבר (עד כה)</div><div class="val">${pl?Math.round(p/pl*100):0}<small>%</small></div></div>
+    <div class="kpi"><div class="lbl">נוכחות ${M.label.split(' ')[0]} הוגשה</div><div class="val">${subm}<small> / ${megamot.length} מגמות</small></div></div>`;
+}
+function renderMg(){
+  document.getElementById('mgGrid').innerHTML=megamot.map(mg=>{
+    const ss=students.filter(s=>s.mg===mg.name);
+    const working=ss.filter(s=>s.status==='work').length;
+    const emps=new Set(ss.map(s=>s.emp)).size;
+    let p=0,t=0;ss.forEach(s=>{const x=monthStats(s,MONTHS[0]);p+=x.p;t+=x.p+x.a});
+    const pct=t?Math.round(p/t*100):0;
+    const sub=(submitted[key(MONTHS[0])]||{})[mg.name];
+    return `<div class="mg-card ${curMg===mg.name?'on':''}" data-mg="${esc(mg.name)}">
+      <h3>${esc(mg.name)}</h3><div class="code">${mg.code?'סמל '+mg.code:'&nbsp;'}</div>
+      <div class="mg-stats"><div><b>${working}<small style="font-size:.8rem;color:var(--muted)">/${ss.length}</small></b>עובדים</div><div><b>${emps}</b>מעסיקים</div><div><b>${pct}%</b>נוכחות</div></div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="mg-foot"><span>ספטמבר</span>${sub?'<span class="tag ok">הוגש '+sub+'</span>':'<span class="tag warn">טרם הוגש</span>'}</div></div>`}).join('');
+  document.querySelectorAll('.mg-card').forEach(c=>c.onclick=()=>{curMg=curMg===c.dataset.mg?'':c.dataset.mg;document.getElementById('fMg').value=curMg;renderMg();renderTable()});
+  const f=document.getElementById('fMg');
+  f.innerHTML='<option value="">כל המגמות</option>'+megamot.map(m=>`<option ${m.name===curMg?'selected':''}>${esc(m.name)}</option>`).join('');
+}
+document.getElementById('fMg').onchange=e=>{curMg=e.target.value;renderMg();renderTable()};
+document.getElementById('q').oninput=renderTable;
+function renderTable(){
+  const q=document.getElementById('q').value.trim();
+  const rows=students.filter(s=>(!curMg||s.mg===curMg)&&(!q||s.name.includes(q)||s.emp.includes(q)));
+  document.getElementById('tbody').innerHTML=rows.length?rows.map(s=>`<tr>
+    <td class="name">${esc(s.name)}<div style="margin-top:3px">${stTag(s.status)}</div></td><td>${esc(s.mg)}</td>
+    <td style="font-variant-numeric:tabular-nums">${esc(s.act)}</td><td>${esc(s.cls)}</td><td>${esc(s.emp)}</td>
+    <td><div class="days">${DAYS.map((d,i)=>`<span class="day ${s.days.includes(i)?'on':''}">${d}</span>`).join('')}</div></td>
+    <td class="note-cell">${esc(s.note||'')}</td>
+    <td style="white-space:nowrap"><button class="ico-btn" title="עריכה" data-ed="${s.id}">${icon('edit')}</button><button class="ico-btn" title="תיק תלמיד" data-tk="${s.id}">${icon('folder')}</button></td></tr>`).join('')
+    :`<tr><td colspan="8" class="empty">אין תלמידים מתאימים</td></tr>`;
+  document.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>openDrawer(+b.dataset.ed));
+  document.querySelectorAll('[data-tk]').forEach(b=>b.onclick=()=>{curStu=+b.dataset.tk;document.querySelector('[data-tab=tik]').click();renderList();renderFile()});
+}
+
+/* מגירה */
+let editId=null;
+const fDays=document.getElementById('fDays');
+fDays.innerHTML=DAYS.map((d,i)=>`<label><input type="checkbox" value="${i}"><span>${d}</span></label>`).join('');
+document.getElementById('fClass').innerHTML=CLASSES.map(c=>`<option>${c}</option>`).join('');
+function openDrawer(id){
+  editId=id||null;const s=students.find(x=>x.id===id)||{name:'',mg:curMg||megamot[0].name,act:'',cls:CLASSES[0],emp:'',days:[],note:'',status:'work',phone:''};
+  document.getElementById('fStat').innerHTML=STATUS.map(x=>`<option value="${x.v}" ${x.v===s.status?'selected':''}>${x.t}</option>`).join('');
+  document.getElementById('fPhone').value=s.phone||'';
+  document.getElementById('dTitle').textContent=id?'עריכת שיבוץ':'שיבוץ תלמיד.ה אצל מעסיק';
+  document.getElementById('fMgSel').innerHTML=megamot.map(m=>`<option ${m.name===s.mg?'selected':''}>${esc(m.name)}</option>`).join('');
+  document.getElementById('fName').value=s.name;document.getElementById('fAct').value=s.act;
+  document.getElementById('fClass').value=s.cls;document.getElementById('fEmp').value=s.emp;document.getElementById('fNote').value=s.note;
+  document.getElementById('empList').innerHTML=employers.map(x=>x.name).map(e=>`<option value="${esc(e)}">`).join('');
+  fDays.querySelectorAll('input').forEach(i=>i.checked=s.days.includes(+i.value));
+  ['dBg','drawer'].forEach(x=>document.getElementById(x).classList.remove('hide'));
+  setTimeout(()=>document.getElementById('fName').focus(),50);
+}
+function closeDrawer(){['dBg','drawer'].forEach(x=>document.getElementById(x).classList.add('hide'))}
+document.getElementById('addBtn').onclick=()=>openDrawer();
+['dClose','dCancel','dBg'].forEach(x=>document.getElementById(x).onclick=closeDrawer);
+document.getElementById('dSave').onclick=()=>{
+  const v={name:fName.value.trim(),mg:fMgSel.value,act:fAct.value.trim(),cls:fClass.value,emp:fEmp.value.trim(),
+    days:[...fDays.querySelectorAll('input:checked')].map(i=>+i.value),note:fNote.value.trim(),status:fStat.value,phone:fPhone.value.trim()};
+  if(!v.name||!v.act||!v.emp||!v.days.length){toast('חסרים שדות חובה');return}
+  let newEmp=false;
+  if(!employers.some(e=>e.name===v.emp)){employers.push({id:Math.max(0,...employers.map(e=>e.id))+1,name:v.emp,contact:'',phone:'',mail:'',addr:'',note:''});newEmp=true}
+  if(editId)Object.assign(students.find(s=>s.id===editId),v);
+  else{const id=Math.max(0,...students.map(s=>s.id))+1;students.push(Object.assign({id,inT:'08:00',outT:'14:00',docs:DOCS.map(()=>({s:'',f:''})),log:[]},v));files[id]={refl:[]}}
+  closeDrawer();renderAll();toast(newEmp?'נוסף מעסיק חדש. השלימו לו פרטי קשר בטאב מעסיקים':(editId?'השיבוץ עודכן':'התלמיד.ה שובץ.ה ונפתח לו/ה תיק'));
+};
+
+/* ── טאב מעסיקים ── */
+document.getElementById('q3').oninput=renderEmp;
+document.getElementById('fEmpMg').onchange=renderEmp;
+function renderEmp(){
+  const fm=document.getElementById('fEmpMg');const cur=fm.value;
+  fm.innerHTML='<option value="">כל המגמות</option>'+megamot.map(m=>`<option ${m.name===cur?'selected':''}>${esc(m.name)}</option>`).join('');
+  const q=document.getElementById('q3').value.trim();
+  const list=employers.map(e=>({e,ss:students.filter(s=>s.emp===e.name&&(!cur||s.mg===cur))}))
+    .filter(({e,ss})=>(!cur||ss.length)&&(!q||e.name.includes(q)||(e.contact||'').includes(q)||ss.some(s=>s.name.includes(q))));
+  const c=(v,ic,href)=>v?(href?`<a href="${href}">${icon(ic)}<span style="direction:ltr">${esc(v)}</span></a>`:`<span>${icon(ic)}${esc(v)}</span>`):`<span class="empty-v">${icon(ic)}חסר</span>`;
+  document.getElementById('empGrid').innerHTML=list.length?list.map(({e,ss})=>{
+    const mgs=[...new Set(ss.map(s=>s.mg))];
+    return `<div class="emp-card"><div class="emp-head"><div><h3>${esc(e.name)}</h3><div class="field-s">${mgs.map(esc).join(' · ')||'אין תלמידים משובצים'}</div></div><div class="sp"></div>
+      <button class="ico-btn edit-only" data-ee="${e.id}" title="עריכה">${icon('edit')}</button></div>
+      <div class="contact">${c(e.contact,'user')}${c(e.phone,'phone','tel:'+e.phone)}${c(e.mail,'mail','mailto:'+e.mail)}${c(e.addr,'pin')}</div>
+      ${e.note?`<div style="font-size:.82rem;color:var(--text2)">${esc(e.note)}</div>`:''}
+      <div class="emp-stu"><span style="font-size:.8rem;color:var(--muted);width:100%">${ss.length} תלמידים מועסקים</span>
+      ${ss.map(s=>`<button class="chip" data-tk="${s.id}">${esc(s.name)} <small>${esc(s.cls)}</small></button>`).join('')}</div></div>`}).join('')
+    :'<div class="empty">אין מעסיקים מתאימים</div>';
+  document.querySelectorAll('[data-ee]').forEach(b=>b.onclick=()=>openEmp(+b.dataset.ee));
+  document.querySelectorAll('#empGrid [data-tk]').forEach(b=>b.onclick=()=>{curStu=+b.dataset.tk;document.querySelector('[data-tab=tik]').click();renderList();renderFile()});
+}
+let editEmp=null;
+function openEmp(id){
+  editEmp=id||null;const e=employers.find(x=>x.id===id)||{name:'',contact:'',phone:'',mail:'',addr:'',note:''};
+  document.getElementById('eTitle').textContent=id?'עריכת מעסיק':'מעסיק חדש';
+  eName.value=e.name;eContact.value=e.contact;ePhone.value=e.phone;eMail.value=e.mail;eAddr.value=e.addr;eNote.value=e.note;
+  ['dBg','drawerE'].forEach(x=>document.getElementById(x).classList.remove('hide'));
+}
+function closeEmp(){['dBg','drawerE'].forEach(x=>document.getElementById(x).classList.add('hide'))}
+document.getElementById('addEmp').onclick=()=>openEmp();
+document.querySelectorAll('[data-close-e]').forEach(b=>b.onclick=closeEmp);
+document.getElementById('dBg').addEventListener('click',()=>{closeEmp();closeShare()});
+document.getElementById('eSave').onclick=()=>{
+  const v={name:eName.value.trim(),contact:eContact.value.trim(),phone:ePhone.value.trim(),mail:eMail.value.trim(),addr:eAddr.value.trim(),note:eNote.value.trim()};
+  if(!v.name||!v.phone){toast('חסרים שם וטלפון');return}
+  if(editEmp){const e=employers.find(x=>x.id===editEmp);const old=e.name;Object.assign(e,v);students.forEach(s=>{if(s.emp===old)s.emp=v.name})}
+  else employers.push(Object.assign({id:Math.max(0,...employers.map(e=>e.id))+1},v));
+  closeEmp();renderAll();toast('פרטי המעסיק נשמרו');
+};
+
+/* ── טאב דוחות ── */
+const CUTS=[{v:'mg',t:'לפי מגמה'},{v:'emp',t:'לפי מעסיק'},{v:'cls',t:'לפי כיתה'},{v:'stu',t:'לפי תלמיד.ה'},{v:'month',t:'לפי חודש'},{v:'docs',t:'טפסים חסרים'}];
+let rCut='mg';
+let share={view:true,monthly:true,sup:false,sent:''};
+const rPeriod=document.getElementById('rPeriod'),rMg=document.getElementById('rMg');
+rPeriod.innerHTML='<option value="all">מתחילת השנה</option>'+MONTHS.map((M,i)=>`<option value="${i}">${M.label}</option>`).join('');
+rPeriod.onchange=renderReport;rMg.onchange=renderReport;
+function statsFor(ss,months){
+  let plan=0,p=0,a=0,h=0;ss.forEach(s=>months.forEach(M=>{const x=monthStats(s,M);plan+=x.plan;p+=x.p;a+=x.a;h+=x.h}));
+  return {n:ss.length,work:ss.filter(s=>s.status==='work').length,plan,p,a,h,pct:p+a?Math.round(p/(p+a)*100):null,
+    full:ss.filter(s=>docsDone(s)===DOCS.length).length};
+}
+function reportData(){
+  const months=rPeriod.value==='all'?MONTHS:[MONTHS[+rPeriod.value]];
+  const pool=students.filter(s=>!rMg.value||s.mg===rMg.value);
+  const cols=['תלמידים','עובדים כעת','ימים מתוכננים','ימי נוכחות','חיסורים','% נוכחות','שעות','תיקי טפסים מלאים'];
+  const row=(label,ss,ms)=>{const x=statsFor(ss,ms||months);return [label,x.n,x.work,x.plan,x.p,x.a,x.pct===null?'—':x.pct+'%',x.h.toFixed(1),x.full+'/'+x.n]};
+  const by=f=>[...new Set(pool.map(f))].sort().map(k=>row(k,pool.filter(s=>f(s)===k)));
+  if(rCut==='mg')return {head:['מגמה',...cols],rows:by(s=>s.mg)};
+  if(rCut==='emp')return {head:['מעסיק',...cols],rows:by(s=>s.emp)};
+  if(rCut==='cls')return {head:['כיתה',...cols],rows:by(s=>s.cls)};
+  if(rCut==='month')return {head:['חודש',...cols],rows:MONTHS.map(M=>row(M.label,pool,[M]))};
+  if(rCut==='stu')return {head:['תלמיד.ה','מגמה','כיתה','מעסיק','סטטוס','ימי נוכחות','חיסורים','% נוכחות','שעות','טפסים'],
+    rows:pool.map(s=>{const x=statsFor([s],months);return [s.name,s.mg,s.cls,s.emp,(STATUS.find(t=>t.v===s.status)||{}).t,x.p,x.a,x.pct===null?'—':x.pct+'%',x.h.toFixed(1),docsDone(s)+'/'+DOCS.length]})};
+  // טפסים חסרים
+  return {head:['תלמיד.ה','מגמה','כיתה','טפסים חסרים','בתהליך','רישום אחרון'],
+    rows:pool.filter(s=>docsDone(s)<DOCS.length).map(s=>[s.name,s.mg,s.cls,
+      DOCS.filter((_,i)=>s.docs[i].s==='miss'||s.docs[i].s==='').join(', ')||'—',
+      DOCS.filter((_,i)=>s.docs[i].s==='proc').join(', ')||'—',
+      s.log.length?s.log[s.log.length-1].d+' · '+s.log[s.log.length-1].t:'—'])};
+}
+function renderReport(){
+  document.getElementById('cutPills').innerHTML=CUTS.map(c=>`<button class="pill ${c.v===rCut?'on':''}" data-cut="${c.v}">${c.t}</button>`).join('');
+  document.querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>{rCut=b.dataset.cut;renderReport()});
+  const cur=rMg.value;rMg.innerHTML='<option value="">כל המגמות</option>'+megamot.map(m=>`<option ${m.name===cur?'selected':''}>${esc(m.name)}</option>`).join('');
+  const {head,rows}=reportData();
+  const pctIdx=head.indexOf('% נוכחות');
+  document.getElementById('rTitle').textContent=`${(CUTS.find(c=>c.v===rCut)||{}).t} · ${rPeriod.options[rPeriod.selectedIndex].text}${rMg.value?' · '+rMg.value:''}`;
+  document.getElementById('rTable').innerHTML=`<thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${r.map((v,i)=>{
+      if(i===0)return `<td class="name">${esc(v)}</td>`;
+      if(i===pctIdx&&v!=='—'){const n=parseInt(v);return `<td><div style="display:flex;align-items:center;gap:8px"><b style="min-width:38px">${v}</b><div class="bar" style="width:70px"><i style="width:${n}%;background:${n<80?'#C77700':'var(--ok)'}"></i></div></div></td>`}
+      return `<td>${esc(v)}</td>`}).join('')}</tr>`).join(''):`<tr><td colspan="${head.length}" class="empty">אין נתונים לחתך הזה</td></tr>`}</tbody>`;
+  const sh=document.getElementById('shareState');
+  sh.innerHTML=share.view?`<span class="tag ok">${icon('check')}המנהל.ת רואה את הנתונים</span>`:`<span class="tag gray">לא משותף עם המנהל.ת</span>`;
+}
+document.getElementById('rCsv').onclick=()=>{
+  const {head,rows}=reportData();
+  const csv='﻿'+[head,...rows].map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download='דוח-חניכות-'+school+'.csv';a.click();toast('הדוח ירד כקובץ אקסל');
+};
+document.getElementById('rPrint').onclick=()=>window.print();
+function openShare(){
+  sView.checked=share.view;sMonthly.checked=share.monthly;sSup.checked=share.sup;
+  document.getElementById('sLast').textContent=share.sent?'נשלח לאחרונה: '+share.sent:'';
+  ['dBg','drawerS'].forEach(x=>document.getElementById(x).classList.remove('hide'));
+}
+function closeShare(){['drawerS'].forEach(x=>document.getElementById(x).classList.add('hide'));if(document.getElementById('drawer').classList.contains('hide')&&document.getElementById('drawerE').classList.contains('hide'))document.getElementById('dBg').classList.add('hide')}
+document.getElementById('rShare').onclick=openShare;
+document.querySelectorAll('[data-close-s]').forEach(b=>b.onclick=closeShare);
+document.getElementById('sSave').onclick=()=>{share.view=sView.checked;share.monthly=sMonthly.checked;share.sup=sSup.checked;closeShare();renderReport();toast('הגדרות השיתוף נשמרו')};
+document.getElementById('sNow').onclick=()=>{share.sent=new Date().toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'2-digit'});
+  document.getElementById('sLast').textContent='נשלח לאחרונה: '+share.sent;toast('הדוח נשלח למנהל.ת במייל')};
+
+/* ── תצוגה כמנהל.ת (במוקאפ בלבד) ── */
+document.getElementById('asPrincipal').onchange=e=>{
+  document.body.classList.toggle('viewer',e.target.checked);
+  document.getElementById('userLbl').textContent=e.target.checked?'ד. מנהל.ת בית הספר · צפייה בלבד':'יונתן א. · רכז חניכות';
+  toast(e.target.checked?'כך המנהל.ת רואה את המערכת: הכול גלוי, בלי עריכה':'חזרה למבט הרכז.ת');
+};
+
+/* ── טאב 2 ── */
+document.getElementById('q2').oninput=renderList;
+function renderList(){
+  const q=document.getElementById('q2').value.trim();
+  if(!curStu&&students.length)curStu=students[0].id;
+  document.getElementById('slist').innerHTML=students.filter(s=>!q||s.name.includes(q)).map(s=>{
+    const f=files[s.id]||{refl:[]},m=monthStats(s,MONTHS[0]);
+    return `<div class="sitem ${s.id===curStu?'on':''}" data-s="${s.id}"><div class="av">${initials(s.name)}</div>
+      <div><div class="nm">${esc(s.name)}</div><div class="mg">${esc(s.mg)}</div></div>
+      <div class="dots"><span class="dot ${docsDone(s)===DOCS.length?'ok':''}" title="טפסי הכנה ${docsDone(s)}/${DOCS.length}"></span><span class="dot ${f.refl.length?'ok':''}" title="רפלקציה"></span><span class="dot ${m.filled?'ok':''}" title="נוכחות החודש"></span></div></div>`}).join('');
+  document.querySelectorAll('.sitem').forEach(e=>e.onclick=()=>{curStu=+e.dataset.s;renderList();renderFile()});
+}
+function fileList(arr,kind){
+  return arr.length?arr.map((f,i)=>`<div class="fitem"><div class="fic">${icon(kind==='prep'?'doc':'pen')}</div>
+    <div><div class="fn">${esc(f.n)}</div><div class="fd">הועלה ${f.d} · יונתן א.</div></div><div class="sp"></div>
+    <button class="btn btn-ghost btn-sm">צפייה</button><button class="ico-btn" title="מחיקה" data-del="${kind}:${i}">${icon('trash')}</button></div>`).join('')
+    :`<div class="fitem" style="border-style:dashed;color:var(--muted)">עוד לא הועלו קבצים</div>`;
+}
+function renderFile(){
+  const s=students.find(x=>x.id===curStu);const box=document.getElementById('sfile');
+  if(!s){box.innerHTML='<div class="empty">אין תלמידים מועסקים עדיין</div>';return}
+  const f=files[s.id];
+  const rows=MONTHS.map(M=>{const x=monthStats(s,M);const sub=(submitted[key(M)]||{})[s.mg];
+    return `<tr><td><b>${M.label}</b></td><td>${x.plan}</td><td>${x.p}</td><td>${x.a}</td><td>${x.h.toFixed(1)}</td>
+    <td>${x.p+x.a?Math.round(x.p/(x.p+x.a)*100)+'%':'—'}</td>
+    <td>${sub?'<span class="tag ok">הוגש</span>':x.filled?'<span class="tag warn">טיוטה</span>':'<span class="tag gray">טרם מולא</span>'}</td></tr>`}).join('');
+  box.innerHTML=`<header><div class="av">${initials(s.name)}</div><div style="flex:1">
+      <h3>${esc(s.name)}</h3>
+      <div class="meta"><span>מגמה: <b>${esc(s.mg)}</b></span><span>כיתה: <b>${esc(s.cls)}</b></span><span>מספר פעולה: <b>${esc(s.act)}</b></span>
+      <span>מעסיק: <b>${esc(s.emp)}</b></span><span>טלפון: <b style="direction:ltr;display:inline-block">${esc(s.phone||'—')}</b></span><span>${stTag(s.status)}</span><span>ימים: <b>${s.days.map(d=>DAYS[d]).join(', ')}</b></span></div></div>
+      <button class="btn btn-ghost btn-sm" id="edStu">${icon('edit')}עריכת שיבוץ</button></header>
+    <div class="sec"><h4>${icon('doc')}טפסי הכנה לתעסוקה</h4><p class="desc">לכל טופס: סטטוס וקובץ סרוק. "אין צורך" נחשב כהושלם.</p>
+      <div class="doc-prog"><b>${docsDone(s)}/${DOCS.length}</b> הושלמו<div class="bar"><i style="width:${docsDone(s)/DOCS.length*100}%"></i></div></div>
+      <div class="docs">${DOCS.map((dn,i)=>{const d=s.docs[i];const st=DSTAT.find(x=>x.v===d.s)||DSTAT[0];
+        return `<div class="doc ${st.c||''}"><div class="fic">${icon(d.s==='ok'?'check':d.s==='miss'?'x':d.s==='proc'?'clock':'doc')}</div>
+          <div><div class="dn">${dn}</div><div class="dd">${d.f?esc(d.f)+' · הועלה':(d.s==='ok'?'סומן כהועבר, אין קובץ סרוק':'אין קובץ')}</div></div>
+          <select class="inp" data-ds="${i}">${DSTAT.map(x=>`<option value="${x.v}" ${x.v===d.s?'selected':''}>${x.t}</option>`).join('')}</select>
+          <label class="btn btn-ghost btn-sm" title="העלאת קובץ">${icon('up')}${d.f?'החלפה':'העלאה'}<input type="file" hidden data-df="${i}"></label></div>`}).join('')}</div></div>
+    <div class="sec"><h4>${icon('mail')}מעקב ושיחות</h4><p class="desc">מה נאמר ומה חסר, עם תאריך. נשמר בתיק ולא נמחק.</p>
+      <div class="log-add"><input class="inp" id="logTxt" placeholder="למשל: שוחחתי עם האם, תעביר את האישור הרפואי עד יום ראשון"><button class="btn btn-primary btn-sm" id="logAdd">הוספה</button></div>
+      <div class="log">${s.log.slice().reverse().map(l=>`<div class="log-item"><div class="ld">${l.d} · יונתן א.</div>${esc(l.t)}</div>`).join('')||'<div class="log-item" style="color:var(--muted)">אין רישומים עדיין</div>'}</div></div>
+    <div class="sec"><h4>${icon('pen')}רפלקציה לתעסוקה</h4><p class="desc">הרפלקציה של התלמיד.ה על התקופה במקום העבודה.</p>
+      <label class="drop">${icon('up')} גררו קובץ לכאן או <b>בחרו מהמחשב</b><input type="file" hidden multiple data-up="refl"></label>
+      <div class="flist">${fileList(f.refl,'refl')}</div></div>
+    <div class="sec"><h4>${icon('clock')}נוכחות במקום התעסוקה</h4><p class="desc">מתמלא אוטומטית מהנוכחות החודשית.</p>
+      <div class="tbl-wrap"><table class="att-mini"><thead><tr><th>חודש</th><th>ימים מתוכננים</th><th>הגיע</th><th>לא הגיע</th><th>שעות</th><th>נוכחות</th><th>סטטוס</th></tr></thead><tbody>${rows}</tbody></table></div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:10px" id="toAtt">${icon('cal')}לנוכחות החודשית של המגמה</button></div>`;
+  document.getElementById('edStu').onclick=()=>openDrawer(s.id);
+  document.getElementById('toAtt').onclick=()=>{curAttMg=s.mg;document.querySelector('[data-tab=nochechut]').click();renderAtt(s.id)};
+  box.querySelectorAll('[data-up]').forEach(inp=>inp.onchange=()=>{
+    [...inp.files].forEach(x=>files[s.id][inp.dataset.up].push({n:x.name,d:new Date().toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'2-digit'})}));
+    renderFile();renderList();toast('הקובץ הועלה לתיק');});
+  box.querySelectorAll('[data-ds]').forEach(sel=>sel.onchange=()=>{s.docs[+sel.dataset.ds].s=sel.value;renderFile();renderList();renderKpis()});
+  box.querySelectorAll('[data-df]').forEach(inp=>inp.onchange=()=>{if(!inp.files[0])return;const d=s.docs[+inp.dataset.df];d.f=inp.files[0].name;d.s='ok';renderFile();renderList();renderKpis();toast('הקובץ הועלה והטופס סומן כהועבר')});
+  document.getElementById('logAdd').onclick=()=>{const t=document.getElementById('logTxt').value.trim();if(!t)return;
+    s.log.push({d:new Date().toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'2-digit'}),t});renderFile()};
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{const [k,i]=b.dataset.del.split(':');files[s.id][k].splice(+i,1);renderFile();renderList()});
+}
+
+/* ── טאב 3 ── */
+const mSel=document.getElementById('month');
+mSel.innerHTML=MONTHS.map((M,i)=>`<option value="${i}">${M.label}</option>`).join('');
+mSel.onchange=()=>{curMonth=+mSel.value;renderAtt();renderKpis()};
+function renderAtt(openId){
+  const M=MONTHS[curMonth],mk=key(M);att[mk]=att[mk]||{};submitted[mk]=submitted[mk]||{};
+  if(!curAttMg)curAttMg=megamot[0].name;
+  const mgState=mg=>submitted[mk][mg]?'ok':(students.some(s=>s.mg===mg&&monthStats(s,M).filled)?'warn':'');
+  document.getElementById('mgPills').innerHTML=megamot.map(m=>`<button class="pill ${m.name===curAttMg?'on':''}" data-mg="${esc(m.name)}"><span class="st ${mgState(m.name)}"></span>${esc(m.name)}</button>`).join('');
+  document.querySelectorAll('.pill').forEach(p=>p.onclick=()=>{curAttMg=p.dataset.mg;renderAtt()});
+  // מי חסר — בכל בית הספר
+  const miss=students.filter(s=>!monthStats(s,M).filled);
+  const missMg=megamot.filter(m=>!submitted[mk][m.name]);
+  document.getElementById('tabMissing').textContent=missMg.length||'';
+  document.getElementById('missing').innerHTML=missMg.length?`<div class="missing">${icon('alert')}<b>ב${M.label.split(' ')[0]} טרם הוגשו ${missMg.length} מגמות:</b>
+    <span class="names">${missMg.map(m=>esc(m.name)).join(' · ')}${miss.length?`<br>בלי אף יום נוכחות: ${miss.map(s=>esc(s.name)).join(', ')}`:''}</span>
+    <button class="btn btn-ghost btn-sm" id="copyMiss">העתקת הרשימה</button></div>`:'';
+  const cm=document.getElementById('copyMiss');if(cm)cm.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(missMg.map(m=>m.name).join('\n'));toast('הרשימה הועתקה')};
+
+  const ss=students.filter(s=>s.mg===curAttMg);const locked=!!submitted[mk][curAttMg];
+  const panel=document.getElementById('attPanel');
+  panel.className='panel'+(locked?' locked':'');
+  panel.innerHTML=(ss.length?ss.map(s=>{
+    const rec=att[mk][s.id]=att[mk][s.id]||{};const x=monthStats(s,M);
+    const dates=[...new Set(workDates(s,M).concat(Object.keys(rec)))].sort();
+    return `<div class="srow ${openId===s.id?'open':''}" data-s="${s.id}">
+      <div class="srow-head"><span class="nm">${esc(s.name)}</span><span class="emp">${esc(s.emp)} · ${s.days.map(d=>DAYS[d]).join(',')}</span>
+        <span class="sum"><span>${x.filled}/${x.plan} ימים מולאו</span><span>${x.h.toFixed(1)} ש׳</span>
+        ${x.a?`<span class="tag bad">${x.a} חיסורים</span>`:''}${x.filled>=x.plan&&x.plan?'<span class="tag ok">מלא</span>':x.filled?'<span class="tag warn">חלקי</span>':'<span class="tag gray">ריק</span>'}
+        <span class="chev">${icon('chev')}</span></span></div>
+      <div class="srow-body">
+        <div style="display:flex;gap:8px;margin:2px 0 10px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" data-all="${s.id}">${icon('check')}כל הימים: הגיע ${s.inT}–${s.outT}</button>
+          <button class="btn btn-ghost btn-sm" data-add="${s.id}">${icon('plus')}הוספת יום עבודה נוסף</button></div>
+        <div class="tbl-wrap"><table class="dtable"><thead><tr><th>תאריך</th><th>יום</th><th>נוכחות</th><th>שעת הגעה</th><th>שעת סיום</th><th>שעות</th></tr></thead><tbody>
+        ${dates.map(d=>{const r=rec[d]||{};return `<tr data-d="${d}"><td><b>${heDate(d)}</b></td><td>${dayName(d)}</td>
+          <td><span class="stt"><button class="p ${r.s==='p'?'on':''}" data-v="p">הגיע</button><button class="a ${r.s==='a'?'on':''}" data-v="a">לא הגיע</button><button class="x ${r.s==='x'?'on':''}" data-v="x" title="חג / המעסיק סגור">לא התקיים</button></span></td>
+          <td><input type="time" class="inp" data-t="in" value="${r.s==='p'?(r.in||''):''}" ${r.s!=='p'?'disabled':''}></td>
+          <td><input type="time" class="inp" data-t="out" value="${r.s==='p'?(r.out||''):''}" ${r.s!=='p'?'disabled':''}></td>
+          <td>${r.s==='p'?hrs(r.in,r.out).toFixed(1):'—'}</td></tr>`}).join('')}
+        </tbody></table></div></div></div>`}).join(''):'<div class="empty">אין תלמידים משובצים במגמה הזו</div>')+
+    `<div class="submit-bar">${locked?`<span class="tag ok">${icon('check')}הוגש ב-${submitted[mk][curAttMg]}</span><span style="font-size:.84rem;color:var(--text2)">הנוכחות נעולה. המפקח.ת ומשרד העבודה רואים אותה.</span><div class="sp"></div><button class="btn btn-ghost btn-sm" id="unlock">פתיחה לתיקון</button>`
+      :`<span style="font-size:.86rem;color:var(--text2)">נשמר אוטומטית כטיוטה. בסוף החודש מגישים.</span><div class="sp"></div><button class="btn btn-ok" id="submitMg">${icon('send')}הגשת נוכחות ${esc(M.label.split(' ')[0])} · ${esc(curAttMg)}</button>`}</div>`;
+
+  panel.querySelectorAll('.srow-head').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('open'));
+  panel.querySelectorAll('.srow').forEach(row=>{
+    const sid=+row.dataset.s,s=students.find(x=>x.id===sid),rec=att[mk][sid];
+    row.querySelectorAll('tr[data-d]').forEach(tr=>{
+      const d=tr.dataset.d;
+      tr.querySelectorAll('.stt button').forEach(b=>b.onclick=()=>{const v=b.dataset.v;
+        rec[d]=v==='p'?{s:'p',in:(rec[d]&&rec[d].in)||s.inT,out:(rec[d]&&rec[d].out)||s.outT}:{s:v};rerender(sid)});
+      tr.querySelectorAll('input[type=time]').forEach(inp=>inp.onchange=()=>{rec[d][inp.dataset.t]=inp.value;rerender(sid)});
+    });
+    const all=row.querySelector('[data-all]');if(all)all.onclick=()=>{workDates(s,M).forEach(d=>{if(!rec[d]||rec[d].s!=='a'&&rec[d].s!=='x')rec[d]={s:'p',in:s.inT,out:s.outT}});rerender(sid);toast('סומן: הגיע בכל ימי העבודה')};
+    const add=row.querySelector('[data-add]');if(add)add.onclick=()=>{const v=prompt('תאריך (יום בחודש):');const n=parseInt(v,10);
+      if(n>=1&&n<=31){const d=M.y+'-'+String(M.m+1).padStart(2,'0')+'-'+String(n).padStart(2,'0');rec[d]={s:'p',in:s.inT,out:s.outT};rerender(sid)}};
+  });
+  const sb=document.getElementById('submitMg');if(sb)sb.onclick=()=>{
+    const empty=ss.filter(s=>monthStats(s,M).filled<monthStats(s,M).plan);
+    if(empty.length&&!confirm('ל-'+empty.length+' תלמידים יש ימים שלא מולאו. להגיש בכל זאת?'))return;
+    submitted[mk][curAttMg]=new Date().toLocaleDateString('he-IL',{day:'numeric',month:'numeric',year:'2-digit'});renderAll();toast('הנוכחות הוגשה')};
+  const ul=document.getElementById('unlock');if(ul)ul.onclick=()=>{delete submitted[mk][curAttMg];renderAll()};
+}
+function rerender(openId){renderAtt(openId);renderKpis();renderMg();renderList();if(curStu===openId)renderFile()}
+</script>
+</body>
+</html>
