@@ -21,6 +21,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@500;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/elnet.css">
+<!--
+  27.9.26: מיטל ואלנט (מפתח adm-/view-) עוברות למעטפת, למסך "משתתפים וזכאות".
+  שני, שנכנסת דרך שער ההרשאות בלי מפתח, נשארת כאן — הדף לא השתנה.
+-->
+<script>
+  (function (w) {
+    var re = /[?&#](?:key|k)=((?:adm|view)-[0-9a-z-]{8,64})/i;
+    var m = (String(w.location.search || "") + String(w.location.hash || "")).match(re);
+    var stored = "";
+    try { stored = w.localStorage.getItem("shag.teamkey") || ""; } catch (e) { stored = ""; }
+    if (m) w.location.replace("index.html?key=" + encodeURIComponent(m[1]) + "#v=people");
+    else if (/^(?:adm|view)-[0-9a-z-]{8,64}$/i.test(stored)) w.location.replace("index.html#v=people");
+  })(window);
+</script>
 </head>
 <body>
 

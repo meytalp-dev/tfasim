@@ -689,8 +689,51 @@
     });
   }
 
+  /* ------------------------------------------------------------------ */
+  /* מי נכנס: רכז/ת (?t=) · מיטל (key=adm-) · אלנט (key=view-)          */
+  /* ------------------------------------------------------------------ */
+
+  var TEAM_KEY = "shag.teamkey";
+  var ADMIN_VIEWS = /(?:^|&)v=(home|kit|desk|ans|att|subs|people|set)(?:&|$)/;
+
+  function keyFrom(text) {
+    var t = String(text || "").trim();
+    var m = t.match(/[?&#](?:key|k)=((?:adm|view)-[0-9a-z-]{8,64})/i) || t.match(/^((?:adm|view)-[0-9a-z-]{8,64})$/i);
+    return m ? m[1] : "";
+  }
+
+  /* המפתח מהכתובת נשמר בדפדפן ונמחק מסרגל הכתובת מיד — שלא יופיע בהיסטוריה,
+     בצילום מסך או בשיתוף מסך בזום. ה-# של המסך נשאר, בלי המפתח. */
+  function adminEntry() {
+    var fromUrl = keyFrom(w.location.search) || keyFrom(w.location.hash);
+    if (fromUrl) {
+      try { w.localStorage.setItem(TEAM_KEY, fromUrl); } catch (e) { /* חלון פרטי */ }
+      var h = String(w.location.hash || "").replace(/^#/, "").split("&")
+        .filter(function (kv) { return !/^(key|k)=/i.test(kv); }).join("&");
+      try { w.history.replaceState(null, "", w.location.pathname + (h ? "#" + h : "")); } catch (e2) { /* דפדפן ישן */ }
+      return { key: fromUrl };
+    }
+    /* מפתח אישי בכתובת = רכז/ת, גם אם בדפדפן הזה שמור מפתח של מיטל
+       (כך "לפתוח כרכז/ת" עובד מאותו מחשב). */
+    if (w.SH_auth && w.SH_auth.token && w.SH_auth.token()) return null;
+    var stored = "";
+    try { stored = keyFrom(w.localStorage.getItem(TEAM_KEY) || ""); } catch (e3) { stored = ""; }
+    if (stored) return { key: stored };
+    /* הפניה מ-team.html בלי מפתח: שער ההדבקה של מיטל, לא הודעת "קישור אישי" */
+    if (ADMIN_VIEWS.test(String(w.location.hash || "").replace(/^#/, ""))) return { key: "" };
+    return null;
+  }
+
   function start() {
     wireSide();
+
+    var adm = adminEntry();
+    if (adm && w.SH_admin) {
+      el("sh-boot").hidden = true;
+      w.SH_admin.start(adm.key);
+      return;
+    }
+
     w.addEventListener("hashchange", route);
     d.addEventListener("visibilitychange", function () { if (!d.hidden && S.stepTimer) pollStep(); });
     boot("רגע, טוענים את הסביבה", "אם זה לוקח יותר מכמה שניות — כדאי לרענן את הדף.");
@@ -723,6 +766,9 @@
     refresh: loadAll,
     setStep: setLive,
     beatsHtml: beatsHtml,
+    drawer: drawer,
+    esc: esc,
+    matsHtml: matsHtml,
     state: function () { return { track: S.me && S.me.track, view: S.view, session: S.sel, step: S.live.step, sessions: S.sessions.length }; }
   };
   w.SH_home = { refresh: loadAll, go: nav, openSession: function (n) { nav("#s=" + n); }, state: w.SH_shell.state };

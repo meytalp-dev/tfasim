@@ -1006,8 +1006,34 @@
     gate("");
   }
 
+  /* בחירת מסלול ומפגש מבחוץ (המעטפת של מיטל, 27.9.26): לחיצה על מפגש
+     בתפריט הצד או על פריט בתור "עבודות שמחכות לי". דור אחד חדש לשניהם,
+     כדי שתשובה ישנה של המסלול הקודם לא תדרוס את הבחירה. */
+  function select(track, n) {
+    var t = String(track || T.track), num = Number(n) || 0;
+    if (t === T.track && num === Number(T.sel)) return;
+    var trackChanged = t !== T.track;
+    bump();
+    T.track = t;
+    T.sel = num;
+    T.live = null;
+    T.marking = null;
+    if (trackChanged) {
+      T.code = null;
+      var bs = el("t-tracks") ? el("t-tracks").getElementsByTagName("button") : [];
+      for (var i = 0; i < bs.length; i++) {
+        bs[i].setAttribute("aria-pressed", bs[i].getAttribute("data-track") === t ? "true" : "false");
+      }
+      try { w.localStorage.setItem("shag.teamtrack", t); } catch (e) { /* לא קריטי */ }
+    }
+    /* ייבוא זום פתוח נסגר, כמו בהחלפה ידנית (zoom-import מאזין ללחיצה על המתג) */
+    try { if (el("t-tracks")) el("t-tracks").dispatchEvent(new Event("click")); } catch (e2) { /* דפדפן ישן */ }
+    if (T.key) { (trackChanged ? loadCode() : Promise.resolve()).then(loadLive); }
+  }
+
   w.SH_team = {
     start: tStart,
+    select: select,
     reload: function () { loadCode().then(loadLive); },
     state: function () { return { track: T.track, session: T.sel, open: !!(T.code && T.code.open), viewer: isViewer() }; },
     reminderText: reminderText,

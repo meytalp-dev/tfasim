@@ -274,9 +274,15 @@
     renderDesk();
   }
 
-  function build() {
-    var stage = d.querySelector(".stage");
+  /* opts.host / opts.wallHost: המכולות שהמעטפת מספקת (index.html, 27.9.26).
+     בלעדיהן — team.html הישן: הפס בראש .stage והקיר לפני הבנטו. */
+  var built = false;
+  function build(opts) {
+    if (built) return;
+    var o = opts || {};
+    var stage = o.host || d.querySelector(".stage");
     if (!stage) return;
+    built = true;
     var desk = d.createElement("div");
     desk.className = "dk-desk"; desk.id = "dk-desk"; desk.hidden = true;
     desk.innerHTML =
@@ -294,8 +300,11 @@
     tile.innerHTML = '<h3>קיר הסטודיו · הדפים המלווים בזמן אמת</h3>' +
       '<p class="legend">"זרקור" מעלה תוצר למצב ההקרנה בלי שם · "לשדך לעזרה" מסמן בקיר בלבד · אחרי המפגש: "הערכה" עם שלוש רמות ומשפט</p>' +
       '<div class="dk-wall" id="dk-wall"><p class="dk-empty">טוען…</p></div>';
-    var bento = d.querySelector(".bento");
-    if (bento) bento.parentNode.insertBefore(tile, bento);
+    if (o.wallHost) o.wallHost.appendChild(tile);
+    else {
+      var bento = d.querySelector(".bento");
+      if (bento) bento.parentNode.insertBefore(tile, bento);
+    }
 
     el("dk-beats").addEventListener("click", function (ev) {
       var b = ev.target.closest ? ev.target.closest("button[data-step]") : null;
@@ -311,8 +320,10 @@
     sync();
   }
 
-  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", build);
-  else build();
+  /* team.html בונה לבד (יש בו .stage). במעטפת admin.js קורא ל-SH_desk.start. */
+  function auto() { if (d.querySelector(".stage")) build(); }
+  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", auto);
+  else auto();
 
-  w.SH_desk = { reload: loadWall, state: function () { return { track: D.track, session: D.session, step: D.wall ? D.wall.step : 0, spot: D.spot }; } };
+  w.SH_desk = { start: build, reload: loadWall, state: function () { return { track: D.track, session: D.session, step: D.wall ? D.wall.step : 0, spot: D.spot }; } };
 })(window, document);

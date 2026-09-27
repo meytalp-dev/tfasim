@@ -1,0 +1,236 @@
+/* ------------------------------------------------------------------------- *
+ * שגרירי חדשנות טכנולוגית — המעטפת של מיטל ואלנט (27.9.26).
+ * נטען תמיד אחרי shell.css. admin.js מוסיף לפניו את team.css ו-desk.css רק
+ * במעטפת של מיטל, והקובץ הזה מתקן את מה שמתנגש (team.css נכתב לדף עצמאי).
+ * כל הסלקטורים כאן תחומים ב-.adm / #a-side / body.is-admin, ולכן אצל
+ * רכז/ת (שם team.css לא נטען) אין לו שום השפעה.
+ * ------------------------------------------------------------------------- */
+
+/* team.css מגדיר --muted בהיר יותר. חוזרים לערך של app.css (ניגודיות 5.3:1). */
+body.is-admin { --muted: #566571; }
+
+/* ---------- תפריט הצד ---------- */
+#a-side .a-tracks { margin: 10px 8px 2px; display: flex; background: var(--paper); border: 1px solid var(--line);
+  border-radius: 14px; padding: 4px; gap: 4px; }
+#a-side .a-tracks button { flex: 1; border: 0; background: none; border-radius: 10px; padding: 8px 6px; min-height: 48px;
+  font-weight: 800; font-size: 14.5px; color: var(--muted); cursor: pointer; line-height: 1.15; }
+#a-side .a-tracks button small { display: block; font-weight: 600; font-size: 11.5px; opacity: .85; }
+#a-side .a-tracks button[aria-pressed="true"] { background: var(--night); color: #fff; }
+#a-side .a-tracks button:focus-visible { outline: 3px solid var(--orange); outline-offset: 2px; }
+#a-nav .a-navlink { width: 100%; display: flex; align-items: center; gap: 10px; text-align: right; padding: 10px 12px;
+  border-radius: 12px; font-size: 14.4px; font-weight: 700; min-height: 46px; color: inherit; text-decoration: none; }
+#a-nav .a-navlink:hover { background: var(--paper); }
+#a-nav .a-ext { margin-inline-start: auto; width: 15px; height: 15px; opacity: .6; }
+#a-nav .v2-n { background: var(--orange-soft); color: #8A4707; }
+#a-mlist .a-miss { color: #8A4707; font-weight: 800; }
+#a-mlist .a-mempty { padding: 8px 12px; font-size: 13px; color: var(--muted); }
+body.t-viewer .a-admin-only { display: none !important; }
+
+/* ---------- ההקשר, השער, ההמתנה ---------- */
+.adm .a-ctx { margin: 0 0 12px; }
+.adm .a-ctx .pick { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 8px 12px; }
+.adm .gate { margin: 10px auto; }
+.adm .t-viewbar { margin: 0 0 12px; }
+.adm .a-wait { margin: 0 0 12px; }
+.adm .sh-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- שולחן המנחה ---------- */
+/* הפס הדביק נצמד מתחת לפס העליון של המעטפת, ולא לראש החלון */
+.adm .dk-desk { top: 70px; }
+.adm .a-deskgrid { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 14px; align-items: start; }
+.adm .a-deskgrid .t-code { grid-column: auto; grid-row: auto; position: sticky; top: 250px; }
+.adm .a-deskgrid .cd2 b { font-size: 58px; letter-spacing: 8px; }
+.adm .a-deskgrid .t-code .row { margin-top: 6px; }
+.adm .dk-walltile { margin: 0; }
+/* team.css מגדיר .warn כפס האזהרה (רקע בהיר, טקסט כתום, display:flex), והוא דרס
+   את גלולת "נתקעתי" בפס הכהה: כתום על כתום. אותו דבר קרה ב-team.html הישן. */
+.adm .dk-counters span.warn, .adm .a-stats .warn { display: inline-block; margin: 0; font-size: 12.8px; line-height: 1.5; }
+.adm .dk-counters span.warn { background: rgba(240, 138, 46, .28); border: 1px solid rgba(240, 138, 46, .6); color: #fff; padding: 5px 12px; border-radius: 99px; font-weight: 700; }
+.adm .a-stats .warn { border: 0; padding: 4px 11px; border-radius: 99px; }
+.adm .dk-wall { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+/* ---------- נוכחות ---------- */
+.adm #a-att .t-att { grid-column: span 12; }
+.adm #a-att .t-k { grid-column: span 12; }
+
+/* ---------- ראש מסך ---------- */
+.adm .a-head { margin: 0 0 14px; }
+.adm .a-head h2 { font-size: 23px; line-height: 1.25; margin: 0; }
+.adm .a-foot { font-size: 12.8px; color: var(--muted); margin: 12px 0 0; line-height: 1.55; }
+.adm .v2-note.bad { color: var(--bad); border-color: #EFC2BE; background: #FDF3F2; }
+.adm .a-empty { color: #8D98A1; font-style: normal; }
+
+/* ---------- הבית: שני המסלולים ---------- */
+.adm .a-tracks2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.adm .a-tcard { display: flex; flex-direction: column; gap: 12px; margin: 0 !important; }
+.adm .a-tcard.cur { border-color: var(--blue-2); box-shadow: 0 0 0 1px var(--blue-2) inset; }
+.adm .a-tch { display: flex; align-items: baseline; gap: 10px; }
+.adm .a-tch b { font: 800 17px Rubik, sans-serif; }
+.adm .a-tch span { color: var(--muted); font-size: 13px; font-weight: 700; }
+.adm .a-tcs h3 { font-size: 18px; line-height: 1.3; margin: 8px 0 4px; }
+.adm .a-meta { margin: 0; color: var(--muted); font-size: 13.4px; }
+.adm .a-stats { display: flex; flex-wrap: wrap; gap: 6px; }
+.adm .a-stats > span { background: var(--paper); border-radius: 99px; padding: 4px 11px; font-size: 12.8px; }
+.adm .a-stats b { font-family: Rubik, sans-serif; }
+.adm .a-stats .hot { background: var(--orange-soft); color: #8A4707; font-weight: 700; }
+.adm .a-stats .warn { background: #FFF4E5; color: #8A4707; font-weight: 700; }
+.adm .a-stats .ok { background: var(--ok-soft); color: #23774F; font-weight: 700; }
+.adm .a-tcard .v2-row { margin-top: auto; }
+
+.adm .a-queue { margin-top: 14px; }
+.adm .a-qh { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; }
+.adm .a-qh h3 { margin: 0; font-size: 17px; }
+.adm .a-qh > :last-child { margin-inline-start: auto; }
+.adm .a-qlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.adm .a-qlist li { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; background: #FBFAF6; }
+.adm .a-qlist li.hot { border-color: #F0C9A3; background: #FFF8F1; }
+.adm .a-qlist .ic { flex: none; width: 38px; height: 38px; border-radius: 11px; background: #fff; color: var(--blue);
+  display: flex; align-items: center; justify-content: center; }
+.adm .a-qlist li.hot .ic { color: var(--orange); }
+.adm .a-qlist .tx { flex: 1; min-width: 0; }
+.adm .a-qlist .tx b { display: block; font-size: 14.4px; }
+.adm .a-qlist .tx span { font-size: 12.8px; color: var(--muted); }
+
+/* ---------- ערכת המנחה ---------- */
+.adm #a-kit .v2-card + .v2-card { margin-top: 14px; }
+.adm .a-gaps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.adm .a-gaps li { display: flex; align-items: center; gap: 8px; border-radius: 12px; padding: 8px 11px; font-size: 13.6px; flex-wrap: wrap; }
+.adm .a-gaps li.ok { background: var(--ok-soft); color: #23774F; }
+.adm .a-gaps li.no { background: #FFF4E5; color: #8A4707; font-weight: 700; }
+.adm .a-gaps li em { width: 100%; font-style: normal; font-weight: 500; font-size: 11.8px; opacity: .8; padding-inline-start: 24px; }
+
+.adm .a-md { font-size: 14.5px; line-height: 1.7; }
+.adm .a-md h3 { font-size: 18px; margin: 18px 0 8px; }
+.adm .a-md h3:first-child { margin-top: 0; }
+.adm .a-md h4 { font-size: 15.5px; margin: 16px 0 6px; color: var(--blue); }
+.adm .a-md h5 { font-size: 14.5px; margin: 12px 0 4px; }
+.adm .a-md p { margin: 0 0 10px; }
+.adm .a-md ul, .adm .a-md ol { margin: 0 0 10px; padding-inline-start: 22px; }
+.adm .a-md ul { list-style: none; padding-inline-start: 4px; }
+.adm .a-md ul li { position: relative; padding-inline-start: 16px; margin: 3px 0; }
+.adm .a-md ul li::before { content: ""; position: absolute; inset-inline-start: 2px; top: .72em; width: 5px; height: 5px; border-radius: 50%; background: var(--blue-2); }
+.adm .a-md ul li.ind { margin-inline-start: 18px; }
+.adm .a-md ul li:has(.a-md-box)::before { display: none; }
+.adm .a-md-box { display: inline-block; width: 14px; height: 14px; border: 1.6px solid var(--muted); border-radius: 4px; vertical-align: -2px; margin-inline-end: 8px; margin-inline-start: -16px; }
+.adm .a-md-box.on { background: var(--ok); border-color: var(--ok); }
+.adm .a-md code { background: var(--paper); border-radius: 6px; padding: 1px 6px; font-size: .92em; direction: ltr; unicode-bidi: isolate; }
+.adm .a-md-tw { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 12px; }
+.adm .a-md table { border-collapse: collapse; width: 100%; font-size: 13.4px; }
+.adm .a-md th, .adm .a-md td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.adm .a-md th { background: var(--paper); font-weight: 800; }
+.adm .a-md tr:last-child td { border-bottom: 0; }
+
+.adm .a-fields { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: fld; }
+.adm .a-fields li { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+.adm .a-fields li.sec { border: 0; padding: 8px 2px 0; font: 800 13px Rubik, sans-serif; color: var(--blue); }
+.adm .a-fields li.plus { border: 2px dashed var(--orange-2); background: #FFFCF8; }
+.adm .a-fields b { font-size: 14.4px; }
+.adm .a-ft { font-size: 12px; color: var(--muted); font-weight: 700; }
+.adm .a-fh { font-size: 12.8px; color: var(--muted); }
+.adm .a-fo { display: flex; flex-wrap: wrap; gap: 5px; }
+.adm .a-fo i { font-style: normal; font-size: 12.4px; background: var(--blue-soft); color: var(--blue); border-radius: 99px; padding: 2px 9px; }
+.adm .a-fields .v2-tip, .adm .a-fields .v2-ex { margin: 2px 0 0; }
+.adm .a-dl { display: grid; grid-template-columns: minmax(120px, 170px) 1fr; gap: 10px 16px; margin: 0; font-size: 14.2px; line-height: 1.6; }
+.adm .a-dl dt { color: var(--muted); font-weight: 700; }
+.adm .a-dl dd { margin: 0; }
+.adm .a-dl .v2-mats { margin: 0; }
+
+/* ---------- תשובות ומיפוי ---------- */
+.adm .a-sesspick { margin-top: 10px; }
+.adm .a-sesspick .v2-btn { min-height: 38px; padding: 6px 12px; font-size: 13px; }
+.adm .a-kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+.adm .a-kpis > div { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+.adm .a-kpis b { display: block; font: 900 28px/1 Rubik, sans-serif; font-variant-numeric: tabular-nums; }
+.adm .a-kpis span { font-size: 12.6px; color: var(--muted); font-weight: 700; }
+.adm .a-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 12px; }
+.adm .a-chart { border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+.adm .a-chart h4 { font-size: 14.5px; margin: 0 0 8px; }
+.adm .a-chart h4 small { color: var(--muted); font-weight: 600; font-family: Assistant, sans-serif; }
+.adm .a-bar { display: grid; grid-template-columns: minmax(0, 1fr) 1.4fr 2.2ch; gap: 8px; align-items: center; width: 100%; border: 0; background: none;
+  padding: 5px 6px; border-radius: 8px; font: inherit; font-size: 13.4px; text-align: right; cursor: pointer; min-height: 34px; }
+.adm .a-bar:hover { background: var(--paper); }
+.adm .a-bar.on { background: var(--blue-soft); outline: 1.5px solid var(--blue); }
+.adm .a-bar .lbl { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.adm .a-bar .trk { display: block; height: 11px; background: #EDEFF1; border-radius: 6px; overflow: hidden; }
+.adm .a-bar .fil { display: block; height: 100%; background: var(--blue-2); border-radius: 6px; }
+.adm .a-bar .n { font: 800 13.5px Rubik, sans-serif; text-align: left; }
+.adm .a-tbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 0 12px; }
+.adm .a-tbar > .v2-btn:last-child { margin-inline-start: auto; }
+.adm .a-search { display: flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 12px; padding: 0 10px; background: #fff; min-height: 42px; }
+.adm .a-search input { border: 0; font: inherit; min-width: 150px; outline: none; background: none; }
+.adm .a-tbar select { border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; font: inherit; min-height: 42px; background: #fff; }
+.adm .a-clear { border: 0; cursor: pointer; min-height: 32px; }
+.adm .a-chk { display: flex; align-items: center; gap: 6px; font-size: 13.6px; font-weight: 700; }
+.adm .a-in { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font: inherit; min-height: 44px; min-width: 220px; }
+.adm .a-tw { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.adm .a-tbl { border-collapse: collapse; width: 100%; font-size: 13.4px; }
+.adm .a-tbl th, .adm .a-tbl td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.adm .a-tbl th { background: var(--paper); font-weight: 800; white-space: nowrap; position: sticky; top: 0; }
+.adm .a-tbl th.plus { color: var(--orange); }
+.adm .a-tbl td { min-width: 90px; max-width: 280px; }
+.adm .a-tbl td.nm { font-weight: 700; white-space: nowrap; }
+.adm .a-tbl td.sch { color: var(--muted); min-width: 120px; }
+.adm .a-tbl tbody tr:hover td { background: #FBFAF6; }
+.adm .a-tbl tr:last-child td { border-bottom: 0; }
+
+/* ---------- מסך אלנט בתוך המעטפת: אותו מראה רשמי (הכרעה 18), תחום כאן ---------- */
+.adm .a-elh { margin: 22px 0 10px; }
+.adm .a-elnet { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 22px 20px; font: 400 15px/1.6 Assistant, Arial, sans-serif; }
+.adm .a-elnet h2 { font-family: Rubik, Arial, sans-serif; }
+.adm .a-elnet .rule { border-inline-start: 3px solid var(--blue); padding: 2px 16px; margin-bottom: 26px; }
+.adm .a-elnet .rule h2 { margin: 0 0 6px; font-size: 17px; }
+.adm .a-elnet .rule p { margin: 0; }
+.adm .a-elnet .rule-note { color: var(--muted); font-size: 13px; margin-top: 8px !important; }
+.adm .a-elnet .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+.adm .a-elnet .tabs button { border: 0; background: none; font: inherit; font-weight: 700; color: var(--muted); padding: 10px 18px; cursor: pointer;
+  border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.adm .a-elnet .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--blue); }
+.adm .a-elnet .panel { margin-bottom: 30px; }
+.adm .a-elnet .panel:last-child { margin-bottom: 0; }
+.adm .a-elnet .panel-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+.adm .a-elnet .panel-h h2 { margin: 0; font-size: 17px; }
+.adm .a-elnet .sum { color: var(--muted); font-size: 14px; font-weight: 600; }
+.adm .a-elnet .panel > p { margin: 0 0 12px; color: var(--muted); font-size: 14px; }
+.adm .a-elnet .scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+.adm .a-elnet .grid { width: 100%; border-collapse: collapse; font-size: 14px; }
+.adm .a-elnet .grid th, .adm .a-elnet .grid td { text-align: right; padding: 9px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.adm .a-elnet .grid thead th { background: var(--paper); font-weight: 700; font-size: 13px; }
+.adm .a-elnet .grid tbody tr:last-child td { border-bottom: 0; }
+.adm .a-elnet .grid td.name { white-space: normal; font-weight: 700; min-width: 150px; }
+.adm .a-elnet .grid td.school, .adm .a-elnet .grid td.mail { white-space: normal; color: var(--muted); }
+.adm .a-elnet .grid td.miss, .adm .a-elnet .miss { color: var(--muted); }
+.adm .a-elnet .st { font-weight: 700; }
+.adm .a-elnet .st.ok { color: #2F6B4F; }
+.adm .a-elnet .st.bad { color: #9E2A22; }
+.adm .a-elnet .st.risk { color: #8E5A0B; }
+.adm .a-elnet .empty { color: var(--muted); padding: 16px 2px; }
+.adm .a-elnet .sync-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.adm .a-elnet .btn { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--blue); background: var(--blue); color: #fff;
+  border-radius: 8px; padding: 10px 16px; font: inherit; font-weight: 700; cursor: pointer; text-decoration: none; min-height: 44px; }
+.adm .a-elnet .btn.ghost { background: #fff; color: var(--blue); }
+.adm .a-elnet .btn.go { background: var(--orange); border-color: var(--orange); }
+.adm .a-elnet .btn[disabled] { opacity: .5; cursor: default; }
+.adm .a-elnet .sync-out { margin-top: 14px; border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; font-size: 14px; }
+.adm .a-elnet .sync-out h3 { margin: 0 0 8px; font-size: 15px; }
+.adm .a-elnet .sync-out .warn { color: #9E2A22; font-weight: 700; background: none; border: 0; padding: 0; display: list-item; }
+.adm .a-elnet .gate { border: 0; padding: 0; margin: 0; max-width: none; }
+body.t-viewer .adm .a-elnet #e-admin-tools { display: none !important; }
+
+/* ---------- נייד ---------- */
+@media (max-width: 960px) {
+  .adm .a-deskgrid { grid-template-columns: minmax(0, 1fr); }
+  .adm .a-deskgrid .t-code { position: static; }
+  .adm .a-tracks2 { grid-template-columns: minmax(0, 1fr); }
+  .adm .a-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  .adm .a-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .adm .a-dl { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .adm .a-dl dd { margin-bottom: 10px; }
+  .adm .a-qlist li { flex-wrap: wrap; }
+  .adm .a-qlist li .v2-btn { width: 100%; }
+  .adm .a-search input { min-width: 0; width: 100%; }
+  .adm .a-search { flex: 1; }
+  .adm .a-in { min-width: 0; flex: 1; }
+  .adm .a-elnet { padding: 16px 12px; }
+}
