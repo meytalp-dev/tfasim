@@ -63,3 +63,15 @@
   .dk-beat { flex: 1 1 30%; }
   .dk-desk { position: static; }
 }
+
+/* ---------- מצב צפייה (מפתח view-): רואים הכול, לא לוחצים כלום ---------- */
+.t-viewbar { background: #E3EFF7; color: #10344F; border: 1px solid #B9D4E8; border-radius: 14px; padding: 10px 16px;
+  font-weight: 700; font-size: 14px; margin: 0 0 14px; text-align: center; }
+body.t-viewer #t-openBtn, body.t-viewer #t-closeBtn, body.t-viewer #t-okBtn, body.t-viewer #t-copy,
+body.t-viewer #t-copyCode, body.t-viewer #t-zoomBtn, body.t-viewer #t-zoomBox, body.t-viewer #t-mark,
+body.t-viewer .t-ok, body.t-viewer .t-zoom,
+body.t-viewer #dk-next, body.t-viewer #dk-off, body.t-viewer .dk-w .acts, body.t-viewer .dk-assess,
+body.t-viewer #t-okNote { display: none !important; }
+body.t-viewer .dk-beat { cursor: default; pointer-events: none; }
+body.t-viewer #t-people button { cursor: default; }
+body.t-viewer .t-miss .legend { display: none; }

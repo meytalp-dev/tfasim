@@ -75,7 +75,7 @@
   <h2>מצב הקרנה</h2>
   <p>המפתח של מסך "היום" לא נמצא בדפדפן הזה. להדביק את הקישור או את המפתח, ולבחור מסלול ומפגש בכתובת:
     <code dir="ltr">proj.html#track=כלים&amp;n=1</code></p>
-  <input type="text" id="keyin" placeholder="adm-…" autocomplete="off" spellcheck="false">
+  <input type="text" id="keyin" placeholder="adm-… או view-…" autocomplete="off" spellcheck="false">
   <button type="button" id="keygo">כניסה</button>
   <p class="err" id="gerr" hidden></p>
 </section>
@@ -109,7 +109,7 @@
   ];
   function el(id) { return d.getElementById(id); }
   function esc(s) { return String(s === undefined || s === null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
-  function keyFrom(t) { var m = String(t || "").match(/[?&#](?:key|k)=(adm-[0-9a-z-]{8,64})/i) || String(t || "").match(/^(adm-[0-9a-z-]{8,64})$/i); return m ? m[1] : ""; }
+  function keyFrom(t) { var m = String(t || "").match(/[?&#](?:key|k)=((?:adm|view)-[0-9a-z-]{8,64})/i) || String(t || "").match(/^((?:adm|view)-[0-9a-z-]{8,64})$/i); return m ? m[1] : ""; }
 
   var P = { key: "", track: "", n: 0, gen: 0 };
 
@@ -200,7 +200,7 @@
 
   el("keygo").addEventListener("click", function () {
     var k = keyFrom(el("keyin").value);
-    if (!k) { el("gerr").hidden = false; el("gerr").textContent = "זה לא נראה כמו המפתח. הוא מתחיל ב-adm-"; return; }
+    if (!k) { el("gerr").hidden = false; el("gerr").textContent = "זה לא נראה כמו המפתח. הוא מתחיל ב-adm- או ב-view-"; return; }
     try { w.localStorage.setItem("shag.teamkey", k); } catch (e) {}
     start();
   });

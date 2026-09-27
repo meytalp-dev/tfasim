@@ -41,6 +41,8 @@
   var D = { key: "", track: "", session: 0, wall: null, poll: null, gen: 0, spot: "", assessing: "", pairs: {} };
 
   function keyGet() { try { return w.localStorage.getItem("shag.teamkey") || ""; } catch (e) { return ""; } }
+  /* מפתח צפייה: קריאה בלבד. הכפתורים מוסתרים ב-CSS (body.t-viewer), וכאן גם לא נשלחים. */
+  function viewer() { return /^view-/i.test(D.key || ""); }
 
   function api(body) {
     var o = { key: D.key, track: D.track, n: D.session };
@@ -79,7 +81,7 @@
     var W = D.wall, c = W ? W.counts : null;
     var step = W ? Number(W.step) || 0 : 0;
     el("dk-beats").innerHTML = beatsHtml(step);
-    el("dk-next").disabled = step >= BEATS.length;
+    el("dk-next").disabled = step >= BEATS.length || viewer();
     el("dk-next").textContent = step === 0 ? "התחלת המפגש · פעימה 1" : step >= BEATS.length ? "המפגש הסתיים" : "השלב הבא ←";
     el("dk-stepnote").textContent = step ? "כל המסכים של המסלול על פעימה " + step : "השלב החי כבוי. הרכזים לא רואים פס פעימות.";
 
@@ -98,6 +100,7 @@
   }
 
   function setStep(step) {
+    if (viewer()) return;
     var gen = ++D.gen;
     api({ action: "stepSet", step: step }).then(function (r) {
       if (gen !== D.gen) return;
@@ -160,11 +163,11 @@
         '<span class="prog" translate="no">' + r.filled + " מתוך " + r.total + (r.savedAt ? " · " + esc(ago(r.savedAt)) : r.filled ? "" : " · לא התחיל/ה") + "</span>" +
         (tx ? '<span class="tx"><i>' + esc(tx.label) + ":</i> " + esc(tx.value) + "</span>" : "") +
         (flags ? '<span class="flags">' + flags + "</span>" : "") +
-        '<span class="acts">' +
+        (viewer() ? "" : '<span class="acts">' +
           '<button type="button" data-act="spot"' + (r.filled ? "" : " disabled") + ">" + (lit ? "הורדה מהזרקור" : "זרקור") + "</button>" +
           (r.stuck ? '<button type="button" data-act="pair">לשדך לעזרה</button><button type="button" data-act="clear">טופל</button>' : "") +
           (r.filled ? '<button type="button" data-act="assess">' + (r.level ? "הערכה מחדש" : "הערכה") + "</button>" : "") +
-        "</span>" +
+        "</span>") +
         (D.assessing === r.sid ? assessForm(r, W.levels) : "") +
         "</div>";
     }
@@ -202,6 +205,7 @@
     var b = ev.target.closest ? ev.target.closest("button") : null;
     var card = ev.target.closest ? ev.target.closest(".dk-w") : null;
     if (!b || !card) return;
+    if (viewer()) return;
     var sid = card.getAttribute("data-sid"), act = b.getAttribute("data-act");
     var row = null;
     for (var i = 0; i < D.wall.rows.length; i++) if (D.wall.rows[i].sid === sid) row = D.wall.rows[i];
@@ -258,6 +262,7 @@
     var changed = key !== D.key || st.track !== D.track || Number(st.session) !== D.session;
     D.key = key; D.track = str(st.track); D.session = Number(st.session) || 0;
     var body = el("t-body");
+    d.body.classList.toggle("t-viewer", viewer());
     el("dk-desk").hidden = !(body && !body.hidden && D.key && D.session);
     el("dk-walltile").hidden = el("dk-desk").hidden;
     if (changed) {

@@ -881,7 +881,7 @@
      dashboard-elnet.html, כדי שקישור שנחתך בדרך לא יתקע את מיטל. */
   function keyFrom(text) {
     var t = String(text || "").trim();
-    var m = t.match(/[?&#](?:key|k)=(adm-[0-9a-z-]{8,64})/i) || t.match(/^(adm-[0-9a-z-]{8,64})$/i);
+    var m = t.match(/[?&#](?:key|k)=((?:adm|view)-[0-9a-z-]{8,64})/i) || t.match(/^((?:adm|view)-[0-9a-z-]{8,64})$/i);
     return m ? m[1] : "";
   }
 
@@ -906,9 +906,16 @@
     el("t-keyin").focus();
   }
 
+  /* מפתח צפייה (27.9.26): אלנט רואה את המסך כמו מיטל, בלי אף כפתור פעולה.
+     ההסתרה כאן היא נוחות בלבד — השרת דוחה כל POST במפתח צפייה ב-badkey. */
+  function isViewer() { return /^view-/i.test(T.key || ""); }
+
   function begin(k) {
     T.key = k;
     keySet(k);
+    d.body.classList.toggle("t-viewer", isViewer());
+    var vb = el("t-viewbar");
+    if (vb) vb.hidden = !isViewer();
     el("t-gate").hidden = true;
     el("t-gerr").hidden = true;
     loadCode().then(loadLive);
@@ -955,6 +962,7 @@
       loadLive();
     });
     el("t-people").addEventListener("click", function (ev) {
+      if (isViewer()) return;
       var b = ev.target.closest ? ev.target.closest("button[data-sid]") : null;
       if (!b) return;
       var sid = b.getAttribute("data-sid");
@@ -972,7 +980,7 @@
       var k = keyFrom(el("t-keyin").value);
       if (!k) {
         el("t-gerr").hidden = false;
-        el("t-gerr").textContent = "זה לא נראה כמו המפתח. הוא מתחיל ב-adm-";
+        el("t-gerr").textContent = "זה לא נראה כמו המפתח. הוא מתחיל ב-adm- (ניהול) או ב-view- (צפייה)";
         return;
       }
       begin(k);
@@ -1001,7 +1009,7 @@
   w.SH_team = {
     start: tStart,
     reload: function () { loadCode().then(loadLive); },
-    state: function () { return { track: T.track, session: T.sel, open: !!(T.code && T.code.open) }; },
+    state: function () { return { track: T.track, session: T.sel, open: !!(T.code && T.code.open), viewer: isViewer() }; },
     reminderText: reminderText,
     errText: errText
   };

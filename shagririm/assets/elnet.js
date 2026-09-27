@@ -103,7 +103,7 @@
   /* המפתח עשוי להגיע כקישור מלא, עם # או לבדו — אותה לוגיקה כמו team.html */
   function keyFrom(text) {
     var t = String(text || "").trim();
-    var m = t.match(/[?&#](?:key|k)=(adm-[0-9a-z-]{8,64})/i) || t.match(/^(adm-[0-9a-z-]{8,64})$/i);
+    var m = t.match(/[?&#](?:key|k)=((?:adm|view)-[0-9a-z-]{8,64})/i) || t.match(/^((?:adm|view)-[0-9a-z-]{8,64})$/i);
     return m ? m[1] : "";
   }
 
