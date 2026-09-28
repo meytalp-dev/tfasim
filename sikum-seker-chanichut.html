@@ -37,6 +37,16 @@ header.top p{margin:0;color:var(--muted);font-size:16.5px}
 .kpi .n{font-family:'Rubik',sans-serif;font-size:34px;font-weight:700;color:var(--navy);line-height:1.1}
 .kpi .l{color:var(--muted);font-size:14.5px;margin-top:3px}
 .kpi.warn .n{color:var(--amber)}
+.progress{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s);padding:16px 20px}
+.progress .row{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin-bottom:8px}
+.progress .row b{color:var(--navy);font-family:'Rubik',sans-serif}
+.progress .track{height:14px;border-radius:99px;background:#fdf2e0;overflow:hidden}
+.progress .fill{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--mint),#7fe0d0);transition:width .7s var(--ease)}
+.jump{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.jump a{background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 15px;font-size:14.5px;font-weight:600;color:var(--navy);text-decoration:none}
+.jump a:hover{border-color:var(--sky)}
+.msgbox{background:#fbfcff;border:1px dashed #c9d3ea;border-radius:14px;padding:14px 16px;margin-top:16px;font-size:15.5px;color:#3d4a70;white-space:pre-wrap}
+section[id]{scroll-margin-top:16px}
 
 .card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-m);
   padding:26px;margin-top:22px}
@@ -166,9 +176,17 @@ footer a:hover{text-decoration:underline}
     <div class="kpi warn"><div class="n" id="kMiss">—</div><div class="l">רכזים שטרם השיבו</div></div>
     <div class="kpi"><div class="n" id="kPilot">0</div><div class="l">מוכנים לפיילוט</div></div>
   </section>
+  <div class="progress">
+    <div class="row"><span>התקדמות מול רכזי החניכות הרשומים</span><b id="pct">0%</b></div>
+    <div class="track"><i class="fill" id="bar"></i></div>
+  </div>
+  <nav class="jump">
+    <a href="#s-miss">מי לא מילא</a><a href="#s-pains">מה מכביד</a><a href="#s-feats">מה לבנות ראשון</a>
+    <a href="#s-quotes">במילים שלהם</a><a href="#s-table">מי מילא</a>
+  </nav>
 
   <!-- ============ טרם השיבו ============ -->
-  <section class="card alert">
+  <section class="card alert" id="s-miss">
     <h2><svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="10" r="3.2"/><circle cx="12" cy="12" r="9"/></svg>
       טרם השיבו · <span id="missHead"></span></h2>
     <p class="sub">מול רכזי החניכות הרשומים בנספח בעלי התפקידים.</p>
@@ -177,13 +195,17 @@ footer a:hover{text-decoration:underline}
       <button class="b pri" id="copyMiss">
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
         העתקת כל מי שטרם השיב</button>
+      <button class="b" id="copyMsg">
+        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>
+        העתקת הודעת תזכורת לרכזים</button>
     </div>
+    <div class="msgbox" id="msgPreview"></div>
   </section>
 
   <section class="card alert">
     <h2><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>
       טרם השיבו — לפי מפקח.ת</h2>
-    <p class="sub">לכל מפקח.ת הרשימה שלה בלבד, עם כפתור העתקה נפרד.</p>
+    <p class="sub">לכל מפקח.ת הרשימה שלה בלבד, עם הודעה מוכנה להעברה.</p>
     <div id="bySup"></div>
   </section>
 
@@ -199,7 +221,7 @@ footer a:hover{text-decoration:underline}
   </section>
 
   <!-- ============ הכאבים ============ -->
-  <section class="card">
+  <section class="card" id="s-pains">
     <h2><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
       המשימות המכבידות</h2>
     <p class="sub">כמה רכזים סימנו כל משימה בין שלוש המכבידות ביותר.</p>
@@ -207,7 +229,7 @@ footer a:hover{text-decoration:underline}
   </section>
 
   <!-- ============ יכולות ============ -->
-  <section class="card">
+  <section class="card" id="s-feats">
     <h2><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.5 6 .9-4.3 4.3 1 6.1-5.3-2.9-5.3 2.9 1-6.1L3.4 9.4l6-.9z"/></svg>
       מה לבנות ראשון</h2>
     <p class="sub">דירוג היכולות, ממוין לפי מספר מי שסימנו "חיוני לי".</p>
@@ -235,7 +257,7 @@ footer a:hover{text-decoration:underline}
   </section>
 
   <!-- ============ במילים שלהם ============ -->
-  <section class="card">
+  <section class="card" id="s-quotes">
     <h2><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>
       במילים שלהם</h2>
     <p class="sub">כל התשובות הפתוחות, מקובצות לפי שאלה — החומר הגולמי לאפיון.</p>
@@ -248,9 +270,9 @@ footer a:hover{text-decoration:underline}
   </section>
 
   <!-- ============ טבלה ============ -->
-  <section class="card">
+  <section class="card" id="s-table">
     <h2><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
-      טבלת המשיבים</h2>
+      מי מילא</h2>
     <p class="sub" id="tblSub"></p>
     <div class="tablewrap"><table>
       <thead><tr>
@@ -277,6 +299,19 @@ footer a:hover{text-decoration:underline}
 <script>
 var API_URL = "https://script.google.com/macros/s/AKfycbxgPvFzQllYZGsOKMvVmNHIU_fIIWuq5Jg9jOhxO9Xq86IP-FKJYzceaPzvIpfnh5YFOQ/exec";
 var KEY_STORE = "seker-chanichut-key";
+var FORM_URL = "https://tfasim.pedagogiamh.co.il/seker-chanichut.html";
+function reminder(){
+  return "שלום לרכזות ולרכזי החניכות,\n" +
+    "אנחנו מתחילים לבנות מערכת עבודה לרכזי החניכות, ולפני כן חשוב לנו לשמוע מכם מה מכביד היום ומה באמת יעזור.\n" +
+    "מי שעוד לא מילא — הסקר לוקח כ-7 דקות:\n" + FORM_URL + "\nתודה!";
+}
+function supMsg(sup, list){
+  return "שלום " + sup + ",\n" +
+    "רכזי החניכות מבתי הספר שלך שטרם מילאו את הסקר לקראת בניית מערכת החניכות (" + list.length + "):\n" +
+    list.map(function(m,i){ return (i+1) + ". " + m.name + " — " + m.school; }).join("\n") +
+    "\n\nאשמח אם תזכיר.י להם. הקישור לסקר:\n" + FORM_URL + "\nתודה!";
+}
+
 
 /* בית ספר → מפקח.ת פדגוגי.ת (פריסת הפיקוח, data/mosdot.json) */
 var SUP = {"בית חנינה בנות":"ויסאם סואלחה","בית חנינה בנים":"ויסאם סואלחה","כפר עקב":"ויסאם סואלחה","סור באהר":"ויסאם סואלחה","עמל טייבה ב'":"ויסאם סואלחה","ערערה":"ויסאם סואלחה","אורט כרמל":"יסמין אמון","אכסאל":"יסמין אמון","אל אמאני סכנין":"יסמין אמון","אלחכמה כסרא-סמיע":"יסמין אמון","ג'וליס בנות":"יסמין אמון","טורען":"יסמין אמון","כפר יסיף":"יסמין אמון","נצרת":"יסמין אמון","עתיד גליל מערבי ירכא בנים":"יסמין אמון","עתיד טק ביר אל מכסור":"יסמין אמון","תיכון טכנולוגי אי טק סקול (מסעדה)":"יסמין אמון","תפן ליזמות":"יסמין אמון","עמל רהט":"יסמין אמון","אור דניאל":"יששכר חפץ","אור העתיד תורני מקצועי":"יששכר חפץ","בית דוד":"יששכר חפץ","הדר":"יששכר חפץ","הקמפוס התורני עתיד":"יששכר חפץ","טל חרמון":"יששכר חפץ","ישיבת חנוך לנער":"יששכר חפץ","כפר זיתים":"יששכר חפץ","מרחביה/מעיינות":"יששכר חפץ","נחלים":"יששכר חפץ","עתיד בת עמי":"יששכר חפץ","עתיד כפר חב\"ד":"יששכר חפץ","אבו סנאן":"ליאת צבר","אום אל פחם בנות":"ליאת צבר","אנרג'י טק":"ליאת צבר","בית אל":"ליאת צבר","דרור גליל":"ליאת צבר","התיכון החברתי חיפה":"ליאת צבר","צור ים":"ליאת צבר","רימונים":"ליאת צבר","רמת דוד":"ליאת צבר","תיכון חברתי ת\"א":"ליאת צבר","תיכון עוצמ\"ה עתיד זוקו":"ליאת צבר","תיכון שיח":"ליאת צבר","אורט אורמת":"סיגלית דאי","אורט תל נוף":"סיגלית דאי","אורט תעשייה אווירית":"סיגלית דאי","דן גורמה":"סיגלית דאי","עמל אשדוד":"סיגלית דאי","עמל טק אין":"סיגלית דאי","עתיד באר שבע":"סיגלית דאי","עתיד פלמחים":"סיגלית דאי","צור ברק":"סיגלית דאי","קמ\"ג דימונה":"סיגלית דאי","תיכון החממה":"סיגלית דאי","אום אל פחם בנים":"רביב שורץ","מצפה רמון":"רביב שורץ","עתיד כרמיאל":"רביב שורץ","שפרעם":"רביב שורץ","אורט בית הערבה":"רויטל אמיר","חוש\"ן":"רויטל אמיר","דרור נווה מדבר":"שרונה בלוך","לקייה":"שרונה בלוך","סכנין תל שבע":"שרונה בלוך","שגב שלום":"שרונה בלוך"};
@@ -408,6 +443,10 @@ function render(){
   $("kMiss").textContent = missing.length;
   $("kPilot").textContent = ROWS.filter(function(r){ return r.pilot === "כן"; }).length;
   $("missHead").textContent = missing.length + " מתוך " + totalCoords;
+  var doneKnown = totalCoords - missing.length, pct = totalCoords ? Math.round(doneKnown / totalCoords * 100) : 0;
+  $("pct").textContent = doneKnown + " מתוך " + totalCoords + " · " + pct + "%";
+  $("bar").style.width = pct + "%";
+  $("msgPreview").textContent = reminder();
 
   $("missAll").innerHTML = missing.length
     ? missing.map(function(m){ return '<span class="chip">'+esc(m.name)+' <small>· '+esc(m.school)+'</small></span>'; }).join("")
@@ -424,12 +463,12 @@ function render(){
   var supKeys = Object.keys(groups).sort(function(a,b){ return groups[b].length - groups[a].length; });
   $("bySup").innerHTML = supKeys.length ? supKeys.map(function(s, i){
     return '<div class="sup"><div class="sh"><div><b>'+esc(s)+'</b> <span>· טרם השיבו '+groups[s].length+' מתוך '+(supTotals[s]||0)+'</span></div>' +
-      '<button class="b sm" data-sup="'+i+'"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתקה</button></div>' +
+      '<button class="b sm" data-sup="'+i+'"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתקת הודעה למפקח.ת</button></div>' +
       '<div class="chips">' + groups[s].map(function(m){ return '<span class="chip">'+esc(m.name)+' <small>· '+esc(m.school)+'</small></span>'; }).join("") + '</div></div>';
   }).join("") : '<div class="empty">אין חסרים.</div>';
   [].slice.call($("bySup").querySelectorAll("[data-sup]")).forEach(function(btn){
     var s = supKeys[+btn.dataset.sup];
-    btn.addEventListener("click", function(){ copyText(listText(groups[s], "טרם השיבו לסקר רכזי החניכות — " + s), btn); });
+    btn.addEventListener("click", function(){ copyText(supMsg(s, groups[s]), btn); });
   });
 
   $("noCoord").innerHTML = noCoord.map(function(s){
@@ -510,6 +549,7 @@ function fallback(txt){
   document.body.removeChild(ta);
 }
 $("copyMiss").addEventListener("click", function(){ if (this.dataset.text) copyText(this.dataset.text, this); });
+$("copyMsg").addEventListener("click", function(){ copyText(reminder(), this); });
 
 $("copyAll").addEventListener("click", function(){
   var out = ["תשובות סקר רכזי החניכות — לפני בניית המערכת", "סה\"כ " + ROWS.length + " משיבים", ""];
