@@ -246,7 +246,7 @@ footer a:hover{text-decoration:underline}
 
     <div class="q">
       <div class="qhead"><span class="qnum">6</span>
-        <span class="qtext">במה את/ה מנהל/ת היום את העבודה? <span class="opt">(אפשר כמה)</span></span></div>
+        <span class="qtext">מלבד מנב״ס — האם את/ה משתמש/ת במערכת או בכלי נוסף לניהול העבודה? <span class="opt">(אפשר כמה)</span></span></div>
       <div class="opts" id="toolsBox" data-name="tools"></div>
       <div id="toolsOtherWrap" style="display:none;margin-top:10px">
         <input type="text" id="toolsOther" placeholder="מה עוד?">
@@ -380,7 +380,8 @@ var OTHER = "__other__";
 /* 64 בתי הספר — השמות האחידים מאדמין המוסדות (school-names.js) */
 var SCHOOLS = ["אבו סנאן","אום אל פחם בנות","אום אל פחם בנים","אור דניאל","אור העתיד תורני מקצועי","אורט אורמת","אורט בית הערבה","אורט כרמל","אורט תל נוף","אורט תעשייה אווירית","אכסאל","אל אמאני סכנין","אלחכמה כסרא-סמיע","אנרג'י טק","בית אל","בית דוד","בית חנינה בנות","בית חנינה בנים","ג'וליס בנות","דן גורמה","דרור גליל","דרור נווה מדבר","הדר","הקמפוס התורני עתיד","התיכון החברתי חיפה","חוש\"ן","טורען","טל חרמון","ישיבת חנוך לנער","כפר זיתים","כפר יסיף","כפר עקב","לקייה","מצפה רמון","מרחביה/מעיינות","נחלים","נצרת","סור באהר","סכנין תל שבע","עמל אשדוד","עמל טייבה ב'","עמל טק אין","עמל רהט","ערערה","עתיד באר שבע","עתיד בת עמי","עתיד גליל מערבי ירכא בנים","עתיד טק ביר אל מכסור","עתיד כפר חב\"ד","עתיד כרמיאל","עתיד פלמחים","צור ברק","צור ים","קמ\"ג דימונה","רימונים","רמת דוד","שגב שלום","שפרעם","תיכון החממה","תיכון חברתי ת\"א","תיכון טכנולוגי אי טק סקול (מסעדה)","תיכון עוצמ\"ה עתיד זוקו","תיכון שיח","תפן ליזמות"];
 
-var TOOLS = ["אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מערכת בית ספרית","מונדיי","אחר"];
+var ONLY = "לא, רק מנב״ס";
+var TOOLS = [ONLY,"אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מונדיי","אחר"];
 
 var PAINS = [
   "מציאת מעסיקים חדשים ושמירה על הקיימים",
@@ -488,7 +489,14 @@ $("name").addEventListener("change", function(){
 $("nameOther").addEventListener("input", function(){ this.classList.remove("bad"); $("e_name").classList.remove("on"); });
 
 /* ---------- כלים: "אחר" ---------- */
-$("toolsBox").addEventListener("change", function(){
+$("toolsBox").addEventListener("change", function(ev){
+  /* "רק מנב״ס" לא מתיישב עם כלי נוסף — בחירה באחד מנקה את השני */
+  var boxes = [].slice.call(document.querySelectorAll('input[name="tools"]'));
+  if (ev && ev.target && ev.target.checked){
+    boxes.forEach(function(b){
+      if (b !== ev.target && (ev.target.value === ONLY || b.value === ONLY)) b.checked = false;
+    });
+  }
   var other = document.querySelector('input[name="tools"][value="אחר"]');
   $("toolsOtherWrap").style.display = other && other.checked ? "block" : "none";
 });

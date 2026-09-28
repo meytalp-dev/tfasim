@@ -225,7 +225,7 @@ footer a:hover{text-decoration:underline}
       איך הם עובדים היום</h2>
     <p class="sub">הכלים, המכשיר והיקף העבודה.</p>
     <div class="grid2">
-      <div><h3>כלים</h3><div class="bars" id="tools"></div></div>
+      <div><h3>כלים נוספים מלבד מנב״ס</h3><div class="bars" id="tools"></div></div>
       <div><h3>מכשיר עיקרי</h3><div class="bars" id="device"></div></div>
       <div><h3>תלמידים בחניכות</h3><div class="bars" id="students"></div></div>
       <div><h3>מעסיקים</h3><div class="bars" id="employers"></div></div>
@@ -298,7 +298,7 @@ var FEATURES = ["סטטוס מועסקים לפי מגמה","מאגר מעסיק
   "דיווח נוכחות חודשי","דוחות מוכנים ושיתוף עם המנהל.ת","תזכורות אוטומטיות",
   "המעסיק מדווח נוכחות בעצמו","הודעות לתלמידים ולהורים מתוך המערכת"];
 var ORDERS = {
-  tools: ["אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מערכת בית ספרית","מונדיי","אחר"],
+  tools: ["לא, רק מנב״ס","אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מונדיי","אחר"],
   device: ["מחשב","טלפון","גם וגם"],
   students: ["עד 30","31–60","61–100","מעל 100"],
   employers: ["עד 10","11–25","26–50","מעל 50"],
@@ -467,7 +467,7 @@ function render(){
   }).join("");
 
   /* --- איך עובדים --- */
-  bars("tools", tally("tools", true), null, Math.max(1, ROWS.length));
+  bars("tools", tally("tools", true), ORDERS.tools, Math.max(1, ROWS.length));
   ["device","students","employers","seniority","pilot"].forEach(function(k){ bars(k, tally(k), ORDERS[k], Math.max(1, ROWS.length)); });
 
   /* --- ציטוטים --- */
@@ -523,7 +523,7 @@ $("copyAll").addEventListener("click", function(){
   });
   ["tools","device","students","employers","seniority"].forEach(function(k){
     var c = tally(k, k === "tools");
-    out.push("", "### " + ({tools:"כלים",device:"מכשיר",students:"תלמידים",employers:"מעסיקים",seniority:"ותק"})[k]);
+    out.push("", "### " + ({tools:"כלים נוספים מלבד מנב״ס",device:"מכשיר",students:"תלמידים",employers:"מעסיקים",seniority:"ותק"})[k]);
     Object.keys(c).forEach(function(v){ out.push("- " + v + ": " + c[v]); });
   });
   OPEN.forEach(function(q){
