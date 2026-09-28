@@ -22,7 +22,7 @@
 *{box-sizing:border-box}
 body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.6;
   color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 16px}
 .strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
 
 header.top{padding:26px 0 6px;text-align:center}
@@ -45,75 +45,96 @@ header.top p{margin:0;color:var(--muted);font-size:16.5px}
 .jump{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
 .jump a{background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px 15px;font-size:14.5px;font-weight:600;color:var(--navy);text-decoration:none}
 .jump a:hover{border-color:var(--sky)}
-.msgbox{background:#fbfcff;border:1px dashed #c9d3ea;border-radius:14px;padding:14px 16px;margin-top:16px;font-size:15.5px;color:#3d4a70;white-space:pre-wrap}
-section[id]{scroll-margin-top:16px}
+section[id],details[id]{scroll-margin-top:16px}
 
 .card{background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-m);
   padding:26px;margin-top:22px}
 @media (max-width:560px){.card{padding:20px 16px}}
-.card h2{font-family:'Rubik',sans-serif;font-size:21px;color:var(--navy);margin:0 0 4px;font-weight:600;
+.card > h2{font-family:'Rubik',sans-serif;font-size:22px;color:var(--navy);margin:0 0 4px;font-weight:600;
   display:flex;align-items:center;gap:10px}
-.card h2 svg{width:21px;height:21px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.card > h2 svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .card .sub{color:var(--muted);font-size:15px;margin:0 0 18px}
-.card.alert{border-color:#f0dcb4}
-.card.alert h2 svg{stroke:var(--amber)}
 
-/* bars */
-.bars{display:grid;gap:11px}
-.bar{display:grid;grid-template-columns:minmax(0,300px) 1fr 44px;align-items:center;gap:12px;font-size:15.5px}
-@media (max-width:640px){.bar{grid-template-columns:1fr 44px}.bar .track{grid-column:1/-1;grid-row:2}}
+/* the "not yet answered" card - collapsed */
+details.miss{background:#fff;border:1px solid #f0dcb4;border-radius:20px;box-shadow:var(--shadow-s);margin-top:18px;overflow:hidden}
+details.miss > summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:18px 24px;
+  font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:var(--navy)}
+details.miss > summary::-webkit-details-marker{display:none}
+details.miss > summary svg{width:21px;height:21px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+details.miss > summary .ic{stroke:var(--amber)}
+details.miss > summary .chev{stroke:var(--muted);margin-inline-start:auto;transition:transform .2s var(--ease)}
+details.miss[open] > summary .chev{transform:rotate(-90deg)}
+details.miss > summary .cnt{color:var(--amber)}
+.missbody{padding:0 24px 22px;border-top:1px solid #f6ead2}
+.missbody .sub{color:var(--muted);font-size:15px;margin:16px 0 14px}
+@media (max-width:560px){details.miss > summary{padding:16px}.missbody{padding:0 16px 18px}}
+
+/* one block per survey question */
+.qb{margin-top:26px;padding-top:24px;border-top:1px solid var(--line)}
+.qb:first-of-type{margin-top:6px;padding-top:0;border-top:0}
+.qh{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.qn{flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--blue-soft);color:var(--navy);
+  font-family:'Rubik',sans-serif;font-weight:700;font-size:15px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.qt{font-family:'Rubik',sans-serif;font-size:18.5px;color:var(--navy);font-weight:600;line-height:1.4}
+.qt small{display:block;font-family:'Assistant',sans-serif;color:var(--muted);font-weight:500;font-size:14.5px;margin-top:2px}
+.qbody{padding-inline-start:42px}
+@media (max-width:560px){.qbody{padding-inline-start:0}}
+
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:minmax(0,300px) 1fr 76px;align-items:center;gap:12px;font-size:15.5px}
+@media (max-width:640px){.bar{grid-template-columns:1fr 76px}.bar .track{grid-column:1/-1;grid-row:2}}
 .bar .track{height:12px;border-radius:99px;background:var(--sky-soft);overflow:hidden}
 .bar .fill{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--blue),var(--sky))}
-.bar .v{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy)}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-@media (max-width:760px){.grid2{grid-template-columns:1fr}}
-.grid2 h3{font-family:'Rubik',sans-serif;font-size:16.5px;color:var(--navy);margin:0 0 12px;font-weight:600}
-.grid2 .bar{grid-template-columns:130px 1fr 36px}
-@media (max-width:640px){.grid2 .bar{grid-template-columns:1fr 36px}}
+.bar .v{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);font-size:14.5px}
+.bar .v span{color:var(--muted);font-weight:500}
 
-/* stacked feature rating */
-.stack{display:grid;grid-template-columns:minmax(0,300px) 1fr 70px;gap:12px;align-items:center;margin-bottom:12px;font-size:15.5px}
-@media (max-width:640px){.stack{grid-template-columns:1fr 60px}.stack .seg{grid-column:1/-1;grid-row:2}}
+.stack{display:grid;grid-template-columns:minmax(0,300px) 1fr 110px;gap:12px;align-items:center;margin-bottom:12px;font-size:15.5px}
+@media (max-width:640px){.stack{grid-template-columns:1fr 100px}.stack .seg{grid-column:1/-1;grid-row:2}}
 .stack .seg{display:flex;height:16px;border-radius:99px;overflow:hidden;background:#f1f3f8}
 .stack .seg i{display:block;height:100%}
 .stack .s1{background:var(--blue)} .stack .s2{background:var(--sky)} .stack .s3{background:#cfd6e6}
-.stack .v{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);font-size:14.5px}
-.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;color:var(--muted);margin-bottom:16px}
+.stack .v{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);font-size:14px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;color:var(--muted);margin-bottom:14px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:12px;height:12px;border-radius:3px;display:inline-block}
 
-/* quotes */
-.qblock{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
-.qblock:first-child{margin-top:0;padding-top:0;border-top:0}
-.qblock h3{font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);margin:0 0 14px;font-weight:600}
-.qblock h3 span{color:var(--muted);font-weight:500;font-size:15px}
 .quote{background:#fbfcff;border:1px solid var(--line);border-inline-start:4px solid var(--sky);
-  border-radius:12px;padding:13px 16px;margin-bottom:10px}
+  border-radius:12px;padding:12px 16px;margin-bottom:10px}
 .quote p{margin:0;font-size:16.5px;color:#25325a;white-space:pre-wrap}
-.quote .who{display:block;margin-top:6px;font-size:14px;color:var(--muted);font-weight:600}
+.quote .who{display:block;margin-top:5px;font-size:14px;color:var(--muted);font-weight:600}
+.others{margin-top:10px;font-size:15px;color:#3d4a70}
+.others b{color:var(--navy)}
 
-/* table */
-.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;font-size:15px;min-width:760px}
-th{text-align:start;padding:11px 12px;background:var(--sky-soft);color:var(--navy);font-weight:700;font-size:14.5px;white-space:nowrap}
-td{padding:11px 12px;border-top:1px solid var(--line);vertical-align:top}
-tr:hover td{background:#fbfcff}
-td.nm{font-weight:600;white-space:nowrap}
-.tag{display:inline-block;padding:3px 10px;border-radius:99px;font-size:13px;font-weight:700;white-space:nowrap}
-.tag.yes{background:#e3f7f3;color:#0d7d6f}
-.tag.maybe{background:#fdf2e0;color:#8a5410}
-.tag.no{background:#f1f3f8;color:#5b6582}
-
-/* missing */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{padding:6px 13px;border-radius:99px;font-size:14.5px;font-weight:600;background:#fdf2e0;color:#8a5410}
 .chip small{font-weight:500;opacity:.8}
 .chip.gray{background:#f1f3f8;color:#5b6582}
 .chip.ok{background:#e3f7f3;color:#0d7d6f}
-.sup{border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:12px}
-.sup .sh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.sup .sh b{font-family:'Rubik',sans-serif;color:var(--navy);font-size:17px}
-.sup .sh span{color:var(--muted);font-size:14.5px}
+
+/* per respondent, collapsed */
+details.resp{border:1px solid var(--line);border-radius:14px;margin-top:10px;background:#fff;overflow:hidden}
+details.resp summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;
+  padding:14px 18px;font-weight:700;color:var(--navy)}
+details.resp summary::-webkit-details-marker{display:none}
+details.resp summary .chev{width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:2.2;stroke-linecap:round;
+  stroke-linejoin:round;transition:transform .2s var(--ease);flex:0 0 auto}
+details.resp[open] summary .chev{transform:rotate(-90deg)}
+details.resp summary .sc{color:var(--muted);font-weight:500;font-size:15px}
+details.resp summary .dt{margin-inline-start:auto;color:var(--muted);font-weight:500;font-size:13.5px}
+details.resp:hover{border-color:var(--sky)}
+details.resp[open]{border-color:var(--sky);box-shadow:var(--shadow-s)}
+.ans{padding:4px 18px 16px;border-top:1px solid var(--line)}
+.ans dl{margin:0;display:grid;grid-template-columns:230px 1fr;gap:0}
+@media (max-width:640px){.ans dl{grid-template-columns:1fr}}
+.ans dt{padding:10px 0;color:var(--muted);font-size:14.5px;font-weight:600;border-bottom:1px solid #f0f3fa}
+.ans dd{margin:0;padding:10px 0;font-size:16px;color:#25325a;border-bottom:1px solid #f0f3fa;white-space:pre-wrap}
+@media (max-width:640px){.ans dt{border-bottom:0;padding-bottom:0}}
+.ans dd.none{color:#b3bcd1}
+.tag{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12.5px;font-weight:700;white-space:nowrap}
+.tag.yes{background:#e3f7f3;color:#0d7d6f}
+.tag.maybe{background:#fdf2e0;color:#8a5410}
+.tag.no{background:#f1f3f8;color:#5b6582}
+.tag.man{background:#f1f3f8;color:#5b6582}
 
 .btnrow{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
 .b{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;cursor:pointer;
@@ -124,7 +145,7 @@ td.nm{font-weight:600;white-space:nowrap}
 .b.pri{background:linear-gradient(100deg,var(--navy),var(--blue) 70%);color:#fff;border-color:transparent;
   box-shadow:0 6px 18px rgba(24,92,255,.24)}
 .b.pri svg{stroke:#fff}
-.b.sm{padding:7px 13px;font-size:14px}
+.msgbox{background:#fbfcff;border:1px dashed #c9d3ea;border-radius:14px;padding:14px 16px;margin-top:16px;font-size:15.5px;color:#3d4a70;white-space:pre-wrap}
 
 .gate{max-width:460px;margin:40px auto;background:#fff;border:1px solid var(--line);border-radius:20px;
   box-shadow:var(--shadow-m);padding:30px;text-align:center}
@@ -135,14 +156,12 @@ td.nm{font-weight:600;white-space:nowrap}
 .gate input:focus{outline:none;border-color:var(--blue);background:#fff}
 .gate .b{width:100%;justify-content:center;margin-top:12px}
 
-.empty{text-align:center;color:var(--muted);padding:26px 20px;font-size:16px}
+.empty{color:var(--muted);padding:6px 0;font-size:15.5px}
 .hide{display:none!important}
-
 footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px}
 footer a{color:var(--navy);font-weight:600;text-decoration:none}
-footer a:hover{text-decoration:underline}
 .credit{margin-top:12px;font-size:13.5px;opacity:.85}
-@media print{.btnrow,.gate,footer .credit{display:none}body{background:#fff}}
+@media print{.btnrow,.gate,.jump,footer .credit,.msgbox{display:none}body{background:#fff}details.resp{break-inside:avoid}}
 </style>
 </head>
 <body>
@@ -180,88 +199,45 @@ footer a:hover{text-decoration:underline}
     <div class="row"><span>התקדמות מול רכזי החניכות הרשומים</span><b id="pct">0%</b></div>
     <div class="track"><i class="fill" id="bar"></i></div>
   </div>
+
+  <!-- ============ טרם השיבו — מקופל ============ -->
+  <details class="miss" id="s-miss">
+    <summary>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="10" r="3.2"/><circle cx="12" cy="12" r="9"/></svg>
+      טרם השיבו · <span class="cnt" id="missHead"></span>
+      <svg class="chev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>
+    </summary>
+    <div class="missbody">
+      <p class="sub">רכזי החניכות הרשומים בנספח בעלי התפקידים שעוד לא מילאו.</p>
+      <div class="chips" id="missAll"></div>
+      <div class="btnrow">
+        <button class="b pri" id="copyMiss">
+          <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+          העתקת כל מי שטרם השיב</button>
+        <button class="b" id="copyMsg">
+          <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>
+          העתקת הודעת תזכורת לרכזים</button>
+      </div>
+      <div class="msgbox" id="msgPreview"></div>
+      <p class="sub" style="margin-top:22px;margin-bottom:10px">בתי ספר בלי רכז.ת רשום.ה בנספח (לא נספרים בחסרים; ירוק = מישהו השיב בכל זאת):</p>
+      <div class="chips" id="noCoord"></div>
+      <div id="extraWrap" class="hide">
+        <p class="sub" style="margin-top:20px;margin-bottom:10px">השיבו בשם שלא מופיע בנספח (כדאי לבדוק אם הנספח צריך עדכון):</p>
+        <div class="chips" id="extra"></div>
+      </div>
+    </div>
+  </details>
+
   <nav class="jump">
-    <a href="#s-miss">מי לא מילא</a><a href="#s-pains">מה מכביד</a><a href="#s-feats">מה לבנות ראשון</a>
-    <a href="#s-quotes">במילים שלהם</a><a href="#s-table">מי מילא</a>
+    <a href="#s-q">התשובות לפי שאלה</a><a href="#s-resp">התשובות של כל רכז</a>
   </nav>
 
-  <!-- ============ טרם השיבו ============ -->
-  <section class="card alert" id="s-miss">
-    <h2><svg viewBox="0 0 24 24"><path d="M16 19a4 4 0 0 0-8 0"/><circle cx="12" cy="10" r="3.2"/><circle cx="12" cy="12" r="9"/></svg>
-      טרם השיבו · <span id="missHead"></span></h2>
-    <p class="sub">מול רכזי החניכות הרשומים בנספח בעלי התפקידים.</p>
-    <div class="chips" id="missAll"></div>
-    <div class="btnrow">
-      <button class="b pri" id="copyMiss">
-        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
-        העתקת כל מי שטרם השיב</button>
-      <button class="b" id="copyMsg">
-        <svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>
-        העתקת הודעת תזכורת לרכזים</button>
-    </div>
-    <div class="msgbox" id="msgPreview"></div>
-  </section>
-
-  <section class="card alert">
-    <h2><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>
-      טרם השיבו — לפי מפקח.ת</h2>
-    <p class="sub">לכל מפקח.ת הרשימה שלה בלבד, עם הודעה מוכנה להעברה.</p>
-    <div id="bySup"></div>
-  </section>
-
-  <section class="card">
-    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-      בתי ספר בלי רכז.ת רשום.ה בנספח</h2>
-    <p class="sub">לא נכנסים לספירת "טרם השיבו" — אין את מי לשאול. אם מישהו מהם השיב בכל זאת, הוא מסומן בירוק.</p>
-    <div class="chips" id="noCoord"></div>
-    <div id="extraWrap" class="hide" style="margin-top:20px">
-      <p class="sub" style="margin-bottom:10px">השיבו בשם שלא מופיע בנספח (כדאי לבדוק אם הנספח צריך עדכון):</p>
-      <div class="chips" id="extra"></div>
-    </div>
-  </section>
-
-  <!-- ============ הכאבים ============ -->
-  <section class="card" id="s-pains">
-    <h2><svg viewBox="0 0 24 24"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/><circle cx="12" cy="12" r="3.2"/></svg>
-      המשימות המכבידות</h2>
-    <p class="sub">כמה רכזים סימנו כל משימה בין שלוש המכבידות ביותר.</p>
-    <div class="bars" id="pains"></div>
-  </section>
-
-  <!-- ============ יכולות ============ -->
-  <section class="card" id="s-feats">
-    <h2><svg viewBox="0 0 24 24"><path d="m12 3 2.6 5.5 6 .9-4.3 4.3 1 6.1-5.3-2.9-5.3 2.9 1-6.1L3.4 9.4l6-.9z"/></svg>
-      מה לבנות ראשון</h2>
-    <p class="sub">דירוג היכולות, ממוין לפי מספר מי שסימנו "חיוני לי".</p>
-    <div class="legend">
-      <span><i style="background:var(--blue)"></i>חיוני לי</span>
-      <span><i style="background:var(--sky)"></i>נחמד שיהיה</span>
-      <span><i style="background:#cfd6e6"></i>לא צריך</span>
-    </div>
-    <div id="feats"></div>
-  </section>
-
-  <!-- ============ איך עובדים ============ -->
-  <section class="card">
-    <h2><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>
-      איך הם עובדים היום</h2>
-    <p class="sub">הכלים, המכשיר והיקף העבודה.</p>
-    <div class="grid2">
-      <div><h3>כלים נוספים מלבד מנב״ס</h3><div class="bars" id="tools"></div></div>
-      <div><h3>מכשיר עיקרי</h3><div class="bars" id="device"></div></div>
-      <div><h3>תלמידים בחניכות</h3><div class="bars" id="students"></div></div>
-      <div><h3>מעסיקים</h3><div class="bars" id="employers"></div></div>
-      <div><h3>ותק בתפקיד</h3><div class="bars" id="seniority"></div></div>
-      <div><h3>פיילוט</h3><div class="bars" id="pilot"></div></div>
-    </div>
-  </section>
-
-  <!-- ============ במילים שלהם ============ -->
-  <section class="card" id="s-quotes">
-    <h2><svg viewBox="0 0 24 24"><path d="M4 5h16v11H8l-4 4z"/></svg>
-      במילים שלהם</h2>
-    <p class="sub">כל התשובות הפתוחות, מקובצות לפי שאלה — החומר הגולמי לאפיון.</p>
-    <div id="quotes"></div>
+  <!-- ============ לפי שאלה ============ -->
+  <section class="card" id="s-q">
+    <h2><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16V9M13 16V6M18 16v-4"/></svg>
+      התשובות לפי שאלה</h2>
+    <p class="sub">כל שאלות הסקר לפי הסדר, עם מה שהרכזים ענו.</p>
+    <div id="byQ"></div>
     <div class="btnrow">
       <button class="b pri" id="copyAll">
         <svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
@@ -269,22 +245,20 @@ footer a:hover{text-decoration:underline}
     </div>
   </section>
 
-  <!-- ============ טבלה ============ -->
-  <section class="card" id="s-table">
-    <h2><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 9v11"/></svg>
-      מי מילא</h2>
-    <p class="sub" id="tblSub"></p>
-    <div class="tablewrap"><table>
-      <thead><tr>
-        <th>שם</th><th>בית ספר</th><th>ותק</th><th>תלמידים</th><th>שלוש המכבידות</th><th>פיילוט</th><th>מתי</th>
-      </tr></thead>
-      <tbody id="tbody"></tbody>
-    </table></div>
-    <div class="btnrow">
+  <!-- ============ לפי רכז ============ -->
+  <section class="card" id="s-resp">
+    <h2><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>
+      התשובות של כל רכז</h2>
+    <p class="sub" id="respSub"></p>
+    <div class="btnrow" style="margin:0 0 6px">
+      <button class="b" id="openAll">
+        <svg viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        <span>לפתוח את כולם</span></button>
       <button class="b" id="csvBtn">
         <svg viewBox="0 0 24 24"><path d="M12 3v11M8.5 10.5 12 14l3.5-3.5M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>
         ייצוא ל-CSV</button>
     </div>
+    <div id="resp"></div>
   </section>
 
 </main>
@@ -300,22 +274,8 @@ footer a:hover{text-decoration:underline}
 var API_URL = "https://script.google.com/macros/s/AKfycbxgPvFzQllYZGsOKMvVmNHIU_fIIWuq5Jg9jOhxO9Xq86IP-FKJYzceaPzvIpfnh5YFOQ/exec";
 var KEY_STORE = "seker-chanichut-key";
 var FORM_URL = "https://tfasim.pedagogiamh.co.il/seker-chanichut.html";
-function reminder(){
-  return "שלום לרכזות ולרכזי החניכות,\n" +
-    "אנחנו מתחילים לבנות מערכת עבודה לרכזי החניכות, ולפני כן חשוב לנו לשמוע מכם מה מכביד היום ומה באמת יעזור.\n" +
-    "מי שעוד לא מילא — הסקר לוקח כ-7 דקות:\n" + FORM_URL + "\nתודה!";
-}
-function supMsg(sup, list){
-  return "שלום " + sup + ",\n" +
-    "רכזי החניכות מבתי הספר שלך שטרם מילאו את הסקר לקראת בניית מערכת החניכות (" + list.length + "):\n" +
-    list.map(function(m,i){ return (i+1) + ". " + m.name + " — " + m.school; }).join("\n") +
-    "\n\nאשמח אם תזכיר.י להם. הקישור לסקר:\n" + FORM_URL + "\nתודה!";
-}
 
-
-/* בית ספר → מפקח.ת פדגוגי.ת (פריסת הפיקוח, data/mosdot.json) */
-var SUP = {"בית חנינה בנות":"ויסאם סואלחה","בית חנינה בנים":"ויסאם סואלחה","כפר עקב":"ויסאם סואלחה","סור באהר":"ויסאם סואלחה","עמל טייבה ב'":"ויסאם סואלחה","ערערה":"ויסאם סואלחה","אורט כרמל":"יסמין אמון","אכסאל":"יסמין אמון","אל אמאני סכנין":"יסמין אמון","אלחכמה כסרא-סמיע":"יסמין אמון","ג'וליס בנות":"יסמין אמון","טורען":"יסמין אמון","כפר יסיף":"יסמין אמון","נצרת":"יסמין אמון","עתיד גליל מערבי ירכא בנים":"יסמין אמון","עתיד טק ביר אל מכסור":"יסמין אמון","תיכון טכנולוגי אי טק סקול (מסעדה)":"יסמין אמון","תפן ליזמות":"יסמין אמון","עמל רהט":"יסמין אמון","אור דניאל":"יששכר חפץ","אור העתיד תורני מקצועי":"יששכר חפץ","בית דוד":"יששכר חפץ","הדר":"יששכר חפץ","הקמפוס התורני עתיד":"יששכר חפץ","טל חרמון":"יששכר חפץ","ישיבת חנוך לנער":"יששכר חפץ","כפר זיתים":"יששכר חפץ","מרחביה/מעיינות":"יששכר חפץ","נחלים":"יששכר חפץ","עתיד בת עמי":"יששכר חפץ","עתיד כפר חב\"ד":"יששכר חפץ","אבו סנאן":"ליאת צבר","אום אל פחם בנות":"ליאת צבר","אנרג'י טק":"ליאת צבר","בית אל":"ליאת צבר","דרור גליל":"ליאת צבר","התיכון החברתי חיפה":"ליאת צבר","צור ים":"ליאת צבר","רימונים":"ליאת צבר","רמת דוד":"ליאת צבר","תיכון חברתי ת\"א":"ליאת צבר","תיכון עוצמ\"ה עתיד זוקו":"ליאת צבר","תיכון שיח":"ליאת צבר","אורט אורמת":"סיגלית דאי","אורט תל נוף":"סיגלית דאי","אורט תעשייה אווירית":"סיגלית דאי","דן גורמה":"סיגלית דאי","עמל אשדוד":"סיגלית דאי","עמל טק אין":"סיגלית דאי","עתיד באר שבע":"סיגלית דאי","עתיד פלמחים":"סיגלית דאי","צור ברק":"סיגלית דאי","קמ\"ג דימונה":"סיגלית דאי","תיכון החממה":"סיגלית דאי","אום אל פחם בנים":"רביב שורץ","מצפה רמון":"רביב שורץ","עתיד כרמיאל":"רביב שורץ","שפרעם":"רביב שורץ","אורט בית הערבה":"רויטל אמיר","חוש\"ן":"רויטל אמיר","דרור נווה מדבר":"שרונה בלוך","לקייה":"שרונה בלוך","סכנין תל שבע":"שרונה בלוך","שגב שלום":"שרונה בלוך"};
-var SCHOOLS = Object.keys(SUP);
+var SCHOOLS = ["אבו סנאן","אום אל פחם בנות","אום אל פחם בנים","אור דניאל","אור העתיד תורני מקצועי","אורט אורמת","אורט בית הערבה","אורט כרמל","אורט תל נוף","אורט תעשייה אווירית","אכסאל","אל אמאני סכנין","אלחכמה כסרא-סמיע","אנרג'י טק","בית אל","בית דוד","בית חנינה בנות","בית חנינה בנים","ג'וליס בנות","דן גורמה","דרור גליל","דרור נווה מדבר","הדר","הקמפוס התורני עתיד","התיכון החברתי חיפה","חוש\"ן","טורען","טל חרמון","ישיבת חנוך לנער","כפר זיתים","כפר יסיף","כפר עקב","לקייה","מצפה רמון","מרחביה/מעיינות","נחלים","נצרת","סור באהר","סכנין תל שבע","עמל אשדוד","עמל טייבה ב'","עמל טק אין","עמל רהט","ערערה","עתיד באר שבע","עתיד בת עמי","עתיד גליל מערבי ירכא בנים","עתיד טק ביר אל מכסור","עתיד כפר חב\"ד","עתיד כרמיאל","עתיד פלמחים","צור ברק","צור ים","קמ\"ג דימונה","רימונים","רמת דוד","שגב שלום","שפרעם","תיכון החממה","תיכון חברתי ת\"א","תיכון טכנולוגי אי טק סקול (מסעדה)","תיכון עוצמ\"ה עתיד זוקו","תיכון שיח","תפן ליזמות"];
 
 var PAINS = [
   "מציאת מעסיקים חדשים ושמירה על הקיימים",
@@ -332,22 +292,25 @@ var PAINS = [
 var FEATURES = ["סטטוס מועסקים לפי מגמה","מאגר מעסיקים","תיק תלמיד דיגיטלי","יומן שיחות ורפלקציה",
   "דיווח נוכחות חודשי","דוחות מוכנים ושיתוף עם המנהל.ת","תזכורות אוטומטיות",
   "המעסיק מדווח נוכחות בעצמו","הודעות לתלמידים ולהורים מתוך המערכת"];
-var ORDERS = {
-  tools: ["לא, רק מנב״ס","אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מונדיי","אחר"],
-  device: ["מחשב","טלפון","גם וגם"],
-  students: ["עד 30","31–60","61–100","מעל 100"],
-  employers: ["עד 10","11–25","26–50","מעל 50"],
-  seniority: ["שנה ראשונה","2–3 שנים","4 שנים ומעלה"],
-  pilot: ["כן","אולי","לא כרגע"]
-};
-var OPEN = [
-  {k:"q1",    t:"הדבר שלוקח לי הכי הרבה זמן…"},
-  {k:"q2",    t:"אני עושה שוב ושוב…"},
-  {k:"q3",    t:"הלוואי שמישהו היה עושה עבורי…"},
-  {k:"story", t:"מקרה שנפל בין הכיסאות"},
-  {k:"must",  t:"מה חייב להיות כדי שישתמשו כל יום"},
-  {k:"wont",  t:"מה יגרום להם לחזור לאקסל"},
-  {k:"more",  t:"עוד משהו"}
+
+/* שאלות הסקר לפי הסדר. kind: choice (בחירה אחת) · multi (כמה) · open (טקסט) · features (דירוג) */
+var QS = [
+  {n:3,  k:"seniority", kind:"choice", t:"כמה זמן את/ה בתפקיד?", opts:["שנה ראשונה","2–3 שנים","4 שנים ומעלה"]},
+  {n:4,  k:"students",  kind:"choice", t:"בערך — כמה תלמידים בחניכות אצלך השנה?", opts:["עד 30","31–60","61–100","מעל 100"]},
+  {n:5,  k:"employers", kind:"choice", t:"ועם כמה מעסיקים את/ה עובד/ת?", opts:["עד 10","11–25","26–50","מעל 50"]},
+  {n:6,  k:"tools",     kind:"multi",  t:"מלבד מנב״ס — האם את/ה משתמש/ת במערכת או בכלי נוסף לניהול העבודה?", sub:"אפשר היה לסמן כמה",
+         opts:["לא, רק מנב״ס","אקסל / גוגל שיטס","מחברת ונייר","וואטסאפ","מייל","טפסי גוגל","מונדיי","אחר"]},
+  {n:7,  k:"device",    kind:"choice", t:"מאיפה את/ה עובד/ת בעיקר?", opts:["מחשב","טלפון","גם וגם"]},
+  {n:8,  k:"q1",        kind:"open",   t:"הדבר שלוקח לי הכי הרבה זמן בתפקיד…"},
+  {n:9,  k:"q2",        kind:"open",   t:"אני עושה שוב ושוב…"},
+  {n:10, k:"q3",        kind:"open",   t:"הלוואי שמישהו היה עושה עבורי…"},
+  {n:11, k:"pains",     kind:"multi",  t:"אילו 3 משימות הכי מכבידות עליך היום?", sub:"עד 3 לכל רכז · ממוין מהנבחר ביותר", opts:PAINS, sort:true},
+  {n:12, k:"story",     kind:"open",   t:"פעם אחת שמשהו \"נפל בין הכיסאות\""},
+  {n:13, k:"features",  kind:"features", t:"כמה כל אחת מהיכולות חשובה לך?", sub:"ממוין לפי מספר מי שסימנו \"חיוני לי\""},
+  {n:14, k:"must",      kind:"open",   t:"מה חייב להיות במערכת כדי שבאמת תשתמשו בה כל יום?"},
+  {n:15, k:"wont",      kind:"open",   t:"ומה יגרום לך לוותר עליה ולחזור לאקסל?"},
+  {n:16, k:"pilot",     kind:"choice", t:"מוכנ/ה להיות בין הראשונים שמנסים את המערכת?", opts:["כן","אולי","לא כרגע"], names:true},
+  {n:17, k:"more",      kind:"open",   t:"עוד משהו שחשוב שנדע?"}
 ];
 
 function $(id){ return document.getElementById(id); }
@@ -395,96 +358,19 @@ function load(key){
     .catch(function(){ $("stamp").textContent = "אין חיבור — ננסה שוב בעוד דקה"; });
 }
 
-/* ---------- ציור ---------- */
-function bars(id, counts, order, max){
-  var keys = order || Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a]; });
-  max = max || Math.max(1, Math.max.apply(null, keys.map(function(k){ return counts[k]||0; }).concat([1])));
-  $(id).innerHTML = keys.map(function(k){
-    var n = counts[k] || 0;
-    return '<div class="bar"><span>'+esc(k)+'</span><span class="track"><i class="fill" style="width:'+(n/max*100)+'%"></i></span><span class="v">'+n+'</span></div>';
-  }).join("") || '<div class="empty">אין עדיין נתונים.</div>';
-}
-function tally(field, multi){
+/* ---------- ספירות ---------- */
+function tally(q){
   var c = {};
   ROWS.forEach(function(r){
-    (multi ? split(r[field]) : [r[field]]).forEach(function(v){
+    (q.kind === "multi" ? split(r[q.k]) : [r[q.k]]).forEach(function(v){
       if (!v) return;
-      if (field === "tools" && /^אחר: /.test(v)) v = "אחר";
+      if (q.k === "tools" && /^אחר: /.test(v)) v = "אחר";
       c[v] = (c[v]||0) + 1;
     });
   });
   return c;
 }
-
-function render(){
-  /* --- כיסוי --- */
-  var answered = {};                                   /* norm(school)|norm(name) */
-  var answeredSchools = {};
-  ROWS.forEach(function(r){ answered[norm(r.school)+"|"+norm(r.name)] = 1; answeredSchools[norm(r.school)] = 1; });
-  var rosterBySchool = {};
-  ROSTER.forEach(function(e){ rosterBySchool[norm(e.school)] = e; });
-  var known = {};
-
-  var missing = [];                                    /* {name, school, sup} */
-  var noCoord = [];
-  SCHOOLS.forEach(function(s){
-    var e = rosterBySchool[norm(s)];
-    if (!e || !e.names.length){ noCoord.push(s); return; }
-    e.names.forEach(function(n){
-      known[norm(s)+"|"+norm(n)] = 1;
-      if (!answered[norm(s)+"|"+norm(n)]) missing.push({name:n, school:s, sup:SUP[s]||"ללא שיוך"});
-    });
-  });
-  var totalCoords = Object.keys(known).length;
-  var extra = ROWS.filter(function(r){ return !known[norm(r.school)+"|"+norm(r.name)]; });
-
-  $("kTotal").textContent = ROWS.length;
-  $("kSchools").textContent = Object.keys(answeredSchools).length;
-  $("kMiss").textContent = missing.length;
-  $("kPilot").textContent = ROWS.filter(function(r){ return r.pilot === "כן"; }).length;
-  $("missHead").textContent = missing.length + " מתוך " + totalCoords;
-  var doneKnown = totalCoords - missing.length, pct = totalCoords ? Math.round(doneKnown / totalCoords * 100) : 0;
-  $("pct").textContent = doneKnown + " מתוך " + totalCoords + " · " + pct + "%";
-  $("bar").style.width = pct + "%";
-  $("msgPreview").textContent = reminder();
-
-  $("missAll").innerHTML = missing.length
-    ? missing.map(function(m){ return '<span class="chip">'+esc(m.name)+' <small>· '+esc(m.school)+'</small></span>'; }).join("")
-    : '<div class="empty">כל הרכזים הרשומים השיבו.</div>';
-  $("copyMiss").dataset.text = listText(missing, "טרם השיבו לסקר רכזי החניכות");
-
-  var groups = {};
-  missing.forEach(function(m){ (groups[m.sup] = groups[m.sup] || []).push(m); });
-  var supTotals = {};
-  SCHOOLS.forEach(function(s){
-    var e = rosterBySchool[norm(s)]; if (!e) return;
-    supTotals[SUP[s]] = (supTotals[SUP[s]]||0) + e.names.length;
-  });
-  var supKeys = Object.keys(groups).sort(function(a,b){ return groups[b].length - groups[a].length; });
-  $("bySup").innerHTML = supKeys.length ? supKeys.map(function(s, i){
-    return '<div class="sup"><div class="sh"><div><b>'+esc(s)+'</b> <span>· טרם השיבו '+groups[s].length+' מתוך '+(supTotals[s]||0)+'</span></div>' +
-      '<button class="b sm" data-sup="'+i+'"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>העתקת הודעה למפקח.ת</button></div>' +
-      '<div class="chips">' + groups[s].map(function(m){ return '<span class="chip">'+esc(m.name)+' <small>· '+esc(m.school)+'</small></span>'; }).join("") + '</div></div>';
-  }).join("") : '<div class="empty">אין חסרים.</div>';
-  [].slice.call($("bySup").querySelectorAll("[data-sup]")).forEach(function(btn){
-    var s = supKeys[+btn.dataset.sup];
-    btn.addEventListener("click", function(){ copyText(supMsg(s, groups[s]), btn); });
-  });
-
-  $("noCoord").innerHTML = noCoord.map(function(s){
-    return '<span class="chip '+(answeredSchools[norm(s)] ? "ok" : "gray")+'">'+esc(s)+'</span>';
-  }).join("") || '<div class="empty">לכל בתי הספר רשום.ה רכז.ת.</div>';
-  $("extraWrap").classList.toggle("hide", !extra.length);
-  $("extra").innerHTML = extra.map(function(r){ return '<span class="chip ok">'+esc(r.name)+' <small>· '+esc(r.school)+'</small></span>'; }).join("");
-
-  /* --- מכבידות --- */
-  var pc = tally("pains", true);
-  var pk = PAINS.slice();
-  Object.keys(pc).forEach(function(k){ if (pk.indexOf(k) < 0) pk.push(k); });
-  pk.sort(function(a,b){ return (pc[b]||0)-(pc[a]||0); });
-  bars("pains", pc, pk, Math.max(1, ROWS.length));
-
-  /* --- יכולות --- */
+function featCounts(){
   var fc = {};
   FEATURES.forEach(function(f){ fc[f] = {"חיוני":0,"נחמד":0,"לא צריך":0}; });
   ROWS.forEach(function(r){
@@ -495,42 +381,157 @@ function render(){
       if (fc[f][v] != null) fc[f][v]++;
     });
   });
-  var fk = Object.keys(fc).sort(function(a,b){ return fc[b]["חיוני"]-fc[a]["חיוני"] || fc[b]["נחמד"]-fc[a]["נחמד"]; });
-  $("feats").innerHTML = fk.map(function(f){
-    var c = fc[f], tot = c["חיוני"]+c["נחמד"]+c["לא צריך"], d = Math.max(1, tot);
-    return '<div class="stack"><span>'+esc(f)+'</span><span class="seg">' +
-      '<i class="s1" style="width:'+(c["חיוני"]/d*100)+'%" title="חיוני: '+c["חיוני"]+'"></i>' +
-      '<i class="s2" style="width:'+(c["נחמד"]/d*100)+'%" title="נחמד: '+c["נחמד"]+'"></i>' +
-      '<i class="s3" style="width:'+(c["לא צריך"]/d*100)+'%" title="לא צריך: '+c["לא צריך"]+'"></i>' +
-      '</span><span class="v">'+c["חיוני"]+' / '+tot+'</span></div>';
-  }).join("");
+  return fc;
+}
+function who(r){ return esc(r.name) + " · " + esc(r.school); }
+function pctOf(n, of){ return of ? Math.round(n / of * 100) : 0; }
 
-  /* --- איך עובדים --- */
-  bars("tools", tally("tools", true), ORDERS.tools, Math.max(1, ROWS.length));
-  ["device","students","employers","seniority","pilot"].forEach(function(k){ bars(k, tally(k), ORDERS[k], Math.max(1, ROWS.length)); });
-
-  /* --- ציטוטים --- */
-  $("quotes").innerHTML = OPEN.map(function(q){
+/* ---------- תשובות לפי שאלה ---------- */
+function block(q, meta, body){
+  return '<div class="qb"><div class="qh"><span class="qn">'+q.n+'</span><div class="qt">'+esc(q.t) +
+    '<small>'+[q.sub, meta].filter(Boolean).map(esc).join(" · ")+'</small></div></div><div class="qbody">'+body+'</div></div>';
+}
+function renderQ(q){
+  var body;
+  if (q.kind === "open"){
     var items = ROWS.filter(function(r){ return r[q.k]; });
-    return '<div class="qblock"><h3>'+esc(q.t)+' <span>· '+items.length+'</span></h3>' +
-      (items.length ? items.map(function(r){
-        return '<div class="quote"><p>'+esc(r[q.k])+'</p><span class="who">'+esc(r.name)+' · '+esc(r.school)+'</span></div>';
-      }).join("") : '<div class="empty">טרם נכתב דבר כאן.</div>') + '</div>';
-  }).join("");
-
-  /* --- טבלה --- */
-  $("tblSub").textContent = ROWS.length + " משיבים · הייצוא כולל את כל השדות";
-  $("tbody").innerHTML = ROWS.length ? ROWS.map(function(r){
-    var cls = r.pilot === "כן" ? "yes" : r.pilot === "אולי" ? "maybe" : "no";
-    return "<tr><td class='nm'>"+esc(r.name)+"</td><td>"+esc(r.school)+"</td><td>"+esc(r.seniority)+"</td><td>"+esc(r.students)+"</td>" +
-      "<td>"+split(r.pains).map(esc).join("<br>")+"</td>" +
-      "<td>"+(r.pilot ? "<span class='tag "+cls+"'>"+esc(r.pilot)+"</span>" : "")+"</td>" +
-      "<td style='white-space:nowrap;color:var(--muted)'>"+esc(r.date)+"</td></tr>";
-  }).join("") : "<tr><td colspan='7' class='empty'>אין עדיין תשובות.</td></tr>";
+    body = items.length ? items.map(function(r){
+      return '<div class="quote"><p>'+esc(r[q.k])+'</p><span class="who">'+who(r)+'</span></div>';
+    }).join("") : '<div class="empty">טרם נכתב דבר.</div>';
+    return block(q, items.length + " כתבו", body);
+  }
+  if (q.kind === "features"){
+    var fc = featCounts();
+    var fk = Object.keys(fc).sort(function(a,b){ return fc[b]["חיוני"]-fc[a]["חיוני"] || fc[b]["נחמד"]-fc[a]["נחמד"]; });
+    body = '<div class="legend"><span><i style="background:var(--blue)"></i>חיוני לי</span>' +
+      '<span><i style="background:var(--sky)"></i>נחמד שיהיה</span><span><i style="background:#cfd6e6"></i>לא צריך</span></div>' +
+      fk.map(function(f){
+        var c = fc[f], tot = c["חיוני"]+c["נחמד"]+c["לא צריך"], d = Math.max(1, tot);
+        return '<div class="stack"><span>'+esc(f)+'</span><span class="seg">' +
+          '<i class="s1" style="width:'+(c["חיוני"]/d*100)+'%"></i><i class="s2" style="width:'+(c["נחמד"]/d*100)+'%"></i>' +
+          '<i class="s3" style="width:'+(c["לא צריך"]/d*100)+'%"></i></span>' +
+          '<span class="v">'+c["חיוני"]+' · '+c["נחמד"]+' · '+c["לא צריך"]+'</span></div>';
+      }).join("");
+    return block(q, "", body);
+  }
+  /* choice / multi */
+  var c = tally(q), total = ROWS.length;
+  var keys = q.opts.slice();
+  Object.keys(c).forEach(function(k){ if (keys.indexOf(k) < 0) keys.push(k); });
+  if (q.sort) keys.sort(function(a,b){ return (c[b]||0)-(c[a]||0); });
+  var answered = ROWS.filter(function(r){ return r[q.k]; }).length;
+  body = '<div class="bars">' + keys.map(function(k){
+    var n = c[k] || 0;
+    return '<div class="bar"><span>'+esc(k)+'</span><span class="track"><i class="fill" style="width:'+pctOf(n,total)+'%"></i></span>' +
+      '<span class="v">'+n+' <span>· '+pctOf(n,total)+'%</span></span></div>';
+  }).join("") + '</div>';
+  if (q.k === "tools"){
+    var oth = [];
+    ROWS.forEach(function(r){ split(r.tools).forEach(function(v){ if (/^אחר: /.test(v)) oth.push(v.slice(5) + " (" + r.name + ")"); }); });
+    if (oth.length) body += '<div class="others"><b>"אחר" פירטו:</b> ' + oth.map(esc).join(" · ") + '</div>';
+  }
+  if (q.names){
+    ["כן","אולי"].forEach(function(v){
+      var ns = ROWS.filter(function(r){ return r.pilot === v; });
+      if (ns.length) body += '<div class="others"><b>'+(v === "כן" ? "אמרו כן" : "אמרו אולי")+':</b> ' + ns.map(who).join(" · ") + '</div>';
+    });
+  }
+  return block(q, answered + " ענו", body);
 }
 
-function listText(list, title){
-  return title + " (" + list.length + "):\n" + list.map(function(m,i){ return (i+1) + ". " + m.name + " — " + m.school; }).join("\n");
+/* ---------- תשובות לפי רכז ---------- */
+var FIELD_LABELS = [
+  ["seniority","ותק בתפקיד"],["students","תלמידים בחניכות"],["employers","מעסיקים"],
+  ["tools","כלים מלבד מנב״ס"],["device","מכשיר עיקרי"],
+  ["q1","הדבר שלוקח הכי הרבה זמן"],["q2","עושה שוב ושוב"],["q3","הלוואי שמישהו היה עושה עבורי"],
+  ["pains","שלוש המשימות המכבידות"],["story","מקרה שנפל בין הכיסאות"],["features","דירוג היכולות"],
+  ["must","חייב להיות כדי להשתמש"],["wont","מה יגרום לחזור לאקסל"],["pilot","פיילוט"],["more","עוד משהו"]
+];
+function fmt(k, v){
+  if (!v) return "";
+  if (k === "tools" || k === "pains") return split(v).map(esc).join("\n");
+  if (k === "features"){
+    var byRate = {"חיוני":[], "נחמד":[], "לא צריך":[]};
+    split(v).forEach(function(p){ var i = p.lastIndexOf(": "); if (i > 0 && byRate[p.slice(i+2)]) byRate[p.slice(i+2)].push(p.slice(0,i)); });
+    return [["חיוני","חיוני לי"],["נחמד","נחמד שיהיה"],["לא צריך","לא צריך"]]
+      .filter(function(x){ return byRate[x[0]].length; })
+      .map(function(x){ return "<b>" + x[1] + ":</b> " + byRate[x[0]].map(esc).join(" · "); }).join("\n");
+  }
+  return esc(v);
+}
+var openAll = false;
+function renderResp(){
+  var rows = ROWS.slice().sort(function(a,b){ return String(b.date).localeCompare(String(a.date)); });
+  $("respSub").textContent = rows.length ? (rows.length + " רכזים · לחיצה על שם פותחת את כל התשובות") : "";
+  var wasOpen = {};
+  [].slice.call(document.querySelectorAll("details.resp[open]")).forEach(function(d){ wasOpen[d.dataset.id] = 1; });
+  $("resp").innerHTML = rows.length ? rows.map(function(r){
+    var id = norm(r.school) + "|" + norm(r.name);
+    var pil = r.pilot ? '<span class="tag '+(r.pilot === "כן" ? "yes" : r.pilot === "אולי" ? "maybe" : "no")+'">פיילוט: '+esc(r.pilot)+'</span>' : "";
+    var man = r.nameOther ? '<span class="tag man">שם ידני</span>' : "";
+    return '<details class="resp" data-id="'+esc(id)+'"'+(wasOpen[id] || openAll ? " open" : "")+'><summary>' +
+      '<svg class="chev" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>' +
+      esc(r.name) + ' <span class="sc">· '+esc(r.school)+'</span>' + man + pil +
+      '<span class="dt">'+esc(r.date)+'</span></summary><div class="ans"><dl>' +
+      FIELD_LABELS.map(function(f){
+        var v = fmt(f[0], r[f[0]]);
+        return '<dt>'+esc(f[1])+'</dt><dd'+(v ? "" : ' class="none"')+'>'+(v || "—")+'</dd>';
+      }).join("") + '</dl></div></details>';
+  }).join("") : '<div class="empty">אין עדיין תשובות.</div>';
+}
+$("openAll").addEventListener("click", function(){
+  openAll = !openAll;
+  [].slice.call(document.querySelectorAll("details.resp")).forEach(function(d){ d.open = openAll; });
+  this.querySelector("span").textContent = openAll ? "לסגור את כולם" : "לפתוח את כולם";
+});
+
+/* ---------- מי לא מילא ---------- */
+function reminder(){
+  return "שלום לרכזות ולרכזי החניכות,\n" +
+    "אנחנו מתחילים לבנות מערכת עבודה לרכזי החניכות, ולפני כן חשוב לנו לשמוע מכם מה מכביד היום ומה באמת יעזור.\n" +
+    "מי שעוד לא מילא — הסקר לוקח כ-7 דקות:\n" + FORM_URL + "\nתודה!";
+}
+function renderMissing(){
+  var answered = {}, answeredSchools = {};
+  ROWS.forEach(function(r){ answered[norm(r.school)+"|"+norm(r.name)] = 1; answeredSchools[norm(r.school)] = 1; });
+  var bySchool = {};
+  ROSTER.forEach(function(e){ bySchool[norm(e.school)] = e; });
+  var known = {}, missing = [], noCoord = [];
+  SCHOOLS.forEach(function(s){
+    var e = bySchool[norm(s)];
+    if (!e || !e.names.length){ noCoord.push(s); return; }
+    e.names.forEach(function(n){
+      known[norm(s)+"|"+norm(n)] = 1;
+      if (!answered[norm(s)+"|"+norm(n)]) missing.push({name:n, school:s});
+    });
+  });
+  var total = Object.keys(known).length, done = total - missing.length;
+  var extra = ROWS.filter(function(r){ return !known[norm(r.school)+"|"+norm(r.name)]; });
+
+  $("kTotal").textContent = ROWS.length;
+  $("kSchools").textContent = Object.keys(answeredSchools).length;
+  $("kMiss").textContent = missing.length;
+  $("kPilot").textContent = ROWS.filter(function(r){ return r.pilot === "כן"; }).length;
+  $("pct").textContent = done + " מתוך " + total + " · " + pctOf(done,total) + "%";
+  $("bar").style.width = pctOf(done,total) + "%";
+  $("missHead").textContent = missing.length + " מתוך " + total;
+  $("missAll").innerHTML = missing.length
+    ? missing.map(function(m){ return '<span class="chip">'+esc(m.name)+' <small>· '+esc(m.school)+'</small></span>'; }).join("")
+    : '<div class="empty">כל הרכזים הרשומים השיבו.</div>';
+  $("copyMiss").dataset.text = "טרם מילאו את סקר רכזי החניכות (" + missing.length + "):\n" +
+    missing.map(function(m,i){ return (i+1) + ". " + m.name + " — " + m.school; }).join("\n");
+  $("msgPreview").textContent = reminder();
+  $("noCoord").innerHTML = noCoord.map(function(s){
+    return '<span class="chip '+(answeredSchools[norm(s)] ? "ok" : "gray")+'">'+esc(s)+'</span>';
+  }).join("");
+  $("extraWrap").classList.toggle("hide", !extra.length);
+  $("extra").innerHTML = extra.map(function(r){ return '<span class="chip ok">'+esc(r.name)+' <small>· '+esc(r.school)+'</small></span>'; }).join("");
+}
+
+function render(){
+  $("byQ").innerHTML = QS.map(renderQ).join("");
+  renderResp();
+  renderMissing();
 }
 
 /* ---------- העתקה וייצוא ---------- */
@@ -552,32 +553,25 @@ $("copyMiss").addEventListener("click", function(){ if (this.dataset.text) copyT
 $("copyMsg").addEventListener("click", function(){ copyText(reminder(), this); });
 
 $("copyAll").addEventListener("click", function(){
-  var out = ["תשובות סקר רכזי החניכות — לפני בניית המערכת", "סה\"כ " + ROWS.length + " משיבים", ""];
-  out.push("### שלוש המשימות המכבידות (ספירה)");
-  var pc = tally("pains", true);
-  Object.keys(pc).sort(function(a,b){ return pc[b]-pc[a]; }).forEach(function(k){ out.push("- " + k + ": " + pc[k]); });
-  out.push("", "### דירוג יכולות (חיוני / נחמד / לא צריך)");
-  [].slice.call(document.querySelectorAll("#feats .stack")).forEach(function(el){
-    var segs = el.querySelectorAll(".seg i");
-    out.push("- " + el.firstChild.textContent + ": " + [].map.call(segs, function(s){ return s.title.split(": ")[1]; }).join(" / "));
-  });
-  ["tools","device","students","employers","seniority"].forEach(function(k){
-    var c = tally(k, k === "tools");
-    out.push("", "### " + ({tools:"כלים נוספים מלבד מנב״ס",device:"מכשיר",students:"תלמידים",employers:"מעסיקים",seniority:"ותק"})[k]);
-    Object.keys(c).forEach(function(v){ out.push("- " + v + ": " + c[v]); });
-  });
-  OPEN.forEach(function(q){
-    out.push("", "### " + q.t);
-    ROWS.forEach(function(r){ if (r[q.k]) out.push("- " + r.name + " (" + r.school + "): " + r[q.k]); });
+  var out = ["תשובות סקר רכזי החניכות — לפני בניית המערכת", "סה\"כ " + ROWS.length + " משיבים"];
+  QS.forEach(function(q){
+    out.push("", "### " + q.n + ". " + q.t);
+    if (q.kind === "open"){
+      ROWS.forEach(function(r){ if (r[q.k]) out.push("- " + r.name + " (" + r.school + "): " + r[q.k]); });
+    } else if (q.kind === "features"){
+      var fc = featCounts();
+      Object.keys(fc).forEach(function(f){ out.push("- " + f + ": חיוני " + fc[f]["חיוני"] + " / נחמד " + fc[f]["נחמד"] + " / לא צריך " + fc[f]["לא צריך"]); });
+    } else {
+      var c = tally(q);
+      Object.keys(c).sort(function(a,b){ return c[b]-c[a]; }).forEach(function(k){ out.push("- " + k + ": " + c[k]); });
+      if (q.k === "tools") ROWS.forEach(function(r){ split(r.tools).forEach(function(v){ if (/^אחר: /.test(v)) out.push("  · אחר (" + r.name + "): " + v.slice(5)); }); });
+    }
   });
   copyText(out.join("\n"), this);
 });
 
 $("csvBtn").addEventListener("click", function(){
-  var cols = [["date","תאריך"],["name","שם"],["school","בית ספר"],["nameOther","שם הוקלד ידנית"],["seniority","ותק"],
-    ["students","תלמידים"],["employers","מעסיקים"],["tools","כלים"],["device","מכשיר"],["q1","לוקח הכי הרבה זמן"],
-    ["q2","עושה שוב ושוב"],["q3","הלוואי ש"],["pains","שלוש המכבידות"],["story","מקרה"],["features","דירוג יכולות"],
-    ["must","חייב להיות"],["wont","מה יגרום לוותר"],["pilot","פיילוט"],["more","עוד"]];
+  var cols = [["date","תאריך"],["name","שם"],["school","בית ספר"],["nameOther","שם הוקלד ידנית"]].concat(FIELD_LABELS);
   var lines = [cols.map(function(c){ return c[1]; }).join(",")];
   ROWS.forEach(function(r){
     lines.push(cols.map(function(c){ return '"' + String(r[c[0]] || "").replace(/"/g,'""') + '"'; }).join(","));
