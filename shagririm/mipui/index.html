@@ -216,7 +216,7 @@
     if (!list.length) return '';
     var h = '<div class="note" style="font-weight:700;' + st + '">' + title + '</div>';
     list.forEach(function (t, i) { h += '<div class="quote"' + (i >= 6 ? ' data-more hidden' : '') + '>' + mEsc(t) + '</div>'; });
-    if (list.length > 6) h += '<button class="btn sm" type="button" onclick="this.parentNode.querySelectorAll('[data-more]').forEach(function(e){e.hidden=false});this.remove()">להציג את כולן (' + list.length + ')</button>';
+    if (list.length > 6) h += '<button class="btn sm more-b" type="button">להציג את כולן (' + list.length + ')</button>';
     return '<div>' + h + '</div>';
   }
 
@@ -283,6 +283,9 @@
       '</div>';
 
     box.innerHTML = h;
+    box.querySelectorAll('.more-b').forEach(function (btn) {
+      btn.onclick = function () { btn.parentNode.querySelectorAll('[data-more]').forEach(function (e) { e.hidden = false; }); btn.remove(); };
+    });
     var aiB = document.getElementById('aiB');
     if (aiB) aiB.onclick = function () {
       var c = counts(rows, 'block');
