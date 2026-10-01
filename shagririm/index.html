@@ -119,6 +119,8 @@
       </li>
       <li><button type="button" data-nav="studio"><svg class="sh-ico"><use href="#i-studio"/></svg>הסטודיו שלי</button></li>
       <li><button type="button" data-nav="port"><svg class="sh-ico"><use href="#i-folio"/></svg>תיק העבודות שלי</button></li>
+      <!-- מיפוי הצוות (1.10.26): אותו מפתח אישי, נפתח בלשונית חדשה. לא data-nav, כי זה דף נפרד -->
+      <li><button type="button" id="v2-mipui"><svg class="sh-ico"><use href="#i-chart"/></svg>מיפוי הצוות<svg class="sh-ico xs" style="margin-inline-start:auto;opacity:.55"><use href="#i-ext"/></svg></button></li>
       <li><button type="button" data-nav="tools"><svg class="sh-ico"><use href="#i-tools"/></svg>מאגר הכלים</button></li>
       <li><button type="button" data-nav="att"><svg class="sh-ico"><use href="#i-clock"/></svg>נוכחות</button></li>
       <li><button type="button" data-nav="enrich"><svg class="sh-ico"><use href="#i-star"/></svg>הצעות להעשרה</button></li>
@@ -372,5 +374,16 @@
 <script src="assets/elnet.js"></script>
 <script src="assets/admin.js"></script>
 <script src="assets/shell.js"></script>
+<script>
+/* מיפוי הצוות: הקישור האישי לסביבת הלמידה (?t=) הוא אותו מפתח של דף המיפוי (?k=) */
+(function () {
+  var b = document.getElementById('v2-mipui');
+  if (!b) return;
+  b.onclick = function () {
+    var t = window.SH_auth && window.SH_auth.token && window.SH_auth.token();
+    window.open('mipui/' + (t ? '?k=' + encodeURIComponent(t) : ''), '_blank', 'noopener');
+  };
+})();
+</script>
 </body>
 </html>
