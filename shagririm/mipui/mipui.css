@@ -50,6 +50,10 @@ footer.mf .credit a { color: #8A97A6; }
 .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 10px; }
 .scale button { min-height: 58px; border-radius: 14px; border: 1.5px solid var(--line); background: #fff; font: 800 1.35rem Rubik, sans-serif; }
 .scale button.on { background: var(--blue); border-color: var(--blue); color: #fff; }
+.gitem { padding: 8px 0 10px; border-bottom: 1px solid var(--line); }
+.gitem .gq { font-weight: 700; margin-bottom: 6px; }
+.scale.sm { margin-top: 0; gap: 6px; }
+.scale.sm button { min-height: 46px; font-size: 1.1rem; }
 .scale-ends { display: flex; justify-content: space-between; font-size: .85rem; color: var(--muted); }
 textarea.qt, input.qt { width: 100%; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; background: #fff; font-size: 1rem; }
 textarea.qt { min-height: 140px; resize: vertical; }

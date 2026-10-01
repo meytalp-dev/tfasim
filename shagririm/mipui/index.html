@@ -101,7 +101,7 @@
     document.getElementById('who').textContent = me.name + ' · ' + me.school;
     var qUrl = MIPUI_BASE + 'q.html?s=' + me.s;
     var msg = 'שלום לכולם, אני ממפה איך הצוות שלנו משתמש ב-AI, כדי שנבנה יחד למידה שמתאימה לנו באמת. ' +
-      'זה לוקח כ-4 דקות, והתשובות חסויות. אשמח שכל אחד ואחת ימלאו עד סוף השבוע:\n' + qUrl;
+      'זה לוקח כ-4 דקות. אשמח שכל אחד ואחת ימלאו עד סוף השבוע:\n' + qUrl;
     main.innerHTML =
       '<div class="h2">' + mEsc(me.school) + '</div><p class="sub">השאלון לצוות מוכן. שלחו אותו לצוות, וכאן תראו את התשובות מצטברות.</p>' +
       '<div class="g2" style="margin-bottom:16px">' +
@@ -125,6 +125,7 @@
           '<div class="row" style="margin-top:6px"><input class="qt" id="staffN" type="number" min="1" max="400" inputmode="numeric" style="width:110px"><button class="btn sm" id="staffB">שמירה</button><span class="note" id="staffMsg"></span></div></div>' +
         '</div>' +
       '</div>' +
+      '<div id="exEd" style="margin-top:16px"></div>' +
       '<div class="row" style="justify-content:space-between;margin:26px 0 12px"><div class="h2" style="margin:0">הדשבורד</div>' +
         '<div class="row"><span class="note" id="upd"></span><button class="btn sm" id="refB"><svg class="i"><use href="#i-refresh"/></svg>רענון</button></div></div>' +
       '<div id="dash"><div class="loading">טוען את התשובות…</div></div>';
@@ -162,6 +163,7 @@
       if (!r.ok) { box.innerHTML = '<div class="empty">אין הרשאה לבית הספר הזה.</div>'; return; }
       mStore('mipui_res_' + s, r);
       draw(box, r);
+      if (document.getElementById('exEd') && !el) editor(s, r);
       if (u) u.textContent = 'עודכן ב-' + r.updated;
       var sn = document.getElementById('staffN'); if (sn && r.staff && !sn.value) sn.value = r.staff;
     }).catch(function () { if (u) u.textContent = 'השרת איטי כרגע. מוצגים הנתונים האחרונים.'; if (!cached) box.innerHTML = '<div class="empty">השרת לא ענה. לחצו רענון בעוד רגע.</div>'; });
@@ -211,6 +213,107 @@
     return Object.keys(c).filter(function (w) { return c[w] >= 2; }).sort(function (a, b) { return c[b] - c[a]; }).slice(0, 14).map(function (w) { return [w, c[w]]; });
   }
 
+  // היגדים: ממוצע לכל משפט
+  function gridCard(rows, qid, title) {
+    var q = Q[qid];
+    var h = '<div class="card"><h3>' + title + ' <span class="chip g">ממוצע מתוך 5</span></h3>';
+    var all = [];
+    q.items.forEach(function (it) {
+      var a = avg(rows, it.id);
+      if (a != null) all.push(a);
+      h += '<div class="bar"><span>' + mEsc(it.he) + '</span><div class="tr"><div class="fl" style="width:' + (a == null ? 0 : a / 5 * 100) + '%"></div></div><span class="v">' + (a == null ? '–' : a.toFixed(1)) + '</span></div>';
+    });
+    if (all.length) h += '<p class="note">מדד כולל: <b>' + (all.reduce(function (x, y) { return x + y; }, 0) / all.length).toFixed(1) + '</b> מתוך 5. משווים אליו במועד ב׳.</p>';
+    return h + '</div>';
+  }
+  // תוצאות השאלות שהרכז/ת הוסיף/ה
+  function extraCards(rows, qs) {
+    if (!qs.length) return '';
+    var h = '<div class="h2" style="font-size:1.15rem;margin:8px 0 10px">השאלות שהוספתם</div><div class="g2" style="margin-bottom:16px">';
+    qs.forEach(function (q) {
+      var vals = rows.map(function (x) { return (x.extra || {})[q.id]; }).filter(function (v) { return v != null && v !== '' && !(Array.isArray(v) && !v.length); });
+      h += '<div class="card"><h3>' + mEsc(q.q) + '</h3>';
+      if (!vals.length) { h += '<p class="note">עוד אין תשובות.</p></div>'; return; }
+      if (q.type === 'text') { h += vals.slice(0, 20).map(function (t) { return '<div class="quote">' + mEsc(t) + '</div>'; }).join('') + '</div>'; return; }
+      var c = {};
+      vals.forEach(function (v) { (Array.isArray(v) ? v : [v]).forEach(function (x) { c[x] = (c[x] || 0) + 1; }); });
+      var keys = q.type === 'scale' ? ['5', '4', '3', '2', '1'] : q.opts.map(function (o) { return o.id; });
+      keys.forEach(function (k) {
+        var lab = q.type === 'scale' ? k : (q.opts.filter(function (o) { return o.id === k; })[0] || {}).t;
+        var v = c[k] || 0;
+        h += '<div class="bar"><span>' + mEsc(lab) + '</span><div class="tr"><div class="fl" style="width:' + pct(v, vals.length) + '%"></div></div><span class="v">' + v + '</span></div>';
+      });
+      h += '</div>';
+    });
+    return h + '</div>';
+  }
+
+  /* ---------- עורך השאלות של הרכז/ת: עד 5, שאלה שנענתה ננעלת ---------- */
+  var TYPE_HE = { one: 'בחירה אחת', many: 'בחירה מרובה', scale: 'סולם 1–5', text: 'שאלה פתוחה' };
+  function editor(s, r) {
+    var box = document.getElementById('exEd');
+    var qs = (r.extra || []).slice();
+    var locked = {};
+    (r.rows || []).forEach(function (x) { Object.keys(x.extra || {}).forEach(function (k) { locked[k] = true; }); });
+    var editing = null;
+    function freeId() { for (var i = 1; i <= 9; i++) if (!qs.some(function (q) { return q.id === 'x' + i; })) return 'x' + i; return null; }
+    function paint(msg) {
+      var h = '<div class="card"><h3><svg class="i"><use href="#i-text"/></svg>שאלות משלכם · ' + qs.length + ' מתוך 5</h3>' +
+        '<p class="note" style="margin-bottom:10px">השאלות של המיפוי נעולות, כי משווים אליהן בסוף השנה. כאן מוסיפים עד 5 שאלות של בית הספר שלכם. הן מופיעות בסוף השאלון, לפני השאלה האחרונה. שאלה שכבר ענו עליה ננעלת.</p>';
+      qs.forEach(function (q, i) {
+        h += '<div class="row" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;justify-content:space-between">' +
+          '<div style="flex:1;min-width:200px"><b>' + mEsc(q.q) + '</b><div class="note">' + TYPE_HE[q.type] + (q.opts ? ' · ' + q.opts.map(function (o) { return mEsc(o.t); }).join(' · ') : '') + '</div></div>' +
+          (locked[q.id] ? '<span class="chip g">נענתה, נעולה</span>' :
+            '<span class="row" style="gap:6px"><button class="btn sm" data-ed="' + i + '">עריכה</button><button class="btn sm" data-del="' + i + '">מחיקה</button></span>') + '</div>';
+      });
+      if (qs.length < 5 || editing != null) {
+        var e = editing != null ? qs[editing] : { type: 'one', q: '', opts: [] };
+        h += '<div style="background:var(--soft);border-radius:12px;padding:12px;margin-top:8px">' +
+          '<div class="note" style="font-weight:700;margin-bottom:6px">' + (editing != null ? 'עריכת שאלה' : 'שאלה חדשה') + '</div>' +
+          '<input class="qt" id="exQ" maxlength="200" placeholder="נוסח השאלה" value="' + mEsc(e.q) + '" style="margin-bottom:8px">' +
+          '<div class="row" style="margin-bottom:8px"><select class="qt" id="exT" style="width:auto">' + Object.keys(TYPE_HE).map(function (t) { return '<option value="' + t + '"' + (t === e.type ? ' selected' : '') + '>' + TYPE_HE[t] + '</option>'; }).join('') + '</select>' +
+          '<label class="note" id="exMaxL">כמה אפשר לסמן <input class="qt" id="exMax" type="number" min="1" max="8" value="' + (e.max || 2) + '" style="width:70px;display:inline-block"></label></div>' +
+          '<textarea class="qt" id="exO" placeholder="אפשרויות התשובה, אחת בכל שורה (2 עד 8)" style="min-height:100px">' + mEsc((e.opts || []).map(function (o) { return o.t; }).join(String.fromCharCode(10))) + '</textarea>' +
+          '<div class="row" style="margin-top:8px"><button class="btn pri sm" id="exSave">' + (editing != null ? 'שמירת השינוי' : 'הוספה לשאלון') + '</button>' +
+          (editing != null ? '<button class="btn sm" id="exCancel">ביטול</button>' : '') + '<span class="note" id="exMsg">' + (msg || '') + '</span></div></div>';
+      }
+      box.innerHTML = h + '</div>';
+      var tSel = document.getElementById('exT');
+      function syncType() {
+        if (!tSel) return;
+        var t = tSel.value;
+        document.getElementById('exO').style.display = t === 'one' || t === 'many' ? '' : 'none';
+        document.getElementById('exMaxL').style.display = t === 'many' ? '' : 'none';
+      }
+      if (tSel) { tSel.onchange = syncType; syncType(); }
+      box.querySelectorAll('[data-ed]').forEach(function (b) { b.onclick = function () { editing = +b.getAttribute('data-ed'); paint(); }; });
+      box.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { var i = +b.getAttribute('data-del'); var nq = qs.slice(); nq.splice(i, 1); save(nq, 'נמחקה'); }; });
+      var cc = document.getElementById('exCancel'); if (cc) cc.onclick = function () { editing = null; paint(); };
+      var sv = document.getElementById('exSave');
+      if (sv) sv.onclick = function () {
+        var t = tSel.value, text = document.getElementById('exQ').value.trim();
+        var opts = document.getElementById('exO').value.split(String.fromCharCode(10)).map(function (x) { return x.trim(); }).filter(Boolean);
+        if (text.length < 3) { document.getElementById('exMsg').textContent = 'חסר נוסח לשאלה.'; return; }
+        if ((t === 'one' || t === 'many') && (opts.length < 2 || opts.length > 8)) { document.getElementById('exMsg').textContent = 'צריך בין 2 ל-8 אפשרויות.'; return; }
+        var q = { id: editing != null ? qs[editing].id : freeId(), type: t, q: text };
+        if (t === 'one' || t === 'many') q.opts = opts.map(function (o) { return { t: o }; });
+        if (t === 'many') q.max = Number(document.getElementById('exMax').value) || 2;
+        var nq = qs.slice();
+        if (editing != null) nq[editing] = q; else nq.push(q);
+        save(nq, 'נשמר. השאלה כבר בשאלון.');
+      };
+    }
+    function save(nq, okMsg) {
+      var m = document.getElementById('exMsg'); if (m) m.textContent = 'שומר…';
+      box.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+      mPost({ action: 'saveExtra', s: s, k: K, qs: nq }).then(function (res) {
+        if (res.ok) { qs = res.qs; editing = null; paint(okMsg); toast('נשמר'); }
+        else paint(res.error === 'locked' ? 'אי אפשר: כבר ענו על השאלה הזו.' : 'לא נשמר (' + res.error + ').');
+      }).catch(function () { paint('לא נשמר. נסו שוב בעוד רגע.'); });
+    }
+    paint();
+  }
+
   // רשימת ציטוטים מקוצרת: 6 ראשונים, והשאר מאחורי "להציג את כולן"
   function quotes(title, list, st) {
     if (!list.length) return '';
@@ -218,6 +321,32 @@
     list.forEach(function (t, i) { h += '<div class="quote"' + (i >= 6 ? ' data-more hidden' : '') + '>' + mEsc(t) + '</div>'; });
     if (list.length > 6) h += '<button class="btn sm more-b" type="button">להציג את כולן (' + list.length + ')</button>';
     return '<div>' + h + '</div>';
+  }
+
+  // מי ענה: שורה לכל מורה, לחיצה פותחת את כל התשובות שלו/ה
+  function ansList(qid, v) {
+    if (Array.isArray(v)) return v.map(function (x) { return label(qid, x); }).join(', ');
+    if (Q[qid] && Q[qid].opts) return label(qid, v);
+    return v == null ? '' : String(v);
+  }
+  function whoTable(rows) {
+    var named = rows.filter(function (x) { return x.name; });
+    if (!named.length) return '';
+    var h = '<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between;margin-bottom:8px">' +
+      '<h3 style="margin:0"><svg class="i"><use href="#i-users"/></svg>מי ענה · ' + named.length + '</h3>' +
+      '<button class="btn sm" id="cpNames"><svg class="i"><use href="#i-copy"/></svg>העתקת השמות</button></div>' +
+      '<p class="note" style="margin-bottom:8px">השוו לרשימת הצוות שלכם כדי לדעת למי לשלוח תזכורת. לחיצה על שורה מציגה את כל התשובות.</p>' +
+      '<div style="overflow-x:auto"><table class="t"><tr><th>שם</th><th>תחום</th><th>תדירות</th><th>ביטחון</th><th>מוכנות</th><th>צוות ראשון</th><th>תאריך</th></tr>';
+    named.forEach(function (x, i) {
+      var subj = x.subj === 'tech' && x.megama ? x.megama : label('subj', x.subj);
+      h += '<tr class="clk" data-w="' + i + '"><td><b>' + mEsc(x.name) + '</b></td><td>' + mEsc(subj) + '</td><td>' + mEsc(label('freq', x.freq)) + '</td><td>' + (x.conf || '–') + '</td><td>' + (x.ready || '–') + '</td><td>' +
+        (x.first === 'yes' ? '<span class="chip">כן</span>' : x.first === 'maybe' ? '<span class="chip g">אולי</span>' : '') + '</td><td class="note">' + mEsc(x.date || '') + '</td></tr>' +
+        '<tr data-wd="' + i + '" hidden><td colspan="7" style="background:#F6F9FC">' +
+        SV.questions.filter(function (q) { return q.id !== 'name' && x[q.id] != null && x[q.id] !== '' && !(Array.isArray(x[q.id]) && !x[q.id].length); }).map(function (q) {
+          return '<div style="margin:4px 0"><span class="note">' + mEsc(q.q.he) + '</span><br>' + mEsc(ansList(q.id, x[q.id])) + (q.id === 'subj' && x.megama ? ' · ' + mEsc(x.megama) : '') + '</div>';
+        }).join('') + '</td></tr>';
+    });
+    return h + '</table></div></div>';
   }
 
   function draw(box, r) {
@@ -251,26 +380,35 @@
     h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'freq', null, 'fixed') + bars(rows, 'block') + '</div>';
     h += '<div class="g2" style="margin-bottom:16px">' + scaleCard(rows, 'conf') + scaleCard(rows, 'ready') + '</div>';
     h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'tools') + bars(rows, 'use') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'learn') + bars(rows, 'sen', null, 'fixed') + '</div>';
+    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'class', null, 'fixed') + gridCard(rows, 'right', 'שימוש נכון') + '</div>';
+    h += '<div class="g2" style="margin-bottom:16px">' + gridCard(rows, 'school', 'בבית הספר שלנו') + bars(rows, 'learn') + '</div>';
+    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'sen', null, 'fixed') + '<div></div></div>';
+    h += extraCards(rows, r.extra || []);
 
-    // פילוח לפי תחום: רק קבוצה של 5 ומעלה, כדי שאי אפשר יהיה לזהות מי ענה
+    // פילוח לפי תחום הוראה
     var bySubj = {};
     rows.forEach(function (x) { (bySubj[x.subj] = bySubj[x.subj] || []).push(x); });
     h += '<div class="card" style="margin-bottom:16px"><h3>לפי תחום הוראה</h3><table class="t"><tr><th>תחום</th><th>ענו</th><th>כל שבוע ומעלה</th><th>ביטחון</th><th>מוכנות</th></tr>';
     Q.subj.opts.forEach(function (o) {
       var g = bySubj[o.id] || [];
       if (!g.length) return;
-      if (g.length < 5) { h += '<tr><td>' + mEsc(o.he) + '</td><td>' + g.length + '</td><td colspan="3" class="note">פחות מ-5 ענו, לא מוצג כדי לשמור על חיסיון</td></tr>'; return; }
       var w = g.filter(function (x) { return x.freq === 'week' || x.freq === 'day'; }).length;
       h += '<tr><td>' + mEsc(o.he) + '</td><td>' + g.length + '</td><td>' + pct(w, g.length) + '%</td><td>' + (avg(g, 'conf') || 0).toFixed(1) + '</td><td>' + (avg(g, 'ready') || 0).toFixed(1) + '</td></tr>';
     });
-    h += '</table></div>';
+    h += '</table>';
+    var meg = {};
+    rows.forEach(function (x) { var m = (x.megama || '').trim(); if (m) meg[m] = (meg[m] || 0) + 1; });
+    var mk = Object.keys(meg).sort(function (a, b) { return meg[b] - meg[a]; });
+    if (mk.length) h += '<div class="note" style="font-weight:700;margin:12px 0 6px">המגמות שנכתבו</div><div class="words">' + mk.map(function (m) { return '<span>' + mEsc(m) + (meg[m] > 1 ? ' ×' + meg[m] : '') + '</span>'; }).join('') + '</div>';
+    h += '</div>';
 
     if (r.first && r.first.length) {
       h += '<div class="card" style="margin-bottom:16px"><h3><svg class="i"><use href="#i-flag"/></svg>רוצים להיות בצוות הראשון · ' + r.first.length + '</h3>' +
         '<div class="words">' + r.first.map(function (x) { return '<span>' + mEsc(x) + '</span>'; }).join('') + '</div>' +
-        '<p class="note" style="margin-top:8px">השמות נשמרים בנפרד מהתשובות, ולכן אי אפשר לדעת מה כל אחד מהם ענה.</p></div>';
+        '</div>';
     }
+
+    h += whoTable(rows);
 
     var help = rows.map(function (x) { return x.help; }).filter(Boolean);
     var story = rows.map(function (x) { return x.story; }).filter(Boolean);
@@ -283,6 +421,11 @@
       '</div>';
 
     box.innerHTML = h;
+    box.querySelectorAll('tr[data-w]').forEach(function (tr) {
+      tr.onclick = function () { var d = box.querySelector('tr[data-wd="' + tr.getAttribute('data-w') + '"]'); if (d) d.hidden = !d.hidden; };
+    });
+    var cpN = document.getElementById('cpNames');
+    if (cpN) cpN.onclick = function () { copy(rows.filter(function (x) { return x.name; }).map(function (x) { return x.name; }).join(String.fromCharCode(10)), 'השמות הועתקו'); };
     box.querySelectorAll('.more-b').forEach(function (btn) {
       btn.onclick = function () { btn.parentNode.querySelectorAll('[data-more]').forEach(function (e) { e.hidden = false; }); btn.remove(); };
     });
@@ -291,7 +434,9 @@
       var c = counts(rows, 'block');
       var topB = Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).slice(0, 3).map(function (id) { return label('block', id) + ' (' + c[id] + ')'; }).join(', ');
       var p = 'לפניך תשובות של ' + n + ' אנשי צוות בבית ספר על-יסודי טכנולוגי, לשאלון על שימוש ב-AI בהוראה. אין בהן שמות.\n' +
-        'נתונים: ' + pct(weekly, n) + '% משתמשים לפחות פעם בשבוע; ' + never + ' עוד לא השתמשו אף פעם; ממוצע ביטחון ' + (conf || 0).toFixed(1) + ' מתוך 5; ממוצע מוכנות לנסות ' + (ready || 0).toFixed(1) + ' מתוך 5. המעכבים הנפוצים: ' + topB + '.\n\n' +
+        'נתונים: ' + pct(weekly, n) + '% משתמשים לפחות פעם בשבוע; ' + never + ' עוד לא השתמשו אף פעם; ממוצע ביטחון ' + (conf || 0).toFixed(1) + ' מתוך 5; ממוצע מוכנות לנסות ' + (ready || 0).toFixed(1) + ' מתוך 5. המעכבים הנפוצים: ' + topB + '.\n' +
+        'שימוש נכון (ממוצע 1-5): ' + Q.right.items.map(function (it) { var a = avg(rows, it.id); return it.he + ' ' + (a == null ? '-' : a.toFixed(1)); }).join('; ') + '.\n' +
+        'בבית הספר (ממוצע 1-5): ' + Q.school.items.map(function (it) { var a = avg(rows, it.id); return it.he + ' ' + (a == null ? '-' : a.toFixed(1)); }).join('; ') + '.\n\n' +
         'המשימה:\n1. זהה 3 עד 5 נושאים חוזרים בתשובות הפתוחות. לכל נושא: כמה תשובות, וציטוט אחד.\n' +
         '2. מה הצרכים שעולים, ומה זה אומר לתוכנית הטמעת AI בבית הספר השנה?\n3. הצע 3 צעדים ראשונים לרכז/ת החדשנות, לפי שלוש קבוצות: מובילים, מתנסים וטרם התחילו.\n4. מה מפתיע או חריג?\nכתוב בעברית, בקצרה ובשפה פשוטה.\n\n' +
         '--- מה הכי היה עוזר ---\n' + help.map(function (t, i) { return (i + 1) + '. ' + t; }).join('\n') +

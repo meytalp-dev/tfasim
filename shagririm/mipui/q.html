@@ -77,8 +77,32 @@
   // מקף לא נשבר לפני AI, שלא יישאר "ב-" לבד בסוף שורה
   function L(o) { return o ? String(o[lang] || o.he).replace(/-AI/g, '‑AI') : ''; }
 
+  /* שאלות שהרכז/ת הוסיף/ה: נטענות ברקע ונכנסות לפני השאלה האחרונה */
+  var EXTRA = normExtra(mStore('mipui_extra_' + S) || []);
+  function normExtra(list) {
+    return (list || []).map(function (x) {
+      return { id: x.id, type: x.type, max: x.max, extra: true, optional: x.type === 'text',
+        q: { he: x.q, ar: x.q },
+        ends: { he: ['בכלל לא', 'מאוד'], ar: ['إطلاقًا', 'جدًا'] },
+        opts: (x.opts || []).map(function (o) { return { id: o.id, he: o.t, ar: o.t }; }),
+        hint: x.type === 'many' ? { he: 'עד ' + x.max, ar: 'حتى ' + x.max } : (x.type === 'text' ? { he: 'לא חובה', ar: 'ليس إلزاميًا' } : null) };
+    });
+  }
+  function allQ() {
+    var core = SV.questions.slice(), at = core.length - 1; // לפני "צוות ראשון"
+    return core.slice(0, at).concat(EXTRA, core.slice(at));
+  }
+  if (MIPUI_SCHOOLS[S]) mGet({ action: 'extra', s: S }, 20000).then(function (r) {
+    if (!r || !r.ok) return;
+    mStore('mipui_extra_' + S, r.qs);
+    var lastCore = visible().length - 1;
+    if (answers.__sent || idx >= lastCore) return; // מאוחר מדי: לא מזיזים שאלות מתחת למורה
+    EXTRA = normExtra(r.qs);
+    if (idx >= 0) render();
+  }).catch(function () {});
+
   function visible() {
-    return SV.questions.filter(function (q) {
+    return allQ().filter(function (q) {
       if (!q.skipIf) return true;
       return !Object.keys(q.skipIf).some(function (k) { return answers[k] === q.skipIf[k]; });
     });
@@ -109,7 +133,7 @@
       return;
     }
     app.innerHTML = '<div class="qstart"><h1>' + mEsc(L(SV.title)) + '</h1><p>' + mEsc(L(SV.intro)) + '</p>' +
-      '<div class="meta"><span><svg class="i"><use href="#i-clock"/></svg>' + t('min') + '</span><span><svg class="i"><use href="#i-lock"/></svg>' + t('priv') + '</span></div>' +
+      '<div class="meta"><span><svg class="i"><use href="#i-clock"/></svg>' + t('min') + '</span></div>' +
       (TEST ? '<div class="testbar">' + t('test') + '</div>' : '') +
       '<div><button class="btn pri" id="go" style="min-width:180px">' + t('start') + '</button></div></div>';
     document.getElementById('go').onclick = function () { idx = 0; render(); };
@@ -124,9 +148,11 @@
     var v = answers[q.id];
     if (q.optional) return true;
     if (q.type === 'many') return Array.isArray(v) && v.length > 0;
-    if (q.type === 'text') return !!(v && v.trim().length >= 2);
+    if (q.type === 'text' || q.type === 'name') return !!(v && v.trim().length >= 2);
+    if (q.type === 'grid') return q.items.every(function (it) { return answers[it.id] != null; });
     return v != null && v !== '';
   }
+
 
   function go(d) {
     idx += d;
@@ -149,10 +175,20 @@
         h += '<button type="button" class="opt' + (multi ? ' multi' : '') + (on ? ' on' : '') + (dim ? ' dim' : '') + '" data-o="' + o.id + '" role="' + (multi ? 'checkbox' : 'radio') + '" aria-checked="' + on + '"><span class="mk"></span><span>' + mEsc(L(o)) + '</span></button>';
       });
       h += '</div>';
+      var fo = !multi && q.opts.filter(function (o) { return o.free && o.id === sel; })[0];
+      if (fo) h += '<label class="qhint" for="fr" style="margin-top:6px;font-weight:700;color:var(--navy)">' + mEsc(L(fo.free)) + '</label>' +
+        '<input class="qt" id="fr" maxlength="60" placeholder="' + mEsc(fo.free.ph[lang] || fo.free.ph.he) + '" value="' + mEsc(answers[fo.free.id] || '') + '">';
     } else if (q.type === 'scale') {
       h += '<div class="scale" role="radiogroup" aria-labelledby="qh">' + [1, 2, 3, 4, 5].map(function (n) {
         return '<button type="button" data-n="' + n + '" class="' + (v === n ? 'on' : '') + '" role="radio" aria-checked="' + (v === n) + '">' + n + '</button>';
       }).join('') + '</div><div class="scale-ends"><span>1 · ' + mEsc(q.ends[lang][0]) + '</span><span>5 · ' + mEsc(q.ends[lang][1]) + '</span></div>';
+    } else if (q.type === 'grid') {
+      q.items.forEach(function (it) {
+        var gv = answers[it.id];
+        h += '<div class="gitem"><div class="gq" id="g_' + it.id + '">' + mEsc(L(it)) + '</div><div class="scale sm" role="radiogroup" aria-labelledby="g_' + it.id + '">' +
+          [1, 2, 3, 4, 5].map(function (n) { return '<button type="button" data-g="' + it.id + '" data-n="' + n + '" class="' + (gv === n ? 'on' : '') + '" role="radio" aria-checked="' + (gv === n) + '">' + n + '</button>'; }).join('') + '</div></div>';
+      });
+      h += '<div class="scale-ends"><span>1 · ' + mEsc(q.ends[lang][0]) + '</span><span>5 · ' + mEsc(q.ends[lang][1]) + '</span></div>';
     } else if (q.type === 'text') {
       h += '<textarea class="qt" id="tx" maxlength="1500" placeholder="' + t('write') + '" aria-labelledby="qh">' + mEsc(v || '') + '</textarea>';
     } else if (q.type === 'name') {
@@ -173,8 +209,11 @@
       b.onclick = function () {
         var id = b.getAttribute('data-o');
         if (q.type === 'one') {
+          var op = q.opts.filter(function (o) { return o.id === id; })[0];
+          q.opts.forEach(function (o) { if (o.free && o.id !== id) delete answers[o.free.id]; });
           answers[q.id] = id;
           render();
+          if (op.free) { var fr = document.getElementById('fr'); if (fr) fr.focus(); return; } // לא מתקדמים לבד: מחכים לשם המגמה
           setTimeout(function () { if (visible()[idx] === q) go(1); }, 260);
         } else {
           var cur = (answers[q.id] || []).slice();
@@ -191,13 +230,23 @@
         }
       };
     });
-    app.querySelectorAll('.scale button').forEach(function (b) {
+    app.querySelectorAll('.scale button[data-g]').forEach(function (b) {
+      b.onclick = function () {
+        answers[b.getAttribute('data-g')] = Number(b.getAttribute('data-n'));
+        var y = window.scrollY;
+        render();
+        window.scrollTo(0, y);
+      };
+    });
+    app.querySelectorAll('.scale button:not([data-g])').forEach(function (b) {
       b.onclick = function () {
         answers[q.id] = Number(b.getAttribute('data-n'));
         render();
         setTimeout(function () { if (visible()[idx] === q) go(1); }, 260);
       };
     });
+    var fr = document.getElementById('fr');
+    if (fr) fr.oninput = function () { var fo = q.opts.filter(function (o) { return o.free && o.id === answers[q.id]; })[0]; if (fo) answers[fo.free.id] = fr.value; };
     var tx = document.getElementById('tx');
     if (tx) {
       tx.oninput = function () {
@@ -224,7 +273,15 @@
   function renderDone() {
     if (!answers.__sent) {
       var a = {};
-      visible().forEach(function (q) { var v = answers[q.id]; if (v != null && v !== '') a[q.id] = typeof v === 'string' ? v.trim() : v; });
+      var ex = {};
+      visible().forEach(function (q) {
+        if (q.type === 'grid') { q.items.forEach(function (it) { if (answers[it.id] != null) a[it.id] = answers[it.id]; }); return; }
+        var v = answers[q.id];
+        if (q.extra) { if (v != null && v !== '' && !(Array.isArray(v) && !v.length)) ex[q.id] = typeof v === 'string' ? v.trim() : v; return; }
+        if (v != null && v !== '') a[q.id] = typeof v === 'string' ? v.trim() : v;
+        (q.opts || []).forEach(function (o) { if (o.free && answers[o.free.id] && answers[q.id] === o.id) a[o.free.id] = String(answers[o.free.id]).trim(); });
+      });
+      if (Object.keys(ex).length) a.extra = ex;
       var item = { action: 'answer', s: S, rid: mRid(), lang: lang, a: a };
       if (TEST) item.test = 1;
       mStore(QKEY, queue().concat([item]));
@@ -232,7 +289,7 @@
       answers.__sent = 1;
       flush();
     }
-    var first = (answers.first || '').trim().split(/\s+/)[0];
+    var first = (answers.name || '').trim().split(/\s+/)[0];
     app.innerHTML = '<div class="qstart" style="text-align:center"><div class="done-ic"><svg class="i"><use href="#i-check"/></svg></div>' +
       '<h1>' + t('thanks') + (first && lang === 'he' ? ' ' + mEsc(first) + '!' : '') + '</h1><p>' + t('thanksP') + '</p>' +
       (TEST ? '<div class="testbar">' + t('test') + '</div>' : '') + '<div id="peek"></div></div>';
