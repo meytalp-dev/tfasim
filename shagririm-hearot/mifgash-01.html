@@ -182,6 +182,25 @@ h2{font-size:80px}
 .st2 b{display:block;font-size:29px;line-height:1.2}
 .st2 .tl{display:block;font-size:22px;color:var(--c);font-weight:600;margin-top:6px}
 .st2 small{display:block;font-size:20px;color:var(--mist);margin-top:4px}
+.seven{list-style:none;margin:40px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:16px 50px;max-width:1500px}
+.seven li{display:flex;gap:20px;align-items:center;font-size:36px;font-weight:600}
+.seven li i{font-style:normal;flex:none;display:grid;place-items:center;width:62px;height:62px;border-radius:50%;border:3px solid var(--blue);color:var(--blue);font-size:30px;font-weight:800}
+.track7{display:grid;gap:12px;margin-top:40px;max-width:1550px}
+.t7{display:grid;grid-template-columns:440px 1fr 70px;gap:20px;align-items:center;font-size:30px}
+.t7 .tb{height:26px;border-radius:13px;background:rgba(30,111,165,.12);overflow:hidden}.t7 .tb i{display:block;height:100%;border-radius:13px;background:var(--blue);transition:width 1s}
+.t7 b{font-size:38px;text-align:left}
+.t7 .stk{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px;margin-top:-4px}
+.t7 .stk span{font-size:22px;font-weight:700;color:#C2620C;border:1.5px solid #C2620C;border-radius:999px;padding:2px 12px}
+.stp7{border:1.5px solid #DDE2E7;border-radius:16px;padding:14px 16px;margin:12px 0;background:#FBFCFD}
+.stp7.done{border-color:#2B7A78;background:#F2F8F6}
+.stp7 .sh{display:flex;gap:10px;align-items:center}.stp7 .sh i{font-style:normal;flex:none;width:30px;height:30px;border-radius:50%;background:#2B7A78;color:#fff;display:grid;place-items:center;font-weight:800}
+.stp7 .sh b{font-size:18px}
+.stp7 .ill{display:block;width:100%;max-width:340px;margin:10px auto 4px}
+.stp7 .ok{background:#EAF2F9;border-radius:10px;padding:8px 12px;font-size:15px}.stp7 .ok span{font-weight:700;color:#1D6FA5}
+.stp7 .sbtn{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn.ghost{background:#fff;color:#C2620C;border:1.5px solid #C2620C}
+.chk{margin:6px 0;padding-inline-start:22px;font-size:16px;line-height:1.6}
+.priv{font-size:15px;color:#5E6B78}
 .ringwrap{position:absolute;left:140px;top:50%;transform:translateY(-50%);width:640px;height:640px}
 .ringwrap svg{width:100%;height:100%}
 .ringwrap .rs{fill:none;stroke-width:34;stroke-linecap:round;stroke:rgba(157,179,198,.2)}
@@ -591,21 +610,8 @@ body{background:#DDE4EC!important}
   <div class="bars" id="w-bars"></div>
 </section>
 
-<!-- 18 -->
-<section class="s full" data-act="3" data-net="dim" data-notes="14:37 · &quot;ככה מבקשים מ-Gemini סקר כזה.&quot; לחכות שייכתב. לחיצה = חמשת החלקים נצבעים.&#10;לפני המפגש: להריץ את הפרומפט הזה ב-Gemini ולבדוק שיוצא סקר דומה.">
-  <h2 class="kt">ככה מבקשים מ-Gemini סקר כזה</h2>
-  <div class="prompt rise" style="--d:400ms"><span class="gem">פרומפט</span><span><span data-p style="--c:var(--c-ember)">אני מנחה השתלמות לרכזי תקשוב בבתי ספר מקצועיים.</span> <span data-p style="--c:var(--c-blue)">בנה/י לי סקר של שתי דקות שימפה את הצרכים ואת האמצעים שלהם,</span> <span data-p style="--c:var(--c-deep)">כדי שאוכל להתאים את ההשתלמות לכל אחד.</span> <span data-p style="--c:var(--c-sky)">עד 8 שאלות, רובן סגורות, שאלה פתוחה אחת בסוף, בלי פרט מזהה.</span> <span data-p style="--c:var(--c-gold)">כתוב/י ליד כל שאלה איזו החלטה היא תעזור לי לקבל.</span></span></div>
-  <div class="tags" data-f="1"><span style="--c:var(--c-ember)">מי אני</span><span style="--c:var(--c-blue)">מה אני צריך/ה</span><span style="--c:var(--c-deep)">בשביל מה</span><span style="--c:var(--c-sky)">כללים</span><span style="--c:var(--c-gold)">מה לבדוק</span></div>
-</section>
-
-<!-- 19 -->
-<section class="s full" data-act="3" data-net="dim" data-notes="14:40 · בשידור חי: מורידים את התשובות מהגיליון, מדביקים ב-Gemini עם הפרומפט. 6 דקות.&#10;לשמור את התשובה: חוזרים אליה בסוף.">
-  <h2 class="kt">ועכשיו: Gemini, מה אתה רואה?</h2>
-  <div class="prompt rise" style="--d:400ms"><span class="gem">פרומפט הניתוח</span><span><span data-p style="--c:var(--c-ember)">הנה התשובות לסקר [הדבקה].</span> <span data-p style="--c:var(--c-blue)">סכם/י כל שאלה במשפט אחד עם מספרים.</span> <span data-p style="--c:var(--c-deep)">חלק/י את המשיבים לשלוש קבוצות לפי מה שהם צריכים,</span> <span data-p style="--c:var(--c-sky)">ותן/י שלושה ממצאים שצריכים לשנות את מה שאני מתכננת.</span> <span data-p style="--c:var(--c-gold)">אל תוסיף/י נתון שלא מופיע בתשובות.</span></span></div>
-</section>
-
 <!-- 20 -->
-<section class="s full" data-act="3" data-net="dim" data-notes="14:46 · הגילוי: הסקר, בסיס הנתונים והגרפים שראיתם הם אפליקציה אחת ב-Apps Script. זה המסלול של רמה 2.">
+<section class="s full" data-act="3" data-net="dim" data-notes="14:46 · הגילוי: הסקר, בסיס הנתונים והגרפים שראיתם הם אפליקציה אחת ב-Apps Script. בהובלה נבנה אפליקציה כזאת במפגש 5. היום רק מראים.">
   <h2 class="kt">מה שראיתם עכשיו: אפליקציה אחת</h2>
   <div class="split">
     <div class="rise" style="--d:400ms"><h3>הסקר</h3><p>דף שנשלח בקישור ונפתח בטלפון</p></div>
@@ -616,6 +622,7 @@ body{background:#DDE4EC!important}
     <div class="rise" style="--d:1000ms"><h3>והכלי שבנה</h3><p>Apps Script, מתוך שיחה עם AI. בלי לדעת לתכנת</p></div>
   </div>
 </section>
+
 
 <!-- 21 -->
 <section class="s full" data-act="3" data-net="dim" data-notes="14:50 · &quot;הסקר לצוות ימפה שני דברים: מה כואב, ועם מי אפשר להתחיל.&quot;&#10;שותפים = מי שמוכן/ה לנסות ושמקשיבים לו/לה. לא בהכרח הכי טכנולוגי/ת.&#10;&quot;את המפה בונים במפגש 2, עם התשובות של הצוות ועם מה שהמנהל/ת יגיד/תגיד. היא נשארת אצלכם.&quot;">
@@ -633,15 +640,26 @@ body{background:#DDE4EC!important}
   <p class="hand note" data-f="5" style="font-size:44px">המפה נשארת אצלך. שמות לא נכנסים ל-AI.</p>
 </section>
 
-<!-- 21 -->
-<section class="s full" data-act="3" data-net="dim" data-notes="14:54 · 22 דקות. כל אחד בוחר רמה, בדף המלווה שלב 5. אפשר לעבור רמה באמצע.&#10;לחיצה: שלוש השאלות שחייבות להיות בכל סקר, בכל רמה.&#10;15:10: חדרי עבודה של 4, ממלאים אחד לשני ובודקים, 5 דקות.">
-  <h2 class="kt">עכשיו אתם: סקר לצוות שלכם</h2>
-  <div class="levels">
-    <div class="lv rise" style="--d:300ms;--c:var(--c-deep)"><small>רמה 1</small><h3>Gemini + Tally</h3><p>Gemini כותב את השאלות, Tally הופך אותן לסקר יפה שנשלח בקישור, ו-Gemini מנתח את התשובות</p><p class="out">חינם, בלי הגבלת תשובות</p></div>
-    <div class="lv rise" style="--d:500ms;--c:var(--c-blue)"><small>רמה 2</small><h3>Gemini + Apps Script</h3><p>Gemini כותב אפליקציה: דף סקר, גיליון שמשמש בסיס נתונים, ודשבורד</p><p class="out">כמו מה שראיתם עכשיו</p></div>
-    <div class="lv rise" style="--d:700ms;--c:var(--c-ember)"><small>רמה 3</small><h3>סקר שמנתח את עצמו</h3><p>למי שכבר מכיר Apps Script: מחברים את Gemini, והוא ממיין כל תשובה פתוחה ושואל שאלת המשך</p><p class="out">מפתח חינמי מ-Google AI Studio</p></div>
-  </div>
-  <div class="tags" data-f="1"><span style="--c:var(--c-deep)">כמה משתמשים ב-AI היום</span><span style="--c:var(--c-blue)">כמה מוכנים לנסות משהו חדש</span><span style="--c:var(--c-ember)">רוצה להיות בצוות הראשון? שם, רשות</span></div>
+
+<!-- 18: הבקשה -->
+<section class="s full" data-act="3" data-net="dim" data-notes="14:55 · &quot;ככה מבקשים מ-AI סקר. זו בדיוק הבקשה שתדביקו עוד רגע ב-Tally. הנוסח המלא בדף המלווה, צעד 3.&quot;&#10;לחכות שייכתב. לחיצה = חמשת החלקים נצבעים.&#10;&quot;כל בקשה טובה ל-AI בנויה מחמשת החלקים האלה. ככה כותבים גם בקשות אחרות.&quot;">
+  <h2 class="kt">ככה מבקשים מ-AI סקר לצוות</h2>
+  <div class="prompt rise" style="--d:400ms"><span class="gem">הבקשה</span><span><span data-p style="--c:var(--c-ember)">אני רכז/ת תקשוב בתיכון מקצועי.</span> <span data-p style="--c:var(--c-blue)">בנה/י סקר קצר לצוות המורים, בעברית, עד 10 שאלות.</span> <span data-p style="--c:var(--c-deep)">המטרה: להבין מה עוצר את המורים, ומי מוכן לנסות ראשון.</span> <span data-p style="--c:var(--c-sky)">רוב השאלות שאלות בחירה, בלי שם ומייל, חוץ משדה רשות בסוף.</span> <span data-p style="--c:var(--c-gold)">חובה לכלול: ותק, תחום, שימוש ב-AI ונכונות לנסות.</span></span></div>
+  <div class="tags" data-f="1"><span style="--c:var(--c-ember)">מי אני</span><span style="--c:var(--c-blue)">מה אני צריך/ה</span><span style="--c:var(--c-deep)">בשביל מה</span><span style="--c:var(--c-sky)">כללים</span><span style="--c:var(--c-gold)">חובה לכלול</span></div>
+</section>
+
+<!-- 21ב: שבעה צעדים -->
+<section class="s full" data-act="3" data-net="dim" data-notes="15:00 · 25 דקות. &quot;אני מראה, אתם עושים, לוחצים סיימתי.&quot;&#10;בכל צעד: משתפים את המסך של Tally ומראים, נותנים 2-3 דקות, ועוברים לשקף הבא (הלוח החי) כדי לראות כמה סיימו. ממשיכים כשרוב הקבוצה סיימה.&#10;צעד 6 בחדרי עבודה של שניים, 5 דקות.">
+  <h2 class="kt">סקר לצוות ב-7 צעדים</h2>
+  <p class="lead rise" style="--d:300ms">בדף המלווה, שלב 5. אחרי כל צעד לוחצים "סיימתי".</p>
+  <ol class="seven"><li class="rise" style="--d:400ms"><i>1</i><span>נכנסים ל-Tally</span></li><li class="rise" style="--d:490ms"><i>2</i><span>New form ואז Create with AI</span></li><li class="rise" style="--d:580ms"><i>3</i><span>מדביקים את הבקשה</span></li><li class="rise" style="--d:670ms"><i>4</i><span>בודקים ומתקנים</span></li><li class="rise" style="--d:760ms"><i>5</i><span>Publish ומעתיקים קישור</span></li><li class="rise" style="--d:850ms"><i>6</i><span>ממלאים אחד לשני</span></li><li class="rise" style="--d:940ms"><i>7</i><span>הקישור בדף המלווה</span></li></ol>
+  <p class="hand note rise" style="--d:1200ms">אני מראה, אתם עושים</p>
+</section>
+
+<!-- 21ג: הלוח החי -->
+<section class="s full" data-act="3" data-net="dim" data-live="steps" data-notes="חוזרים לשקף הזה אחרי כל צעד. העמודה = כמה לחצו &quot;סיימתי&quot;. השמות בכתום = מי לחץ &quot;נתקעתי&quot; ועוד לא סיים: לשלוח לחדר עזרה או לעזור על המסך.">
+  <h2 class="kt">איפה כולם?</h2>
+  <div class="track7" id="w-steps"></div>
 </section>
 
 <!-- 22: משימת שטח -->
@@ -725,40 +743,16 @@ body{background:#DDE4EC!important}
     <button class="btn" type="button" data-send="survey">לשלוח את הסקר</button><span class="msg"></span>
   </section>
 
-  <section class="blk" style="--c:#2B7A78"><h2><i>5</i>סקר לצוות שלך</h2>
-    <p>הסקר ממפה שני דברים: מה כואב לצוות, ומי מוכן/ה להיות שותף/ה ראשון/ה. בוחרים רמה, ואפשר לעבור באמצע.</p>
-    <p><b>שלוש שאלות שחייבות להיות בכל רמה:</b> כמה משתמשים ב-AI היום · כמה מוכנים לנסות משהו חדש השנה · "רוצה להיות בצוות הראשון שמנסה? השאר/י שם" (רשות).</p>
-    <p><b>פרטיות:</b> חוץ משדה השם, הסקר אנונימי. לפני שמעלים את התשובות ל-Gemini, מוחקים את עמודת השמות. את מפת השותפים בונים במפגש 2, והיא נשארת אצלך.</p>
-    <div class="modes" id="modes"><button type="button" data-v="1" aria-pressed="true">רמה 1 · Gemini + Tally</button><button type="button" data-v="2">רמה 2 · Apps Script</button><button type="button" data-v="3">רמה 3 · סקר שמנתח את עצמו</button></div>
-    <div data-m="1">
-      <p><b>1.</b> ב-<b>gemini.google.com</b>, מדביקים:</p>
-      <div class="pr" id="l1a">אני רכז/ת תקשוב בבית ספר תיכון מקצועי. כתוב/י לי סקר של חמש דקות לצוות המורים, שימפה באילו כלים דיגיטליים ו-AI הם משתמשים, כמה הם בטוחים בעצמם, מה עוצר אותם, ואיך הכי נוח להם ללמוד, כדי שאוכל לבנות לכל קבוצה ליווי שמתאים לה. עד 12 שאלות, רובן סגורות, שאלה פתוחה אחת בסוף. כלול/י שאלה על תחום ההוראה ושאלה על ותק, ושלוש שאלות שיעזרו לי למצוא שותפים: כמה פעמים משתמשים היום ב-AI, כמה מוכנים לנסות משהו חדש השנה (סולם 1 עד 5), ושדה רשות בסוף: "רוצה להיות בצוות הראשון שמנסה? השאר/י שם". חוץ מהשדה הזה, בלי שום פרט מזהה. כתוב/י ליד כל שאלה איזו החלטה היא תעזור לי לקבל.</div>
-      <button class="btn" type="button" data-copy="l1a">העתקה</button>
-      <p><b>2.</b> ב-<b>tally.so</b> (כניסה עם חשבון Google): טופס חדש ← מדביקים את השאלות. Tally יודע לבנות טופס מטקסט.</p>
-      <p><b>3.</b> כשיש תשובות: Tally ← Submissions ← Download CSV. <b>מוחקים מהקובץ את עמודת השמות</b>, ומעלים ל-Gemini עם:</p>
-      <div class="pr" id="l1b">מצורפות תשובות של סקר צוות המורים. סכם/י כל שאלה במשפט עם מספרים, חלק/י את המורים ל-3 קבוצות לפי מה שהם צריכים, וצייר/י גרף לכל שאלה סגורה. בנוסף: כמה מורים משתמשים ב-AI כל שבוע, וכמה סימנו 4 או 5 בנכונות לנסות. אל תוסיף/י נתון שלא מופיע בקובץ.</div>
-      <button class="btn" type="button" data-copy="l1b">העתקה</button>
-    </div>
-    <div data-m="2" hidden>
-      <p>ב-<b>gemini.google.com</b>, מדביקים. אחר כך: <b>script.new</b> ← מדביקים את הקוד ← Deploy ← Web app.</p>
-      <div class="pr" id="l2a">כתוב/י לי אפליקציית Google Apps Script לסקר אנונימי לצוות המורים, בשני קבצים: Code.gs ו-index.html.
-1. index.html: דף סקר בעברית, מימין לשמאל, נוח בטלפון, עם השאלות האלה: [הדבקה]. כפתור שליחה ותודה בסוף.
-2. Code.gs: doGet שמגיש את הדף, ופונקציה שכותבת כל תשובה לשורה בגיליון (הגיליון הוא בסיס הנתונים). ליצור את הגיליון בהרצה הראשונה.
-3. דשבורד: אם הכתובת נפתחת עם ?view=dash, להציג גרף עמודות לכל שאלה סגורה, שמתעדכן כל עשר שניות.
-בלי ספריות חיצוניות. הסבר/י לי בסוף, בצעדים קצרים, איך מפרסמים כ-Web app.</div>
-      <button class="btn" type="button" data-copy="l2a">העתקה</button>
-      <details class="code"><summary>נתקעת? קוד מוכן, רק להדביק</summary><p>הקוד המוכן נמצא בקובץ <b>תבנית-סקר-רמה-2</b> בתיקיית ההשתלמות. (ייבנה ויצורף אחרי שהאפליקציה של המפגש תאושר ותיבדק.)</p></details>
-    </div>
-    <div data-m="3" hidden>
-      <p>ממשיכים מרמה 2. מפתח חינמי: <b>aistudio.google.com</b> ← Get API key. שומרים אותו ב-Script Properties, לא בקוד.</p>
-      <div class="pr" id="l3a">יש לי אפליקציית Apps Script לסקר צוות (מצורף הקוד). הוסף/י לה:
-1. בכל תשובה חדשה, לשלוח את התשובה הפתוחה ל-Gemini API (המפתח ב-Script Properties בשם GEMINI_KEY) ולקבל נושא אחד מתוך רשימה קבועה: זמן, ציוד, ידע, מוטיבציה, אחר. לשמור אותו בעמודה.
-2. בדשבורד: סיכום של שלוש שורות שמתעדכן, שנכתב על ידי Gemini מכל התשובות הפתוחות.
-3. שאלת המשך: אחרי השאלה הפתוחה, להציג למורה שאלה אחת נוספת ש-Gemini מנסח לפי מה שהוא כתב.
-לטפל בשגיאות: אם Gemini לא עונה, הסקר ממשיך לעבוד בלי זה.</div>
-      <button class="btn" type="button" data-copy="l3a">העתקה</button>
-    </div>
-    <label class="fld" style="margin-top:14px"><span>הקישור לסקר שלי</span><small>קישור השליחה</small><input type="text" id="p-link" dir="ltr"></label>
+  <section class="blk" style="--c:#2B7A78"><h2><i>5</i>סקר לצוות שלך, ב-7 צעדים</h2>
+    <p>הסקר יבדוק שני דברים: מה מפריע לצוות, ומי מוכן/ה להתחיל ראשון/ה. עושים את זה יחד, צעד אחד בכל פעם: מיטל מראה על המסך, אתם עושים, ובסוף כל צעד לוחצים <b>"סיימתי"</b>. לא הצליח? לוחצים <b>"נתקעתי"</b>, ומישהו יגיע לעזור.</p>
+    <p class="priv"><b>פרטיות:</b> הסקר אנונימי, חוץ משדה שם אחד בסוף, והוא רשות. את התשובות ננתח יחד במפגש 2.</p>
+    <div class="stp7" data-n="1"><div class="sh"><i>1</i><b>נכנסים ל-Tally</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tally.so</text><text x="160" y="62" text-anchor="middle" font-size="15" font-weight="800" fill="#13234A">Tally</text><rect x="85" y="85" width="150" height="26" rx="8" fill="#fff" stroke="#C9D2DC"/><rect x="85" y="85" width="150" height="26" rx="8" fill="none"/><text x="160.0" y="102" text-anchor="middle" font-size="12" font-weight="700" fill="#13234A" direction="ltr">Continue with Google</text><rect x="80" y="80" width="160" height="36" rx="11" stroke="#C2620C" stroke-width="3" fill="none"/></svg><p>פותחים לשונית חדשה, כותבים <b dir="ltr">tally.so</b> ולוחצים <b dir="ltr">Continue with Google</b>. אפשר להיכנס עם החשבון של בית הספר או עם החשבון הפרטי.</p><p class="ok"><span>איך יודעים שהצלחתם:</span> רואים את המסך הראשי של Tally, ובו כפתור <b dir="ltr">New form</b>.</p><div class="sbtn"><button type="button" class="btn" data-done="1">סיימתי</button><button type="button" class="btn ghost" data-stuck="1">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="2"><div class="sh"><i>2</i><b>מבקשים מ-AI לבנות</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tally.so/dashboard</text><rect x="200" y="40" width="100" height="26" rx="8" fill="#13234A"/><text x="250.0" y="57" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" direction="ltr">+ New form</text><rect x="150" y="76" width="150" height="74" rx="10" fill="#fff" stroke="#C9D2DC"/><text x="285" y="98" text-anchor="end" font-size="11" fill="#5B6B82" direction="ltr">Start from scratch</text><rect x="160" y="112" width="130" height="26" rx="8" fill="#EAF2F9"/><text x="225.0" y="129" text-anchor="middle" font-size="12" font-weight="700" fill="#1E6FA5" direction="ltr">Create with AI</text><rect x="155" y="107" width="140" height="36" rx="11" stroke="#C2620C" stroke-width="3" fill="none"/></svg><p>לוחצים <b dir="ltr">New form</b>. בחלון שנפתח בוחרים <b dir="ltr">Create with AI</b>.</p><p class="ok"><span>איך יודעים שהצלחתם:</span> נפתחה תיבה ריקה לכתיבה.</p><div class="sbtn"><button type="button" class="btn" data-done="2">סיימתי</button><button type="button" class="btn ghost" data-stuck="2">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="3"><div class="sh"><i>3</i><b>מדביקים את הבקשה</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tally.so</text><rect x="20" y="40" width="280" height="80" rx="10" fill="#F8F7F5" stroke="#C9D2DC"/><rect x="110" y="52" width="180" height="7" rx="3.5" fill="#E3E8EE"/><rect x="110" y="66" width="140" height="7" rx="3.5" fill="#E3E8EE"/><rect x="110" y="80" width="180" height="7" rx="3.5" fill="#E3E8EE"/><rect x="110" y="94" width="140" height="7" rx="3.5" fill="#E3E8EE"/><text x="290" y="112" text-anchor="start" font-size="10" fill="#5B6B82">הבקשה מהדף המלווה</text><rect x="230" y="132" width="70" height="26" rx="8" fill="#13234A"/><text x="265.0" y="149" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" direction="ltr">Create</text><rect x="225" y="127" width="80" height="36" rx="11" stroke="#C2620C" stroke-width="3" fill="none"/></svg><p>מעתיקים את הבקשה שכאן למטה, מדביקים אותה בתיבה, ולוחצים על הכפתור שיוצר את הטופס. מחכים דקה.</p><div class="pr" id="l1a">אני רכז/ת תקשוב בתיכון מקצועי. בנה/י סקר קצר לצוות המורים, בעברית, עד 10 שאלות, שאפשר למלא ב-3 דקות. המטרה: להבין באילו כלים דיגיטליים ו-AI המורים משתמשים, מה עוצר אותם, ומי מוכן לנסות ראשון. רוב השאלות שאלות בחירה. חובה לכלול: תחום ההוראה; ותק בהוראה; כמה פעמים את/ה משתמש/ת ב-AI בעבודה (אף פעם / ניסיתי / כל שבוע / כל יום); כמה את/ה מוכן/ה לנסות משהו חדש השנה (סולם 1 עד 5); שאלה פתוחה אחת: מה הכי היה עוזר לך? ובסוף שדה רשות: "רוצה להיות בצוות הראשון שמנסה? השאר/י שם". בלי שאלות על שם, מייל או טלפון, חוץ מהשדה האחרון. כותרת הסקר: סקר קצר לצוות, 3 דקות.</div><button class="btn" type="button" data-copy="l1a">העתקת הבקשה</button><p class="ok"><span>איך יודעים שהצלחתם:</span> יש טופס בעברית, עם כותרת ושאלות.</p><div class="sbtn"><button type="button" class="btn" data-done="3">סיימתי</button><button type="button" class="btn ghost" data-stuck="3">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="4"><div class="sh"><i>4</i><b>בודקים ומתקנים</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tally.so</text><rect x="150" y="38" width="150" height="120" rx="8" fill="#F8F7F5"/><rect x="170" y="50" width="110" height="7" rx="3.5" fill="#E3E8EE"/><rect x="170" y="64" width="70" height="7" rx="3.5" fill="#E3E8EE"/><rect x="170" y="78" width="110" height="7" rx="3.5" fill="#E3E8EE"/><rect x="170" y="92" width="70" height="7" rx="3.5" fill="#E3E8EE"/><rect x="170" y="106" width="110" height="7" rx="3.5" fill="#E3E8EE"/><rect x="170" y="120" width="70" height="7" rx="3.5" fill="#E3E8EE"/><circle cx="128" cy="56" r="9" fill="#2F8F78"/><path d="M123 56 l4 4 l7 -8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><rect x="20" y="52" width="92" height="8" rx="4" fill="#E3E8EE"/><circle cx="128" cy="90" r="9" fill="#2F8F78"/><path d="M123 90 l4 4 l7 -8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><rect x="20" y="86" width="92" height="8" rx="4" fill="#E3E8EE"/><circle cx="128" cy="124" r="9" fill="#2F8F78"/><path d="M123 124 l4 4 l7 -8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><rect x="20" y="120" width="92" height="8" rx="4" fill="#E3E8EE"/></svg><p>עוברים על הטופס ובודקים שלושה דברים. מה שלא מתאים מתקנים: לוחצים על השאלה ומשנים, או לוחצים <b dir="ltr">Ask AI</b> וכותבים מה לשנות.</p><ul class="chk"><li>הסקר בעברית ומיושר לימין</li><li>אין שאלה שמזהה מורה, חוץ משדה השם הרשות בסוף</li><li>השאלות מתאימות לבית הספר שלי, למשל המגמות שיש אצלנו</li></ul><p class="ok"><span>איך יודעים שהצלחתם:</span> הטופס נראה כמו משהו שהייתי שולח/ת לצוות שלי.</p><div class="sbtn"><button type="button" class="btn" data-done="4">סיימתי</button><button type="button" class="btn ghost" data-stuck="4">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="5"><div class="sh"><i>5</i><b>מפרסמים ומעתיקים קישור</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tally.so</text><rect x="230" y="36" width="70" height="26" rx="8" fill="#13234A"/><text x="265.0" y="53" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" direction="ltr">Publish</text><rect x="225" y="31" width="80" height="36" rx="11" stroke="#C2620C" stroke-width="3" fill="none"/><rect x="20" y="90" width="280" height="34" rx="9" fill="#EAF2F9"/><text x="250" y="112" text-anchor="end" font-size="12" fill="#1E6FA5" direction="ltr">tally.so/r/abc123</text><rect x="34" y="94" width="44" height="26" rx="8" fill="#1E6FA5"/><text x="56.0" y="111" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" direction="ltr">Copy</text><rect x="29" y="89" width="54" height="36" rx="11" stroke="#C2620C" stroke-width="3" fill="none"/></svg><p>לוחצים <b dir="ltr">Publish</b> למעלה. מופיע קישור, ולוחצים <b dir="ltr">Copy</b>.</p><p class="ok"><span>איך יודעים שהצלחתם:</span> יש קישור שמתחיל ב-<b dir="ltr">tally.so/r/</b>.</p><div class="sbtn"><button type="button" class="btn" data-done="5">סיימתי</button><button type="button" class="btn ghost" data-stuck="5">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="6"><div class="sh"><i>6</i><b>ממלאים אחד לשני</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="34" y="14" width="86" height="146" rx="14" fill="#fff" stroke="#C9D2DC"/><rect x="44" y="34" width="66" height="8" rx="4" fill="#13234A"/><rect x="44" y="52" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="44" y="66" width="26" height="7" rx="3.5" fill="#E3E8EE"/><rect x="44" y="80" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="44" y="94" width="26" height="7" rx="3.5" fill="#E3E8EE"/><rect x="44" y="108" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="44" y="128" width="66" height="18" rx="6" fill="#1E6FA5"/><rect x="200" y="14" width="86" height="146" rx="14" fill="#fff" stroke="#C9D2DC"/><rect x="210" y="34" width="66" height="8" rx="4" fill="#13234A"/><rect x="210" y="52" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="210" y="66" width="26" height="7" rx="3.5" fill="#E3E8EE"/><rect x="210" y="80" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="210" y="94" width="26" height="7" rx="3.5" fill="#E3E8EE"/><rect x="210" y="108" width="66" height="7" rx="3.5" fill="#E3E8EE"/><rect x="210" y="128" width="66" height="18" rx="6" fill="#1E6FA5"/><path d="M128 70 C160 50 170 50 192 70" stroke="#C2620C" stroke-width="3" fill="none"/><path d="M186 62 l7 8 l-10 3" stroke="#C2620C" stroke-width="3" fill="none"/><path d="M192 110 C160 130 150 130 128 110" stroke="#C2620C" stroke-width="3" fill="none"/><path d="M134 118 l-7 -8 l10 -3" stroke="#C2620C" stroke-width="3" fill="none"/></svg><p>בחדר העבודה: שולחים את הקישור לבן/בת הזוג, וכל אחד ממלא את הסקר של השני.</p><p class="ok"><span>איך יודעים שהצלחתם:</span> ב-Tally, בלשונית <b dir="ltr">Submissions</b>, מופיעה תשובה אחת.</p><div class="sbtn"><button type="button" class="btn" data-done="6">סיימתי</button><button type="button" class="btn ghost" data-stuck="6">נתקעתי</button><span class="msg"></span></div></div>
+    <div class="stp7" data-n="7"><div class="sh"><i>7</i><b>שומרים את הקישור</b></div><svg class="ill" viewBox="0 0 320 170" aria-hidden="true"><rect x="1" y="1" width="318" height="168" rx="12" fill="#fff" stroke="#C9D2DC"/><rect x="1" y="1" width="318" height="26" rx="12" fill="#EEF2F6"/><rect x="1" y="16" width="318" height="11" fill="#EEF2F6"/><circle cx="16" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="28" cy="14" r="3.5" fill="#C9D2DC"/><circle cx="40" cy="14" r="3.5" fill="#C9D2DC"/><rect x="60" y="7" width="200" height="14" rx="7" fill="#fff"/><text x="160" y="18" text-anchor="middle" font-size="10" fill="#5B6B82" direction="ltr">tfasim.pedagogiamh.co.il/shagririm</text><text x="296" y="56" text-anchor="start" font-size="12" font-weight="700" fill="#13234A">הקישור לסקר שלי</text><rect x="20" y="66" width="280" height="30" rx="8" fill="#fff" stroke="#C9D2DC"/><text x="285" y="86" text-anchor="end" font-size="11" fill="#5B6B82" direction="ltr">tally.so/r/abc123</text><circle cx="40" cy="81" r="9" fill="#2F8F78"/><path d="M35 81 l4 4 l7 -8" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><p>מדביקים כאן את הקישור. הוא יישלח אליי יחד עם משימת השטח, בשלב 6.</p><label class="fld"><span>הקישור לסקר שלי</span><input type="text" data-k="f_survey" dir="ltr" placeholder="tally.so/r/..."></label><p class="ok"><span>איך יודעים שהצלחתם:</span> וי ירוק, וסיימתם. מחר שולחים את הקישור לצוות.</p><div class="sbtn"><button type="button" class="btn" data-done="7">סיימתי</button><button type="button" class="btn ghost" data-stuck="7">נתקעתי</button><span class="msg"></span></div></div>
   </section>
 
   <section class="blk" style="--c:#6B55B5"><h2><i>6</i>משימת שטח: שיחת תכנון עם המנהל/ת</h2>
@@ -807,6 +801,7 @@ function save(){try{localStorage.setItem('shag-m1-v5',JSON.stringify(st))}catch(
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 
 var GEO={"schools": [[367.9, 462.6], [365.0, 459.8], [369.8, 441.9], [371.8, 471.8], [328.7, 349.9], [346.3, 297.0], [324.7, 230.3], [389.4, 255.6], [385.5, 214.2], [385.5, 188.9], [362.0, 195.8], [399.3, 232.6], [358.1, 193.5], [385.5, 251.0], [367.9, 193.5], [369.8, 232.6], [475.7, 129.1], [379.6, 182.0], [277.7, 552.3], [364.0, 462.6], [269.8, 460.3], [281.6, 501.7], [368.2, 466.7], [242.4, 487.9], [462.0, 184.3], [424.7, 191.2], [409.1, 246.4], [421.9, 188.4], [313.0, 423.5], [411.0, 184.3], [301.2, 405.1], [360.0, 191.2], [356.1, 292.4], [311.0, 310.8], [316.9, 280.9], [406.2, 243.6], [321.8, 227.5], [325.1, 234.4], [430.6, 230.3], [385.5, 264.8], [279.6, 400.5], [342.4, 221.1], [350.2, 188.9], [275.7, 439.6], [287.5, 451.1], [328.7, 435.0], [283.5, 393.6], [258.1, 458.0], [316.9, 412.0], [285.5, 584.5], [283.5, 467.2], [277.7, 474.1], [332.6, 625.9], [305.1, 377.5], [353.2, 289.6], [287.5, 731.7], [385.5, 200.4], [360.0, 225.7], [414.9, 455.7], [370.3, 459.3], [313.0, 598.3], [301.2, 568.4], [382.6, 211.4], [295.3, 596.0]], "outline": [[347.3, 160.6], [385.5, 159.0], [424.7, 163.6], [440.4, 117.6], [479.7, 106.1], [493.4, 124.5], [499.3, 193.5], [479.7, 251.0], [438.5, 269.4], [434.6, 320.0], [428.7, 412.0], [434.6, 464.9], [440.4, 538.5], [414.9, 630.5], [365.9, 734.0], [356.1, 826.0], [322.8, 975.5], [307.1, 987.0], [258.1, 872.0], [232.6, 757.0], [209.0, 665.0], [183.5, 591.4], [173.7, 568.4], [218.8, 515.5], [238.4, 487.9], [254.1, 458.0], [277.7, 400.5], [295.3, 343.0], [303.2, 297.0], [314.9, 251.0], [320.8, 221.1], [342.4, 216.5], [340.4, 198.1]]};
+var STEPN=["נכנסים ל-Tally", "New form ואז Create with AI", "מדביקים את הבקשה", "בודקים ומתקנים", "Publish ומעתיקים קישור", "ממלאים אחד לשני", "הקישור בדף המלווה"];
 var TOPIC_MAP={"בינה מלאכותית להכנת חומרי למידה": {"k": 2, "h": null}, "הערכה ומשוב דיגיטליים": {"k": 4, "h": null}, "יצירת תוכן: מצגות, סרטונים וחידונים": {"k": 5, "h": 8}, "שימוש בטוח ומדיניות AI": {"k": 6, "h": 4}, "הדרכת הצוות": {"k": 9, "h": 2}, "נתונים ומעקב": {"k": null, "h": 5}, "סדר בענן ותקלות שחוזרות": {"k": 7, "h": 7}, "כלים מתקדמים ואוטומציות": {"k": 8, "h": 8}};
 var PT=['סקר שבונים עם AI','AI מנתח את הנתונים','עוזר שלומד מהמסמכים','מתרגלים מול בוט','בוטים ואוטומציות','AI בכיתה','ידע שאפשר לשאול','המקצוע בעידן ה-AI','אמנת AI וסרטון לצוות','מה השתנה בנתונים'],
  TOOL={k:['Gemini + Tally','Gemini · גרפים','NotebookLM','Gem מורה מתנגד','Gems · Apps Script','Gemini Canvas','NotebookLM','מחקר עומק ב-Gemini','NotebookLM · Canva','לפני ואחרי'],h:['Gemini + Apps Script','Gemini · לוח מחוונים','NotebookLM','Gem מורה מתנגד','Apps Script','Gemini Canvas','AI Studio · NotebookLM','מחקר עומק · AI Studio','NotebookLM · Canva','לפני ואחרי']},
@@ -867,7 +862,7 @@ var DEMO_DATA={n:27,q:{computers:{'כמעט אין':6,'עד 10':9,'11 עד 30':8
  pains:{'אין לי זמן':15,'הצוות לא משתמש בכלים':12,'חסר ציוד או חיבור':10,'אותן תקלות חוזרות':7,'אין תוכנית או כיוון מההנהלה':6,'קשה להתעדכן בכלים החדשים':4},
  topics:{'בינה מלאכותית להכנת חומרי למידה':14,'הדרכת הצוות':11,'כלים מתקדמים ואוטומציות':9,'שימוש בטוח ומדיניות AI':6,'הערכה ומשוב דיגיטליים':5,'נתונים ומעקב':4,'יצירת תוכן: מצגות, סרטונים וחידונים':3,'סדר בענן ותקלות שחוזרות':2}},
  intro:{arch:{'הכבאי/ת':11,'הממציא/ה':7,'המורה של המורים':6,'המסדר/ת':4},cards:[{name:'רוני',arch:'הכבאי/ת',fav:'Canva',funny:'המקרן "לא עבד" כי לא היה מחובר לחשמל'},{name:'סמאח',arch:'הממציא/ה',fav:'Gemini',funny:'מורה שהדפיסה את כל האינטרנט'},{name:'דני',arch:'המסדר/ת',fav:'Drive',funny:'שלוש תיקיות בשם "חדש חדש סופי"'},{name:'אורית',arch:'המורה של המורים',fav:'Padlet',funny:'הסיסמה הייתה כתובה על המקרן'}]},
- pain:['מקרן','סיסמאות','המדפסת','Wi-Fi','מקרן','שכחתי סיסמה','מחשבים','מקרן','המייל'],missing:['כמה מחשבים יש לנו באמת','שחצי מהצוות לא ישתמש','מה המנהלת רוצה','שאין Wi-Fi בקומה 2','שכבר ניסינו פעם ונכשל'],wishes:[]};
+ a:{step:['7','7','6','5','5','5','4','4','3','3','3','2','2','1'],stuck:['3|רוני','5|סמאח']},pain:['מקרן','סיסמאות','המדפסת','Wi-Fi','מקרן','שכחתי סיסמה','מחשבים','מקרן','המייל'],missing:['כמה מחשבים יש לנו באמת','שחצי מהצוות לא ישתמש','מה המנהלת רוצה','שאין Wi-Fi בקומה 2','שכבר ניסינו פעם ונכשל'],wishes:[]};
 function setLive(ok){liveOn=ok;var l=$('#live');l.classList.toggle('on',ok||DEMO);l.lastChild.textContent=DEMO?'הדגמה':(ok?'מחובר':'לא מחובר')}
 function poll(){if(DEMO){DATA=DEMO_DATA;renderLive();setLive(false);return}
  fetch(API+'?api=data&t='+st.t+'&s=1').then(function(r){return r.json()}).then(function(d){DATA=d;setLive(true);renderLive()}).catch(function(){setLive(false);renderLive()})}
@@ -879,6 +874,9 @@ function renderLive(){var s=S[st.i];if(!s)return;var kind=s.dataset.live,d=DATA|
   $('#w-pain').innerHTML=ks.length?ks.slice(0,24).map(function(w){return '<span style="--fs:'+(26+Math.min(5,cnt[w]-1)*10)+'px">'+esc(w)+'</span>'}).join(''):'<span style="background:none;border:0;color:var(--mist);font-weight:400">התשובות יופיעו כאן.</span>'}
  if(kind==='missing')$('#w-missing').innerHTML=(d.missing||[]).length?d.missing.slice(-12).map(function(w){return '<div class="it">'+esc(w)+'</div>'}).join(''):'<p class="empty">התשובות יופיעו כאן.</p>';
  if(kind==='n')$('#n-live').textContent=d.n||0;
+ if(kind==='steps'){var A=d.a||{},sv=(A.step||[]).map(Number),sk=(A.stuck||[]).filter(Boolean),tot=Math.max(1,(d.intro&&d.intro.cards?d.intro.cards.length:0),sv.length);
+  $('#w-steps').innerHTML=STEPN.map(function(nm,i){var n=i+1,c=sv.filter(function(x){return x>=n}).length,who=sk.filter(function(x){return +String(x).split('|')[0]===n}).map(function(x){return String(x).split('|').slice(1).join('|')});
+   return '<div class="t7"><span>'+n+'. '+esc(nm)+'</span><div class="tb"><i style="width:'+(c/tot*100)+'%"></i></div><b>'+c+'</b>'+(who.length?'<div class="stk">'+who.map(function(w){return '<span>'+esc(w)+'</span>'}).join('')+'</div>':'')+'</div>'}).join('')}
  if(kind==='bars'){var Qs=[['computers','מחשבים לתלמידים','var(--c-blue)'],['wifi','Wi-Fi בכיתות','var(--c-blue)'],['ai','שימוש ב-AI','var(--c-deep)'],['pains','מה הכי כואב','var(--c-ember)']];
   $('#w-bars').innerHTML=Qs.map(function(q){var o=(d.q||{})[q[0]]||{},ks=Object.keys(o).sort(function(a,b){return o[b]-o[a]}).slice(0,5),mx=Math.max.apply(null,[1].concat(ks.map(function(k){return o[k]})));
    return '<section><h4>'+q[1]+'</h4>'+(ks.length?ks.map(function(k){return '<div class="br" style="--c:'+q[2]+'"><span>'+esc(k)+'</span><i style="width:'+(o[k]/mx*100)+'%"></i><b>'+o[k]+'</b></div>'}).join(''):'<p style="color:var(--mist);font-size:24px">עוד אין תשובות</p>')+'</section>'}).join('')}
@@ -917,7 +915,7 @@ window.addEventListener('resize',fit);
 /* ---------- דף מלווה ---------- */
 $$('.opts').forEach(function(box){var q=box.dataset.q,multi=+box.dataset.multi||0;box.innerHTML=box.dataset.opts.split('|').map(function(o,i){return '<label><input type="'+(multi?'checkbox':'radio')+'" name="q-'+q+'" value="'+esc(o)+'">'+esc(o)+'</label>'}).join('');
  if(multi)box.addEventListener('change',function(e){var on=$$('input:checked',box);if(on.length>multi)e.target.checked=false})});
-function post(body,btn){var m=btn.nextElementSibling;body.track=st.t;body.s=1;btn.disabled=true;
+function post(body,btn){var m=btn.parentNode.querySelector('.msg')||btn.nextElementSibling;body.track=st.t;body.s=1;btn.disabled=true;
  if(DEMO){btn.classList.add('sent');m.textContent='נשלח (הדגמה)';btn.disabled=false;return}
  fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(){btn.classList.add('sent');m.textContent='נשלח. אפשר לשנות ולשלוח שוב.'}).catch(function(){m.textContent='לא נשלח. בדקו חיבור ונסו שוב.'}).finally(function(){btn.disabled=false})}
 function val(id){return ($('#'+id)||{}).value||''}
@@ -926,16 +924,21 @@ $$('[data-send]').forEach(function(b){b.onclick=function(){var k=b.dataset.send,
  if(k==='intro'){var a=($('[name=arch]:checked')||{}).value;if(!a||!val('i-name')){m.textContent='צריך לבחור דמות ולכתוב שם פרטי';return}post({kind:'answer',cid:CID,key:'intro',value:{name:val('i-name'),arch:a,fav:val('i-fav'),funny:val('i-funny')}},b)}
  else if(k==='survey'){var need=['computers','wifi','cloud','ai'].filter(function(q){return !pick(q).length});if(need.length){m.textContent='חסרות תשובות בשאלות הבחירה';return}
   post({kind:'survey',computers:pick('computers')[0],wifi:pick('wifi')[0],cloud:pick('cloud')[0],ai:pick('ai')[0],pains:pick('pains'),topics:pick('topics'),wish:val('s-wish')},b)}
- else if(k==='field'){var F={},kv=function(x){return (st.v[st.t+':f_'+x]||'').trim()};['name','school','date','time','megama','team','success','start','slot','more'].forEach(function(x){F[x]=kv(x)});
+ else if(k==='field'){var F={},kv=function(x){return (st.v[st.t+':f_'+x]||'').trim()};['name','school','date','time','megama','team','success','start','slot','more','survey'].forEach(function(x){F[x]=kv(x)});
   if(!F.name||!F.school){m.textContent='צריך שם מלא ובית ספר';return}if(!F.success){m.textContent='חסרה התשובה לשאלה 4, מה ייחשב הצלחה';return}
   post({kind:'field',cid:CID,value:F},b)}
  else{var v=val('a-'+k);if(!v.trim()){m.textContent='אפשר לכתוב מילה אחת';return}post({kind:'answer',cid:CID,key:k,value:v},b)}}});
+$$('[data-done]').forEach(function(b){b.onclick=function(){var n=+b.dataset.done,k=st.t+':step';st.v[k]=Math.max(+st.v[k]||0,n);save();markSteps();
+  post({kind:'answer',cid:CID,key:'step',value:String(st.v[k])},b);if(+st.v[st.t+':stuck']===n){st.v[st.t+':stuck']='';save();post({kind:'answer',cid:CID,key:'stuck',value:''},b)}}});
+$$('[data-stuck]').forEach(function(b){b.onclick=function(){var n=+b.dataset.stuck,nm=(val('i-name')||'').trim()||'בלי שם';st.v[st.t+':stuck']=n;save();
+  post({kind:'answer',cid:CID,key:'stuck',value:n+'|'+nm},b);setTimeout(function(){b.parentNode.querySelector('.msg').textContent='קיבלתי. מישהו יגיע לעזור. בינתיים אפשר לנסות שוב.'},400)}});
+function markSteps(){var d=+st.v[st.t+':step']||0;$$('.stp7').forEach(function(e){e.classList.toggle('done',+e.dataset.n<=d)})}
 $$('[data-copy]').forEach(function(b){b.onclick=function(){var t=document.getElementById(b.dataset.copy).innerText,o=b.textContent;if(navigator.clipboard)navigator.clipboard.writeText(t).then(function(){b.textContent='הועתק';setTimeout(function(){b.textContent=o},1500)})}});
 function loadK(){$$('#comp [data-k]').forEach(function(e){var v=st.v[st.t+':'+e.dataset.k];e.value=v===undefined?'':v})}
 $$('#comp [data-k]').forEach(function(e){var h=function(){st.v[st.t+':'+e.dataset.k]=e.value;save()};e.addEventListener('input',h);e.addEventListener('change',h)});
 
 /* ---------- מתגים ---------- */
-function applyT(){$$('[data-t]').forEach(function(e){e.hidden=e.dataset.t!==st.t});loadK();$$('#trk button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===st.t))})}
+function applyT(){$$('[data-t]').forEach(function(e){e.hidden=e.dataset.t!==st.t});loadK();markSteps();$$('#trk button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===st.t))})}
 function applyM(){$$('#modes button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===st.m))});$$('[data-m]').forEach(function(e){e.hidden=e.dataset.m!==st.m})}
 function applyTab(){$('#deck').hidden=st.tab!=='deck';$('#comp').hidden=st.tab!=='comp';$$('#tab button').forEach(function(b){b.setAttribute('aria-pressed',String(b.dataset.v===st.tab))});if(st.tab==='deck'){fit();go(st.i)}}
 $$('#trk button').forEach(function(b){b.onclick=function(){st.t=b.dataset.v;applyT();go(st.i)}});
