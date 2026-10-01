@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>שאלון לצוות · שגרירי חדשנות</title>
+<!--
+  השאלון למורה. נטען מהאתר ולא משרת Apps Script, ולכן נפתח מיד.
+  השליחה יוצאת ברקע: המורה רואה "תודה" מיד, והתשובה נשמרת בתור מקומי עד שהשרת מאשר.
+  ?s=<קוד בית ספר>  ·  &lang=ar  ·  &test=1 (בדיקה של הרכז/ת, לא נספרת)
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="mipui.css">
+</head>
+<body>
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+</svg>
+
+<div class="qwrap">
+  <div class="qtop">
+    <img src="../assets/logo-kehila.png" alt="שגרירי חדשנות טכנולוגית">
+    <div class="sch"><b id="schName"></b><span id="schSub"></span></div>
+    <button class="lang" id="langBtn" type="button"><svg class="i" style="width:16px;height:16px"><use href="#i-globe"/></svg><span></span></button>
+  </div>
+  <div id="app" style="flex:1;display:flex;flex-direction:column"></div>
+</div>
+
+<footer class="mf">
+  <img src="../assets/logo-minhal.png" alt="משרד העבודה · המנהל להכשרה מקצועית">
+  <div>שגרירי חדשנות טכנולוגית · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</footer>
+
+<script src="schools.js"></script>
+<script src="survey.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  var P = new URLSearchParams(location.search);
+  var S = P.get('s') || '';
+  var TEST = P.get('test') === '1';
+  var SV = MIPUI_SURVEY;
+  var lang = P.get('lang') === 'ar' ? 'ar' : (mStore('mipui_lang') || 'he');
+  var DONE_KEY = 'mipui_done_' + S + '_' + SV.id;
+  var QKEY = 'mipui_queue';
+  var app = document.getElementById('app');
+  var answers = {};
+  var idx = -1; // -1 = מסך פתיחה
+
+  var T = {
+    he: { lang: 'العربية', sub: 'שאלון לצוות', start: 'מתחילים', next: 'הבא', back: 'חזרה', finish: 'שליחה', skip: 'דילוג',
+          min: 'כ-4 דקות', priv: 'חסוי', q: 'שאלה', of: 'מתוך', pick: 'בחרו עד', thanks: 'תודה!',
+          thanksP: 'התשובות שלך יעזרו לבנות לצוות שלנו למידה שמתאימה לו באמת.',
+          peekT: 'מה ענה הצוות עד עכשיו', peekN: function (n) { return n + ' אנשי צוות כבר ענו.'; },
+          peekW: function (p) { return p + '% משתמשים ב-AI לפחות פעם בשבוע.'; }, peekB: 'המעכב הנפוץ: ',
+          again: 'כבר מילאת את השאלון מהמכשיר הזה. תודה!', againBtn: 'מילוי נוסף (מכשיר משותף)',
+          bad: 'הקישור לא שלם. בקשו מרכז/ת החדשנות את הקישור של בית הספר.',
+          test: 'מצב בדיקה: התשובה לא תיספר בתוצאות של הצוות.', name: 'שם (לא חובה)', write: 'כתבו כאן…' },
+    ar: { lang: 'עברית', sub: 'استبيان للطاقم', start: 'نبدأ', next: 'التالي', back: 'رجوع', finish: 'إرسال', skip: 'تخطي',
+          min: 'حوالي 4 دقائق', priv: 'سري', q: 'سؤال', of: 'من', pick: 'اختاروا حتى', thanks: 'شكرًا!',
+          thanksP: 'إجاباتك ستساعد في بناء تعلم يلائم طاقمنا حقًا.',
+          peekT: 'ماذا أجاب الطاقم حتى الآن', peekN: function (n) { return n + ' من أعضاء الطاقم أجابوا.'; },
+          peekW: function (p) { return p + '% يستخدمون الذكاء الاصطناعي مرة في الأسبوع على الأقل.'; }, peekB: 'العائق الأكثر شيوعًا: ',
+          again: 'لقد ملأت الاستبيان من هذا الجهاز. شكرًا!', againBtn: 'تعبئة إضافية (جهاز مشترك)',
+          bad: 'الرابط غير مكتمل. اطلبوا من منسق/ة التجديد رابط المدرسة.',
+          test: 'وضع تجربة: الإجابة لن تُحسب في نتائج الطاقم.', name: 'الاسم (ليس إلزاميًا)', write: 'اكتبوا هنا…' }
+  };
+  function t(k) { return T[lang][k]; }
+  // מקף לא נשבר לפני AI, שלא יישאר "ב-" לבד בסוף שורה
+  function L(o) { return o ? String(o[lang] || o.he).replace(/-AI/g, '‑AI') : ''; }
+
+  function visible() {
+    return SV.questions.filter(function (q) {
+      if (!q.skipIf) return true;
+      return !Object.keys(q.skipIf).some(function (k) { return answers[k] === q.skipIf[k]; });
+    });
+  }
+
+  function header() {
+    document.documentElement.lang = lang === 'ar' ? 'ar' : 'he';
+    document.querySelector('#langBtn span').textContent = t('lang');
+    document.getElementById('schName').textContent = MIPUI_SCHOOLS[S] || '';
+    document.getElementById('schSub').textContent = t('sub');
+    document.title = L(SV.title);
+  }
+
+  function render() {
+    header();
+    if (!MIPUI_SCHOOLS[S]) { app.innerHTML = '<div class="qstart"><p class="err">' + t('bad') + '</p></div>'; return; }
+    if (idx === -1) return renderStart();
+    var qs = visible();
+    if (idx >= qs.length) return renderDone();
+    renderQ(qs[idx], qs);
+  }
+
+  function renderStart() {
+    if (!TEST && mStore(DONE_KEY)) {
+      app.innerHTML = '<div class="qstart" style="text-align:center"><div class="done-ic"><svg class="i"><use href="#i-check"/></svg></div>' +
+        '<p>' + t('again') + '</p><div><button class="btn sm" id="againB">' + t('againBtn') + '</button></div></div>';
+      document.getElementById('againB').onclick = function () { mStore(DONE_KEY, null); render(); };
+      return;
+    }
+    app.innerHTML = '<div class="qstart"><h1>' + mEsc(L(SV.title)) + '</h1><p>' + mEsc(L(SV.intro)) + '</p>' +
+      '<div class="meta"><span><svg class="i"><use href="#i-clock"/></svg>' + t('min') + '</span><span><svg class="i"><use href="#i-lock"/></svg>' + t('priv') + '</span></div>' +
+      (TEST ? '<div class="testbar">' + t('test') + '</div>' : '') +
+      '<div><button class="btn pri" id="go" style="min-width:180px">' + t('start') + '</button></div></div>';
+    document.getElementById('go').onclick = function () { idx = 0; render(); };
+  }
+
+  function stories(qs) {
+    return '<div class="stories">' + qs.map(function (_, i) { return '<i class="' + (i <= idx ? 'f' : '') + '"></i>'; }).join('') + '</div>' +
+      '<div class="qcount">' + t('q') + ' ' + (idx + 1) + ' ' + t('of') + ' ' + qs.length + '</div>';
+  }
+
+  function canNext(q) {
+    var v = answers[q.id];
+    if (q.optional) return true;
+    if (q.type === 'many') return Array.isArray(v) && v.length > 0;
+    if (q.type === 'text') return !!(v && v.trim().length >= 2);
+    return v != null && v !== '';
+  }
+
+  function go(d) {
+    idx += d;
+    if (idx < -1) idx = -1;
+    render();
+    window.scrollTo(0, 0);
+  }
+
+  function renderQ(q, qs) {
+    var h = stories(qs) + '<div class="qbody"><div class="qq" id="qh">' + mEsc(L(q.q)) + '</div>';
+    if (q.hint) h += '<div class="qhint">' + mEsc(L(q.hint)) + '</div>';
+    var v = answers[q.id];
+    if (q.type === 'one' || q.type === 'many') {
+      var multi = q.type === 'many';
+      var sel = multi ? (v || []) : v;
+      h += '<div role="' + (multi ? 'group' : 'radiogroup') + '" aria-labelledby="qh" style="display:flex;flex-direction:column;gap:8px">';
+      q.opts.forEach(function (o) {
+        var on = multi ? sel.indexOf(o.id) > -1 : sel === o.id;
+        var dim = multi && !on && sel.length >= q.max;
+        h += '<button type="button" class="opt' + (multi ? ' multi' : '') + (on ? ' on' : '') + (dim ? ' dim' : '') + '" data-o="' + o.id + '" role="' + (multi ? 'checkbox' : 'radio') + '" aria-checked="' + on + '"><span class="mk"></span><span>' + mEsc(L(o)) + '</span></button>';
+      });
+      h += '</div>';
+    } else if (q.type === 'scale') {
+      h += '<div class="scale" role="radiogroup" aria-labelledby="qh">' + [1, 2, 3, 4, 5].map(function (n) {
+        return '<button type="button" data-n="' + n + '" class="' + (v === n ? 'on' : '') + '" role="radio" aria-checked="' + (v === n) + '">' + n + '</button>';
+      }).join('') + '</div><div class="scale-ends"><span>1 · ' + mEsc(q.ends[lang][0]) + '</span><span>5 · ' + mEsc(q.ends[lang][1]) + '</span></div>';
+    } else if (q.type === 'text') {
+      h += '<textarea class="qt" id="tx" maxlength="1500" placeholder="' + t('write') + '" aria-labelledby="qh">' + mEsc(v || '') + '</textarea>';
+    } else if (q.type === 'name') {
+      h += '<input class="qt" id="tx" maxlength="80" autocomplete="name" placeholder="' + t('name') + '" aria-labelledby="qh" value="' + mEsc(v || '') + '">';
+    }
+    h += '</div>';
+    var last = idx === qs.length - 1;
+    h += '<div class="qnav"><button type="button" class="btn" id="bk"><svg class="i"><use href="#i-back"/></svg>' + t('back') + '</button>' +
+      '<button type="button" class="btn pri" id="nx">' + (last ? t('finish') : (q.optional && !answers[q.id] ? t('skip') : t('next'))) + '</button></div>';
+    app.innerHTML = h;
+
+    var nx = document.getElementById('nx');
+    nx.disabled = !canNext(q);
+    document.getElementById('bk').onclick = function () { go(-1); };
+    nx.onclick = function () { if (canNext(q)) go(1); };
+
+    app.querySelectorAll('.opt').forEach(function (b) {
+      b.onclick = function () {
+        var id = b.getAttribute('data-o');
+        if (q.type === 'one') {
+          answers[q.id] = id;
+          render();
+          setTimeout(function () { if (visible()[idx] === q) go(1); }, 260);
+        } else {
+          var cur = (answers[q.id] || []).slice();
+          var opt = q.opts.filter(function (o) { return o.id === id; })[0];
+          var i = cur.indexOf(id);
+          if (i > -1) cur.splice(i, 1);
+          else if (opt.solo) cur = [id];
+          else {
+            cur = cur.filter(function (x) { return !q.opts.some(function (o) { return o.id === x && o.solo; }); });
+            if (cur.length < q.max) cur.push(id);
+          }
+          answers[q.id] = cur;
+          render();
+        }
+      };
+    });
+    app.querySelectorAll('.scale button').forEach(function (b) {
+      b.onclick = function () {
+        answers[q.id] = Number(b.getAttribute('data-n'));
+        render();
+        setTimeout(function () { if (visible()[idx] === q) go(1); }, 260);
+      };
+    });
+    var tx = document.getElementById('tx');
+    if (tx) {
+      tx.oninput = function () {
+        answers[q.id] = tx.value;
+        nx.disabled = !canNext(q);
+        if (q.optional && !last) nx.textContent = tx.value.trim() ? t('next') : t('skip');
+      };
+    }
+  }
+
+  /* ---------- שליחה ברקע ---------- */
+  function queue() { return mStore(QKEY) || []; }
+  function flush() {
+    var q = queue();
+    if (!q.length) return;
+    var item = q[0];
+    mPost(item).then(function (r) {
+      if (r && r.ok) { mStore(QKEY, queue().filter(function (x) { return x.rid !== item.rid; })); flush(); }
+      else if (r && (r.error === 'school' || r.error === 'rid')) { mStore(QKEY, queue().filter(function (x) { return x.rid !== item.rid; })); }
+      else setTimeout(flush, 4000);
+    }).catch(function () { setTimeout(flush, 6000); });
+  }
+
+  function renderDone() {
+    if (!answers.__sent) {
+      var a = {};
+      visible().forEach(function (q) { var v = answers[q.id]; if (v != null && v !== '') a[q.id] = typeof v === 'string' ? v.trim() : v; });
+      var item = { action: 'answer', s: S, rid: mRid(), lang: lang, a: a };
+      if (TEST) item.test = 1;
+      mStore(QKEY, queue().concat([item]));
+      if (!TEST) mStore(DONE_KEY, 1);
+      answers.__sent = 1;
+      flush();
+    }
+    var first = (answers.first || '').trim().split(/\s+/)[0];
+    app.innerHTML = '<div class="qstart" style="text-align:center"><div class="done-ic"><svg class="i"><use href="#i-check"/></svg></div>' +
+      '<h1>' + t('thanks') + (first && lang === 'he' ? ' ' + mEsc(first) + '!' : '') + '</h1><p>' + t('thanksP') + '</p>' +
+      (TEST ? '<div class="testbar">' + t('test') + '</div>' : '') + '<div id="peek"></div></div>';
+    mGet({ action: 'peek', s: S }, 15000).then(function (r) {
+      if (!r || !r.ok || r.n < 3) return;
+      var blk = SV.questions.filter(function (q) { return q.id === 'block'; })[0].opts.filter(function (o) { return o.id === r.topBlock; })[0];
+      document.getElementById('peek').innerHTML = '<div class="peek"><b>' + t('peekT') + '</b>' + t('peekN')(r.n) + '<br>' +
+        t('peekW')(Math.round(r.weekly / r.n * 100)) + (blk ? '<br>' + t('peekB') + mEsc(L(blk)) : '') + '</div>';
+    }).catch(function () {});
+  }
+
+  document.getElementById('langBtn').onclick = function () {
+    lang = lang === 'he' ? 'ar' : 'he';
+    mStore('mipui_lang', lang);
+    render();
+  };
+
+  flush();
+  render();
+})();
+</script>
+</body>
+</html>
