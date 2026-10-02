@@ -55,7 +55,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 (function () {
+  // המפתח נשמר בדפדפן, כדי שאפשר יהיה לחזור לדף בלי הקישור (למשל מהתפריט של סביבת הלמידה)
   var K = new URLSearchParams(location.search).get('k') || '';
+  if (K) mStore('mipui_k', K); else K = mStore('mipui_k') || '';
   var main = document.getElementById('main');
   var SV = MIPUI_SURVEY;
   var Q = {}; SV.questions.forEach(function (q) { Q[q.id] = q; });
@@ -485,7 +487,7 @@
   var meC = mStore('mipui_me_' + K);
   if (meC && meC.s) renderCoord(meC);
   mGet({ action: 'me', k: K }).then(function (r) {
-    if (!r.ok) { mStore('mipui_me_' + K, null); renderEntry('הקישור לא מוכר. אפשר לבקש קישור חדש למייל.'); return; }
+    if (!r.ok) { mStore('mipui_me_' + K, null); mStore('mipui_k', null); renderEntry('הקישור לא מוכר. אפשר לבקש קישור חדש למייל.'); return; }
     var S0 = new URLSearchParams(location.search).get('s');
     if (r.admin && S0 && MIPUI_SCHOOLS[S0]) { renderCoord({ name: 'מיטל', s: S0, school: MIPUI_SCHOOLS[S0] }); return; }
     if (r.admin) { renderAdmin(); return; }
