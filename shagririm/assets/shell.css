@@ -211,3 +211,16 @@
   .v2-seg { width: 100%; }
   .v2-seg button { flex: 1; padding: 7px 8px; }
 }
+
+/* אימות פרטים בכניסה (verify.js, 3.10.26) */
+#v2-verify:empty { display: none; }
+#v2-verify { margin-bottom: 16px; }
+.vf { border: 2px solid var(--orange-2, #E08A3C); }
+.vf h2 { margin: 0 0 6px; font-size: 21px; }
+.vf-lead { margin: 0 0 14px; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+.vf-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.vf-grid label { display: grid; gap: 6px; font-size: 13.5px; font-weight: 700; color: var(--ink); }
+.vf-grid input, .vf-grid select { font: inherit; font-weight: 400; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: #fff; min-width: 0; }
+.vf-err { color: #A33; font-weight: 700; margin: 0 0 10px; }
+.vf-done { background: var(--blue-soft); border-color: transparent; font-size: 15px; }
+@media (max-width: 760px) { .vf-grid { grid-template-columns: 1fr; } }

@@ -250,3 +250,13 @@ body.t-viewer .adm .a-elnet #e-admin-tools { display: none !important; }
 #a-mlist > li > button > span:not(.v2-st) { display: none; }
 #a-mlist > li > button[aria-current="true"] { background: var(--blue-soft, #E3EEF6); }
 #a-mlist .a-mempty { grid-column: 1 / -1; }
+
+/* נתוני הבסיס · אימות פרטים ובקשות הצטרפות (3.10.26) */
+.adm .a-prof .a-kpis { margin: 12px 0 16px; }
+.adm .a-plist2 { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 8px; }
+.adm .a-plist2 > li { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  border: 1px solid var(--line); border-radius: 14px; padding: 10px 14px; background: #fff; }
+.adm .a-diff { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.adm .a-newjoin { background: var(--ok-soft); border-radius: 14px; padding: 12px 14px; margin: 0 0 16px; }
+.adm .a-newjoin .a-in { min-width: min(100%, 420px); }
+.adm .a-todo { line-height: 1.9; margin: 8px 0 12px; }

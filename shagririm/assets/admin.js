@@ -853,12 +853,13 @@
       }).catch(function () { A.peopleBusy = false; A.people = { error: "אין חיבור לשרת" }; if (A.view === "people") renderPeople(); });
     }
     var P = A.people, tr = track(), host = el("a-plist");
-    var h = '<div class="a-head"><p class="v2-eyebrow">מסלול ' + esc(tr) + "</p><h2>משתתפים וזכאות</h2></div>";
+    var h = '<div class="a-head"><p class="v2-eyebrow">מסלול ' + esc(tr) + "</p><h2>נתוני הבסיס</h2></div>";
     if (!P) { host.innerHTML = h + '<div class="v2-card"><p class="v2-note" style="margin:0">טוען…</p></div>'; return; }
     if (P.error) { host.innerHTML = h + '<div class="v2-card"><p class="v2-note bad" style="margin:0">' + esc(P.error) + "</p></div>"; return; }
     var t = null;
     for (var i = 0; i < P.tracks.length; i++) if (P.tracks[i].track === tr) t = P.tracks[i];
     if (!t) { host.innerHTML = h; return; }
+    h += profPanel(tr);
     var all = P.tracks.reduce(function (a, x) { return a + x.rows.length; }, 0);
     var inAll = P.tracks.reduce(function (a, x) { return a + x.rows.filter(function (r) { return str(r.lastLogin); }).length; }, 0);
     var never = t.rows.filter(function (r) { return !str(r.lastLogin); });
@@ -876,6 +877,97 @@
       }).join("") + "</tbody></table></div></div>" +
       '<p class="v2-eyebrow a-elh">מסך אלנט · כמו שאלנט רואה אותו</p>';
     host.innerHTML = h;
+  }
+
+  /* ---- אימות פרטים ובקשות הצטרפות (3.10.26, Profile.source.txt) ---- */
+  var JOIN_URL = "https://tfasim.pedagogiamh.co.il/shagririm/hitztarfut.html";
+  var ADVA_URL = "https://tfasim.pedagogiamh.co.il/shagririm/?t=";
+
+  function loadProf() {
+    if (A.profBusy) return;
+    A.profBusy = true;
+    get("profile", {}).then(function (r) {
+      A.profBusy = false;
+      A.prof = r && r.ok ? r : { error: (r && r.error) || "server" };
+      if (A.view === "people") renderPeople();
+    }).catch(function () { A.profBusy = false; A.prof = { error: "אין חיבור לשרת" }; if (A.view === "people") renderPeople(); });
+  }
+
+  function profPanel(tr) {
+    var R = A.prof;
+    if (!R) { loadProf(); return '<div class="v2-card"><p class="v2-note" style="margin:0">טוען את אימות הפרטים…</p></div>'; }
+    if (R.error) return '<div class="v2-card"><p class="v2-note bad" style="margin:0">אימות הפרטים לא נטען (' + esc(R.error) + ")</p></div>";
+    var ro = viewer();
+    var mine = R.people.filter(function (p) { return p.track === tr; });
+    var done = mine.filter(function (p) { return p.verified; });
+    var todo = mine.filter(function (p) { return !p.verified; });
+    var allDone = R.people.filter(function (p) { return p.verified; }).length;
+    var pend = R.verify.filter(function (v) { return v.status === "ממתין"; });
+    var joins = R.joins.filter(function (j) { return j.status === "ממתינה"; });
+
+    var h = '<div class="v2-card a-prof"><div class="a-tbar"><p class="v2-eyebrow" style="margin:0">אימות פרטים ובקשות הצטרפות</p>' +
+      '<button type="button" class="v2-btn ghost" data-act="prof-refresh">רענון</button></div>' +
+      '<div class="a-kpis"><div><b>' + done.length + "/" + mine.length + "</b><span>אימתו במסלול " + esc(tr) + "</span></div>" +
+      "<div><b>" + allDone + "/" + R.people.length + "</b><span>בשני המסלולים</span></div>" +
+      "<div><b>" + pend.length + "</b><span>תיקונים לאישור</span></div><div><b>" + joins.length + "</b><span>בקשות הצטרפות</span></div></div>";
+
+    if (pend.length) {
+      h += '<p class="v2-eyebrow">תיקונים שמחכים לאישור שלך</p><ul class="a-plist2">' + pend.map(function (v) {
+        function diff(lbl, a, b) { return a === b ? "" : "<span><b>" + lbl + ":</b> " + esc(a || "—") + " ← <b>" + esc(b) + "</b></span>"; }
+        return "<li><div><b>" + esc(v.was.name) + "</b> · " + esc(v.track) +
+          '<div class="a-diff">' + diff("שם", v.was.name, v.now.name) + diff("בית ספר", v.was.school, v.now.school) +
+          (ro ? "" : diff("מייל", v.was.mail, v.now.mail)) + "</div></div>" +
+          (ro ? "" : '<div class="v2-row"><button type="button" class="v2-btn primary" data-act="prof-ok" data-sid="' + esc(v.sid) + '">אישור</button>' +
+            '<button type="button" class="v2-btn" data-act="prof-no" data-sid="' + esc(v.sid) + '">דחייה</button></div>') + "</li>";
+      }).join("") + "</ul>";
+    }
+
+    if (joins.length) {
+      h += '<p class="v2-eyebrow">בקשות הצטרפות</p><ul class="a-plist2">' + joins.map(function (j) {
+        return "<li><div><b>" + esc(j.name) + "</b> · " + esc(j.school) + (ro ? "" : ' · <span dir="ltr">' + esc(j.mail) + "</span>") +
+          '<div class="a-diff"><span>ביקש/ה: ' + esc(j.track) + "</span>" + (j.note ? "<span>" + esc(j.note) + "</span>" : "") + "</div></div>" +
+          (ro ? "" : '<div class="v2-row"><select class="a-in" id="jt-' + esc(j.id) + '"><option value="">מסלול…</option><option' + (j.track === "כלים" ? " selected" : "") + '>כלים</option><option' + (j.track === "הובלה" ? " selected" : "") + ">הובלה</option></select>" +
+            '<button type="button" class="v2-btn primary" data-act="join-ok" data-id="' + esc(j.id) + '">אישור והוספה</button>' +
+            '<button type="button" class="v2-btn" data-act="join-no" data-id="' + esc(j.id) + '">דחייה</button></div>') + "</li>";
+      }).join("") + "</ul>";
+    }
+    if (A.newJoin) {
+      h += '<div class="a-newjoin"><b>' + esc(A.newJoin.name) + " נוסף/ה למסלול " + esc(A.newJoin.track) + ".</b> הקישור האישי לאדווה, לשלוח לו/ה:" +
+        '<div class="v2-row"><input class="a-in" dir="ltr" readonly value="' + esc(ADVA_URL + A.newJoin.key) + '">' +
+        '<button type="button" class="v2-btn" data-act="join-copy">' + ico("copy") + "העתקה</button></div></div>";
+    }
+
+    if (todo.length) {
+      h += '<div class="a-tbar"><p class="v2-eyebrow" style="margin:0">טרם אימתו · מסלול ' + esc(tr) + " (" + todo.length + ")</p>" +
+        (ro ? "" : '<button type="button" class="v2-btn" data-act="prof-copy">' + ico("copy") + "העתקת השמות והקישורים</button>") + "</div>" +
+        '<p class="a-todo">' + todo.map(function (p) { return esc(p.name); }).join(" · ") + "</p>";
+    }
+    h += '<p class="a-foot">קישור ההצטרפות לשליחה בקבוצה: <span dir="ltr">' + esc(JOIN_URL) + "</span>" +
+      (ro ? "" : ' <button type="button" class="v2-btn ghost" data-act="join-url">' + ico("copy") + "העתקה</button>") + "</p></div>";
+    return h;
+  }
+
+  function profCopy() {
+    var R = A.prof, tr = track();
+    if (!R || !R.people) return;
+    var todo = R.people.filter(function (p) { return p.track === tr && !p.verified; });
+    copyText("טרם אימתו את הפרטים באדווה · מסלול " + tr + " (" + todo.length + "):\n" +
+      todo.map(function (p) { return "· " + p.name + " — " + ADVA_URL + p.key; }).join("\n"), "הועתקו " + todo.length + " שמות עם קישורים");
+  }
+
+  function profAct(action, body, okMsg) {
+    var o = { action: action, key: key() };
+    for (var k in body) o[k] = body[k];
+    return w.SH_auth.post(o).then(function (r) {
+      if (!r || r.ok !== true) {
+        var m = { mailtaken: "המייל הזה כבר שייך למשתתף/ת אחר/ת.", notpending: "כבר טופל.", badtrack: "צריך לבחור מסלול.", busy: "המערכת עמוסה, לנסות שוב." };
+        toast(m[r && r.error] || "הפעולה לא הצליחה (" + ((r && r.error) || "רשת") + ")", true);
+        return null;
+      }
+      toast(okMsg);
+      A.prof = null; A.people = null;
+      return r;
+    }).catch(function () { toast("אין חיבור לשרת", true); return null; });
   }
 
   function copyNever() {
@@ -952,6 +1044,25 @@
       else if (a === "ans-csv") ansCsv();
       else if (a === "ans-clear") { A.ans.field = ""; A.ans.opt = ""; renderAns(); }
       else if (a === "copy-never") copyNever();
+      else if (a === "prof-refresh") { A.prof = null; renderPeople(); }
+      else if (a === "prof-copy") profCopy();
+      else if (a === "join-url") copyText(JOIN_URL, "קישור ההצטרפות הועתק");
+      else if (a === "join-copy" && A.newJoin) copyText(ADVA_URL + A.newJoin.key, "הקישור האישי הועתק");
+      else if (a === "prof-ok" || a === "prof-no") {
+        act.disabled = true;
+        profAct("profileDecide", { sid: act.getAttribute("data-sid"), decision: a === "prof-ok" ? "approve" : "reject" },
+          a === "prof-ok" ? "התיקון אושר ונכנס לרשימה" : "התיקון נדחה").then(function () { renderPeople(); });
+      }
+      else if (a === "join-ok" || a === "join-no") {
+        var jid = act.getAttribute("data-id"), sel = el("jt-" + jid), jt = sel ? sel.value : "";
+        if (a === "join-ok" && !jt) { toast("צריך לבחור מסלול", true); return; }
+        act.disabled = true;
+        profAct("joinDecide", { id: jid, decision: a === "join-ok" ? "approve" : "reject", track: jt },
+          a === "join-ok" ? "נוסף/ה לרשימה" : "הבקשה נדחתה").then(function (r) {
+          if (r && r.key) A.newJoin = { name: r.name, track: r.track, key: r.key };
+          renderPeople();
+        });
+      }
       else if (a === "testkey-save") { lsSet(TEST_KEY, str(el("a-testkey").value)); toast("נשמר בדפדפן הזה"); renderSet(); }
       else if (a === "logout") {
         if (!w.confirm("להוציא את המפתח מהדפדפן הזה? בכניסה הבאה צריך את הקישור שוב.")) return;
