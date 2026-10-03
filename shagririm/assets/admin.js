@@ -21,6 +21,11 @@
 
   var TEAM_KEY = "shag.teamkey";
   var TEST_KEY = "shag.testkey";       /* מפתח משתתף/ת לבדיקה, רק בדפדפן של מיטל */
+  /* מפגש שהדף המלווה שלו הוא הלשונית "הדף המלווה" של המצגת החיה (3.10.26: דף מלווה אחד).
+     אותה רשימה כמו EXT_PAGE ב-shell.js. התשובות נאספות בשרת המפגש החי ומוצגות בדשבורד שלו. */
+  var EXT_PAGE = { 1: "mifgash-01/" };
+  var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
+  function extUrl(tr, num, view) { return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : ""; }
   var TRACKS = ["כלים", "הובלה"];
   var DAYS = { "כלים": "ימי שני", "הובלה": "ימי רביעי" };
   var VIEWS = { home: 1, kit: 1, desk: 1, ans: 1, att: 1, subs: 1, people: 1, set: 1 };
@@ -165,6 +170,7 @@
       need(str(s.slides), "קישור המצגת", "קישור מצגת");
     }
     if (s.pageFieldsError) list.push({ ok: false, label: "שדות הדף המלווה — JSON שבור (" + s.pageFieldsError + ")", col: "שדות הדף המלווה" });
+    else if (EXT_PAGE[s.num]) list.push({ ok: true, label: "הדף המלווה (מתוך המצגת)", col: "" });
     else need(s.hasPage, "שדות הדף המלווה", "שדות הדף המלווה");
     need(str(s.example), "דוגמה פתורה", "דוגמה פתורה");
     need(str(s.bridge), "החיבור להמשך", "החיבור להמשך");
@@ -288,7 +294,7 @@
 
   function renderSide() {
     var tr = track();
-    el("v2-me-name").textContent = viewer() ? "תצוגת אלנט" : "שולחן העבודה של המנחה";
+    el("v2-me-name").textContent = viewer() ? "תצוגת אלנט" : "מיטל · המנחה";
     el("v2-me-sub").textContent = "מסלול " + tr + " · " + DAYS[tr];
     var l = sessionsOf(tr), past = 0;
     for (var i = 0; i < l.length; i++) if (l[i].past) past++;
@@ -303,7 +309,7 @@
       var mark = s.past ? ico("check", "xs") : esc(s.num);
       var sub = (s.isUnit ? "יחידה · " + esc(shortDate(s.opens || s.date)) + "–" + esc(shortDate(s.dueBy)) : esc(shortDate(s.date)) + (s.now ? " · היום" : "")) +
         (!s.past && miss ? ' · <span class="a-miss">חסרים ' + miss + "</span>" : "");
-      h += '<li><button type="button" data-kit="' + esc(s.num) + '"' +
+      h += '<li><button type="button" data-kit="' + esc(s.num) + '" title="' + esc((s.isUnit ? "יחידה " : "מפגש ") + s.num + " · " + s.topic + " · " + (s.isUnit ? shortDate(s.opens || s.date) : shortDate(s.date))) + '"' +
         (A.view === "kit" && Number(s.num) === curNum() ? ' aria-current="true"' : "") + ">" +
         '<span class="' + cls + '" translate="no">' + mark + "</span>" +
         "<span>" + esc(s.topic) + '<small translate="no">' + sub + "</small></span></button></li>";
@@ -316,7 +322,6 @@
       if (k !== "kit" && k === A.view) bs[b].setAttribute("aria-current", "true");
       else bs[b].removeAttribute("aria-current");
     }
-    el("a-projlink").href = "proj.html#track=" + encodeURIComponent(tr) + "&n=" + (curNum() || 1);
   }
 
   function wireSide() {
@@ -377,8 +382,9 @@
 
   function route() {
     var p = hashParams();
-    var v = VIEWS[p.v] ? p.v : "home";
-    if (v === "set" && viewer()) v = "home";
+    /* 3.10.26: אין "בית" נפרד. נכנסים לעמוד המפגש, כמו הרכזים. */
+    var v = VIEWS[p.v] && p.v !== "home" ? p.v : "kit";
+    if (v === "set" && viewer()) v = "kit";
     if (v === "kit" && p.s && Number(p.s) !== curNum()) select(track(), Number(p.s));
     /* עשרת המפגשים פתוחים בתפריט רק במסך "מפגשי ההדרכה" — אחרת הם דוחפים
        את שאר הפריטים מתחת לקצה המסך */
@@ -541,7 +547,7 @@
       jobs.push(get("meet", { what: "code", track: tr }).then(function (r) { if (r && r.ok) T.code = r; }).catch(function () {}));
       sessionsOf(tr).forEach(function (s) {
         if (s.locked) return;
-        if (s.hasPage) jobs.push(get("page", { what: "wall", track: tr, n: s.num }).then(function (r) {
+        if (s.hasPage && !EXT_PAGE[s.num]) jobs.push(get("page", { what: "wall", track: tr, n: s.num }).then(function (r) {
           if (r && r.ok) { T.walls.push(r); if (f && Number(f.num) === Number(s.num)) T.wall = r; }
         }).catch(function () {}));
         if (!s.isUnit) jobs.push(get("meet", { what: "live", track: tr, n: s.num }).then(function (r) {
@@ -581,24 +587,47 @@
     var s = sessionOf(tr, n);
     if (!s) { host.innerHTML = '<div class="v2-card"><h2>המפגש לא נמצא</h2><p class="v2-note">לבחור מפגש מהתפריט.</p></div>'; return; }
 
-    var who = s.locked ? (s.isUnit ? "נעולה לרכזים עד " : "נעול לרכזים עד ") + shortDate(s.isUnit ? (s.opens || s.date) : s.date)
-      : s.now ? (s.isUnit ? "החלון פתוח לרכזים" : "מתקיים היום") : "התקיים";
-    var h = '<div class="v2-card v2-mhead"><span class="v2-tag' + (s.now ? "" : " quiet") + '">' + (s.locked ? ico("lock", "xs") + " " : "") + esc(who) + "</span>" +
+    /* עמוד המפגש: אותו מבנה כמו אצל הרכזים (3.10.26) — כותרת, מצגת, דף מלווה, נוכחות, ומתחת מה שהם קוראים.
+       מה שרק למנחה (מה חסר, התסריט, השדות) מקופל בתחתית. */
+    var tag = s.now ? (s.isUnit ? "החלון פתוח עכשיו" : "מתקיים היום")
+      : s.locked ? (s.isUnit ? "היחידה נפתחת ב-" : "המפגש ב-") + shortDate(s.isUnit ? (s.opens || s.date) : s.date)
+      : (s.isUnit ? "היחידה נסגרה" : "המפגש התקיים");
+    var h = '<div class="v2-card v2-mhead"><span class="v2-tag' + (s.now ? "" : " quiet") + '">' + esc(tag) + "</span>" +
       "<h2>" + (s.isUnit ? "יחידה " : "מפגש ") + '<span translate="no">' + esc(s.num) + "</span> · " + esc(s.topic) + "</h2>" +
+      (str(s.why) ? "<p>" + esc(s.why) + "</p>" : "") +
       '<div class="v2-mmeta">' + (s.isUnit
-        ? "<span>נפתחת <b translate=\"no\">" + esc(s.opens) + "</b></span><span>הגשה עד <b translate=\"no\">" + esc(s.dueBy) + "</b></span>"
-        : "<span>יום <b>" + esc(dayName(s.date)) + '</b></span><span><b translate="no">' + esc(s.date) + "</b></span>" + (str(s.hours) ? '<span><b dir="ltr" translate="no">' + esc(s.hours) + "</b></span>" : "")) +
-      (str(s.deliverable) ? "<span>התוצר: <b>" + esc(s.deliverable) + "</b></span>" : "") +
-      (str(s.buildsPart) ? "<span>חלק בארגז: <b>" + esc(s.buildsPart) + "</b></span>" : "") +
-      (str(s.contentStatus) ? "<span>סטטוס תוכן: <b>" + esc(s.contentStatus) + "</b></span>" : "") + "</div>" +
-      '<div class="v2-row" style="margin-top:14px">' +
-        '<button type="button" class="v2-btn primary" data-go="desk" data-n="' + esc(s.num) + '">' + ico("desk") + "שולחן המנחה של המפגש</button>" +
-        '<a class="v2-btn" href="proj.html#track=' + encodeURIComponent(tr) + "&n=" + esc(s.num) + '" target="_blank" rel="noopener">' + ico("slides") + "מצב הקרנה</a>" +
-        (str(s.slides) ? '<a class="v2-btn" href="' + esc(s.slides) + '" target="_blank" rel="noopener">' + ico("slides") + "המצגת</a>" : "") +
-        (str(s.zoom) ? '<a class="v2-btn" href="' + esc(s.zoom) + '" target="_blank" rel="noopener">' + ico("video") + "קישור הזום</a>" : "") +
-        (s.hasPage ? '<button type="button" class="v2-btn" data-go="ans" data-n="' + esc(s.num) + '">' + ico("chart") + "התשובות</button>" : "") +
-        (!viewer() && lsGet(TEST_KEY) ? '<a class="v2-btn ghost" href="index.html?t=' + encodeURIComponent(lsGet(TEST_KEY)) + "#s=" + esc(s.num) + '" target="_blank" rel="noopener">' + ico("ext") + "לפתוח כרכז/ת</a>" : "") +
-      "</div></div>";
+        ? "<span>יחידה עצמית</span><span>נפתחת <b translate=\"no\">" + esc(s.opens) + "</b></span><span>להגשה עד <b translate=\"no\">" + esc(s.dueBy) + "</b></span>"
+        : "<span>יום <b>" + esc(dayName(s.date)) + '</b></span><span><b translate="no">' + esc(s.date) + "</b></span>" + (str(s.hours) ? '<span><b dir="ltr" translate="no">' + esc(s.hours) + "</b></span>" : "") + "<span>זום</span>") +
+      (str(s.deliverable) ? "<span>התוצר: <b>" + esc(s.deliverable) + "</b></span>" : "") + "</div>" +
+      (str(s.zoom) ? '<div class="v2-row" style="margin-top:14px"><a class="v2-btn dark" href="' + esc(s.zoom) + '" target="_blank" rel="noopener">' + ico("video") + "כניסה לזום</a></div>" : "") +
+      "</div>";
+
+    function big(href, icon, title, sub, btn, primary, isBtn) {
+      var inner = '<span class="ic">' + ico(icon) + '</span><span class="tx"><b>' + esc(title) + "</b><span>" + esc(sub) + "</span></span>" +
+        '<span class="end"><span class="v2-btn' + (primary ? " primary" : "") + '">' + esc(btn) + "</span></span>";
+      return isBtn
+        ? '<button type="button" class="v2-bigitem' + (primary ? " primary" : "") + '" ' + href + ">" + inner + "</button>"
+        : '<a class="v2-bigitem' + (primary ? " primary" : "") + '" href="' + esc(href) + '" target="_blank" rel="noopener">' + inner + "</a>";
+    }
+    function quiet(icon, title, sub) {
+      return '<div class="v2-bigitem quiet"><span class="ic">' + ico(icon) + '</span><span class="tx"><b>' + esc(title) + "</b><span>" + esc(sub) + "</span></span></div>";
+    }
+    h += '<div class="v2-big">';
+    if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "deck"), "slides", "מצגת המפגש", "אותה מצגת שהרכזים פותחים. הערות המרצה מוצגות רק לך", "פתיחה");
+    else if (str(s.slides)) h += big(s.slides, "slides", "מצגת המפגש", "נפתחת בלשונית נפרדת", "פתיחה");
+    else h += quiet("slides", "מצגת המפגש", s.isUnit ? "ביחידה עצמית אין מצגת." : "המצגת עוד לא הועלתה (עמודה \"קישור מצגת\" בגיליון).");
+    if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "comp"), "studio", "הדף המלווה", "כאן הרכזים עונים במהלך המפגש, והתשובות עולות לשקפים", "פתיחה", true);
+    else if (s.hasPage) h += big('data-go="ans" data-n="' + esc(s.num) + '"', "studio", "הדף המלווה", s.pageFields.length + " שדות · התשובות בבדיקת עבודות", "לתשובות", true, true);
+    else h += quiet("studio", "הדף המלווה", "למפגש הזה עוד אין דף מלווה.");
+    if (!s.isUnit) h += big('data-go="desk" data-n="' + esc(s.num) + '"', "check", "רישום נוכחות", "פתיחת הרישום, הקוד וסגירה — בשולחן המנחה", "לשולחן המנחה", false, true);
+    h += "</div>";
+
+    if (!s.isUnit && str(s.before) && !s.past) h += '<div class="v2-card"><p class="v2-eyebrow">לפני המפגש · עד 15 דקות</p><p style="margin:0;line-height:1.65">' + esc(s.before) + "</p></div>";
+    if (str(s.bridge)) h += '<div class="v2-card v2-bridge"><p class="v2-eyebrow">החיבור להמשך</p><p style="margin:0;font-size:15px;line-height:1.65">' + esc(s.bridge) + "</p></div>";
+    if (EXT_PAGE[s.num]) h += '<div class="v2-row" style="margin:4px 0 14px"><a class="v2-btn" href="' + LIVE_DASH + '" target="_blank" rel="noopener">' + ico("chart") + "התשובות החיות של המפגש</a>" +
+      (!viewer() && lsGet(TEST_KEY) ? '<a class="v2-btn ghost" href="index.html?t=' + encodeURIComponent(lsGet(TEST_KEY)) + "#s=" + esc(s.num) + '" target="_blank" rel="noopener">' + ico("ext") + "לפתוח כרכז/ת</a>" : "") + "</div>";
+
+    h += '<details class="a-more"><summary>' + ico("gear", "xs") + " למנחה בלבד · מה חסר בגיליון, התסריט והשדות</summary>";
 
     /* מה חסר */
     var g = gaps(s), miss = g.filter(function (x) { return !x.ok; }).length;
@@ -617,6 +646,12 @@
 
     /* הדף המלווה */
     var ex = exampleMap(s.example);
+    if (EXT_PAGE[s.num]) {
+      h += '<div class="v2-card"><p class="v2-eyebrow">הדף המלווה · מה הרכזים ממלאים</p>' +
+        '<p class="v2-note" style="margin:0 0 12px">במפגש הזה הדף המלווה הוא הלשונית "הדף המלווה" של המצגת. הרכזים פותחים אותו מאדווה, ' +
+        "כל אחד/ת במסלול שלו/ה, והתשובות עולות לשקפים החיים. טופס מפת הפתיחה שהיה כאן הועבר לארכיון.</p>" +
+        '<div class="v2-row"><a class="v2-btn" href="' + esc(extUrl(tr, s.num)) + '" target="_blank" rel="noopener">' + ico("ext") + "לפתוח את הדף כמו שהרכזים רואים</a></div></div>";
+    } else {
     h += '<div class="v2-card"><p class="v2-eyebrow">הדף המלווה · מה הרכזים ממלאים' + (s.hasPage ? " · " + s.pageFields.length + " שדות" : "") + "</p>";
     if (s.pageFieldsError) h += '<p class="v2-note bad">JSON השדות שבור (' + esc(s.pageFieldsError) + "). הרכזים יראו \"אין דף מלווה\" עד שיתוקן.</p>";
     else if (!s.hasPage) h += '<p class="v2-note" style="margin:0">למפגש הזה עוד אין שדות.</p>';
@@ -635,6 +670,7 @@
       if (str(s.challenge)) h += '<div class="v2-plus"><p class="v2-eyebrow">אתגר</p>' + esc(s.challenge) + "</div>";
     }
     h += "</div>";
+    }
 
     /* מה הרכזים רואים בעמוד המפגש */
     var blocks = [
@@ -647,6 +683,7 @@
     });
     h += "<dt>חומרים</dt><dd>" + (str(s.materials) && w.SH_shell && w.SH_shell.matsHtml ? w.SH_shell.matsHtml(s.materials) : '<span class="a-empty">ריק</span>') + "</dd></dl></div>";
 
+    h += "</details>";
     host.innerHTML = h;
   }
 
@@ -656,12 +693,18 @@
 
   function renderAns() {
     var host = el("a-ans"), tr = track(), n = curNum();
-    var withPage = sessionsOf(tr).filter(function (s) { return s.hasPage; });
+    var withPage = sessionsOf(tr).filter(function (s) { return s.hasPage && !EXT_PAGE[s.num]; });
     var s = sessionOf(tr, n);
     var pick = withPage.length ? '<div class="v2-row a-sesspick">' + withPage.map(function (x) {
       return '<button type="button" class="v2-btn' + (Number(x.num) === n ? " dark" : "") + '" data-ans="' + esc(x.num) + '">מפגש ' + esc(x.num) + "</button>";
     }).join("") + "</div>" : "";
 
+    if (s && EXT_PAGE[s.num]) {
+      host.innerHTML = '<div class="v2-card"><h2>תשובות ומיפוי · מפגש ' + esc(s.num) + '</h2><p class="v2-note">' +
+        "התשובות של המפגש הזה נאספות בדף המלווה של המצגת ומוצגות בדשבורד החי שלה.</p>" +
+        '<div class="v2-row"><a class="v2-btn primary" href="' + LIVE_DASH + '" target="_blank" rel="noopener">' + ico("chart") + "לדשבורד החי</a></div>" + pick + "</div>";
+      return;
+    }
     if (!s || !s.hasPage) {
       host.innerHTML = '<div class="v2-card"><h2>תשובות ומיפוי</h2><p class="v2-note">' +
         (s ? "למפגש " + esc(s.num) + " אין דף מלווה. " : "") + (withPage.length ? "לבחור מפגש עם דף מלווה:" : "עוד אין מפגש עם דף מלווה במסלול הזה.") + "</p>" + pick + "</div>";

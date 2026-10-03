@@ -25,6 +25,14 @@
   "use strict";
 
   var STEP_POLL_MS = 20000;
+  /* מפגש שהדף המלווה שלו הוא הלשונית "הדף המלווה" של המצגת החיה (3.10.26, החלטת מיטל:
+     דף מלווה אחד במקום אחד). נבנה ב-build_comp01.py (תיקיית _build של מפגשי השגרירים).
+     שדות הדף המלווה שבגיליון למפגש הזה הועברו לארכיון ולא מוצגים. */
+  var EXT_PAGE = { 1: "mifgash-01/" };
+  function extPageUrl(num, view) {
+    var u = EXT_PAGE[num];
+    return u ? u + "?v=" + (view || "comp") + "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k") : "";
+  }
 
   /* חמש הפעימות של תבנית המפגש (סעיף 3 באפיון). במפגש 1 הראשונה היא "פתיחה". */
   var BEATS = [
@@ -299,7 +307,7 @@
       var num = Number(p.s) || currentNum();
       if (!sessionByNum(num)) num = currentNum();
       S.sel = num;
-      if (p.p && sessionByNum(num) && sessionByNum(num).hasPage) {
+      if (p.p && sessionByNum(num) && sessionByNum(num).hasPage && !EXT_PAGE[num]) {
         show("page");
         openPage(num);
       } else {
@@ -415,7 +423,14 @@
   function renderItems(s) {
     /* 1 · הדף המלווה */
     var pg = el("v2-item-page");
-    if (s.hasPage) {
+    if (EXT_PAGE[s.num]) {
+      pg.innerHTML = s.locked
+        ? quietItem("studio", "הדף המלווה", "עמוד העבודה של המפגש. נפתח כאן ביום המפגש.")
+        : '<a class="v2-bigitem primary" href="' + esc(extPageUrl(s.num)) + '" target="_blank" rel="noopener">' +
+          '<span class="ic">' + ico("studio") + '</span><span class="tx"><b>הדף המלווה</b><span>' +
+          "כאן עונים במהלך המפגש, והתשובות עולות לשקפים</span></span>" +
+          '<span class="end"><span class="v2-btn primary">פתיחה</span></span></a>';
+    } else if (s.hasPage) {
       pg.innerHTML = '<button type="button" class="v2-bigitem primary" id="v2-open-page">' +
         '<span class="ic">' + ico("studio") + '</span><span class="tx"><b>הדף המלווה</b><span>' +
         (str(s.deliverable) ? esc(s.deliverable) + " · " : "") + "כאן עובדים במהלך המפגש, ומיטל רואה</span></span>" +
@@ -429,7 +444,11 @@
     /* 2 · מצגת המפגש. רק Google Slides נפתח בתוך העמוד; השרת מחליט (slidesEmbed). */
     var sl = el("v2-item-slides"), fr = el("v2-slides");
     fr.hidden = true; fr.innerHTML = ""; S.slidesOpen = false;
-    if (str(s.slidesEmbed)) {
+    if (EXT_PAGE[s.num] && !s.locked) {
+      sl.innerHTML = '<a class="v2-bigitem" href="' + esc(extPageUrl(s.num, "deck")) + '" target="_blank" rel="noopener">' +
+        '<span class="ic">' + ico("slides") + '</span><span class="tx"><b>מצגת המפגש</b><span>נפתחת בלשונית נפרדת</span></span>' +
+        '<span class="end"><span class="v2-btn">פתיחה</span></span></a>';
+    } else if (str(s.slidesEmbed)) {
       sl.innerHTML = '<button type="button" class="v2-bigitem" id="v2-open-slides" aria-expanded="false" aria-controls="v2-slides">' +
         '<span class="ic">' + ico("slides") + '</span><span class="tx"><b>מצגת המפגש</b><span>נפתחת כאן, בתוך העמוד</span></span>' +
         '<span class="end"><span class="v2-btn" id="v2-slides-lbl">פתיחה</span></span></button>';
@@ -593,7 +612,7 @@
 
   /* מצב הדף המלווה לצ'יפ שבפריט הראשון. קריאה אחת למפגש, ורק כשיש דף. */
   function loadPageInfo(s) {
-    if (!s.hasPage || !w.SH_auth) return;
+    if (!s.hasPage || EXT_PAGE[s.num] || !w.SH_auth) return;
     w.SH_auth.api("pageGet", { n: s.num }).then(function (r) {
       if (!r || !r.ok) return;
       S.pageInfo[s.num] = { state: str(r.state), filled: Number(r.filled) || 0, total: Number(r.total) || 0 };
@@ -629,11 +648,11 @@
 
     /* הסטודיו כבר שימושי היום: הדפים המלווים של המפגשים שנפתחו */
     if (key === "studio") {
-      var pages = S.sessions.filter(function (s) { return s.hasPage; });
+      var pages = S.sessions.filter(function (s) { return s.hasPage || (EXT_PAGE[s.num] && !s.locked); });
       if (pages.length) {
         h += '<div class="v2-card"><p class="v2-eyebrow">הדפים המלווים שלי</p><ul class="v2-mats">' +
           pages.map(function (s) {
-            return '<li><a href="#s=' + esc(s.num) + '&p=1">' + ico("studio", "s") + "מפגש " + esc(s.num) + " · " + esc(s.deliverable || s.topic) + "</a></li>";
+            return '<li><a href="' + (EXT_PAGE[s.num] ? esc(extPageUrl(s.num)) + '" target="_blank" rel="noopener' : "#s=" + esc(s.num) + "&p=1") + '">' + ico("studio", "s") + "מפגש " + esc(s.num) + " · " + esc(s.deliverable || s.topic) + "</a></li>";
           }).join("") + "</ul></div>";
       }
     }

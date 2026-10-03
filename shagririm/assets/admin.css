@@ -234,3 +234,19 @@ body.t-viewer .adm .a-elnet #e-admin-tools { display: none !important; }
   .adm .a-in { min-width: 0; flex: 1; }
   .adm .a-elnet { padding: 16px 12px; }
 }
+
+/* עמוד המפגש של מיטל = עמוד המפגש של הרכזים (3.10.26). מה שרק למנחה מקופל כאן. */
+.adm button.v2-bigitem { width: 100%; font: inherit; text-align: start; color: inherit; cursor: pointer; }
+.adm .a-more { margin-top: 18px; }
+.adm .a-more > summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 16px; border-radius: 999px; border: 1px dashed var(--line); color: var(--muted); font-weight: 700; font-size: 14px; }
+.adm .a-more > summary::-webkit-details-marker { display: none; }
+.adm .a-more[open] > summary { margin-bottom: 14px; color: var(--ink); }
+.adm .a-navsec { margin: 18px 24px 6px; font-size: 12px; font-weight: 800; letter-spacing: .02em; color: var(--muted); list-style: none; }
+/* מפגשי ההדרכה אצל מיטל: עשרה מספרים בשתי שורות, כדי ש"ניהול" ייכנס במסך בלי לגלול בתוך התפריט.
+   השם והתאריך בריחוף (title) ובראש עמוד המפגש. */
+#a-mlist { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; padding: 6px 12px 10px; }
+#a-mlist > li > button { flex-direction: column; justify-content: center; align-items: center; gap: 2px; padding: 6px 2px; min-height: 0; border-radius: 12px; }
+#a-mlist > li > button > span:not(.v2-st) { display: none; }
+#a-mlist > li > button[aria-current="true"] { background: var(--blue-soft, #E3EEF6); }
+#a-mlist .a-mempty { grid-column: 1 / -1; }

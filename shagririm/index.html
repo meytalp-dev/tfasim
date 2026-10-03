@@ -133,19 +133,18 @@
         <button type="button" data-track="הובלה" aria-pressed="false">הובלה <small>ימי רביעי</small></button>
       </div>
       <ul class="v2-nav" id="a-nav">
-        <li><button type="button" data-av="home"><svg class="sh-ico"><use href="#i-home"/></svg>הבית</button></li>
         <li class="open" id="a-nav-kit">
           <button type="button" data-av="kit" aria-expanded="true"><svg class="sh-ico"><use href="#i-cal"/></svg>מפגשי ההדרכה<svg class="sh-ico v2-caret"><use href="#i-caret"/></svg></button>
           <ul class="v2-mlist" id="a-mlist"></ul>
         </li>
-        <li><button type="button" data-av="desk"><svg class="sh-ico"><use href="#i-desk"/></svg>שולחן המנחה</button></li>
-        <li><button type="button" data-av="ans"><svg class="sh-ico"><use href="#i-chart"/></svg>תשובות ומיפוי</button></li>
-        <li><button type="button" data-av="att"><svg class="sh-ico"><use href="#i-check"/></svg>נוכחות ואישור<span class="v2-n" id="a-n-att" hidden></span></button></li>
-        <li><button type="button" data-av="subs"><svg class="sh-ico"><use href="#i-inbox"/></svg>הגשות<span class="v2-n">2.11</span></button></li>
-        <li><button type="button" data-av="people"><svg class="sh-ico"><use href="#i-users"/></svg>משתתפים וזכאות</button></li>
         <!-- מיפוי הצוותות (1.10.26): נפתח עם מפתח המבט-על שנשמר בדפדפן אחרי הכניסה הראשונה לדף המיפוי -->
         <li><a class="a-navlink" id="a-mipui" href="mipui/" target="_blank" rel="noopener"><svg class="sh-ico"><use href="#i-users"/></svg>מיפוי הצוותות<svg class="sh-ico xs a-ext"><use href="#i-ext"/></svg></a></li>
-        <li><a class="a-navlink" id="a-projlink" href="proj.html" target="_blank" rel="noopener"><svg class="sh-ico"><use href="#i-slides"/></svg>מצב הקרנה<svg class="sh-ico xs a-ext"><use href="#i-ext"/></svg></a></li>
+        <!-- 3.10.26: מעל = מה שגם הרכזים רואים. מתחת = ניהול, רק למיטל ולאלנט -->
+        <li class="a-navsec" aria-hidden="true">ניהול</li>
+        <li><button type="button" data-av="people"><svg class="sh-ico"><use href="#i-users"/></svg>נתוני הבסיס</button></li>
+        <li><button type="button" data-av="att"><svg class="sh-ico"><use href="#i-check"/></svg>נוכחות ואישור<span class="v2-n" id="a-n-att" hidden></span></button></li>
+        <li><button type="button" data-av="ans"><svg class="sh-ico"><use href="#i-chart"/></svg>בדיקת עבודות</button></li>
+        <li><button type="button" data-av="desk"><svg class="sh-ico"><use href="#i-desk"/></svg>שולחן המנחה</button></li>
         <li class="a-admin-only"><button type="button" data-av="set"><svg class="sh-ico"><use href="#i-gear"/></svg>הגדרות</button></li>
       </ul>
     </div>
@@ -159,9 +158,9 @@
       <div class="v2-card v2-mhead" id="v2-mhead"></div>
 
       <div class="v2-big" id="v2-big">
-        <div id="v2-item-page"></div>
         <div id="v2-item-slides"></div>
         <div class="v2-slides" id="v2-slides" hidden></div>
+        <div id="v2-item-page"></div>
         <!-- ביום מפגש בלבד: בלוק הנוכחות, כמו שהוא. השרת מחליט שהיום יום מפגש. -->
         <section class="sh-live" id="sh-attend" hidden aria-labelledby="sh-attend-h"></section>
         <div id="v2-item-att"></div>
