@@ -29,6 +29,17 @@
      דף מלווה אחד במקום אחד). נבנה ב-build_comp01.py (תיקיית _build של מפגשי השגרירים).
      שדות הדף המלווה שבגיליון למפגש הזה הועברו לארכיון ולא מוצגים. */
   var EXT_PAGE = { 1: "mifgash-01/" };
+  /* משאבי המפגש שמובנים במערכת (3.10.26: "הכול במקום אחד"). נוספים לחומרים שבגיליון.
+     [כותרת, שורת הסבר, כתובת]. אותה רשימה ב-admin.js (שם הקישורים במצב בדיקה). */
+  function sessionRes(num) {
+    var tr = str(S.me.track) === "הובלה" ? "h" : "k";
+    var tk = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
+    if (num === 1) return [
+      ["השאלון שלי כרכז/ת", "ממלאים בעצמכם במפגש. אותו שאלון שיוצא לצוות", "mipui/q.html?s=rk-" + tr],
+      ["מיפוי הצוות שלי", "הקישור לשאלון של הצוות, ההודעה לשליחה והדשבורד של בית הספר", "mipui/" + (tk ? "?k=" + encodeURIComponent(tk) : "")]
+    ];
+    return [];
+  }
   function extPageUrl(num, view) {
     var u = EXT_PAGE[num];
     return u ? u + "?v=" + (view || "comp") + "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k") : "";
@@ -560,6 +571,17 @@
     if (!s) return;
     var h = "";
 
+    /* משאבי המפגש: מיד מתחת למצגת ולדף המלווה (3.10.26) */
+    var res = sessionRes(Number(s.num));
+    h += '<div class="v2-card"><p class="v2-eyebrow">משאבי המפגש</p>';
+    if (res.length) h += '<ul class="v2-mats">' + res.map(function (r) {
+      return '<li><a href="' + esc(r[2]) + '" target="_blank" rel="noopener">' + ico("link", "s") +
+        '<span><b style="display:block">' + esc(r[0]) + '</b><small style="color:var(--muted)">' + esc(r[1]) + "</small></span></a></li>";
+    }).join("") + "</ul>";
+    if (str(s.materials)) h += matsHtml(s.materials);
+    else if (!res.length) h += '<p class="v2-note" style="margin:0">' + (s.locked ? "החומרים נפתחים ביום המפגש." : "מיטל עוד לא העלתה חומרים למפגש הזה.") + "</p>";
+    h += "</div>";
+
     /* "החיבור להמשך": הפעימה החמישית, ואחרי המפגש הוא נשאר כתזכורת */
     var step = (S.live.session === s.num) ? S.live.step : 0;
     if (str(s.bridge) && (s.past || step === 5)) {
@@ -576,10 +598,6 @@
         steps.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol></div>";
     }
 
-    h += '<div class="v2-card"><p class="v2-eyebrow">חומרי ההדרכה של המפגש</p>';
-    if (str(s.materials)) h += matsHtml(s.materials);
-    else h += '<p class="v2-note" style="margin:0">' + (s.locked ? "החומרים נפתחים ביום המפגש." : "מיטל עוד לא העלתה חומרים למפגש הזה.") + "</p>";
-    h += "</div>";
 
     if (str(s.summary)) {
       h += '<div class="v2-card"><p class="v2-eyebrow">סיכום המפגש</p><p style="margin:0;line-height:1.7">' +

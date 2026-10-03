@@ -24,6 +24,16 @@
   /* מפגש שהדף המלווה שלו הוא הלשונית "הדף המלווה" של המצגת החיה (3.10.26: דף מלווה אחד).
      אותה רשימה כמו EXT_PAGE ב-shell.js. התשובות נאספות בשרת המפגש החי ומוצגות בדשבורד שלו. */
   var EXT_PAGE = { 1: "mifgash-01/" };
+  /* משאבי המפגש — אותה רשימה כמו sessionRes ב-shell.js. אצל מיטל השאלון במצב בדיקה (לא נספר),
+     ומיפוי הצוות נפתח במבט-העל שלה. */
+  function sessionRes(tr, num) {
+    var t = tr === "הובלה" ? "h" : "k";
+    if (Number(num) === 1) return [
+      ["השאלון של הרכזים · מסלול " + tr, "הרכזים ממלאים במפגש. אצלך נפתח במצב בדיקה ולא נספר", "mipui/q.html?s=rk-" + t + "&test=1"],
+      ["מיפוי הצוות", "אצל הרכזים: הדף של בית הספר שלהם. אצלך: מבט-על על כל בתי הספר", "mipui/"]
+    ];
+    return [];
+  }
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
   function extUrl(tr, num, view) { return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : ""; }
   var TRACKS = ["כלים", "הובלה"];
@@ -622,6 +632,14 @@
     if (!s.isUnit) h += big('data-go="desk" data-n="' + esc(s.num) + '"', "check", "רישום נוכחות", "פתיחת הרישום, הקוד וסגירה — בשולחן המנחה", "לשולחן המנחה", false, true);
     h += "</div>";
 
+    var res = sessionRes(tr, s.num);
+    if (res.length || str(s.materials)) {
+      h += '<div class="v2-card"><p class="v2-eyebrow">משאבי המפגש</p>' + (res.length ? '<ul class="v2-mats">' + res.map(function (r) {
+        return '<li><a href="' + esc(r[2]) + '" target="_blank" rel="noopener">' + ico("link", "s") +
+          '<span><b style="display:block">' + esc(r[0]) + '</b><small style="color:var(--muted)">' + esc(r[1]) + "</small></span></a></li>";
+      }).join("") + "</ul>" : "") +
+        (str(s.materials) && w.SH_shell && w.SH_shell.matsHtml ? w.SH_shell.matsHtml(s.materials) : "") + "</div>";
+    }
     if (!s.isUnit && str(s.before) && !s.past) h += '<div class="v2-card"><p class="v2-eyebrow">לפני המפגש · עד 15 דקות</p><p style="margin:0;line-height:1.65">' + esc(s.before) + "</p></div>";
     if (str(s.bridge)) h += '<div class="v2-card v2-bridge"><p class="v2-eyebrow">החיבור להמשך</p><p style="margin:0;font-size:15px;line-height:1.65">' + esc(s.bridge) + "</p></div>";
     if (EXT_PAGE[s.num]) h += '<div class="v2-row" style="margin:4px 0 14px"><a class="v2-btn" href="' + LIVE_DASH + '" target="_blank" rel="noopener">' + ico("chart") + "התשובות החיות של המפגש</a>" +
