@@ -191,7 +191,7 @@
   function renderSide() {
     el("v2-me-name").textContent = str(S.me.name);
     el("v2-me-sub").textContent = str(S.me.school) + (str(S.me.track) ? " · מסלול " + str(S.me.track) : "");
-    el("sh-track").textContent = "מסלול " + str(S.me.track) + " · תשפ״ז";
+    el("sh-track").textContent = "שגרירי חדשנות · מסלול " + str(S.me.track);
 
     /* מספר הנוכחות מגיע מהשרת בלבד. עד שיש — מציגים איפה הקבוצה, לא ממציאים. */
     var n = el("v2-me-n");
@@ -749,7 +749,7 @@
     }, function () {
       if (authScreenUp()) { el("sh-boot").hidden = true; return; }
       boot("צריך את הקישור האישי",
-        "הכניסה לסביבת הלמידה היא דרך הקישור האישי שנשלח אליך בהודעה " +
+        "הכניסה לאדווה, סביבת הלמידה של שגרירי החדשנות, היא דרך הקישור האישי שנשלח אליך בהודעה " +
         "(בקבוצת הוואטסאפ של הקהילה, ושוב במייל). הוא נראה כך: " +
         '<span dir="ltr" translate="no">/shagririm/?t=…</span>',
         { bad: true });

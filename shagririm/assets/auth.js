@@ -274,7 +274,7 @@
     box.className = "shauth";
     box.setAttribute("role", "dialog");
     box.setAttribute("aria-modal", "true");
-    box.setAttribute("aria-label", "כניסה לסביבת הלמידה");
+    box.setAttribute("aria-label", "כניסה לאדווה");
     box.innerHTML = '<div class="shauth-card" id="shauth-card"></div>';
     d.body.appendChild(box);
     return box;
@@ -403,7 +403,7 @@
     function askScreen() {
       card(
         '<div class="shauth-mark">' + ring(78, false) + "</div>" +
-        "<h2>כניסה לסביבת הלמידה</h2>" +
+        "<h2>כניסה לאדווה</h2>" +
         "<p>זו הכניסה הראשונה מהמכשיר הזה. נשלח קוד בן 6 ספרות למייל " +
         (info.mailMask ? '<span class="shauth-mask" translate="no">' + info.mailMask + "</span>" : "שלך") +
         ", ואחר כך המכשיר ייזכר 30 יום.</p>" +
@@ -567,7 +567,7 @@
     pending = new Promise(function (resolve, reject) {
       if (!TOKEN) {
         fatal("צריך את הקישור האישי",
-          "הכניסה לסביבת הלמידה היא דרך הקישור האישי שנשלח אליך בוואטסאפ או במייל. " +
+          "הכניסה לאדווה, סביבת הלמידה של שגרירי החדשנות, היא דרך הקישור האישי שנשלח אליך בוואטסאפ או במייל. " +
           "הוא נראה כך: <span dir=\"ltr\" translate=\"no\">/shagririm/?t=…</span>", null, true);
         reject(new Error("notoken"));
         return;

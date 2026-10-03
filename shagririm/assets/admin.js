@@ -293,7 +293,7 @@
     var l = sessionsOf(tr), past = 0;
     for (var i = 0; i < l.length; i++) if (l[i].past) past++;
     el("v2-me-n").textContent = l.length ? past + " מתוך " + l.length + " מאחורינו" : "";
-    el("sh-track").textContent = (viewer() ? "תצוגה בלבד · " : "") + "מסלול " + tr + " · תשפ״ז";
+    el("sh-track").textContent = (viewer() ? "תצוגה בלבד · " : "") + "שגרירי חדשנות · מסלול " + tr;
     drawRing();
 
     var h = "";
