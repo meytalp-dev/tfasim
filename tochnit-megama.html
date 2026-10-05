@@ -91,6 +91,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 .helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:9px 18px;margin-bottom:14px;color:var(--navy)}
 .helpbtn svg{width:17px;height:17px;color:var(--accent)}
 .credit{margin-top:6px;font-size:.8rem}
+.ask{background:var(--blue-100);border-right:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:.95rem;color:var(--text)}
+.ask>b:first-child{display:block;color:var(--navy);font-size:1.02rem;margin-bottom:4px}
+.ask .in-t{color:var(--navy)}
+.ask .how{display:block;margin-top:6px;font-size:.88rem;color:var(--text2)}
+.ask a{color:var(--navy);font-weight:700}
 @media(max-width:560px){.two{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
 </style>
 </head>
@@ -207,9 +212,15 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <input class="in" id="approvalNo" placeholder="לדוגמה 5204/26" style="max-width:220px;margin-top:4px">
     </div>
 
+    <div class="ask">
+      <b>מתמטיקה ואנגלית שמחוברות למגמה</b>
+      אנחנו פועלים להתאים את לימודי המתמטיקה והאנגלית למקצועות המגמות. נשמח אם תשתפו אותנו בחומרים שיש לכם בנושא, או בנושאים שהייתם רוצים לראות ב<b class="in-t">אנגלית טכנית־מקצועית</b> וב<b class="in-t">מתמטיקה יישומית</b> המחוברות למגמה.
+      <span class="how">אפשר לכתוב אותם בשדה ההערות שמתחת, ולשלוח קבצים במייל ל-<a href="mailto:mlypeleg@gmail.com?subject=%D7%97%D7%95%D7%9E%D7%A8%D7%99%D7%9D%20%D7%9C%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94%20%D7%95%D7%90%D7%A0%D7%92%D7%9C%D7%99%D7%AA%20%D7%91%D7%9E%D7%92%D7%9E%D7%94" dir="ltr">mlypeleg@gmail.com</a></span>
+    </div>
+
     <div class="f">
       <label class="l" for="notes">הערות</label>
-      <textarea class="in" id="notes" rows="2" placeholder="למשל: זו גרסה מעודכנת לתוכנית הקודמת"></textarea>
+      <textarea class="in" id="notes" rows="3" placeholder="למשל: זו גרסה מעודכנת לתוכנית הקודמת, או נושאים למתמטיקה ולאנגלית במגמה"></textarea>
     </div>
 
     <div class="f" id="w-consent">
