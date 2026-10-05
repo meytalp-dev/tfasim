@@ -127,6 +127,7 @@
           '<div class="row" style="margin-top:6px"><input class="qt" id="staffN" type="number" min="1" max="400" inputmode="numeric" style="width:110px"><button class="btn sm" id="staffB">שמירה</button><span class="note" id="staffMsg"></span></div></div>' +
         '</div>' +
       '</div>' +
+      '<div id="forms" style="margin-top:16px"></div>' +
       '<div id="exEd" style="margin-top:16px"></div>' +
       '<div class="row" style="justify-content:space-between;margin:26px 0 12px"><div class="h2" style="margin:0">הדשבורד</div>' +
         '<div class="row"><span class="note" id="upd"></span><button class="btn sm" id="refB"><svg class="i"><use href="#i-refresh"/></svg>רענון</button></div></div>' +
@@ -153,6 +154,257 @@
     };
     document.getElementById('refB').onclick = function () { load(me.s); };
     load(me.s);
+    myForms(me.s);
+  }
+
+  /* ---------- השאלונים שלי (5.10.26): שאלונים לכל מטרה, נפרדים משאלון הצוות ---------- */
+  function fPost(body, tries) {
+    return mPost(body).then(function (r) {
+      // מופע ישן של השרת אחרי פריסה עונה 'action': מנסים שוב
+      if (r && r.error === 'action' && (tries || 0) < 3) return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return fPost(body, (tries || 0) + 1); });
+      return r;
+    });
+  }
+  function fGet(params, tries) {
+    tries = tries || 0;
+    function again() { return new Promise(function (ok) { setTimeout(ok, 1500); }).then(function () { return fGet(params, tries + 1); }); }
+    return mGet(params).then(function (r) {
+      if (r && r.error === 'action' && tries < 3) return again();
+      return r;
+    }, function (e) { if (tries < 3) return again(); throw e; });
+  }
+  function myForms(s) {
+    var box = document.getElementById('forms');
+    var forms = mStore('mipui_forms_' + s) || null, openId = null, msg = '';
+    var FERR = { title: 'חסרה כותרת לשאלון.', locked: 'אי אפשר: כבר ענו על השאלה הזו.', max: 'אפשר עד 15 שאלות.', many: 'הגעתם למספר השאלונים המרבי.', key: 'אין הרשאה.', busy: 'השרת עסוק. נסו שוב.', opts: 'צריך בין 2 ל-8 אפשרויות.', text: 'חסר נוסח לשאלה.' };
+    function err(r) { return FERR[r && r.error] || 'לא נשמר (' + (r && r.error) + ').'; }
+    var gen = 0; // תשובה של שליפה שהתחילה לפני שמירה אחרונה כבר לא עדכנית
+    function fetchAll() {
+      var g = ++gen;
+      return fGet({ action: 'forms', s: s, k: K }).then(function (r) {
+        if (!r || !r.ok || g !== gen) return;
+        forms = r.forms; mStore('mipui_forms_' + s, forms); paint();
+      }).catch(function () { if (!forms) { box.innerHTML = '<div class="card"><p class="note">השאלונים לא נטענו. לחצו רענון בעוד רגע.</p></div>'; } });
+    }
+    function cur() { return (forms || []).filter(function (f) { return f.id === openId; })[0]; }
+    function realRows(f) { return (f.rows || []).filter(function (x) { return !x.test; }); }
+
+    function paint() {
+      if (!forms) { box.innerHTML = '<div class="card"><h3><svg class="i"><use href="#i-text"/></svg>השאלונים שלי</h3><div class="loading">טוען…</div></div>'; return; }
+      if (openId === 'new') return paintNew();
+      if (openId && cur()) return paintForm(cur());
+      openId = null;
+      var h = '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0"><svg class="i"><use href="#i-text"/></svg>השאלונים שלי · ' + forms.length + '</h3>' +
+        '<button class="btn pri sm" id="fNew">+ שאלון חדש</button></div>' +
+        '<p class="note" style="margin-bottom:10px">כאן בונים שאלונים לכל מטרה: למנהל/ת, להורים, לתלמידים, לצוות מגמה או אחרי אירוע. לכל שאלון קישור משלו ותוצאות משלו. שאלון הצוות שלמעלה לא משתנה.</p>' +
+        (msg ? '<p class="note"><b>' + mEsc(msg) + '</b></p>' : '');
+      if (!forms.length) h += '<div class="empty" style="padding:18px">עוד אין שאלונים. לוחצים "שאלון חדש".</div>';
+      forms.forEach(function (f) {
+        var n = realRows(f).length;
+        h += '<div class="row clk" data-open="' + f.id + '" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;justify-content:space-between;cursor:pointer">' +
+          '<div style="flex:1;min-width:180px"><b>' + mEsc(f.title) + '</b><div class="note">' + f.qs.length + ' שאלות' + (f.named ? ' · מזוהה' : '') + '</div></div>' +
+          '<span class="chip' + (n ? '' : ' g') + '">' + n + ' ענו</span></div>';
+      });
+      box.innerHTML = h + '</div>';
+      msg = '';
+      document.getElementById('fNew').onclick = function () { openId = 'new'; paint(); };
+      box.querySelectorAll('[data-open]').forEach(function (el) { el.onclick = function () { openId = el.getAttribute('data-open'); paint(); }; });
+    }
+
+    function head(title) {
+      return '<button class="btn sm" id="fBack"><svg class="i"><use href="#i-back"/></svg>כל השאלונים</button>' +
+        '<div class="h2" style="font-size:1.25rem;margin:10px 0 4px">' + mEsc(title) + '</div>';
+    }
+    function bindBack() { document.getElementById('fBack').onclick = function () { openId = null; paint(); }; }
+    function meta(f) {
+      return '<input class="qt" id="fT" maxlength="120" placeholder="שם השאלון. למשל: שיחת תכנון עם המנהל/ת" value="' + mEsc(f.title || '') + '" style="margin-bottom:8px">' +
+        '<textarea class="qt" id="fI" maxlength="500" placeholder="פתיח קצר למי שעונה (לא חובה): למה השאלון, כמה זמן ייקח" style="min-height:70px;margin-bottom:8px">' + mEsc(f.intro || '') + '</textarea>' +
+        '<label class="note" style="display:flex;gap:8px;align-items:center;font-weight:700"><input type="checkbox" id="fN"' + (f.named ? ' checked' : '') + '> שאלון מזוהה: מתחילים בשאלת שם, ובתוצאות רואים מי ענה מה</label>';
+    }
+    function readMeta() { return { title: document.getElementById('fT').value.trim(), intro: document.getElementById('fI').value.trim(), named: document.getElementById('fN').checked }; }
+
+    function paintNew() {
+      box.innerHTML = '<div class="card">' + head('שאלון חדש') + '<p class="note" style="margin-bottom:10px">קודם שם ופתיח. אחרי היצירה מוסיפים שאלות.</p>' + meta({ named: true }) +
+        '<div class="row" style="margin-top:10px"><button class="btn pri sm" id="fCreate">יצירה</button><span class="note" id="fMsg"></span></div></div>';
+      bindBack();
+      document.getElementById('fCreate').onclick = function () {
+        var m = readMeta();
+        if (m.title.length < 2) { document.getElementById('fMsg').textContent = FERR.title; return; }
+        this.disabled = true; document.getElementById('fMsg').textContent = 'יוצר…';
+        fPost({ action: 'saveForm', s: s, k: K, form: { title: m.title, intro: m.intro, named: m.named, qs: [] } }).then(function (r) {
+          if (!r.ok) { document.getElementById('fMsg').textContent = err(r); document.getElementById('fCreate').disabled = false; return; }
+          forms = (forms || []).concat([{ id: r.id, title: m.title, intro: m.intro, named: m.named, qs: [], rows: [] }]);
+          mStore('mipui_forms_' + s, forms);
+          openId = r.id; paint(); toast('השאלון נוצר. עכשיו מוסיפים שאלות');
+        }).catch(function () { document.getElementById('fMsg').textContent = 'לא נשמר. נסו שוב בעוד רגע.'; document.getElementById('fCreate').disabled = false; });
+      };
+    }
+
+    var editing = null;
+    function paintForm(f) {
+      var url = MIPUI_BASE + 'f.html?f=' + f.id;
+      var locked = {};
+      (f.rows || []).forEach(function (x) { Object.keys(x.a || {}).forEach(function (k) { locked[k] = true; }); });
+      var h = '<div class="card">' + head(f.title);
+      // 1. השאלות
+      h += '<div class="note" style="font-weight:700;margin:12px 0 6px">השאלות · ' + f.qs.length + ' מתוך 15</div>';
+      if (!f.qs.length) h += '<p class="note" style="margin-bottom:8px">עוד אין שאלות. מוסיפים את הראשונה כאן למטה.</p>';
+      f.qs.forEach(function (q, i) {
+        h += '<div class="row" style="border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;justify-content:space-between">' +
+          '<div style="flex:1;min-width:200px"><b>' + (i + 1) + '. ' + mEsc(q.q) + '</b><div class="note">' + TYPE_HE[q.type] + (q.type === 'many' ? ' (עד ' + q.max + ')' : '') + (q.opts ? ' · ' + q.opts.map(function (o) { return mEsc(o.t); }).join(' · ') : '') + '</div></div>' +
+          (locked[q.id] ? '<span class="chip g">נענתה, נעולה</span>' :
+            '<span class="row" style="gap:6px">' + (i ? '<button class="btn sm" data-up="' + i + '" aria-label="להעלות">↑</button>' : '') + '<button class="btn sm" data-ed="' + i + '">עריכה</button><button class="btn sm" data-del="' + i + '">מחיקה</button></span>') + '</div>';
+      });
+      if (f.qs.length < 15 || editing != null) {
+        var e = editing != null ? f.qs[editing] : { type: 'one', q: '', opts: [] };
+        h += '<div style="background:var(--soft);border-radius:12px;padding:12px;margin-top:8px">' +
+          '<div class="note" style="font-weight:700;margin-bottom:6px">' + (editing != null ? 'עריכת שאלה' : 'שאלה חדשה') + '</div>' +
+          '<input class="qt" id="exQ" maxlength="200" placeholder="נוסח השאלה" value="' + mEsc(e.q) + '" style="margin-bottom:8px">' +
+          '<div class="row" style="margin-bottom:8px"><select class="qt" id="exT" style="width:auto">' + Object.keys(TYPE_HE).map(function (t) { return '<option value="' + t + '"' + (t === e.type ? ' selected' : '') + '>' + TYPE_HE[t] + '</option>'; }).join('') + '</select>' +
+          '<label class="note" id="exMaxL">כמה אפשר לסמן <input class="qt" id="exMax" type="number" min="1" max="8" value="' + (e.max || 2) + '" style="width:70px;display:inline-block"></label></div>' +
+          '<textarea class="qt" id="exO" placeholder="אפשרויות התשובה, אחת בכל שורה (2 עד 8)" style="min-height:100px">' + mEsc((e.opts || []).map(function (o) { return o.t; }).join(String.fromCharCode(10))) + '</textarea>' +
+          '<p class="note" id="exHint" style="margin-top:4px"></p>' +
+          '<div class="row" style="margin-top:8px"><button class="btn pri sm" id="exSave">' + (editing != null ? 'שמירת השינוי' : 'הוספה לשאלון') + '</button>' +
+          (editing != null ? '<button class="btn sm" id="exCancel">ביטול</button>' : '') + '<span class="note" id="fMsg">' + mEsc(msg) + '</span></div></div>';
+      }
+      // 2. פרטים
+      h += '<details style="margin-top:14px"><summary class="note" style="font-weight:700;cursor:pointer">שם, פתיח וזיהוי</summary><div style="margin-top:8px">' + meta(f) +
+        '<div class="row" style="margin-top:8px"><button class="btn sm" id="fMeta">שמירה</button><button class="btn sm" id="fDel" style="margin-inline-start:auto">הסרת השאלון</button></div></div></details>';
+      // 3. שליחה
+      if (f.qs.length) {
+        var txt = 'שלום, אשמח שתענו על שאלון קצר: ' + f.title + '\n' + url;
+        h += '<div style="margin-top:16px;padding-top:12px;border-top:1px solid var(--line)"><div class="note" style="font-weight:700;margin-bottom:6px">שליחה</div>' +
+          '<div class="linkbox"><span class="ltr">' + mEsc(url) + '</span><button class="btn sm" id="fCp"><svg class="i"><use href="#i-copy"/></svg>העתקה</button></div>' +
+          '<textarea class="qt" id="fMsgT" style="min-height:80px;font-size:.92rem;margin-top:8px">' + mEsc(txt) + '</textarea>' +
+          '<div class="row" style="margin-top:8px"><a class="btn pri sm" id="fWa" target="_blank" rel="noopener"><svg class="i"><use href="#i-chat"/></svg>וואטסאפ</a>' +
+          '<a class="btn sm" id="fMail"><svg class="i"><use href="#i-mail"/></svg>מייל</a>' +
+          '<a class="btn sm" target="_blank" rel="noopener" href="' + url + '&test=1"><svg class="i"><use href="#i-eye"/></svg>מילוי ניסיון</a>' +
+          '<button class="btn sm" id="fQrB">QR</button></div><div id="fQr" style="margin-top:10px"></div></div>';
+      }
+      h += '</div>';
+      // 4. תוצאות
+      h += '<div class="row" style="justify-content:space-between;margin:18px 0 10px"><div class="h2" style="margin:0;font-size:1.15rem">התוצאות</div><button class="btn sm" id="fRef"><svg class="i"><use href="#i-refresh"/></svg>רענון</button></div>' +
+        formResults(f);
+      box.innerHTML = h;
+      msg = '';
+      bindBack();
+      var tSel = document.getElementById('exT');
+      function syncType() {
+        if (!tSel) return;
+        var t = tSel.value;
+        document.getElementById('exO').style.display = t === 'one' || t === 'many' ? '' : 'none';
+        document.getElementById('exMaxL').style.display = t === 'many' ? '' : 'none';
+        document.getElementById('exHint').textContent = t === 'scale' ? 'סולם 1 עד 5, מ"בכלל לא" עד "מאוד".' : t === 'text' ? 'שאלה פתוחה לא חובה: אפשר לדלג עליה.' : '';
+      }
+      if (tSel) { tSel.onchange = syncType; syncType(); }
+      function saveQs(nq, okMsg) {
+        var m = document.getElementById('fMsg'); if (m) m.textContent = 'שומר…';
+        box.querySelectorAll('button').forEach(function (b) { b.disabled = true; });
+        gen++;
+        fPost({ action: 'saveForm', s: s, k: K, form: { id: f.id, title: f.title, intro: f.intro, named: f.named, qs: nq } }).then(function (r) {
+          if (r.ok) {
+            // מציגים מיד את מה שהשרת שמר, ומרעננים את התשובות ברקע
+            if (r.qs) f.qs = r.qs; else f.qs = nq;
+            mStore('mipui_forms_' + s, forms);
+            editing = null; msg = okMsg; paint(); toast('נשמר'); fetchAll();
+          }
+          else { msg = err(r); paint(); }
+        }).catch(function () { msg = 'לא נשמר. נסו שוב בעוד רגע.'; paint(); });
+      }
+      function freeId() { for (var i = 1; i <= 15; i++) if (!f.qs.some(function (q) { return q.id === 'q' + i; })) return 'q' + i; return null; }
+      box.querySelectorAll('[data-ed]').forEach(function (b) { b.onclick = function () { editing = +b.getAttribute('data-ed'); paint(); }; });
+      box.querySelectorAll('[data-del]').forEach(function (b) { b.onclick = function () { var nq = f.qs.slice(); nq.splice(+b.getAttribute('data-del'), 1); saveQs(nq, 'השאלה נמחקה'); }; });
+      box.querySelectorAll('[data-up]').forEach(function (b) { b.onclick = function () { var i = +b.getAttribute('data-up'), nq = f.qs.slice(), t = nq[i - 1]; nq[i - 1] = nq[i]; nq[i] = t; saveQs(nq, 'הסדר עודכן'); }; });
+      var cc = document.getElementById('exCancel'); if (cc) cc.onclick = function () { editing = null; paint(); };
+      var sv = document.getElementById('exSave');
+      if (sv) sv.onclick = function () {
+        var t = tSel.value, text = document.getElementById('exQ').value.trim();
+        var opts = document.getElementById('exO').value.split(String.fromCharCode(10)).map(function (x) { return x.trim(); }).filter(Boolean);
+        if (text.length < 3) { document.getElementById('fMsg').textContent = FERR.text; return; }
+        if ((t === 'one' || t === 'many') && (opts.length < 2 || opts.length > 8)) { document.getElementById('fMsg').textContent = FERR.opts; return; }
+        var q = { id: editing != null ? f.qs[editing].id : freeId(), type: t, q: text };
+        if (t === 'one' || t === 'many') q.opts = opts.map(function (o) { return { t: o }; });
+        if (t === 'many') q.max = Number(document.getElementById('exMax').value) || 2;
+        var nq = f.qs.slice();
+        if (editing != null) nq[editing] = q; else nq.push(q);
+        saveQs(nq, editing != null ? 'השינוי נשמר' : 'נוספה. היא כבר בשאלון.');
+      };
+      document.getElementById('fMeta').onclick = function () {
+        var m = readMeta();
+        if (m.title.length < 2) { toast(FERR.title); return; }
+        f.title = m.title; f.intro = m.intro; f.named = m.named;
+        saveQs(f.qs, 'נשמר');
+      };
+      document.getElementById('fDel').onclick = function () {
+        if (!confirm('להסיר את השאלון "' + f.title + '"? הקישור יפסיק לעבוד. התשובות שכבר נשלחו נשמרות.')) return;
+        fPost({ action: 'delForm', s: s, k: K, f: f.id }).then(function (r) {
+          if (!r.ok) { toast(err(r)); return; }
+          openId = null; msg = 'השאלון הוסר.'; fetchAll();
+        });
+      };
+      document.getElementById('fRef').onclick = function () { this.disabled = true; fetchAll(); };
+      if (f.qs.length) {
+        document.getElementById('fCp').onclick = function () { copy(url, 'הקישור הועתק'); };
+        var ta = document.getElementById('fMsgT');
+        var upd = function () {
+          document.getElementById('fWa').href = 'https://wa.me/?text=' + encodeURIComponent(ta.value);
+          document.getElementById('fMail').href = 'mailto:?subject=' + encodeURIComponent(f.title) + '&body=' + encodeURIComponent(ta.value);
+        };
+        ta.oninput = upd; upd();
+        document.getElementById('fQrB').onclick = function () {
+          var q = document.getElementById('fQr'); q.innerHTML = '';
+          try { new QRCode(q, { text: url, width: 160, height: 160, correctLevel: QRCode.CorrectLevel.M }); } catch (x) {}
+        };
+      }
+      box.querySelectorAll('tr[data-w]').forEach(function (tr) {
+        tr.onclick = function () { var d = box.querySelector('tr[data-wd="' + tr.getAttribute('data-w') + '"]'); if (d) d.hidden = !d.hidden; };
+      });
+    }
+
+    function fAns(q, v) {
+      if (v == null || v === '') return '';
+      if (q.type === 'one' || q.type === 'many') return (Array.isArray(v) ? v : [v]).map(function (id) { return ((q.opts || []).filter(function (o) { return o.id === id; })[0] || {}).t || id; }).join(', ');
+      return String(v);
+    }
+    function formResults(f) {
+      var all = f.rows || [], rows = realRows(f), tests = all.length - rows.length;
+      var h = tests ? '<p class="note" style="margin-bottom:10px">מילויי ניסיון שלכם: ' + tests + ' (לא נספרים).</p>' : '';
+      if (!rows.length) return h + '<div class="empty"><b>עוד אין תשובות.</b><br>ברגע שיענו, התוצאות יופיעו כאן.</div>';
+      h += '<div class="g4" style="margin-bottom:16px"><div class="kpi"><div class="v">' + rows.length + '</div><div class="l">ענו</div></div></div><div class="g2" style="margin-bottom:16px">';
+      f.qs.forEach(function (q) {
+        var vals = rows.map(function (x) { return (x.a || {})[q.id]; }).filter(function (v) { return v != null && v !== '' && !(Array.isArray(v) && !v.length); });
+        h += '<div class="card"><h3>' + mEsc(q.q) + '</h3>';
+        if (!vals.length) { h += '<p class="note">עוד אין תשובות.</p></div>'; return; }
+        if (q.type === 'text') { h += vals.slice(0, 30).map(function (t) { return '<div class="quote">' + mEsc(t) + '</div>'; }).join('') + '</div>'; return; }
+        var c = {};
+        vals.forEach(function (v) { (Array.isArray(v) ? v : [v]).forEach(function (x) { c[x] = (c[x] || 0) + 1; }); });
+        if (q.type === 'scale') {
+          var a = vals.reduce(function (x, y) { return x + Number(y); }, 0) / vals.length;
+          h += '<div class="kpi" style="border:0;padding:0 0 6px"><div class="v">' + a.toFixed(1) + '<small> /5</small></div><div class="l">ממוצע</div></div>';
+        }
+        var keys = q.type === 'scale' ? ['5', '4', '3', '2', '1'] : q.opts.map(function (o) { return o.id; });
+        keys.forEach(function (k) {
+          var lab = q.type === 'scale' ? k : (q.opts.filter(function (o) { return o.id === k; })[0] || {}).t;
+          var v = c[k] || 0;
+          h += '<div class="bar"><span>' + mEsc(lab) + '</span><div class="tr"><div class="fl" style="width:' + pct(v, vals.length) + '%"></div></div><span class="v">' + v + '</span></div>';
+        });
+        h += '</div>';
+      });
+      h += '</div>';
+      // טבלת מי ענה: שורה לכל משיב/ה, לחיצה פותחת את כל התשובות
+      h += '<div class="card"><h3><svg class="i"><use href="#i-users"/></svg>כל התשובות · ' + rows.length + '</h3><div style="overflow-x:auto"><table class="t"><tr><th>' + (f.named ? 'שם' : 'מס׳') + '</th><th>תאריך</th></tr>';
+      rows.forEach(function (x, i) {
+        h += '<tr class="clk" data-w="' + i + '"><td><b>' + (f.named ? mEsc(x.name || '–') : (rows.length - i)) + '</b></td><td class="note">' + mEsc(x.date) + '</td></tr>' +
+          '<tr data-wd="' + i + '" hidden><td colspan="2" style="background:#F6F9FC">' + f.qs.map(function (q) {
+            var v = fAns(q, (x.a || {})[q.id]);
+            return v ? '<div style="margin:4px 0"><span class="note">' + mEsc(q.q) + '</span><br>' + mEsc(v) + '</div>' : '';
+          }).join('') + '</td></tr>';
+      });
+      return h + '</table></div></div>';
+    }
+
+    paint();
+    fetchAll();
   }
 
   /* ---------- טעינת התוצאות: קודם מהזיכרון המקומי, ואז מהשרת ---------- */
