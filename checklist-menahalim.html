@@ -263,8 +263,8 @@ function fetchJson(url, ms, tries){
 }
 var data = {};
 var pending = {
-  rg:    fetchJson(API.rg, 15000).then(function(j){ data.rg = j; }, function(){ data.rg = null; }),
-  bs:    fetchJson(API.bs, 15000).then(function(j){ data.bs = j; }, function(){ data.bs = null; }),
+  rg:    fetchJson(API.rg, 30000).then(function(j){ data.rg = j; }, function(){ data.rg = null; }),
+  bs:    fetchJson(API.bs, 30000).then(function(j){ data.bs = j; }, function(){ data.bs = null; }),
   menor: fetchJson(API.menor, 45000).then(function(j){ data.menor = j; }, function(){ data.menor = null; })
 };
 
