@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>צ'ק ליסט למנהלים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D3B66' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='3' width='18' height='18' rx='4'/><path d='M8 12l3 3 5-6'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0D3B66;--navy-800:#124D7A;--accent:#0A7799;--blue-100:#E8F2FF;
+  --canvas:#F4F8FC;--soft:#F2F7FC;--text:#102A43;--text2:#52687A;
+  --border:#D8E6F2;--border-strong:#BED4E7;--grad:linear-gradient(135deg,#124D7A,#087B9C);
+  --green:#1F7A42;--green-bg:#E6F4EA;--amber:#8A5A00;--amber-bg:#FFF4D6;--red:#B42318;--red-bg:#FDECEA;
+  --sh:0 12px 34px rgba(13,59,102,.09);--ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:Assistant,'Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.55;background:var(--canvas);color:var(--text);-webkit-font-smoothing:antialiased}
+svg{width:18px;height:18px;flex:none}
+.hero{background:var(--grad);color:#fff;padding:34px 16px 46px}
+.in-w{max-width:720px;margin:0 auto}
+.kick{font-size:.85rem;opacity:.85;font-weight:600}
+.hero h1{margin:4px 0 6px;font-size:1.95rem;line-height:1.2}
+.hero p{margin:0;opacity:.92}
+main{max-width:720px;margin:-28px auto 0;padding:0 16px}
+
+/* בחירת בית ספר + התקדמות */
+.top{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:var(--sh);display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center}
+.top label{display:block;font-weight:700;margin-bottom:6px}
+.top select{width:100%;border:1px solid var(--border-strong);border-radius:10px;padding:11px 12px;font:600 1rem Assistant,sans-serif;background:#fff;color:var(--text)}
+.top select:focus{outline:2px solid var(--accent);outline-offset:1px}
+.ring{position:relative;width:86px;height:86px}
+.ring svg{width:86px;height:86px;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .bg{stroke:var(--blue-100)}
+.ring .fg{stroke:var(--green);stroke-linecap:round;transition:stroke-dashoffset .6s var(--ease)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.05}
+.ring .num b{font-size:1.45rem;color:var(--navy)}
+.ring .num small{display:block;font-size:.72rem;color:var(--text2);font-weight:600}
+.allset{margin-top:14px;background:var(--green-bg);color:var(--green);border-radius:12px;padding:12px 16px;font-weight:700;display:flex;gap:10px;align-items:center}
+
+/* משימות */
+.tasks{list-style:none;margin:18px 0 0;padding:0;display:grid;gap:14px}
+.task{background:#fff;border:1px solid var(--border);border-radius:16px;padding:18px 20px;box-shadow:0 4px 14px rgba(13,59,102,.05);transition:border-color .2s var(--ease),background .2s var(--ease)}
+.task.done{border-color:#B9DEC6;background:#FAFDFB}
+.head{display:flex;gap:14px;align-items:flex-start}
+.box{appearance:none;-webkit-appearance:none;margin:2px 0 0;width:30px;height:30px;border:2px solid var(--border-strong);border-radius:9px;background:#fff;cursor:pointer;flex:none;display:grid;place-items:center;transition:background .15s var(--ease),border-color .15s var(--ease)}
+.box:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.box:checked{background:var(--green);border-color:var(--green)}
+.box:checked::after{content:"";width:9px;height:15px;border:solid #fff;border-width:0 3px 3px 0;transform:translate(0,-2px) rotate(45deg)}
+.ttl{flex:1;min-width:0}
+.ttl .n{font-size:.8rem;font-weight:700;color:var(--accent)}
+.ttl h2{margin:0;font-size:1.22rem;line-height:1.3;color:var(--navy)}
+.task.done h2{color:var(--green)}
+.ttl p{margin:5px 0 0;color:var(--text2);font-size:.97rem}
+.ico{width:42px;height:42px;border-radius:12px;background:var(--blue-100);color:var(--navy);display:grid;place-items:center;flex:none}
+.ico svg{width:22px;height:22px}
+
+.live{margin:14px 0 0;border-radius:12px;background:var(--soft);padding:11px 14px;font-size:.94rem}
+.live .lh{display:flex;gap:8px;align-items:center;font-weight:700;color:var(--text2);font-size:.82rem;margin-bottom:4px}
+.live .lh svg{width:15px;height:15px}
+.st{font-weight:700}
+.st.ok{color:var(--green)}
+.st.wait{color:var(--amber)}
+.st.no{color:var(--red)}
+.st.muted{color:var(--text2);font-weight:600}
+.bar{height:8px;border-radius:99px;background:#fff;border:1px solid var(--border);overflow:hidden;margin-top:7px}
+.bar i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .6s var(--ease)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:4px 11px;font-size:.86rem;font-weight:600;text-decoration:none;border:1px solid var(--border);background:#fff;color:var(--text2)}
+.chip.on{background:var(--green-bg);border-color:#B9DEC6;color:var(--green)}
+.chip svg{width:13px;height:13px}
+a.chip:hover{border-color:var(--accent)}
+
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:11px 18px;font:700 1rem Assistant,sans-serif;cursor:pointer;text-decoration:none;background:var(--navy);color:#fff;transition:transform .12s var(--ease),background .15s var(--ease)}
+.btn:hover{background:var(--navy-800)}
+.btn:active{transform:scale(.97)}
+.btn.soft{background:var(--blue-100);color:var(--navy)}
+.btn.soft:hover{background:#D7E8FB}
+.btn.wa{background:#E7F7EE;color:#146C3A}
+.btn.wa:hover{background:#D3F0E0}
+.note{font-size:.85rem;color:var(--text2);margin-top:12px}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;background:var(--green);color:#fff;font-weight:700;padding:11px 20px;border-radius:12px;box-shadow:var(--sh);transition:all .25s var(--ease);pointer-events:none;z-index:9}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+footer{text-align:center;padding:30px 16px 40px;color:var(--text2);font-size:.9rem}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.helpbtn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--border-strong);background:#fff;border-radius:99px;padding:9px 16px;margin-bottom:14px}
+.credit{margin-top:6px;font-size:.8rem}
+
+@media (max-width:560px){
+  .hero h1{font-size:1.6rem}
+  .top{grid-template-columns:1fr;justify-items:stretch}
+  .ring{justify-self:center}
+  .task{padding:16px}
+  .ico{display:none}
+  .acts .btn{flex:1 1 100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero"><div class="in-w">
+  <div class="kick">המנהל להכשרה מקצועית · משרד העבודה</div>
+  <h1>צ'ק ליסט למנהלים — תשפ״ז</h1>
+  <p>שלוש משימות לפתיחת השנה. בוחרים בית ספר, רואים מה כבר נקלט במערכות ומסמנים וי על מה שהושלם.</p>
+</div></header>
+
+<main>
+  <section class="top">
+    <div>
+      <label for="school">בית הספר שלי</label>
+      <select id="school"><option value="">בחירת בית ספר…</option></select>
+    </div>
+    <div class="ring" aria-live="polite">
+      <svg viewBox="0 0 86 86" aria-hidden="true"><circle class="bg" cx="43" cy="43" r="37"/><circle class="fg" id="ringFg" cx="43" cy="43" r="37" stroke-dasharray="232.5" stroke-dashoffset="232.5"/></svg>
+      <div class="num"><div><b id="ringNum">0/3</b><small>הושלמו</small></div></div>
+    </div>
+  </section>
+  <div class="allset" id="allset" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>
+    כל המשימות הושלמו. תודה רבה!
+  </div>
+
+  <ol class="tasks">
+
+    <!-- 1 · רישום להשתלמויות -->
+    <li class="task" data-t="rg">
+      <div class="head">
+        <input type="checkbox" class="box" id="c-rg" aria-labelledby="h-rg">
+        <div class="ttl">
+          <div class="n">משימה 1</div>
+          <h2 id="h-rg">רישום בעלי התפקידים להשתלמויות</h2>
+          <p>רכזים חברתיים, מת״ליות, רכזי הכלה ושילוב, נתיבים לקריירה, מורים חונכים, רכזים פדגוגיים ושירות לאומי. כל אחד נרשם בעצמו בטופס אחד.</p>
+        </div>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg></div>
+      </div>
+      <div class="live" id="l-rg" hidden></div>
+      <div class="acts">
+        <a class="btn" href="https://pedagogiamh.co.il/hishtalmuyot.html#rishum" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+          לטופס הרישום
+        </a>
+        <button class="btn soft" type="button" data-copy="https://pedagogiamh.co.il/hishtalmuyot.html#rishum">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          העתקת הקישור לבעלי התפקידים
+        </button>
+      </div>
+    </li>
+
+    <!-- 2 · רישום המורים במנור -->
+    <li class="task" data-t="menor">
+      <div class="head">
+        <input type="checkbox" class="box" id="c-menor" aria-labelledby="h-menor">
+        <div class="ttl">
+          <div class="n">משימה 2</div>
+          <h2 id="h-menor">רישום המורים במנור</h2>
+          <p>כל מורה נרשם.ת פעם אחת בקישור הקבוע: מאמת.ת מייל בקוד ועונה על שאלת ההשתלמות המקצועית. התפקיד שלך: להעביר את הקישור לצוות ולוודא שכולם השלימו.</p>
+        </div>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2 9 2 12 0v-5"/></svg></div>
+      </div>
+      <div class="live" id="l-menor" hidden></div>
+      <div class="acts">
+        <button class="btn" type="button" data-copy="https://pedagogiamh.co.il/hadrachot/teacher/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          העתקת הקישור למורים
+        </button>
+        <a class="btn wa" id="waMenor" target="_blank" rel="noopener" href="#">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.5 8.5 0 0 1-12.6 7.4L3 20.5l1.6-5.2A8.5 8.5 0 1 1 21 11.5z"/></svg>
+          שליחה לקבוצת המורים
+        </a>
+        <a class="btn soft" href="https://pedagogiamh.co.il/hadrachot/" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+          מי נרשם — כניסה למנור
+        </a>
+      </div>
+    </li>
+
+    <!-- 3 · השתלמות בית ספרית -->
+    <li class="task" data-t="bs">
+      <div class="head">
+        <input type="checkbox" class="box" id="c-bs" aria-labelledby="h-bs">
+        <div class="ttl">
+          <div class="n">משימה 3</div>
+          <h2 id="h-bs">בחירת ההשתלמות הבית ספרית</h2>
+          <p>בוחרים השתלמות אחת מהקטלוג, או מנחה מבחוץ בכפוף לתנאי הסף. הבקשה עוברת לאישור המפקח.ת, ומשם לאלנט.</p>
+        </div>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></div>
+      </div>
+      <div class="live" id="l-bs" hidden></div>
+      <div class="acts">
+        <a class="btn" href="https://pedagogiamh.co.il/hishtalmut-beit-sifrit.html" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>
+          לבחירת ההשתלמות
+        </a>
+      </div>
+    </li>
+  </ol>
+
+  <p class="note">הסימון נשמר במכשיר הזה. משימה שהמערכת כבר רואה כגמורה מסומנת לבד.</p>
+</main>
+
+<div class="toast" id="toast" role="status">הקישור הועתק</div>
+
+<footer>
+  <a class="helpbtn" href="mailto:mlypeleg@gmail.com?subject=%D7%A0%D7%AA%D7%A7%D7%9C%D7%AA%D7%99%20%D7%91%D7%91%D7%A2%D7%99%D7%94%20-%20%D7%A6'%D7%A7%20%D7%9C%D7%99%D7%A1%D7%98%20%D7%9C%D7%9E%D7%A0%D7%94%D7%9C%D7%99%D7%9D">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v12H8l-4 3z"/><path d="M12 9v3M12 14h.01"/></svg>
+    נתקלתם בבעיה? שלחו הודעה
+  </a>
+  <div>המנהל להכשרה מקצועית · משרד העבודה — המנהיגות הפדגוגית היוצרת</div>
+  <div class="credit">נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</footer>
+
+<script src="https://pedagogiamh.co.il/school-names.js"></script>
+<script>
+(function(){
+var GAS = "https://script.google.com/macros/s/";
+var API = {
+  rg:    GAS + "AKfycbxraYAhcv_oefTLHxyOfripC0R2LlmPMgYNIWR4rCQUa0FFybRoFHIe4zqgWB1MikF9/exec?mode=schools",
+  bs:    GAS + "AKfycbybTYpXL_XPluv-r1wUZaWwDsZjAtXX4BeaO7quSQOvqWf0u8EUNJUbAxleScvchzcX/exec?mode=public",
+  menor: GAS + "AKfycbwDOLGv0Hr7KNjFJBIslJkDt9cDa2g4-Gfho3dTfI0AP3uwjlM3NGCwSnQkXZd4DUlyHg/exec?action=registration.count&by=school"
+};
+var TEACHER_LINK = "https://pedagogiamh.co.il/hadrachot/teacher/";
+var WS = [
+  {k:"social",  t:"רכזים חברתיים"},
+  {k:"matal",   t:"מת״ליות"},
+  {k:"hachala", t:"הכלה ושילוב"},
+  {k:"career",  t:"נתיבים לקריירה"},
+  {k:"honchim", t:"מורים חונכים"},
+  {k:"ped",     t:"רכזים פדגוגיים"},
+  {k:"sherut",  t:"שירות לאומי"}
+];
+var TASKS = ["rg", "menor", "bs"];
+var SN = window.SchoolNames || { list: [], canon: function(n){ return n; } };
+var $ = function(id){ return document.getElementById(id); };
+var ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
+var LIVE_HEAD = '<div class="lh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>מה המערכת רואה</div>';
+
+/* ---------- אחסון מקומי (עטוף — עלול להיחסם) ---------- */
+function load(k){ try { return JSON.parse(localStorage.getItem(k) || "null"); } catch(e){ return null; } }
+function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+var school = "", manual = {}, auto = {};
+
+/* ---------- רשת: פסק זמן + ניסיונות חוזרים (Apps Script 302→404 רגעי) ---------- */
+function fetchJson(url, ms, tries){
+  tries = tries || 3;
+  return new Promise(function(res, rej){
+    var done = false, t = setTimeout(function(){ if (!done){ done = true; rej(new Error("timeout")); } }, ms);
+    fetch(url).then(function(r){ return r.json(); })
+      .then(function(j){ if (!done){ done = true; clearTimeout(t); res(j); } })
+      .catch(function(e){ if (!done){ done = true; clearTimeout(t); rej(e); } });
+  }).catch(function(e){
+    if (tries > 1) return fetchJson(url, ms, tries - 1);
+    throw e;
+  });
+}
+var data = {};
+var pending = {
+  rg:    fetchJson(API.rg, 15000).then(function(j){ data.rg = j; }, function(){ data.rg = null; }),
+  bs:    fetchJson(API.bs, 15000).then(function(j){ data.bs = j; }, function(){ data.bs = null; }),
+  menor: fetchJson(API.menor, 45000).then(function(j){ data.menor = j; }, function(){ data.menor = null; })
+};
+
+/* ---------- בית ספר ---------- */
+var sel = $("school");
+SN.list.forEach(function(n){ var o = document.createElement("option"); o.value = o.textContent = n; sel.appendChild(o); });
+var last = load("chk-menahalim:school");
+if (last && SN.list.indexOf(last) > -1) sel.value = last;
+sel.addEventListener("change", function(){ save("chk-menahalim:school", sel.value); pick(sel.value); });
+
+/* ---------- סימון ידני ---------- */
+TASKS.forEach(function(t){
+  $("c-" + t).addEventListener("change", function(e){
+    manual[t] = e.target.checked;
+    if (school) save("chk-menahalim:" + school, manual);
+    paint();
+  });
+});
+
+function paint(){
+  var n = 0;
+  TASKS.forEach(function(t){
+    var on = !!(manual[t] || auto[t]);
+    $("c-" + t).checked = on;
+    $("c-" + t).closest(".task").classList.toggle("done", on);
+    if (on) n++;
+  });
+  $("ringNum").textContent = n + "/3";
+  $("ringFg").setAttribute("stroke-dashoffset", (232.5 * (1 - n / 3)).toFixed(1));
+  $("allset").hidden = n !== 3;
+}
+
+function pick(s){
+  school = s;
+  manual = (s && load("chk-menahalim:" + s)) || {};
+  auto = {};
+  TASKS.forEach(function(t){ var l = $("l-" + t); l.hidden = !s; l.innerHTML = s ? LIVE_HEAD + '<span class="st muted">בודק…</span>' : ""; });
+  paint();
+  if (!s) return;
+  pending.rg.then(function(){ if (school === s) liveRg(s); });
+  pending.bs.then(function(){ if (school === s) liveBs(s); });
+  pending.menor.then(function(){ if (school === s) liveMenor(s); });
+}
+
+function canonKeys(obj){
+  var out = {};
+  Object.keys(obj || {}).forEach(function(k){
+    var c = SN.canon(k), v = obj[k];
+    if (!out[c]) { out[c] = v; return; }
+    // שני כתיבים לאותו בית ספר — מחברים מספרים
+    Object.keys(v).forEach(function(f){ if (typeof v[f] === "number") out[c][f] = (out[c][f] || 0) + v[f]; });
+  });
+  return out;
+}
+function offline(id){ $(id).innerHTML = LIVE_HEAD + '<span class="st muted">לא הצלחנו לבדוק כרגע. אפשר לסמן ידנית.</span>'; }
+
+/* ---------- 1 · רישום להשתלמויות ---------- */
+function liveRg(s){
+  var j = data.rg;
+  if (!j || !j.ok) return offline("l-rg");
+  var me = canonKeys(j.schools)[s] || {};
+  var reg = WS.filter(function(w){ return me[w.k]; });
+  var n = reg.reduce(function(a, w){ return a + me[w.k]; }, 0);
+  var head = n
+    ? '<span class="st ok">' + n + ' נרשמו מבית הספר, ב-' + reg.length + ' מתוך ' + WS.length + ' השתלמויות</span>'
+    : '<span class="st no">עדיין אין נרשמים מבית הספר</span>';
+  var chips = WS.map(function(w){
+    var c = me[w.k] || 0;
+    return '<a class="chip' + (c ? ' on' : '') + '" target="_blank" rel="noopener" href="https://pedagogiamh.co.il/hishtalmuyot.html#rg=' + w.k + '">' +
+      (c ? ICON_OK : '') + w.t + (c ? ' · ' + c : '') + '</a>';
+  }).join("");
+  $("l-rg").innerHTML = LIVE_HEAD + head + '<div class="chips">' + chips + '</div>';
+  // לא מסמנים לבד: לא כל בית ספר צריך את כל ההשתלמויות — המנהל.ת מחליט.ה מתי זה גמור
+}
+
+/* ---------- 2 · מנור ---------- */
+function liveMenor(s){
+  var j = data.menor;
+  if (!j || !j.ok || !j.bySchool) return offline("l-menor");
+  var me = canonKeys(j.bySchool)[s];
+  if (!me || !me.t) {
+    $("l-menor").innerHTML = LIVE_HEAD + '<span class="st muted">עוד אין מורים של בית הספר ברשימת מנור. מורה שלא מופיע.ה בוחר.ת ”השם שלי לא ברשימה”.</span>';
+    return;
+  }
+  var pct = Math.round(me.r / me.t * 100);
+  var cls = me.r >= me.t ? "ok" : me.r ? "wait" : "no";
+  $("l-menor").innerHTML = LIVE_HEAD +
+    '<span class="st ' + cls + '">' + me.r + ' מתוך ' + me.t + ' מורים נרשמו</span>' +
+    (me.r ? ' · <span class="st muted">' + me.d + ' השלימו את כל השלבים</span>' : '') +
+    '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + pct + '"><i style="width:' + pct + '%"></i></div>';
+  auto.menor = me.r >= me.t;
+  paint();
+}
+
+/* ---------- 3 · השתלמות בית ספרית ---------- */
+function stamp(v){ var m = /(\d+)\/(\d+)\/(\d+)\s+(\d+):(\d+)/.exec(v || ""); return m ? +(m[3] + m[2].padStart(2,"0") + m[1].padStart(2,"0") + m[4].padStart(2,"0") + m[5]) : 0; }
+function esc(x){ return String(x).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+function liveBs(s){
+  var j = data.bs;
+  if (!j || !j.ok) return offline("l-bs");
+  var rows = (j.rows || []).filter(function(r){ return SN.canon(r["בית הספר"]) === s; });
+  rows.sort(function(a, b){ return stamp(b["חותמת זמן"]) - stamp(a["חותמת זמן"]); });
+  var r = rows[0];
+  if (!r) { $("l-bs").innerHTML = LIVE_HEAD + '<span class="st no">עוד לא נבחרה השתלמות</span>'; return; }
+  var st = r["סטטוס"] || "", cls = "wait", txt = st;
+  if (/מאושר/.test(st)) { cls = "ok"; txt = "אושרה ונשלחה לאלנט"; auto.bs = true; }
+  else if (/ממתין/.test(st)) { txt = "הוגשה, ממתינה לאישור המפקח.ת"; }
+  else if (/נדחה|הוחזר/.test(st)) { cls = "no"; txt = st + " — יש לבחור מחדש"; }
+  $("l-bs").innerHTML = LIVE_HEAD + '<span class="st ' + cls + '">' + esc(txt) + '</span>' +
+    (r["שם ההשתלמות"] ? '<div style="margin-top:4px">' + esc(r["שם ההשתלמות"]) + '</div>' : '');
+  paint();
+}
+
+/* ---------- העתקה + וואטסאפ ---------- */
+var toastT;
+function toast(msg){ var t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove("on"); }, 1800); }
+function copy(text){
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text).then(function(){ toast("הקישור הועתק"); }, function(){ fallback(text); });
+  fallback(text);
+}
+function fallback(text){
+  var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); toast("הקישור הועתק"); } catch(e){ prompt("העתיקו את הקישור:", text); }
+  ta.remove();
+}
+document.querySelectorAll("[data-copy]").forEach(function(b){ b.addEventListener("click", function(){ copy(b.getAttribute("data-copy")); }); });
+$("waMenor").href = "https://wa.me/?text=" + encodeURIComponent(
+  "שלום לכולם,\nכל מורה נרשם/ת למנור פעם אחת בקישור הזה: בוחרים בית ספר, מקצוע ושם, מאמתים את המייל בקוד ועונים על שאלת ההשתלמות המקצועית.\n" + TEACHER_LINK + "\nתודה!");
+
+pick(sel.value);
+})();
+</script>
+</body>
+</html>
