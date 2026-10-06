@@ -110,7 +110,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 <header class="hero"><div class="in-w">
   <div class="kick">המנהל להכשרה מקצועית · משרד העבודה</div>
   <h1>צ'ק ליסט למנהלים — תשפ״ז</h1>
-  <p>שלוש משימות לפתיחת השנה. בוחרים בית ספר, רואים מה כבר נקלט במערכות ומסמנים וי על מה שהושלם.</p>
+  <p>ארבע משימות לפתיחת השנה. בוחרים בית ספר, רואים מה כבר נקלט במערכות ומסמנים וי על מה שהושלם.</p>
 </div></header>
 
 <main>
@@ -121,7 +121,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
     <div class="ring" aria-live="polite">
       <svg viewBox="0 0 86 86" aria-hidden="true"><circle class="bg" cx="43" cy="43" r="37"/><circle class="fg" id="ringFg" cx="43" cy="43" r="37" stroke-dasharray="232.5" stroke-dashoffset="232.5"/></svg>
-      <div class="num"><div><b id="ringNum">0/3</b><small>הושלמו</small></div></div>
+      <div class="num"><div><b id="ringNum">0/4</b><small>הושלמו</small></div></div>
     </div>
   </section>
   <div class="allset" id="allset" hidden>
@@ -202,6 +202,19 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         </a>
       </div>
     </li>
+
+    <!-- 4 · פגישה עם רכז.ת התקשוב (סימון ידני בלבד) -->
+    <li class="task" data-t="tikshuv">
+      <div class="head">
+        <input type="checkbox" class="box" id="c-tikshuv" aria-labelledby="h-tikshuv">
+        <div class="ttl">
+          <div class="n">משימה 4</div>
+          <h2 id="h-tikshuv">פגישה קצרה עם רכז.ת התקשוב</h2>
+          <p>שיחת חשיבה משותפת על תוכנית העבודה של התקשוב בבית הספר לשנה הקרובה.</p>
+        </div>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+      </div>
+    </li>
   </ol>
 
   <p class="note">הסימון נשמר במכשיר הזה. משימה שהמערכת כבר רואה כגמורה מסומנת לבד.</p>
@@ -237,7 +250,7 @@ var WS = [
   {k:"ped",     t:"רכזים פדגוגיים"},
   {k:"sherut",  t:"שירות לאומי"}
 ];
-var TASKS = ["rg", "menor", "bs"];
+var TASKS = ["rg", "menor", "bs", "tikshuv"];
 var SN = window.SchoolNames || { list: [], canon: function(n){ return n; } };
 var $ = function(id){ return document.getElementById(id); };
 var ICON_OK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"/></svg>';
@@ -292,16 +305,16 @@ function paint(){
     $("c-" + t).closest(".task").classList.toggle("done", on);
     if (on) n++;
   });
-  $("ringNum").textContent = n + "/3";
-  $("ringFg").setAttribute("stroke-dashoffset", (232.5 * (1 - n / 3)).toFixed(1));
-  $("allset").hidden = n !== 3;
+  $("ringNum").textContent = n + "/" + TASKS.length;
+  $("ringFg").setAttribute("stroke-dashoffset", (232.5 * (1 - n / TASKS.length)).toFixed(1));
+  $("allset").hidden = n !== TASKS.length;
 }
 
 function pick(s){
   school = s;
   manual = (s && load("chk-menahalim:" + s)) || {};
   auto = {};
-  TASKS.forEach(function(t){ var l = $("l-" + t); l.hidden = !s; l.innerHTML = s ? LIVE_HEAD + '<span class="st muted">בודק…</span>' : ""; });
+  TASKS.forEach(function(t){ var l = $("l-" + t); if (!l) return; l.hidden = !s; l.innerHTML = s ? LIVE_HEAD + '<span class="st muted">בודק…</span>' : ""; });
   paint();
   if (!s) return;
   pending.rg.then(function(){ if (school === s) liveRg(s); });
