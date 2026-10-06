@@ -106,7 +106,7 @@
 .v2-mmeta b { color: var(--ink); }
 
 /* ---------- שלושת הפריטים ---------- */
-.v2-big { display: grid; gap: 12px; margin-top: 16px; }
+.v2-big { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 16px; }
 .v2-bigitem { display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid var(--line);
   border-radius: 18px; padding: 18px 20px; text-decoration: none; color: inherit; min-height: 88px; width: 100%;
   text-align: right; font: inherit; cursor: pointer; }

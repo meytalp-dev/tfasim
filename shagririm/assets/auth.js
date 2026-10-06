@@ -452,7 +452,7 @@
         '<div class="shauth-mark">' + IC.lock + "</div>" +
         "<h2>הקלידו את הקוד</h2>" +
         "<p>שלחנו קוד בן 6 ספרות ל" +
-        (mask ? '<span class="shauth-mask" translate="no">' + mask + "</span>" : "מייל שלך") +
+        (mask ? 'מייל <span class="shauth-mask" translate="no" dir="ltr">' + mask + "</span>" : "מייל שלך") +
         ". הקוד תקף 15 דקות.</p>" +
         '<label class="shauth-note" for="shauth-input" style="display:block;margin:0 0 4px">קוד הכניסה</label>' +
         '<input id="shauth-input" class="shauth-code" type="text" inputmode="numeric" ' +
