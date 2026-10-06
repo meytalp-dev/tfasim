@@ -190,7 +190,8 @@
   var cached = mStore('mipui_form_' + F);
   function use(r) {
     form = r;
-    document.getElementById('schName').textContent = r.school || '';
+    // שאלונים של מיטל יושבים ב"בית ספר לדוגמה" (demo00); למשיבים מציגים את שם הקהילה
+    document.getElementById('schName').textContent = r.school === 'בית ספר לדוגמה' ? 'קהילת שגרירי החדשנות' : (r.school || '');
     document.title = r.title;
     render();
   }
