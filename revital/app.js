@@ -1057,8 +1057,33 @@
         '<div class="acts" style="margin-top:10px">' + (fid
           ? '<button type="button" class="btn primary" data-saldoc="' + esc(r.s.semel) + '">' + I.doc + 'פתיחת המסמך</button>'
           : '<span class="small">המסמך עוד לא הועלה לדרייב.</span>') + '</div>' +
-        '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח דרך הבית, רק למי שבית הספר משויך אליו/ה.</div></div>'
+        '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח דרך הבית, רק למי שבית הספר משויך אליו/ה.</div></div>' +
+        salSummary(x)
     };
+  }
+
+  /* תקציר המסמך (עמודת "תקציר" בגיליון, JSON) — מוכן מראש מכל מסמך, כולל סרוקים. משמש גם את הבוט */
+  function salSummary(x) {
+    var j = null;
+    try { j = JSON.parse(String(x['תקציר'] || '')); } catch (e) { j = null; }
+    if (!j) return '';
+    var goals = Object.keys(j.goals || {}).filter(function (k) { return String(j.goals[k] || '').trim(); });
+    var progs = j.programs || [];
+    var facts = [j.approved_students ? ['תלמידים מאושרים', j.approved_students] : null, j.approved_classes ? ['כיתות מאושרות', j.approved_classes] : null,
+                 progs.length ? ['תוכניות בסל', progs.length] : null].filter(Boolean);
+    return '<div class="card"><p class="eyebrow">' + I.book + 'מה בית הספר הגיש · תקציר' +
+      '<span class="end">' + (j.source === 'סרוק' ? 'נקרא ממסמך סרוק · ' : '') + 'אמינות ' + esc(j.confidence || '') + '</span></p>' +
+      (facts.length ? '<div class="facts">' + facts.map(function (f) { return '<div class="fact"><span>' + esc(f[0]) + '</span><b>' + esc(f[1]) + '</b></div>'; }).join('') + '</div>' : '') +
+      ((j.megamot || []).length ? '<div class="note" style="margin-top:10px"><b>מגמות:</b> ' + esc(j.megamot.join(', ')) + '</div>' : '') +
+      (j.background ? '<div class="note"><b>רקע:</b> ' + esc(j.background) + '</div>' : '') +
+      (goals.length ? '<h4 class="subh">מטרות בית הספר</h4><ul class="lvl">' + goals.map(function (k) {
+        return '<li><span><b>' + esc(k) + ':</b> ' + esc(j.goals[k]) + '</span></li>'; }).join('') + '</ul>' : '') +
+      (progs.length ? '<details class="vis" style="margin-top:12px"><summary><b>התוכניות שהוגשו</b> · ' + progs.length + '</summary><div class="vb"><ul class="lvl">' +
+        progs.map(function (p) {
+          return '<li><span><b>' + esc(p.name) + '</b>' + (p.target ? ' · ' + esc(p.target) : '') + (p.details ? '<small style="display:block;color:var(--muted)">' + esc(p.details) + '</small>' : '') +
+            '</span>' + (p.domain ? '<span class="chip ok">' + esc(p.domain) + '</span>' : '') + '</li>';
+        }).join('') + '</ul></div></details>' : '') +
+      (j.notes ? '<div class="small">' + esc(j.notes) + '</div>' : '') + '</div>';
   }
 
   /* פתיחת מסמך הסל: חלון נפתח מיד בלחיצה (אחרת הדפדפן חוסם), והמסמך נטען אליו מהשער.
