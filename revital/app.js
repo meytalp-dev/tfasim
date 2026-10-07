@@ -1510,7 +1510,37 @@
   }
   function fById(id) { return FORMS.filter(function (f) { return f.id === id; })[0] || null; }
   function fIsDone(r) { return String(r['סטטוס']) === F_DONE; }
-  function fOpenN(f) { return (f.rows || []).filter(function (r) { return !fIsDone(r); }).length; }
+  function fOpenN(f) { return fIsG(f) ? 0 : (f.rows || []).filter(function (r) { return !fIsDone(r); }).length; }
+  /* טופס גוגל מחובר (src=gform): השורות = לשונית התשובות כמו שהיא. מזהים עמודות לפי שם השאלה */
+  function fIsG(f) { return f.src === 'gform'; }
+  function fCol(f, re) { return (f.head || []).filter(function (h) { return re.test(h); })[0] || ''; }
+  function fSchoolOf(f, r) {
+    if (!fIsG(f)) return String(r['בית ספר'] || '').trim();
+    return String(r[fCol(f, /בית הספר|ביה"ס|ביה״ס|בית ספר/)] || '').trim();
+  }
+  function fNameOf(f, r) {
+    if (!fIsG(f)) return String(r['שם מלא'] || '').trim();
+    var a = fCol(f, /^שם פרטי/), b = fCol(f, /^שם משפחה/);
+    if (a) return (String(r[a] || '').trim() + ' ' + String(r[b] || '').trim()).trim();
+    return String(r[fCol(f, /^שם (המנהל|מלא)|^שם$/)] || '').trim();
+  }
+  function fPhoneNorm(v) {
+    var d = String(v || '').replace(/\D/g, '');
+    if (d.indexOf('972') === 0) d = '0' + d.slice(3);
+    if (d.length === 9 && d.charAt(0) === '5') d = '0' + d;
+    return d;
+  }
+  function fPhoneOf(f, r) { var c = fCol(f, /פלאפון|נייד|טלפון/); return c ? fPhoneNorm(r[c]) : ''; }
+  /* מי שנרשם פעמיים נספר פעם אחת — לפי נייד, ואם אין נייד לפי שם + בית ספר. החדשים למעלה */
+  function fRegs(f) {
+    var seen = {}, out = [];
+    (f.rows || []).slice().reverse().forEach(function (r) {
+      var k = fPhoneOf(f, r) || (fNameOf(f, r) + '|' + SN.canon(fSchoolOf(f, r)));
+      if (seen[k]) return;
+      seen[k] = 1; out.push(r);
+    });
+    return out;
+  }
   function fNavCount() {
     if (ST.forms !== 'ok') return '';
     var n = 0;
@@ -1547,18 +1577,20 @@
   }
   /* אריח = כותרת + שני כפתורים: הטופס עצמו (נפתח בלשונית חדשה) ודף המעקב (מיטל, 7.10.26) */
   function fTile(f) {
-    var n = (f.rows || []).length, o = fOpenN(f);
+    var n = (f.rows || []).length, o = fOpenN(f), g = fIsG(f);
+    var link = g ? (f.link || '') : FORM_URL + encodeURIComponent(f.id);
     return '<div class="tile ftile">' + I.doc + '<span class="ftx"><button type="button" class="fttl" data-go="f:' + esc(f.id) + '">' + esc(f.title) + '</button><small>' +
-      (f.track ? 'מילאו ' + fFilled(f).n + ' מתוך ' + SCHOOLS.length + ' · ' : '') +
-      (n ? n + ' פניות' + (o ? ' · ' + o + ' פתוחות' : ' · כולן טופלו') : 'אין פניות עדיין') +
+      (g ? (f.error ? 'אין גישה לגיליון' : 'טופס גוגל · ' + fRegs(f).length + ' נרשמו') :
+        (f.track === 'schools' ? 'מילאו ' + fFilled(f).n + ' מתוך ' + SCHOOLS.length + ' · ' : '') +
+        (n ? n + ' פניות' + (o ? ' · ' + o + ' פתוחות' : ' · כולן טופלו') : 'אין פניות עדיין')) +
       (f.open ? ' · נפתח ' + esc(fDate(f.opened, true)) : (f.closed ? ' · נסגר ' + esc(fDate(f.closed, true)) : '')) + '</small>' +
-      '<span class="fbt"><a class="btn sm" href="' + esc(FORM_URL + encodeURIComponent(f.id)) + '" target="_blank" rel="noopener">' + I.ext + 'הטופס</a>' +
+      '<span class="fbt">' + (link ? '<a class="btn sm" href="' + esc(link) + '" target="_blank" rel="noopener">' + I.ext + 'הטופס</a>' : '') +
       '<button type="button" class="btn sm primary" data-go="f:' + esc(f.id) + '">' + I.chart + 'מעקב</button></span></span></div>';
   }
   /* בתי הספר שמילאו (לפי השם האחיד) — לטפסים עם מעקב */
   function fFilled(f) {
     var set = {}, n = 0;
-    (f.rows || []).forEach(function (r) { set[SN.canon(String(r['בית ספר'] || '').trim())] = 1; });
+    (f.rows || []).forEach(function (r) { set[SN.canon(fSchoolOf(f, r))] = 1; });
     SCHOOLS.forEach(function (s) { if (set[s.name]) n++; });
     return { set: set, n: n };
   }
@@ -1567,7 +1599,7 @@
     var fl = fFilled(f), miss = SCHOOLS.filter(function (s) { return !fl.set[s.name]; });
     if (!miss.length) return '<div class="card"><p class="eyebrow">' + I.check + 'מעקב</p><div class="empty">כל ' + SCHOOLS.length + ' בתי הספר מילאו.</div></div>';
     LISTS.formMiss = ['בית ספר\tמפקח.ת'].concat(miss.map(function (s) { return s.name + '\t' + supsOf(s).join(', '); })).join('\n');
-    var link = FORM_URL + encodeURIComponent(f.id), mailPart = '';
+    var link = fIsG(f) && f.link ? f.link : FORM_URL + encodeURIComponent(f.id), mailPart = '';
     if (ST.contacts === 'ok') {
       var bcc = [], noMail = 0;
       miss.forEach(function (s) { var m = principalOf(BY[s.name]).mails; if (m.length) bcc = bcc.concat(m); else noMail++; });
@@ -1578,7 +1610,7 @@
       mailPart = mailBtn('fmiss-' + f.id, { to: [], bcc: cleanMails(bcc), subject: 'תזכורת · ' + f.title, html: html, text: text }, 'מייל למנהלים (' + (miss.length - noMail) + ')') +
         (noMail ? '<span class="small">' + noMail + ' בלי מייל של מנהל.ת בגיליון אנשי הקשר</span>' : '');
     } else mailPart = '<span class="small">' + (ST.contacts === 'load' ? 'טוען את אנשי הקשר…' : 'אנשי הקשר לא נטענו — אין כרגע מייל למנהלים') + '</span>';
-    return sec('fmiss', I.check, 'טרם מילאו', tag('warn', miss.length + ' בתי ספר') + ' · מילאו ' + fl.n + ' מתוך ' + SCHOOLS.length,
+    return sec('fmiss', I.check, fIsG(f) ? 'טרם נרשמו' : 'טרם מילאו', tag('warn', miss.length + ' בתי ספר') + (fIsG(f) ? ' · נרשמו ' : ' · מילאו ') + fl.n + ' מתוך ' + SCHOOLS.length,
       '<div class="acts" style="margin-bottom:12px"><button type="button" class="btn" data-copy="formMiss">' + I.copy + 'העתקת הרשימה</button>' + mailPart + '</div>' +
       '<ul class="list">' + miss.map(function (s) {
         return '<li><button type="button" data-go="s:' + esc(s.semel) + '">' + esc(s.name) + '<span>' + esc(supsOf(s).join(' · ')) + '</span></button></li>';
@@ -1591,6 +1623,7 @@
       $('main').innerHTML = backLink() + '<div class="card">' + (ST.forms === 'ok' ? '<div class="empty">הטופס לא נמצא.</div>' : pending('forms')) + '</div>';
       return;
     }
+    if (fIsG(f)) return gFormPage(f);
     MAILS = {};
     var rows = (f.rows || []).slice().reverse();   /* החדשות למעלה */
     var o = fOpenN(f), done = rows.length - o;
@@ -1611,7 +1644,7 @@
       '<button type="button" class="btn" data-fopen="' + (f.open ? '0' : '1') + '" data-fid="' + esc(f.id) + '">' + (f.open ? 'סגירת הטופס' : 'פתיחה מחדש') + '</button>' +
       (f.open ? '' : '<button type="button" class="btn fdel" data-fdel="' + esc(f.id) + '">מחיקת הטופס</button>') +
       '</div></div></div>';
-    if (f.track) h += fMissing(f);
+    if (f.track === 'schools') h += fMissing(f);
     h += shown.length ? shown.map(function (r) { return fItem(f, r); }).join('')
       : '<div class="card"><div class="empty">' + (FFILT === 'open' ? (rows.length ? 'כל הפניות טופלו.' : 'עוד לא הגיעו פניות.') : 'אין פניות להצגה.') + '</div></div>';
     $('main').innerHTML = h;
@@ -1667,13 +1700,100 @@
     var f = fById(id);
     if (!f) return;
     if (!open && !window.confirm('לסגור את הטופס "' + f.title + '"?\nמי שייכנס לקישור יראה "הטופס נסגר". הפניות נשמרות, והטופס עובר לארכיון.')) return;
-    fPost({ action: 'setOpen', id: id, open: open }).then(function () {
+    fPost({ action: 'setOpen', id: id, open: open }).then(function (d) {
+      if (d.warn === 'gform') window.alert('בבית הטופס ' + (open ? 'נפתח' : 'נסגר') + ', אבל לא הצלחתי ' + (open ? 'לפתוח' : 'לסגור') + ' את טופס הגוגל עצמו. צריך לעשות את זה ידנית בטופס (תגובות ← מקבל תגובות).');
       f.open = open;
       if (open) f.closed = ''; else f.closed = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
       toast(open ? 'הטופס נפתח מחדש' : 'הטופס נסגר');
       side(); render();
     }, function () { toast('הפעולה לא הצליחה. נסי שוב'); });
   }
+  /* ----- דף מעקב לטופס גוגל מחובר: מי נרשם (בלי כפילויות) + טרם נרשמו (בתי ספר / בנות שירות) ----- */
+  var FOUT = [];
+  function gFormPage(f) {
+    MAILS = {};
+    var regs = fRegs(f), dup = (f.rows || []).length - regs.length;
+    var nameC = fCol(f, /^שם/), skip = { 'חותמת זמן': 1 };
+    LISTS.formLink = f.link || '';
+    LISTS.form = [(f.head || []).join('\t')].concat(regs.map(function (r) {
+      return (f.head || []).map(function (k) { return String(r[k] == null ? '' : (k === 'חותמת זמן' ? fDate(r[k]) : r[k])).replace(/[\t\r\n]+/g, ' ').trim(); }).join('\t');
+    })).join('\n');
+    var h = backLink() + '<div class="card head"><h1>' + esc(f.title) + '</h1><div class="meta">' +
+      (f.open ? tag('ok', 'פתוח') : tag('warn', 'סגור')) + ' · טופס גוגל · <b>' + regs.length + '</b> נרשמו' +
+      (dup ? ' · ' + dup + (dup === 1 ? ' הרשמה כפולה לא נספרה' : ' הרשמות כפולות לא נספרו') : '') + '</div>' +
+      '<div class="views"><div class="acts">' +
+      (f.link ? '<button type="button" class="btn" data-copy="formLink">' + I.copy + 'העתקת הקישור לטופס</button>' +
+        '<a class="btn" href="' + esc(f.link) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחת הטופס</a>' : '') +
+      (regs.length ? '<button type="button" class="btn" data-copy="form">' + I.copy + 'העתקה לאקסל</button>' : '') +
+      '<button type="button" class="btn" data-fopen="' + (f.open ? '0' : '1') + '" data-fid="' + esc(f.id) + '">' + (f.open ? 'סגירת הטופס' : 'פתיחה מחדש') + '</button>' +
+      (f.open ? '' : '<button type="button" class="btn fdel" data-fdel="' + esc(f.id) + '">מחיקת הטופס</button>') +
+      '</div></div></div>';
+    if (f.error) {
+      $('main').innerHTML = h + '<div class="card"><div class="empty">אין גישה לגיליון התשובות של הטופס. צריך לשתף אותו עם meytalp@bethaarava.ort.org.il.</div></div>';
+      return;
+    }
+    if (f.track === 'schools') h += fMissing(f);
+    else if (f.track === 'sherut') h += fSherutTrack(f, regs);
+    h += '<div class="card"><p class="eyebrow">' + I.users + 'מי נרשם (' + regs.length + ')</p>' + (regs.length ? '' : '<div class="empty">עוד אין נרשמים.</div>') + '</div>';
+    h += regs.map(function (r, i) {
+      var sch = fSchoolOf(f, r), c = SN.canon(sch);
+      var body = (f.head || []).filter(function (k) { return !skip[k] && k !== nameC && String(r[k] == null ? '' : r[k]).trim(); }).map(function (k) {
+        return '<div class="fv"><span>' + esc(k) + '</span><div>' + esc(r[k]).replace(/\n/g, '<br>') + '</div></div>';
+      }).join('');
+      return sec('g-' + f.id + '-' + i, I.users, fNameOf(f, r) || '—', esc(BY[c] ? c : sch) + ' · ' + esc(fDate(r['חותמת זמן'])), body);
+    }).join('');
+    $('main').innerHTML = h;
+  }
+  /* בנות שירות: ההתאמה לפי נייד מול הרשימה שבבית (admin-sherut) */
+  function fSherutTrack(f, regs) {
+    if (ST.sherut !== 'ok') return '<div class="card">' + pending('sherut') + '</div>';
+    var regPh = {}, all = [], listPh = {};
+    regs.forEach(function (r) { var p = fPhoneOf(f, r); if (p) regPh[p] = 1; });
+    SCHOOLS.forEach(function (s) {
+      (BY[s.name].sherut || []).forEach(function (row) {
+        var p = fPhoneNorm(row['נייד'] || row['e164']);
+        all.push({ s: s, name: String(row['שם'] || ''), ph: p });
+        if (p) listPh[p] = 1;
+      });
+    });
+    var miss = all.filter(function (x) { return !x.ph || !regPh[x.ph]; });
+    FOUT = regs.filter(function (r) { var p = fPhoneOf(f, r); return p && !listPh[p]; }).map(function (r) {
+      return { name: fNameOf(f, r), phone: fPhoneOf(f, r), raw: fSchoolOf(f, r) };
+    });
+    LISTS.formMiss = ['שם\tבית ספר\tנייד'].concat(miss.map(function (x) { return x.name + '\t' + x.s.name + '\t' + x.ph; })).join('\n');
+    var h = miss.length
+      ? sec('fmiss', I.check, 'טרם נרשמו', tag('warn', miss.length + ' בנות שירות') + ' · נרשמו ' + (all.length - miss.length) + ' מתוך ' + all.length,
+        '<div class="acts" style="margin-bottom:12px"><button type="button" class="btn" data-copy="formMiss">' + I.copy + 'העתקת שמות וניידים</button></div>' +
+        '<ul class="list">' + miss.map(function (x) {
+          return '<li><span class="li"><b>' + esc(x.name) + '</b><span>' + esc(x.s.name) + (x.ph ? ' · ' + telA(x.ph) : '') + '</span></span></li>';
+        }).join('') + '</ul>')
+      : '<div class="card"><p class="eyebrow">' + I.check + 'מעקב</p><div class="empty">כל ' + all.length + ' בנות השירות נרשמו.</div></div>';
+    if (FOUT.length) {
+      var opts = SCHOOLS.map(function (s) { return s.name; }).sort();
+      h += sec('fout', I.users, 'נרשמו ולא ברשימת בנות השירות', FOUT.length + ' נרשמות',
+        '<div class="small" style="margin:0 0 10px">הנייד שלהן לא נמצא ברשימה. בוחרים בית ספר ולוחצים "הוספה לרשימה". הן יופיעו מעכשיו בבית ובאדמין המוסדות.</div>' +
+        '<ul class="list">' + FOUT.map(function (x, i) {
+          var c = SN.canon(x.raw);
+          return '<li class="foutli"><span><b>' + esc(x.name) + '</b> · ' + esc(x.raw) + ' · <span dir="ltr">' + esc(x.phone) + '</span></span>' +
+            '<span class="foutact"><select id="fosch' + i + '" aria-label="בית ספר"><option value="">בחרו בית ספר</option>' + opts.map(function (n) {
+              return '<option' + (n === c ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select>' +
+            '<button type="button" class="btn sm primary" data-foadd="' + i + '">הוספה לרשימה</button></span></li>';
+        }).join('') + '</ul>');
+    }
+    return h;
+  }
+  function fAddSherut(i) {
+    var x = FOUT[i], school = $('fosch' + i) && $('fosch' + i).value;
+    if (!x) return;
+    if (!school || !BY[school]) { toast('צריך לבחור בית ספר'); return; }
+    var semel = String(BY[school].s.semel);
+    fPost({ action: 'addSherut', name: x.name, phone: x.phone, school: school, semel: semel }).then(function () {
+      (BY[school].sherut = BY[school].sherut || []).push({ 'בית ספר': school, 'שם': x.name, 'נייד': x.phone.slice(0, 3) + '-' + x.phone.slice(3), 'e164': '972' + x.phone.slice(1) });
+      toast(x.name + ' נוספה לרשימה');
+      render();
+    }, function () { toast('ההוספה לא הצליחה. נסי שוב'); });
+  }
+
   /* מחיקה — רק טופס סגור. בשרת ההגדרה עוברת ללשונית "נמחקו" והפניות נשמרות בלשונית מוסתרת (אפשר לשחזר) */
   function fDelete(id) {
     var f = fById(id);
@@ -1698,6 +1818,7 @@
       '<button type="button" class="sumh" data-go="F">' + (n ? n + ' פניות פתוחות' : 'אין פניות פתוחות') + ' · ' +
       (open.length === 1 ? 'טופס פתוח אחד' : open.length + ' טפסים פתוחים') + ' ←</button><div class="gc">' +
       open.map(function (f) {
+        if (fIsG(f)) return '<button type="button" class="chip ok" data-go="f:' + esc(f.id) + '">' + esc(f.title) + ' · ' + fRegs(f).length + ' נרשמו</button>';
         var o = fOpenN(f);
         return '<button type="button" class="chip ' + (o ? 'warn' : 'ok') + '" data-go="f:' + esc(f.id) + '">' + esc(f.title) + ' · ' + o + '</button>';
       }).join('') + '</div></div></div>';
@@ -1707,13 +1828,13 @@
     if (!adminView() || ST.forms !== 'ok') return '';
     var items = [];
     FORMS.forEach(function (f) {
-      (f.rows || []).forEach(function (r) { if (SN.canon(String(r['בית ספר'] || '').trim()) === s.name) items.push({ f: f, r: r }); });
+      (fIsG(f) ? fRegs(f) : (f.rows || [])).forEach(function (r) { if (SN.canon(fSchoolOf(f, r)) === s.name) items.push({ f: f, r: r }); });
     });
     if (!items.length) return '';
     items.sort(function (a, b) { return String(b.r['חותמת זמן']).localeCompare(String(a.r['חותמת זמן'])); });
-    return '<div class="card"><p class="eyebrow">' + I.doc + 'פניות בטפסים</p><ul class="list">' + items.map(function (z) {
-      return '<li><button type="button" data-go="f:' + esc(z.f.id) + '">' + esc(z.f.title) + ' · ' + esc(z.r['שם מלא']) +
-        '<span>' + esc(fDate(z.r['חותמת זמן'], true)) + ' · ' + (fIsDone(z.r) ? F_DONE : F_OPEN) + '</span></button></li>';
+    return '<div class="card"><p class="eyebrow">' + I.doc + 'בטפסים הפעילים</p><ul class="list">' + items.map(function (z) {
+      return '<li><button type="button" data-go="f:' + esc(z.f.id) + '">' + esc(z.f.title) + ' · ' + esc(fNameOf(z.f, z.r)) +
+        '<span>' + esc(fDate(z.r['חותמת זמן'], true)) + ' · ' + (fIsG(z.f) ? 'נרשם.ה' : (fIsDone(z.r) ? F_DONE : F_OPEN)) + '</span></button></li>';
     }).join('') + '</ul></div>';
   }
 
@@ -1754,6 +1875,8 @@
     if (ff) { FFILT = ff.getAttribute('data-ffilt'); render(); return; }
     var fs = t.closest('[data-fst]');
     if (fs) { fSetStatus(fs.getAttribute('data-fid'), fs.getAttribute('data-rid'), fs.getAttribute('data-fst')); return; }
+    var fa = t.closest('[data-foadd]');
+    if (fa) { fAddSherut(+fa.getAttribute('data-foadd')); return; }
     var fd = t.closest('[data-fdel]');
     if (fd) { fDelete(fd.getAttribute('data-fdel')); return; }
     var fo = t.closest('[data-fopen]');

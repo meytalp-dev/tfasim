@@ -159,6 +159,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     fetchJson(API + '?mode=form&id=' + encodeURIComponent(ID), {}, 30000).then(function (d) {
       if (!d.ok) return info('הטופס לא נמצא', 'ייתכן שהקישור לא מלא. בדקו את הקישור שקיבלתם.');
       FORM = d.form;
+      if (FORM.redirect && FORM.open) { location.replace(FORM.redirect); return; }   /* טופס גוגל מחובר */
       document.title = FORM.title;
       $('title').textContent = FORM.title;
       $('intro').textContent = FORM.intro || '';

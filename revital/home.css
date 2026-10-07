@@ -335,6 +335,9 @@ footer a{color:var(--navy)}
 .fttl{display:block;border:0;background:none;padding:0;font:700 15px Assistant,sans-serif;color:var(--ink);cursor:pointer;text-align:right}
 .fttl:hover{color:var(--blue);text-decoration:underline}
 .fbt{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.foutli{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;background:var(--paper);border-radius:10px;padding:8px 12px;font-size:14.5px}
+.foutact{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.foutact select{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:9px;padding:6px 8px;background:#fff;max-width:200px}
 .btn.fdel{color:var(--bad);border-color:#f1c9cd}
 .btn.fdel:hover{background:var(--bad-soft)}
 /* בונה טפסים (#N) */
