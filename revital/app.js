@@ -28,7 +28,7 @@
   var MENOR_LOW = 0.5;
   var BS_LINK = 'https://pedagogiamh.co.il/sikum-hishtalmuyot.html';
   var RG_LINK = 'https://pedagogiamh.co.il/sikum-rishum-hishtalmuyot.html';
-  var WS = [['social', 'רכזים חברתיים'], ['matal', 'מת״ליות'], ['hachala', 'הכלה ושילוב'], ['career', 'נתיבים לקריירה'],
+  var WS = [['social', 'רכזים חברתיים'], ['matal', 'מת״ליות'], ['career', 'נתיבים לקריירה'],
             ['honchim', 'מורים חונכים'], ['ped', 'רכזים פדגוגיים'], ['sherut', 'שירות לאומי']];
   /* סוגי החוסרים — הסדר הזה הוא הסדר בכל הרשימות */
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
