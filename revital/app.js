@@ -84,7 +84,9 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load' };
+  /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
+  var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
   var CORE = [];
   var MEF = {};     /* סמל → {st:'load'|'ok'|'err'|'noaccess', d} */
@@ -141,7 +143,7 @@
       });
       CUR = fromHash();
       side(); render();
-      loadContacts(); loadNispach(); loadMenor(); loadMatz(); loadBs(); loadRg();
+      loadContacts(); loadSherut(); loadNispach(); loadMenor(); loadMatz(); loadBs(); loadRg();
     }).catch(function () {
       $('main').innerHTML = '<div class="card"><b>לא הצלחתי לטעון את רשימת בתי הספר.</b> <button class="btn" id="retry">לנסות שוב</button></div>';
       $('retry').onclick = start;
@@ -155,6 +157,29 @@
       if (r && r.ok && Array.isArray(r.data)) { CONTACTS = r.data; loaded('contacts', true); }
       else loaded('contacts', false);
     }, function () { loaded('contacts', false); });
+  }
+  function loadSherut() {
+    if (!window.PMH_AUTH || !PMH_AUTH.load) return loaded('sherut', false);
+    PMH_AUTH.load('admin-sherut').then(function (res) {
+      if (!(res && res.ok && Array.isArray(res.data))) return loaded('sherut', false);
+      res.data.forEach(function (row) {
+        var r = BY[SN.canon(String(row['בית ספר'] || '').trim())];
+        if (r) (r.sherut = r.sherut || []).push(row);
+      });
+      loaded('sherut', true);
+    }, function () { loaded('sherut', false); });
+  }
+  function sherutDates(row) {
+    function d(v) { var m = String(v || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? (+m[3]) + '.' + (+m[2]) + '.' + m[1].slice(2) : String(v || ''); }
+    return row['תחילת שירות'] ? 'שירות ' + d(row['תחילת שירות']) + '–' + d(row['סיום שירות']) : String(row['סטטוס'] || '');
+  }
+  /* בת שירות בצורה של בעל.ת תפקיד, כדי שכל הרשימות והמיילים יעבדו עליה כרגיל */
+  function sherutPerson(row) {
+    return {
+      role: SHERUT_ROLE, detail: row['רכזת'] ? 'רכזת: ' + row['רכזת'] : '', name: String(row['שם'] || ''),
+      phone: String(row['נייד'] || row['e164'] || ''), email: String(row['מייל'] || ''),
+      note: [row['עיר'], sherutDates(row)].filter(Boolean).join(' · ')
+    };
   }
   function loadNispach() {
     fetchJson(SRC.nispach, {
@@ -270,7 +295,13 @@
     });
     var rest = Object.keys(count).filter(function (r) { return CORE.indexOf(r) < 0; })
       .sort(function (a, b) { return count[b] - count[a]; });
-    return { list: CORE.concat(rest), count: count };
+    var list = CORE.concat(rest);
+    if (ST.sherut === 'ok') {
+      count[SHERUT_ROLE] = 0;
+      SCHOOLS.forEach(function (s) { count[SHERUT_ROLE] += (BY[s.name].sherut || []).length; });
+      list.push(SHERUT_ROLE);
+    }
+    return { list: list, count: count };
   }
   function shortRole(r) { return String(r).split(' — ')[0]; }
 
@@ -437,6 +468,7 @@
       (links ? '<div class="lk">' + links + '</div>' : '') + (extra ? '<div class="x">' + extra + '</div>' : '') + '</div></div>';
   }
   function holderExtra(q) {
+    if (q.note) return esc(q.note);
     return [q.hours ? q.hours + ' ש״ש' : '', q.scope ? 'משרה ' + q.scope + '%' : '', q.seniority ? 'ותק ' + q.seniority : '', q.other ? 'גם: ' + q.other : '']
       .filter(Boolean).map(esc).join(' · ');
   }
@@ -556,6 +588,15 @@
     }
     h += sec('hisht', I.book, 'השתלמויות', hSum.join(' · ') || 'טוען…', hBody);
 
+    /* בנות שירות */
+    var sh = r.sherut || [];
+    h += sec('sherut', I.users, 'בנות שירות',
+      ST.sherut === 'ok' ? (sh.length ? (sh.length === 1 ? 'בת שירות אחת' : sh.length + ' בנות שירות') : 'אין') : (ST.sherut === 'load' ? 'טוען…' : 'לא נטען'),
+      ST.sherut !== 'ok' ? pending('sherut') : (sh.length ? sh.map(function (row) {
+        var q = sherutPerson(row);
+        return personHtml('בת שירות' + (q.detail ? ' · ' + q.detail : ''), q.name, q.phone, q.email, esc(q.note));
+      }).join('') : '<div class="empty">אין בנות שירות משובצות בבית הספר הזה.</div>'));
+
     /* הבית של המפקח: ביקורים ודוחות, משימות, מסמכים */
     var mf = MEF[String(s.semel)] || { st: 'load' };
     var vBody = '', vSum = '', tBody = '', tSum = '';
@@ -670,6 +711,11 @@
   var ROLEQ = '', ROLESUP = '';
   function roleRows(role) {
     var rows = [], missing = [];
+    if (role === SHERUT_ROLE) {
+      SCHOOLS.forEach(function (s) { (BY[s.name].sherut || []).forEach(function (row) { rows.push([s, sherutPerson(row)]); }); });
+      rows.sort(function (a, b) { return a[0].name.localeCompare(b[0].name, 'he'); });
+      return { rows: rows, missing: [] };
+    }
     SCHOOLS.forEach(function (s) {
       var x = BY[s.name].nispach;
       if (!x || !x.submitted) { missing.push([s, 'לא הוגש נספח']); return; }
@@ -688,7 +734,8 @@
     return Object.keys(sups).sort(function (a, b) { return a.localeCompare(b, 'he'); });
   }
   function rolePage(role) {
-    if (ST.nispach !== 'ok') { $('main').innerHTML = '<div class="card head"><h1>' + esc(shortRole(role)) + '</h1>' + pending('nispach') + '</div>'; return; }
+    var need = role === SHERUT_ROLE ? 'sherut' : 'nispach';
+    if (ST[need] !== 'ok') { $('main').innerHTML = '<div class="card head"><h1>' + esc(shortRole(role)) + '</h1>' + pending(need) + '</div>'; return; }
     var box = $('roleBox');
     if (!box || box.getAttribute('data-role') !== role) {
       ROLEQ = ''; ROLESUP = '';
@@ -718,7 +765,7 @@
     });
     var missing = R.missing.filter(function (z) { return !ROLESUP || supsOf(z[0]).indexOf(ROLESUP) > -1; });
     $('roleMeta').textContent = (rows.length !== R.rows.length ? rows.length + ' מתוך ' + R.rows.length : R.rows.length) +
-      ' בעלי תפקידים' + (missing.length ? ' · חסר ב-' + missing.length + ' בתי ספר' : '');
+      (role === SHERUT_ROLE ? ' בנות שירות' : ' בעלי תפקידים') + (missing.length ? ' · חסר ב-' + missing.length + ' בתי ספר' : '');
     LISTS.role = ['בית ספר', 'מפקח.ת', 'פירוט', 'שם', 'נייד', 'מייל', 'שעות', 'משרה', 'ותק'].join('\t') + '\n' +
       rows.map(function (z) {
         var p = z[1];
