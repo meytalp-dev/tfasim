@@ -33,6 +33,7 @@
     doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>',
     ext:   '<svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
+    mail:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
     copy:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
   };
 
@@ -190,11 +191,13 @@
     if (m && BYSEMEL[m[1]]) return 's:' + m[1];
     m = h.match(/^r=(.+)$/);
     if (m) return 'r:' + m[1];
+    m = h.match(/^p=(.+)$/);
+    if (m) return 'p:' + m[1];
     return '';
   }
   function go(to) {
     CUR = to || '';
-    var hash = CUR ? '#' + (CUR.charAt(0) === 's' ? 's=' : 'r=') + encodeURIComponent(CUR.slice(2)) : '';
+    var hash = CUR ? '#' + CUR.charAt(0) + '=' + encodeURIComponent(CUR.slice(2)) : '';
     try { history.replaceState(null, '', hash || location.pathname); } catch (e) {}
     document.body.classList.remove('nav-on');
     side(); render();
@@ -243,7 +246,9 @@
       var list = groups[n].filter(function (s) { return !q || norm(s.name + ' ' + s.semel + ' ' + s.network).indexOf(q) > -1; });
       if (q && !list.length) return;
       var open = q || OPENGRP[n] || (cur && supsOf(cur).indexOf(n) > -1);
-      h += grpHtml(n, esc(n), list.length, open, list.map(function (s) {
+      h += grpHtml(n, esc(n), list.length, open || CUR === 'p:' + n,
+        (q ? '' : '<li><button type="button" class="supl" data-go="p:' + esc(n) + '"' + (CUR === 'p:' + n ? ' aria-current="true"' : '') + '>' +
+          I.mail + 'מצב ושליחה למפקח.ת</button></li>') + list.map(function (s) {
         var r = BY[s.name], dot = allLoaded() ? (issues(r).length ? 'bad' : 'ok') : '';
         return '<li><button type="button" data-go="s:' + esc(s.semel) + '"' + (CUR === 's:' + s.semel ? ' aria-current="true"' : '') +
           '><i class="dot ' + dot + '"></i>' + esc(s.name) + '</button></li>';
@@ -265,6 +270,7 @@
   function render() {
     if (CUR.charAt(0) === 's') school(BYSEMEL[CUR.slice(2)]);
     else if (CUR.charAt(0) === 'r') rolePage(CUR.slice(2));
+    else if (CUR.charAt(0) === 'p') supPage(CUR.slice(2));
     else overview();
   }
 
@@ -453,8 +459,79 @@
   /* ----- לפי תפקיד ----- */
   var ROLEVIEW = 'all';   /* all = רשימה אחת · sup = לפי מפקח.ת */
   try { ROLEVIEW = localStorage.getItem('revital.roleview') === 'sup' ? 'sup' : 'all'; } catch (e) {}
-  function rolePage(role) {
-    if (ST.nispach !== 'ok') { $('main').innerHTML = '<div class="card head"><h1>' + esc(shortRole(role)) + '</h1>' + pending('nispach') + '</div>'; return; }
+  /* ===== מייל =====
+     נייד = <a href="mailto:"> אמיתי שנבנה בזמן הציור; מחשב = טיוטת Gmail בחלון חדש.
+     גוף ארוך במחשב: HTML מימין לשמאל מועתק ללוח לפני פתיחת החלון, ומדביקים ב-Ctrl+V (ראו /mail-button).
+     לרשימות תפקיד הנמענים בעותק מוסתר — רכזים לא רואים זה את זה. */
+  var IS_MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) ||
+    (window.matchMedia && matchMedia('(pointer:coarse)').matches && innerWidth < 900);
+  var MAILS = {};
+  function cleanMails(list) {
+    var seen = {}, out = [];
+    list.forEach(function (raw) {
+      String(raw || '').split(/[\s,;]+/).forEach(function (m) {
+        m = m.trim();
+        if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(m) && !seen[m.toLowerCase()]) { seen[m.toLowerCase()] = 1; out.push(m); }
+      });
+    });
+    return out;
+  }
+  function mailsOf(rows) { return cleanMails(rows.map(function (z) { return z[1].email; })); }
+  /* M = {to:[], bcc:[], subject, text, html} */
+  function mailHref(M) {
+    var q = [];
+    if (M.bcc && M.bcc.length) q.push('bcc=' + M.bcc.map(encodeURIComponent).join(','));
+    q.push('subject=' + encodeURIComponent(M.subject || ''));
+    if (M.text) q.push('body=' + encodeURIComponent(M.text));
+    return 'mailto:' + (M.to || []).map(encodeURIComponent).join(',') + '?' + q.join('&');
+  }
+  function mailBtn(id, M, label) {
+    MAILS[id] = M;
+    if (!(M.to && M.to.length) && !(M.bcc && M.bcc.length)) return '';
+    var n = (M.to || []).length + (M.bcc || []).length;
+    return '<a class="btn primary" data-mail="' + id + '" href="' + esc(mailHref(M)) + '">' + I.mail + esc(label || ('מייל ל-' + n)) + '</a>';
+  }
+  function copyHtml(html, text) {
+    var ok = false, div = document.createElement('div');
+    div.contentEditable = 'true';
+    div.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+    div.innerHTML = html;
+    document.body.appendChild(div);
+    try {
+      var r = document.createRange(); r.selectNodeContents(div);
+      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      ok = document.execCommand('copy');
+      sel.removeAllRanges();
+    } catch (e) { ok = false; }
+    document.body.removeChild(div);
+    if (!ok) { try { fallbackText(text); ok = true; } catch (e2) {} }
+    return ok;
+  }
+  function fallbackText(text) {
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+  function openDraft(M) {
+    var url = 'https://mail.google.com/mail/?view=cm&fs=1' +
+      (M.to && M.to.length ? '&to=' + encodeURIComponent(M.to.join(',')) : '') +
+      (M.bcc && M.bcc.length ? '&bcc=' + encodeURIComponent(M.bcc.join(',')) : '') +
+      '&su=' + encodeURIComponent(M.subject || '');
+    if (M.html) {
+      var copied = copyHtml(M.html, M.text || '');
+      if (!copied) url += '&body=' + encodeURIComponent(M.text || '');
+      window.open(url, '_blank', 'noopener');
+      toast(copied ? 'התוכן הועתק. לחצי בגוף המייל ו-Ctrl+V' : 'נפתחה טיוטה');
+    } else {
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  /* ----- לפי תפקיד ----- */
+  var ROLEQ = '', ROLESUP = '';
+  function roleRows(role) {
     var rows = [], missing = [];
     SCHOOLS.forEach(function (s) {
       var x = BY[s.name].nispach;
@@ -465,32 +542,78 @@
         else if (m.indexOf(role + ' — ') === 0) missing.push([s, m.slice(role.length + 3) + ' — טרם אויש']);
       });
     });
+    rows.sort(function (a, b) { return a[0].name.localeCompare(b[0].name, 'he'); });
+    return { rows: rows, missing: missing };
+  }
+  function supNames() {
+    var sups = {};
+    SCHOOLS.forEach(function (s) { supsOf(s).forEach(function (n) { sups[n] = 1; }); });
+    return Object.keys(sups).sort(function (a, b) { return a.localeCompare(b, 'he'); });
+  }
+  function rolePage(role) {
+    if (ST.nispach !== 'ok') { $('main').innerHTML = '<div class="card head"><h1>' + esc(shortRole(role)) + '</h1>' + pending('nispach') + '</div>'; return; }
+    var box = $('roleBox');
+    if (!box || box.getAttribute('data-role') !== role) {
+      ROLEQ = ''; ROLESUP = '';
+      $('main').innerHTML = '<div class="card head" id="roleBox" data-role="' + esc(role) + '"><h1>' + esc(role) + '</h1>' +
+        '<div class="meta" id="roleMeta"></div>' +
+        '<div class="filters"><input id="rq" type="search" placeholder="חיפוש שם, בית ספר או פירוט">' +
+        '<select id="rsup"><option value="">כל המפקחים</option>' +
+        supNames().map(function (n) { return '<option>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
+        '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
+        '<button type="button" data-rview="all" aria-pressed="' + (ROLEVIEW === 'all') + '">רשימה אחת</button>' +
+        '<button type="button" data-rview="sup" aria-pressed="' + (ROLEVIEW === 'sup') + '">לפי מפקח.ת</button></div>' +
+        '<div class="acts" id="roleActs"></div></div></div><div id="roleList"></div>';
+      $('rq').oninput = function () { ROLEQ = this.value; drawRole(role); };
+      $('rsup').onchange = function () { ROLESUP = this.value; drawRole(role); };
+    } else {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-rview]'), function (b) {
+        b.setAttribute('aria-pressed', b.getAttribute('data-rview') === ROLEVIEW);
+      });
+    }
+    drawRole(role);
+  }
+  function drawRole(role) {
+    var R = roleRows(role), q = norm(ROLEQ);
+    var rows = R.rows.filter(function (z) {
+      if (ROLESUP && supsOf(z[0]).indexOf(ROLESUP) < 0) return false;
+      return !q || norm(z[0].name + ' ' + z[1].name + ' ' + z[1].detail + ' ' + z[0].network).indexOf(q) > -1;
+    });
+    var missing = R.missing.filter(function (z) { return !ROLESUP || supsOf(z[0]).indexOf(ROLESUP) > -1; });
+    $('roleMeta').textContent = (rows.length !== R.rows.length ? rows.length + ' מתוך ' + R.rows.length : R.rows.length) +
+      ' בעלי תפקידים' + (missing.length ? ' · חסר ב-' + missing.length + ' בתי ספר' : '');
     LISTS.role = ['בית ספר', 'מפקח.ת', 'פירוט', 'שם', 'נייד', 'מייל', 'שעות', 'משרה', 'ותק'].join('\t') + '\n' +
       rows.map(function (z) {
         var p = z[1];
         return [z[0].name, supsOf(z[0]).join(' · '), p.detail, p.name, p.phone, p.email, p.hours, p.scope, p.seniority].join('\t');
       }).join('\n');
     LISTS.roleMiss = missing.map(function (z) { return z[0].name + ' — ' + z[1]; }).join('\n');
-    var h = '<div class="card head"><h1>' + esc(role) + '</h1><div class="meta">' + rows.length + ' בעלי תפקידים ב-64 בתי הספר' +
-      (missing.length ? ' · חסר ב-' + missing.length : '') + '</div>' +
-      '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
-        '<button type="button" data-rview="all" aria-pressed="' + (ROLEVIEW === 'all') + '">רשימה אחת</button>' +
-        '<button type="button" data-rview="sup" aria-pressed="' + (ROLEVIEW === 'sup') + '">לפי מפקח.ת</button></div>' +
-        '<button class="btn" data-copy="role">' + I.copy + 'העתקת הרשימה לאקסל</button></div></div>';
-    if (ROLEVIEW === 'all') {
-      var all = rows.slice().sort(function (a, b) { return a[0].name.localeCompare(b[0].name, 'he'); });
-      h += '<div class="card">' + (all.length ? all.map(function (z) {
+    MAILS = {};
+    var subj = shortRole(role);
+    var all = mailsOf(rows);
+    LISTS.roleMails = all.join(', ');
+    $('roleActs').innerHTML = mailBtn('all', { bcc: all, subject: subj }) +
+      (all.length ? '<button class="btn" data-copy="roleMails">' + I.copy + 'העתקת הכתובות</button>' : '') +
+      '<button class="btn" data-copy="role">' + I.copy + 'העתקה לאקסל</button>';
+
+    var h = '';
+    if (!rows.length) h += '<div class="card"><div class="empty">אין בעלי תפקידים שמתאימים לחיפוש.</div></div>';
+    else if (ROLEVIEW === 'all') {
+      h += '<div class="card">' + rows.map(function (z) {
         var p = z[1];
         return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : '') + ' · ' + supsOf(z[0]).join(' · '), p.name, p.phone, p.email, holderExtra(p));
-      }).join('') : '<div class="empty">אין בעלי תפקידים בתפקיד הזה.</div>') + '</div>';
+      }).join('') + '</div>';
     } else {
       var bySup = {};
-      rows.forEach(function (z) { supsOf(z[0]).forEach(function (n) { (bySup[n] = bySup[n] || []).push(z); }); });
-      Object.keys(bySup).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n) {
-        h += sec('role-' + n, I.users, n, bySup[n].length + ' בעלי תפקידים', bySup[n].map(function (z) {
-          var p = z[1];
-          return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : ''), p.name, p.phone, p.email, holderExtra(p));
-        }).join(''));
+      rows.forEach(function (z) { supsOf(z[0]).forEach(function (n) { if (!ROLESUP || n === ROLESUP) (bySup[n] = bySup[n] || []).push(z); }); });
+      Object.keys(bySup).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n, k) {
+        var list = bySup[n];
+        h += sec('role-' + n, I.users, n, list.length + ' בעלי תפקידים',
+          '<div class="acts row-end">' + mailBtn('s' + k, { bcc: mailsOf(list), subject: subj }) + '</div>' +
+          list.map(function (z) {
+            var p = z[1];
+            return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : ''), p.name, p.phone, p.email, holderExtra(p));
+          }).join(''));
       });
     }
     if (missing.length) {
@@ -500,6 +623,78 @@
           return '<li><button type="button" data-go="s:' + esc(z[0].semel) + '">' + esc(z[0].name) + '<span>' + esc(z[1]) + '</span></button></li>';
         }).join('') + '</ul>');
     }
+    $('roleList').innerHTML = h;
+  }
+
+  /* ----- עמוד מפקח.ת: מצב בתי הספר + שליחה במייל ----- */
+  var SUP_PAGE = 'https://tfasim.pedagogiamh.co.il/baaley-tafkidim/';
+  function supMail(name, list) {
+    var c = contactByName(name);
+    var to = cleanMails([c && c['מייל']]);
+    var date = new Date().toLocaleDateString('he-IL');
+    var td = 'style="border:1px solid #d9dee8;padding:6px 8px;text-align:right;vertical-align:top"';
+    var th = 'style="border:1px solid #d9dee8;padding:6px 8px;text-align:right;background:#eef2fb"';
+    var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#16203c">' +
+      'שלום ' + esc(name) + ',<br><br>זו תמונת המצב של בתי הספר שלך, נכון ל-' + esc(date) + '.<br><br>' +
+      '<table dir="rtl" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">' +
+      '<tr><th ' + th + '>בית הספר</th><th ' + th + '>נספח בעלי תפקידים</th><th ' + th + '>מנור</th><th ' + th + '>מצבת</th></tr>' +
+      list.map(function (r) {
+        var x = r.nispach;
+        var nis = ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? '<b style="color:#c43c47">לא הוגש</b>' :
+          (x.missing.length ? '<span style="color:#c43c47">חסר: ' + esc(x.missing.map(shortRole).join(', ')) + '</span>' : 'מאויש'));
+        var men = r.menor && r.menor.t ? r.menor.r + ' מתוך ' + r.menor.t : '';
+        var mz = r.matz ? r.matz.n + ' תלמידים' : (ST.matz === 'ok' ? '<span style="color:#c43c47">לא דווחה</span>' : '');
+        return '<tr><td ' + td + '><b>' + esc(r.s.name) + '</b></td><td ' + td + '>' + nis + '</td><td ' + td + '>' + men + '</td><td ' + td + '>' + mz + '</td></tr>';
+      }).join('') + '</table><br>';
+    list.forEach(function (r) {
+      var x = r.nispach;
+      if (!x || !x.submitted || !x.people.length) return;
+      html += '<div style="font-weight:bold;margin:14px 0 4px">בעלי התפקידים · ' + esc(r.s.name) + '</div>' +
+        '<table dir="rtl" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">' +
+        '<tr><th ' + th + '>תפקיד</th><th ' + th + '>שם</th><th ' + th + '>נייד</th><th ' + th + '>מייל</th></tr>' +
+        x.people.map(function (q) {
+          return '<tr><td ' + td + '>' + esc(shortRole(q.role) + (q.detail ? ' · ' + q.detail : '')) + '</td><td ' + td + '>' + esc(q.name) +
+            '</td><td ' + td + ' dir="ltr">' + esc(q.phone) + '</td><td ' + td + ' dir="ltr">' + esc(q.email) + '</td></tr>';
+        }).join('') + '</table>';
+    });
+    html += '<br>הרשימה המלאה ומתעדכנת נמצאת גם בדף שלך: <a href="' + SUP_PAGE + '">בעלי התפקידים בבתי הספר שלי</a>.<br><br>תודה,<br>' +
+      esc(($('meName').textContent || '').trim()) + '</div>';
+    /* בנייד הגוף עובר בתוך קישור mailto, ולכן קצר: רק מה שפתוח */
+    var open = list.filter(function (r) { return issues(r).length; });
+    var text = 'שלום ' + name + ',\n\nזו תמונת המצב של בתי הספר שלך, נכון ל-' + date + ':\n\n' +
+      (open.length ? open.map(function (r) { return '• ' + r.s.name + ': ' + issues(r).join(' · '); }).join('\n') : 'בכל בתי הספר הכול תקין.') +
+      (open.length && open.length < list.length ? '\n\nבשאר ' + (list.length - open.length) + ' בתי הספר הכול תקין.' : '') +
+      '\n\nהרשימה המלאה של בעלי התפקידים, עם טלפונים ומיילים, נמצאת בדף שלך:\n' + SUP_PAGE + '\n\nתודה,\n' + ($('meName').textContent || '').trim();
+    return { to: to, subject: 'תמונת מצב · בתי הספר שלך · ' + date, html: html, text: text };
+  }
+  function supPage(name) {
+    var list = SCHOOLS.filter(function (s) { return supsOf(s).indexOf(name) > -1; }).map(function (s) { return BY[s.name]; });
+    var c = ST.contacts === 'ok' ? contactByName(name) : null;
+    MAILS = {};
+    var M = supMail(name, list);
+    var h = '<div class="card head"><h1>' + esc(name) + '</h1><div class="meta">מפקח.ת פדגוגי.ת · ' + list.length + ' בתי ספר' +
+      (c ? ' · ' + telA(c['טלפון'] || c['e164']) + (c['מייל'] ? ' · ' + mailA(c['מייל']) : '') : '') + '</div>' +
+      '<div class="views"><div class="small" style="margin:0">' + (M.to.length ? 'המייל כולל טבלת מצב לכל בית ספר ואת כל בעלי התפקידים.' :
+        'אין מייל של המפקח.ת בגיליון אנשי הקשר.') + '</div>' +
+      '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') + '</div></div></div>';
+    var bad = list.filter(function (r) { return issues(r).length; });
+    h += sec('sup-state', I.chart, 'מצב בתי הספר', bad.length ? tag('', bad.length + ' עם משהו פתוח') : tag('ok', 'הכול תקין'),
+      '<ul class="list">' + list.map(function (r) {
+        var is = issues(r);
+        return '<li><button type="button" data-go="s:' + esc(r.s.semel) + '">' + esc(r.s.name) +
+          '<span>' + (is.length ? esc(is.join(' · ')) : 'תקין') + '</span></button></li>';
+      }).join('') + '</ul>');
+    var people = 0;
+    var body = list.map(function (r) {
+      var x = r.nispach;
+      if (!x || !x.submitted) return '<div class="person"><div class="tx"><div class="nm">' + esc(r.s.name) + '</div><div class="x">הנספח לא הוגש</div></div></div>';
+      people += x.people.length;
+      return '<h4 class="subh">' + esc(r.s.name) + '</h4>' + x.people.map(function (q) {
+        return personHtml(shortRole(q.role) + (q.detail ? ' · ' + q.detail : ''), q.name, q.phone, q.email, holderExtra(q));
+      }).join('');
+    }).join('');
+    h += sec('sup-people', I.users, 'בעלי התפקידים בבתי הספר', ST.nispach === 'ok' ? people + ' בעלי תפקידים' : 'טוען…',
+      ST.nispach === 'ok' ? body : pending('nispach'));
     $('main').innerHTML = h;
   }
 
@@ -524,6 +719,12 @@
     }
     var rv = t.closest('[data-rview]');
     if (rv) { ROLEVIEW = rv.getAttribute('data-rview'); try { localStorage.setItem('revital.roleview', ROLEVIEW); } catch (err) {} render(); return; }
+    var ml = t.closest('[data-mail]');
+    if (ml && !IS_MOBILE) {
+      var M = MAILS[ml.getAttribute('data-mail')];
+      if (M) { e.preventDefault(); openDraft(M); }
+      return;
+    }
     var c = t.closest('[data-copy]');
     if (c) { e.preventDefault(); copy(LISTS[c.getAttribute('data-copy')] || ''); return; }
     if (t.closest('#burger')) { document.body.classList.toggle('nav-on'); return; }

@@ -164,3 +164,15 @@ footer a{color:var(--navy)}
 .seg{display:inline-flex;background:var(--paper);border-radius:12px;padding:3px}
 .seg button{border:0;background:none;font:inherit;font-weight:700;font-size:14px;color:var(--muted);padding:7px 14px;border-radius:9px;cursor:pointer;min-height:38px}
 .seg button[aria-pressed=true]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(22,32,60,.12)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.filters input,.filters select{font:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--paper);min-width:0;color:var(--ink)}
+.filters input{flex:1 1 220px}
+.filters select{flex:0 1 200px}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.btn{text-decoration:none;min-height:38px}
+.btn.primary{background:var(--navy);border-color:var(--navy);color:#fff}
+.sl .supl{color:var(--blue);font-weight:700}
+.sl .supl svg{width:15px;height:15px;flex:none}
+.subh{margin:16px 0 4px;font:700 15px Rubik,sans-serif;color:var(--navy)}
+.subh:first-child{margin-top:0}
