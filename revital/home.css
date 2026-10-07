@@ -160,3 +160,7 @@ footer a{color:var(--navy)}
 @media (max-width:960px){ .sec>summary{padding:12px 14px} .sec .sb{padding:12px 14px 14px} .sec .sum{margin-inline-start:0;width:100%} }
 .nav a.home{text-decoration:none}
 .nav .home .ext{width:14px;height:14px;margin-inline-start:auto;color:var(--muted)}
+.views{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:12px}
+.seg{display:inline-flex;background:var(--paper);border-radius:12px;padding:3px}
+.seg button{border:0;background:none;font:inherit;font-weight:700;font-size:14px;color:var(--muted);padding:7px 14px;border-radius:9px;cursor:pointer;min-height:38px}
+.seg button[aria-pressed=true]{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(22,32,60,.12)}

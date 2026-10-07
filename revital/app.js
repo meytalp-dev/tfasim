@@ -451,6 +451,8 @@
   }
 
   /* ----- לפי תפקיד ----- */
+  var ROLEVIEW = 'all';   /* all = רשימה אחת · sup = לפי מפקח.ת */
+  try { ROLEVIEW = localStorage.getItem('revital.roleview') === 'sup' ? 'sup' : 'all'; } catch (e) {}
   function rolePage(role) {
     if (ST.nispach !== 'ok') { $('main').innerHTML = '<div class="card head"><h1>' + esc(shortRole(role)) + '</h1>' + pending('nispach') + '</div>'; return; }
     var rows = [], missing = [];
@@ -471,15 +473,26 @@
     LISTS.roleMiss = missing.map(function (z) { return z[0].name + ' — ' + z[1]; }).join('\n');
     var h = '<div class="card head"><h1>' + esc(role) + '</h1><div class="meta">' + rows.length + ' בעלי תפקידים ב-64 בתי הספר' +
       (missing.length ? ' · חסר ב-' + missing.length : '') + '</div>' +
-      '<div class="row-end" style="margin-top:12px"><button class="btn" data-copy="role">' + I.copy + 'העתקת הרשימה לאקסל</button></div></div>';
-    var bySup = {};
-    rows.forEach(function (z) { supsOf(z[0]).forEach(function (n) { (bySup[n] = bySup[n] || []).push(z); }); });
-    Object.keys(bySup).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n) {
-      h += sec('role-' + n, I.users, n, bySup[n].length + ' בעלי תפקידים', bySup[n].map(function (z) {
+      '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
+        '<button type="button" data-rview="all" aria-pressed="' + (ROLEVIEW === 'all') + '">רשימה אחת</button>' +
+        '<button type="button" data-rview="sup" aria-pressed="' + (ROLEVIEW === 'sup') + '">לפי מפקח.ת</button></div>' +
+        '<button class="btn" data-copy="role">' + I.copy + 'העתקת הרשימה לאקסל</button></div></div>';
+    if (ROLEVIEW === 'all') {
+      var all = rows.slice().sort(function (a, b) { return a[0].name.localeCompare(b[0].name, 'he'); });
+      h += '<div class="card">' + (all.length ? all.map(function (z) {
         var p = z[1];
-        return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : ''), p.name, p.phone, p.email, holderExtra(p));
-      }).join(''));
-    });
+        return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : '') + ' · ' + supsOf(z[0]).join(' · '), p.name, p.phone, p.email, holderExtra(p));
+      }).join('') : '<div class="empty">אין בעלי תפקידים בתפקיד הזה.</div>') + '</div>';
+    } else {
+      var bySup = {};
+      rows.forEach(function (z) { supsOf(z[0]).forEach(function (n) { (bySup[n] = bySup[n] || []).push(z); }); });
+      Object.keys(bySup).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n) {
+        h += sec('role-' + n, I.users, n, bySup[n].length + ' בעלי תפקידים', bySup[n].map(function (z) {
+          var p = z[1];
+          return personHtml(z[0].name + (p.detail ? ' · ' + p.detail : ''), p.name, p.phone, p.email, holderExtra(p));
+        }).join(''));
+      });
+    }
     if (missing.length) {
       h += sec('role-miss', I.chart, 'בתי ספר שבהם התפקיד חסר', tag('', missing.length + ' בתי ספר'),
         '<div class="row-end"><button class="btn" data-copy="roleMiss">' + I.copy + 'העתקה</button></div><ul class="list">' +
@@ -509,6 +522,8 @@
       OPENGRP[grp.getAttribute('data-grp')] = open;
       return;
     }
+    var rv = t.closest('[data-rview]');
+    if (rv) { ROLEVIEW = rv.getAttribute('data-rview'); try { localStorage.setItem('revital.roleview', ROLEVIEW); } catch (err) {} render(); return; }
     var c = t.closest('[data-copy]');
     if (c) { e.preventDefault(); copy(LISTS[c.getAttribute('data-copy')] || ''); return; }
     if (t.closest('#burger')) { document.body.classList.toggle('nav-on'); return; }
