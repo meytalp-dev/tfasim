@@ -91,7 +91,14 @@
     return s;
   }
   function telA(p) { p = phoneOf(p); return p ? '<a href="tel:' + esc(p.replace(/[^\d+]/g, '')) + '" dir="ltr">' + esc(p) + '</a>' : ''; }
-  function mailA(m) { m = String(m || '').trim(); return m ? '<a href="mailto:' + esc(m) + '" dir="ltr">' + esc(m) + '</a>' : ''; }
+  /* תא מייל יכול להכיל כמה כתובות (ארגוני + פרטי), מופרדות בפסיק */
+  function mailA(m) {
+    return String(m || '').split(/[\s,;]+/).filter(function (x) { return x.indexOf('@') > 0; }).map(function (x) {
+      return '<a href="mailto:' + esc(x) + '" dir="ltr">' + esc(x) + '</a>';
+    }).join(' ');
+  }
+  /* כל המיילים של איש קשר: עמודת "מייל" + עמודת "מייל נוסף" (אם נוספה בגיליון) */
+  function cMail(c) { return c ? [c['מייל'], c['מייל נוסף']].filter(Boolean).join(', ') : ''; }
   function initials(n) { var p = String(n || '').trim().split(/\s+/); return esc((p[0] || '').charAt(0) + (p[1] || '').charAt(0)); }
 
   function toast(t) {
@@ -375,12 +382,12 @@
     else {
       var pr = cs[0];
       cSum = esc(pr ? pr['שם'] : principal) + (pr && pr['טלפון'] ? ' · ' + esc(phoneOf(pr['טלפון'])) : '');
-      if (cs.length) cBody += cs.map(function (c) { return personHtml(c['תפקיד'] || 'מנהל.ת', c['שם'], c['טלפון'] || c['e164'], c['מייל']); }).join('');
+      if (cs.length) cBody += cs.map(function (c) { return personHtml(c['תפקיד'] || 'מנהל.ת', c['שם'], c['טלפון'] || c['e164'], cMail(c)); }).join('');
       else if (principal) cBody += personHtml('מנהל.ת', principal, '', '', 'אין פרטי קשר בגיליון אנשי הקשר');
       else cBody += '<div class="empty">אין רשומת מנהל.ת לבית הספר הזה.</div>';
       supsOf(s).forEach(function (n) {
         var c = contactByName(n);
-        cBody += personHtml('מפקח.ת פדגוגי.ת', n, c && (c['טלפון'] || c['e164']), c && c['מייל'],
+        cBody += personHtml('מפקח.ת פדגוגי.ת', n, c && (c['טלפון'] || c['e164']), cMail(c),
           s.changed && s.supPrev ? 'בתשפ״ו: ' + esc(s.supPrev) : '');
       });
     }
@@ -489,7 +496,10 @@
     MAILS[id] = M;
     if (!(M.to && M.to.length) && !(M.bcc && M.bcc.length)) return '';
     var n = (M.to || []).length + (M.bcc || []).length;
-    return '<a class="btn primary" data-mail="' + id + '" href="' + esc(mailHref(M)) + '">' + I.mail + esc(label || ('מייל ל-' + n)) + '</a>';
+    /* במחשב שני מסלולים: Gmail (ראשי) ותוכנת המייל — Outlook (mailto, גוף קצר) */
+    return '<a class="btn primary" data-mail="' + id + '" href="' + esc(mailHref(M)) + '">' + I.mail + esc(label || ('מייל ל-' + n)) +
+      (IS_MOBILE ? '' : ' · Gmail') + '</a>' +
+      (IS_MOBILE ? '' : '<a class="btn" href="' + esc(mailHref(M)) + '">' + I.mail + 'בתוכנת המייל (Outlook)</a>');
   }
   function copyHtml(html, text) {
     var ok = false, div = document.createElement('div');
@@ -630,7 +640,7 @@
   var SUP_PAGE = 'https://tfasim.pedagogiamh.co.il/baaley-tafkidim/';
   function supMail(name, list) {
     var c = contactByName(name);
-    var to = cleanMails([c && c['מייל']]);
+    var to = cleanMails([cMail(c)]);
     var date = new Date().toLocaleDateString('he-IL');
     var td = 'style="border:1px solid #d9dee8;padding:6px 8px;text-align:right;vertical-align:top"';
     var th = 'style="border:1px solid #d9dee8;padding:6px 8px;text-align:right;background:#eef2fb"';
@@ -673,7 +683,7 @@
     MAILS = {};
     var M = supMail(name, list);
     var h = '<div class="card head"><h1>' + esc(name) + '</h1><div class="meta">מפקח.ת פדגוגי.ת · ' + list.length + ' בתי ספר' +
-      (c ? ' · ' + telA(c['טלפון'] || c['e164']) + (c['מייל'] ? ' · ' + mailA(c['מייל']) : '') : '') + '</div>' +
+      (c ? ' · ' + telA(c['טלפון'] || c['e164']) + (cMail(c) ? ' · ' + mailA(cMail(c)) : '') : '') + '</div>' +
       '<div class="views"><div class="small" style="margin:0">' + (M.to.length ? 'המייל כולל טבלת מצב לכל בית ספר ואת כל בעלי התפקידים.' :
         'אין מייל של המפקח.ת בגיליון אנשי הקשר.') + '</div>' +
       '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') + '</div></div></div>';
