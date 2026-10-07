@@ -1055,10 +1055,30 @@
         '<div class="gc">' + tag('ok', 'הוגש') + '</div>' +
         (note ? '<div class="note" style="margin-top:10px"><b>הערה לאישור:</b> ' + esc(note) + '</div>' : '') +
         '<div class="acts" style="margin-top:10px">' + (fid
-          ? '<a class="btn primary" href="https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view" target="_blank" rel="noopener">' + I.doc + 'פתיחת המסמך' + I.ext + '</a>'
+          ? '<button type="button" class="btn primary" data-saldoc="' + esc(r.s.semel) + '">' + I.doc + 'פתיחת המסמך</button>'
           : '<span class="small">המסמך עוד לא הועלה לדרייב.</span>') + '</div>' +
-        '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח בדרייב, ורק למי שהוא שותף איתו.</div></div>'
+        '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח דרך הבית, רק למי שבית הספר משויך אליו/ה.</div></div>'
     };
+  }
+
+  /* פתיחת מסמך הסל: חלון נפתח מיד בלחיצה (אחרת הדפדפן חוסם), והמסמך נטען אליו מהשער.
+     השער בודק שבית הספר משויך למי שנכנס.ה — בלי שיתוף בדרייב (מיטל, 7.10.26) */
+  var GATE_EXEC = GAS + 'AKfycbynKp-eTNj7pY5lTaSD5_S_qhBH2RgEeLWOPW5ZeF2dTQ5hifL3Q7Lb4KDdQYJ_4Vz9/exec';
+  function openSalDoc(semel) {
+    var w = window.open('', '_blank');
+    if (w) w.document.write('<p dir="rtl" style="font-family:Arial,sans-serif;padding:24px">טוען את המסמך…</p>');
+    toast('טוען את המסמך…');
+    fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'salDoc', token: token(), semel: semel }) }, 90000, 1).then(function (d) {
+      if (!d || !d.ok) throw new Error(d && d.error || 'err');
+      var bin = atob(d.b64), arr = new Uint8Array(bin.length);
+      for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      var url = URL.createObjectURL(new Blob([arr], { type: d.mime || 'application/pdf' }));
+      if (w) w.location.href = url; else location.href = url;
+    }).catch(function (e) {
+      if (w) w.close();
+      toast(String(e.message) === 'notyours' ? 'המסמך לא שייך לבתי הספר שלך' : 'לא הצלחתי לפתוח את המסמך. נסו שוב בעוד רגע.');
+    });
   }
 
   /* ----- עמוד בית ספר: יעדים, מיפוי, ביקורי תשפ״ו (pikuah-data) ----- */
@@ -1708,6 +1728,8 @@
     var mp = t.closest('[data-mefpick]');
     if (mp) { try { localStorage.setItem('mefakeach.school', mp.getAttribute('data-mefpick')); } catch (err) {} return; }
     /* לפני data-go: כפתור שמסנן ואז עובר לרשימה */
+    var sd = t.closest('[data-saldoc]');
+    if (sd) { e.preventDefault(); openSalDoc(sd.getAttribute('data-saldoc')); return; }
     var gk2 = t.closest('[data-gk]');
     if (gk2) { GKIND = gk2.getAttribute('data-gk'); go('G'); return; }
     var ak2 = t.closest('[data-ak]');
