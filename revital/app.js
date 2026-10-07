@@ -36,8 +36,13 @@
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
                    ['menor', 'רישום מורים למנור'], ['sal', 'סל תוכניות']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
   /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
-  var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה']];
+  var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה'],
+                    ['aklim', 'אקלים: פער או ירידה']];
   var VISIT_DAYS = 90;
+  /* שאלון אקלים תשפ"ו (מיטל, 7.10.26): ממד חריג = 12 נקודות ומעלה מתחת להשוואה, או ירידה של 12 ומעלה
+     מתשפ"ה. כרטיס עם פחות מ-10 משיבים מוצג עם הערה, ולא נכנס להתראות */
+  var AKL_GAP = 12, AKL_MIN = 10;
+  var AKL_AUD = ['מורים', 'תלמידים', 'פדגוגיה'];
   var LV = { 'יציב ומתקדם': 'ok', 'בתהליך/דורש חיזוק': 'warn', 'במצב סיכון': 'bad' };
   /* קבוצות המדדים במיפוי — כל קבוצה מתחילה במדד הזה, לפי סדר העמודות */
   var LV_GROUPS = [['אקלים בית ספרי', 'אקלים, חוסן ומענים'], ['איכות ההוראה', 'הוראה ולמידה'], ['הערכה כללית של המנהל', 'ניהול']];
@@ -113,7 +118,7 @@
   var MEF = {};     /* סמל → {st:'load'|'ok'|'err'|'noaccess', d} */
   var OPENSEC = { head: true };   /* אילו מקטעים פתוחים — נשמר בין בתי ספר */
   /* לשוניות בעמוד בית ספר (מיטל, 7.10.26: "הדף ארוך מדי") — "פיקוח" מפוצל לשתיים */
-  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['vis', 'ביקורים ומשימות'], ['sal', 'סל תוכניות'], ['lrn', 'למידה']];
+  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['akl', 'אקלים'], ['vis', 'ביקורים ומשימות'], ['sal', 'סל תוכניות'], ['lrn', 'למידה']];
   var STAB = 'ov';
 
   function supsOf(s) { return s.sups && s.sups.length ? s.sups : [s.sup]; }
@@ -265,11 +270,15 @@
 
   /* מיפוי, ביקורי תשפ״ו ויעדים — מהשער. השרת מחזיר רק את בתי הספר של המחובר.ת (all = הכול) */
   function loadPikuah() {
-    if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = 'err'; return loaded('pk', false); }
+    if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = ST.akl = 'err'; return loaded('pk', false); }
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
-      if (!d || d.error) { ST.sal = 'err'; return loaded('pk', false); }
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; });
+      if (!d || d.error) { ST.sal = ST.akl = 'err'; return loaded('pk', false); }
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; });
+      /* אקלים: בשער שלפני 7.10.26 אין את המפתח — אז "לא נטען", לא "לא התקבל דוח" */
+      ST.akl = Array.isArray(d.aklim) && d.aklim.length ? 'ok' : 'err';
+      (d.aklim || []).forEach(function (row) { var r = at(row); if (r) r.akl.push(row); });
+      (d.aklimWeak || []).forEach(function (row) { var r = at(row); if (r) r.aklWeak.push(row); });
       (d.sal || []).forEach(function (row) { var r = at(row); if (r) r.sal = row; });
       function at(row) { return BYSEMEL[String(row['סמל מוסד'] || '').trim()]; }
       (d.mipui || []).forEach(function (row) { var r = at(row); if (r) r.mipui.push(row); });
@@ -282,7 +291,7 @@
       });
       ST.sal = 'ok';
       loaded('pk', true);
-    }, function () { ST.sal = 'err'; loaded('pk', false); });
+    }, function () { ST.sal = 'err'; ST.akl = 'err'; loaded('pk', false); });
   }
   /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
   function loadMefVisits() {
@@ -375,7 +384,29 @@
       else if (overall.indexOf('סיכון') === 0) out.push({ k: 'risk', t: overall });
       if (!r.yaad) out.push({ k: 'goals', t: 'אין יעדים מהוועדה המלווה האחרונה' });
     }
+    if (ST.akl === 'ok') {
+      var ab = aklBad(r);
+      if (ab.length) out.push({ k: 'aklim', t: 'אקלים: ' + ab.slice(0, 3).map(aklWhy).join(' · ') + (ab.length > 3 ? ' · ועוד ' + (ab.length - 3) : '') });
+    }
     return out;
+  }
+
+  /* ===== שאלון אקלים תשפ"ו ===== */
+  function aklNum(v) { v = String(v == null ? '' : v).trim(); return v === '' ? null : Number(v); }
+  function aklFew(row) { var n = aklNum(row['משיבים']); return n !== null && n < AKL_MIN; }
+  /* "פדגוגיה (מורים)" בקובץ הפדגוגיה זהה לממד בקובץ המורים — מסומן רק שם */
+  function aklDup(row) { return row['קהל'] === 'פדגוגיה' && row['ממד'] === 'פדגוגיה (מורים)'; }
+  function aklGap(row) { var g = aklNum(row['פער מההשוואה']); return g !== null && g <= -AKL_GAP; }
+  function aklDrop(row) { var c = aklNum(row['שינוי מתשפ"ה']); return c !== null && c <= -AKL_GAP; }
+  function aklLow(row) { return !aklFew(row) && (aklGap(row) || aklDrop(row)); }
+  function aklBad(r) { return (r.akl || []).filter(function (row) { return !aklDup(row) && aklLow(row); }); }
+  function aklCmpName(row) { return String(row['סוג השוואה'] || '').indexOf('דומים') > -1 ? 'דומים' : 'הקבוצה'; }
+  function aklWhy(row) { return row['קהל'] + (row['יחידה'] ? ' ' + row['יחידה'] : '') + ': ' + row['ממד'] + ' ' + aklReason(row); }
+  function aklReason(row) {
+    var p = [];
+    if (aklGap(row)) p.push('נמוך ב-' + Math.round(-aklNum(row['פער מההשוואה'])) + ' מ' + (aklCmpName(row) === 'דומים' ? 'הדומים' : 'הקבוצה'));
+    if (aklDrop(row)) p.push('ירד ב-' + Math.round(-aklNum(row['שינוי מתשפ"ה'])));
+    return p.join(', ');
   }
 
   /* ===== ניתוב ===== */
@@ -397,10 +428,13 @@
   var FROM = null;   /* מאיזה עמוד רשימה נכנסו לעמוד פנימי — אליו מוביל "חזרה" */
   function go(to) {
     to = to || '';
+    var tt = /^(s:\d+)&t=(\w+)$/.exec(to);   /* ישר ללשונית (למשל אקלים מ"דורש תשומת לב") */
+    if (tt) to = tt[1];
     if (CUR === 'N') nfSync();   /* טיוטת טופס חדש נשמרת גם כשיוצאים מהעמוד */
     if (to.indexOf(':') > -1) { if (CUR.indexOf(':') < 0) FROM = CUR; }
     else FROM = null;
     if (to !== CUR && to.charAt(0) === 's') STAB = 'ov';   /* בית ספר אחר נפתח בסקירה */
+    if (tt) STAB = tt[2];
     CUR = to;
     setHash();
     document.body.classList.remove('nav-on');
@@ -746,7 +780,8 @@
     }).filter(function (z) { return z.g.length && (!ASUP || supsOf(z.r.s).indexOf(ASUP) > -1); });
   }
   function attLi(z, withSup) {
-    return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
+    var onlyAkl = z.g.every(function (x) { return x.k === 'aklim'; });
+    return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + (onlyAkl ? '&t=akl' : '') + '"><span class="gn">' + esc(z.r.s.name) +
       (withSup ? '<small>' + esc(supsOf(z.r.s).join(' · ')) + '</small>' : '') + '</span><span class="gc">' +
       z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button></li>';
   }
@@ -1022,18 +1057,23 @@
     var K = pikuahSecs(r);
     var ppl = cSum, lrn = [mSum, hSum.join(' · ')].filter(Boolean).join(' · ');
     var SL = salTab(r);
+    var AK = aklimTab(r);
     var fl = flags(r);
     var T = {
       ov: (fl.length ? '<div class="card"><p class="eyebrow">' + I.chart + 'דורש תשומת לב</p><div class="gc">' +
-            fl.map(function (z) { return '<span class="chip k-' + z.k + '">' + esc(z.t) + '</span>'; }).join('') + '</div></div>' : '') +
+            fl.map(function (z) {
+              return z.k === 'aklim' ? '<button type="button" class="chip k-aklim" data-tab="akl">' + esc(z.t) + '</button>'
+                : '<span class="chip k-' + z.k + '">' + esc(z.t) + '</span>';
+            }).join('') + '</div></div>' : '') +
           '<div class="card"><ul class="tabsum">' +
-          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
+          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['akl', I.chart, AK.sum], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
             .map(function (z) {
               var lbl = TABS.filter(function (t) { return t[0] === z[0]; })[0][1];
               return '<li><button type="button" data-tab="' + z[0] + '"><span class="st">' + z[1] + esc(lbl) + '</span><span class="sum">' + (z[2] || '') + '</span><span class="go">←</span></button></li>';
             }).join('') + '</ul></div>' + schoolForms(s),
       ppl: P.contacts + P.roles + P.sherut,
       map: K.yaad + K.mipui,
+      akl: AK.body,
       vis: K.bik + P.visits + P.tasks,
       sal: SL.body,
       lrn: P.megamot + P.hisht + P.menor
@@ -1042,6 +1082,72 @@
       return '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (STAB === t[0]) + '">' + esc(t[1]) + '</button>';
     }).join('') + '</nav><div class="tabp" role="tabpanel">' + (T[STAB] || T.ov) + '</div>';
     $('main').innerHTML = h;
+  }
+
+  /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
+  function aklimTab(r) {
+    var head = '<p class="eyebrow">' + I.chart + 'שאלון אקלים תשפ״ו</p>';
+    if (ST.akl !== 'ok') {
+      var sm = ST.pk === 'load' ? 'טוען…' : 'לא נטען';
+      return { sum: sm, body: '<div class="card">' + head + (ST.pk === 'load' ? pending('pk') : '<div class="empty">נתוני האקלים לא נטענו כרגע. רענון הדף ינסה שוב.</div>') + '</div>' };
+    }
+    if (!r.akl.length) return { sum: 'לא התקבל דוח', body: '<div class="card">' + head + '<div class="empty">לא התקבל דוח אקלים תשפ״ו לבית הספר הזה.</div></div>' };
+
+    var cards = [], by = {};
+    r.akl.forEach(function (row) {
+      var k = row['קהל'] + '|' + (row['יחידה'] || '');
+      if (!by[k]) { by[k] = []; cards.push(k); }
+      by[k].push(row);
+    });
+    cards.sort(function (a, b) { return AKL_AUD.indexOf(a.split('|')[0]) - AKL_AUD.indexOf(b.split('|')[0]) || a.localeCompare(b); });
+    var nBad = aklBad(r).length;
+
+    function n1(v) { var x = aklNum(v); return x === null ? '' : String(Math.round(x * 10) / 10); }
+    function bar(row) {
+      var cur = aklNum(row['תשפ"ו']), cmp = aklNum(row['השוואה']), chg = aklNum(row['שינוי מתשפ"ה']);
+      var low = !aklDup(row) && aklLow(row), clamp = function (x) { return Math.max(0, Math.min(100, x)); };
+      var tip = 'תשפ״ו ' + n1(cur) + (cmp !== null ? ' · ' + (aklCmpName(row) === 'דומים' ? 'בתי ספר דומים ' : 'קבוצת התייחסות ') + n1(cmp) : '') +
+        (aklNum(row['תשפ"ה']) !== null ? ' · תשפ״ה ' + n1(row['תשפ"ה']) : '') + (aklNum(row['תשפ"ד']) !== null ? ' · תשפ״ד ' + n1(row['תשפ"ד']) : '');
+      var arrow = chg === null ? '' : '<span class="akd' + (aklDrop(row) && !aklFew(row) ? ' bad' : '') + '">' +
+        (Math.abs(chg) < 0.5 ? '= ' : (chg > 0 ? '↑ ' : '↓ ')) + Math.abs(Math.round(chg)) + '</span>';
+      return '<li class="akb' + (low ? ' low' : '') + '"><div class="akn">' + esc(row['ממד']) + '</div>' +
+        '<div class="akr"><div class="akt" title="' + esc(tip) + '"><i class="akf" style="width:' + clamp(cur || 0) + '%"></i>' +
+        (cmp !== null ? '<i class="akc" style="inset-inline-start:' + clamp(cmp) + '%"></i>' : '') + '</div>' +
+        '<div class="akv"><b>' + Math.round(cur) + '</b>' + (cmp !== null ? '<span>' + aklCmpName(row) + ' ' + Math.round(cmp) + '</span>' : '') + arrow + '</div></div>' +
+        (low ? '<div class="akw">' + esc(aklReason(row)) + '</div>' : '') +
+        (aklDup(row) ? '<div class="akw muted">אותו ממד כמו בכרטיס המורים — מסומן שם</div>' : '') + '</li>';
+    }
+
+    var body = cards.map(function (k) {
+      var rows = by[k], aud = k.split('|')[0], unit = k.split('|')[1], f = rows[0];
+      var few = aklFew(f), bad = rows.filter(function (x) { return !aklDup(x) && aklLow(x); }).length;
+      var resp = aklNum(f['משיבים']), reg = aklNum(f['רשומים']), rt = aklNum(f['שיעור משיבים']);
+      var sum = (resp !== null ? resp + ' משיבים' + (reg && reg >= resp ? ' מתוך ' + reg : '') : '') +
+        (few ? ' ' + tag('warn', 'מעט משיבים') : (bad ? ' ' + tag('k-aklim', bad === 1 ? 'ממד אחד חריג' : bad + ' ממדים חריגים') : ''));
+      var kinds = rows.map(function (x) { return x['סוג השוואה']; }).filter(Boolean);
+      var weak = r.aklWeak.filter(function (x) { return x['קהל'] === aud && String(x['יחידה'] || '') === unit; })
+        .sort(function (a, b) { return Number(a['דירוג בכרטיס']) - Number(b['דירוג בכרטיס']); });
+      var b = '<div class="small akkey">הפס: ציון תשפ״ו (0–100)' + (kinds.length ? ' · הקו: ' + esc(kinds[0]) : '') + ' · החץ: שינוי מתשפ״ה' +
+        (rt !== null && rt <= 100 ? ' · שיעור משיבים ' + rt + '%' : '') + '</div>' +
+        (few ? '<div class="note">ענו רק ' + resp + '. הציונים פחות אמינים, ולכן הכרטיס לא נכנס ל"דורש תשומת לב".</div>' : '') +
+        '<ul class="akl">' + rows.map(bar).join('') + '</ul>' +
+        (weak.length ? '<details class="vis" style="margin-top:12px"><summary><b>3 ההיגדים החלשים</b></summary><div class="vb"><ul class="lvl">' +
+          weak.map(function (x) {
+            return '<li><span>' + esc(x['היגד']) + '<small style="display:block;color:var(--muted)">' + esc(x['ממד']) +
+              (String(x['אחוז במידה רבה / מאוד']) !== '' ? ' · ' + esc(x['אחוז במידה רבה / מאוד']) + '% במידה רבה / רבה מאוד' : '') + '</small></span>' +
+              '<span class="chip warn">' + Math.round(aklNum(x['ממוצע'])) + '</span></li>';
+          }).join('') + '</ul></div></details>' : '');
+      return sec('akl-' + aud + unit, aud === 'פדגוגיה' ? I.book : I.users,
+        aud + (unit ? ' · ' + unit : ''), sum, b);
+    }).join('');
+
+    var got = AKL_AUD.filter(function (a) { return cards.some(function (k) { return k.split('|')[0] === a; }); });
+    return {
+      sum: nBad ? tag('k-aklim', nBad === 1 ? 'ממד אחד חריג' : nBad + ' ממדים חריגים') : 'אין פער או ירידה',
+      body: '<div class="card">' + head + '<div class="small">התקבלו: ' + esc(got.join(' · ')) +
+        (got.length < 3 ? ' · לא התקבל: ' + esc(AKL_AUD.filter(function (a) { return got.indexOf(a) < 0; }).join(' · ')) : '') +
+        ' · חריג = ' + AKL_GAP + ' נקודות ומעלה מתחת להשוואה, או ירידה של ' + AKL_GAP + ' ומעלה מתשפ״ה</div></div>' + body
+    };
   }
 
   /* ----- לשונית סל תוכניות: סטטוס, הערת האישור, המסמך (בדרייב של אורט, משותף עם רויטל ועם המפקח.ת) ----- */
