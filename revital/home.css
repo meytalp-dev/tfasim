@@ -176,3 +176,18 @@ footer a{color:var(--navy)}
 .sl .supl svg{width:15px;height:15px;flex:none}
 .subh{margin:16px 0 4px;font:700 15px Rubik,sans-serif;color:var(--navy)}
 .subh:first-child{margin-top:0}
+
+/* מה חסר */
+.kinds{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:12px}
+.kind{border:1px solid var(--line);background:var(--paper);border-radius:12px;padding:8px 10px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;text-align:right;display:flex;flex-direction:column;gap:2px}
+.kind b{font:700 20px Rubik,sans-serif;color:var(--bad)}
+.kind.on{border-color:var(--blue);background:var(--blue-soft);color:var(--navy)}
+.glist{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.gapi{width:100%;display:flex;gap:10px 14px;align-items:flex-start;flex-wrap:wrap;border:0;background:var(--paper);border-radius:12px;padding:10px 12px;font:inherit;cursor:pointer;text-align:right;color:var(--ink)}
+.gapi:hover{background:var(--blue-soft)}
+.gapi .gn{font-weight:700;min-width:150px}
+.gapi .gn small{display:block;font-weight:400;color:var(--muted);font-size:12.5px}
+.gapi .gc{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+.gapi .chip{font-weight:600;font-size:12.5px}
+.gapi .chip{border-radius:9px;text-align:right}
+@media (max-width:960px){ .gapi .gn{min-width:0;flex-basis:100%} .gapi .gc{flex-basis:100%} }
