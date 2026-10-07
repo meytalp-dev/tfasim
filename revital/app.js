@@ -459,7 +459,7 @@
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
-      (adminView() ? item('F', I.doc, 'טפסים נקודתיים', fNavCount()) : '') +
+      (adminView() ? item('F', I.doc, 'טפסים פעילים', fNavCount()) : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
       '<li class="sep"></li>' +
       (adminView() ? '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
@@ -1384,7 +1384,7 @@
     $('main').innerHTML = h;
   }
 
-  /* ===== טפסים נקודתיים (7.10.26) =====
+  /* ===== טפסים פעילים (נקראו בהתחלה "טפסים נקודתיים", 7.10.26) =====
      טפסי רישום/דיווח זמניים. שרת וגיליון משלהם ("טפסים נקודתיים — הבית של רויטל"); הטופס הציבורי: tfasim/f.html?id=<מזהה>.
      טופס חדש = שורה בלשונית "טפסים". סגירה = כפתור כאן — הטופס עובר לארכיון והפניות נשמרות.
      אדמין בלבד: השרת מאמת את הטוקן מול השער (מרחב all). */
@@ -1512,7 +1512,7 @@
   }
 
   function formsPage() {
-    var h = '<div class="card head"><h1>טפסים נקודתיים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div>' +
+    var h = '<div class="card head"><h1>טפסים פעילים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div>' +
       '<div class="acts" style="margin-top:12px"><button type="button" class="btn primary" data-go="N">+ טופס חדש</button></div></div>';
     if (ST.forms !== 'ok') { $('main').innerHTML = h + '<div class="card">' + pending('forms') + '</div>'; return; }
     var open = FORMS.filter(function (f) { return f.open; }), closed = FORMS.filter(function (f) { return !f.open; });
@@ -1589,6 +1589,7 @@
       '<a class="btn" href="' + esc(link) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחת הטופס</a>' +
       (shown.length ? '<button type="button" class="btn" data-copy="form">' + I.copy + 'העתקה לאקסל</button>' : '') +
       '<button type="button" class="btn" data-fopen="' + (f.open ? '0' : '1') + '" data-fid="' + esc(f.id) + '">' + (f.open ? 'סגירת הטופס' : 'פתיחה מחדש') + '</button>' +
+      (f.open ? '' : '<button type="button" class="btn fdel" data-fdel="' + esc(f.id) + '">מחיקת הטופס</button>') +
       '</div></div></div>';
     if (f.track) h += fMissing(f);
     h += shown.length ? shown.map(function (r) { return fItem(f, r); }).join('')
@@ -1653,6 +1654,19 @@
       side(); render();
     }, function () { toast('הפעולה לא הצליחה. נסי שוב'); });
   }
+  /* מחיקה — רק טופס סגור. בשרת ההגדרה עוברת ללשונית "נמחקו" והפניות נשמרות בלשונית מוסתרת (אפשר לשחזר) */
+  function fDelete(id) {
+    var f = fById(id);
+    if (!f || f.open) return;
+    var n = (f.rows || []).length;
+    if (!window.confirm('למחוק את הטופס "' + f.title + '"?\n' + (n === 1 ? 'פנייה אחת תוסר מהבית. ' : (n ? n + ' פניות יוסרו מהבית. ' : '')) +
+      'הטופס ייעלם מהרשימה ומהארכיון. הנתונים נשמרים בגיליון, ומיטל יכולה לשחזר במקרה הצורך.')) return;
+    fPost({ action: 'deleteForm', id: id }).then(function () {
+      FORMS = FORMS.filter(function (x) { return x.id !== id; });
+      toast('הטופס נמחק');
+      go('F');
+    }, function () { toast('המחיקה לא הצליחה. נסי שוב'); });
+  }
   /* דשבורד — שורה מרוכזת אחת, רק כשיש טופס פתוח */
   function dashForms() {
     if (!adminView() || ST.forms !== 'ok') return '';
@@ -1660,7 +1674,7 @@
     if (!open.length) return '';
     var n = 0;
     open.forEach(function (f) { n += fOpenN(f); });
-    return '<div class="card" id="dashForms"><h2 class="h2">טפסים נקודתיים</h2><div class="sumrow">' +
+    return '<div class="card" id="dashForms"><h2 class="h2">טפסים פעילים</h2><div class="sumrow">' +
       '<button type="button" class="sumh" data-go="F">' + (n ? n + ' פניות פתוחות' : 'אין פניות פתוחות') + ' · ' +
       (open.length === 1 ? 'טופס פתוח אחד' : open.length + ' טפסים פתוחים') + ' ←</button><div class="gc">' +
       open.map(function (f) {
@@ -1677,7 +1691,7 @@
     });
     if (!items.length) return '';
     items.sort(function (a, b) { return String(b.r['חותמת זמן']).localeCompare(String(a.r['חותמת זמן'])); });
-    return '<div class="card"><p class="eyebrow">' + I.doc + 'פניות בטפסים נקודתיים</p><ul class="list">' + items.map(function (z) {
+    return '<div class="card"><p class="eyebrow">' + I.doc + 'פניות בטפסים</p><ul class="list">' + items.map(function (z) {
       return '<li><button type="button" data-go="f:' + esc(z.f.id) + '">' + esc(z.f.title) + ' · ' + esc(z.r['שם מלא']) +
         '<span>' + esc(fDate(z.r['חותמת זמן'], true)) + ' · ' + (fIsDone(z.r) ? F_DONE : F_OPEN) + '</span></button></li>';
     }).join('') + '</ul></div>';
@@ -1718,6 +1732,8 @@
     if (ff) { FFILT = ff.getAttribute('data-ffilt'); render(); return; }
     var fs = t.closest('[data-fst]');
     if (fs) { fSetStatus(fs.getAttribute('data-fid'), fs.getAttribute('data-rid'), fs.getAttribute('data-fst')); return; }
+    var fd = t.closest('[data-fdel]');
+    if (fd) { fDelete(fd.getAttribute('data-fdel')); return; }
     var fo = t.closest('[data-fopen]');
     if (fo) { fSetOpen(fo.getAttribute('data-fid'), fo.getAttribute('data-fopen') === '1'); return; }
     var rv = t.closest('[data-rview]');
