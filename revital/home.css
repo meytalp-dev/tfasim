@@ -193,3 +193,14 @@ footer a{color:var(--navy)}
 @media (max-width:960px){ .gapi .gn{min-width:0;flex-basis:100%} .gapi .gc{flex-basis:100%} }
 .kind.soon{cursor:default;border-style:dashed;background:#fff}
 .kind.soon b{color:var(--muted);font-size:16px}
+
+/* צבע לכל תחום חוסר — אותו צבע בכרטיס המונה ובתגיות שברשימה */
+.k-nispach{--kc:#c43c47;--ks:#fdecee}
+.k-bs{--kc:#7b3fbf;--ks:#f2eafc}
+.k-rg{--kc:#b8620b;--ks:#fff1df}
+.k-menor{--kc:#1659d6;--ks:#e6efff}
+.k-matz{--kc:#0f7f6c;--ks:#e0f4ef}
+.gapi .chip[class*="k-"]{background:var(--ks);color:var(--kc)}
+.kind[class*="k-"]{border-inline-start:4px solid var(--kc)}
+.kind[class*="k-"] b{color:var(--kc)}
+.kind[class*="k-"].on{background:var(--ks);border-color:var(--kc);color:var(--kc)}

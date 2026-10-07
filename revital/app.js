@@ -426,7 +426,7 @@
     SCHOOLS.forEach(function (s) { gaps(BY[s.name]).forEach(function (x) { cnt[x.k] = (cnt[x.k] || 0) + 1; }); });
     $('gapKinds').innerHTML = GAP_KINDS.map(function (k) {
       var st = ST[k[0]];
-      return '<button type="button" class="kind' + (GKIND === k[0] ? ' on' : '') + '" data-gkind="' + k[0] + '"><b>' +
+      return '<button type="button" class="kind k-' + k[0] + (GKIND === k[0] ? ' on' : '') + '" data-gkind="' + k[0] + '"><b>' +
         (st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—')) + '</b>' + esc(k[1]) + '</button>';
     }).join('') + '<div class="kind soon"><b>בבנייה</b>הגשת תוכנית עבודה</div>';
     $('gapMeta').innerHTML = rows.length + ' בתי ספר עם חוסרים' + (waiting ? ' · עוד ' + waiting + ' מקורות נטענים…' : '') +
