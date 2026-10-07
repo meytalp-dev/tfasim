@@ -34,7 +34,7 @@
             ['honchim', 'מורים חונכים'], ['ped', 'רכזים פדגוגיים'], ['sherut', 'שירות לאומי']];
   /* סוגי החוסרים — הסדר הזה הוא הסדר בכל הרשימות */
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
-                   ['menor', 'רישום מורים למנור']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
+                   ['menor', 'רישום מורים למנור'], ['sal', 'סל תוכניות']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
   /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
   var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה']];
   var VISIT_DAYS = 90;
@@ -105,7 +105,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -113,7 +113,7 @@
   var MEF = {};     /* סמל → {st:'load'|'ok'|'err'|'noaccess', d} */
   var OPENSEC = { head: true };   /* אילו מקטעים פתוחים — נשמר בין בתי ספר */
   /* לשוניות בעמוד בית ספר (מיטל, 7.10.26: "הדף ארוך מדי") — "פיקוח" מפוצל לשתיים */
-  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['vis', 'ביקורים ומשימות'], ['lrn', 'למידה']];
+  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['vis', 'ביקורים ומשימות'], ['sal', 'סל תוכניות'], ['lrn', 'למידה']];
   var STAB = 'ov';
 
   function supsOf(s) { return s.sups && s.sups.length ? s.sups : [s.sup]; }
@@ -177,7 +177,7 @@
       side(); render();
       document.dispatchEvent(new Event('revital:ready'));
       loadContacts(); loadSherut(); loadNispach(); loadMenor(); loadMatz(); loadBs(); loadRg();
-      loadPikuah(); loadMefVisits();
+      loadPikuah(); loadMefVisits(); loadForms();
     }).catch(function () {
       $('main').innerHTML = '<div class="card"><b>לא הצלחתי לטעון את רשימת בתי הספר.</b> <button class="btn" id="retry">לנסות שוב</button></div>';
       $('retry').onclick = start;
@@ -265,11 +265,12 @@
 
   /* מיפוי, ביקורי תשפ״ו ויעדים — מהשער. השרת מחזיר רק את בתי הספר של המחובר.ת (all = הכול) */
   function loadPikuah() {
-    if (!window.PMH_AUTH || !PMH_AUTH.load) return loaded('pk', false);
+    if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = 'err'; return loaded('pk', false); }
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
-      if (!d || d.error) return loaded('pk', false);
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; });
+      if (!d || d.error) { ST.sal = 'err'; return loaded('pk', false); }
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; });
+      (d.sal || []).forEach(function (row) { var r = at(row); if (r) r.sal = row; });
       function at(row) { return BYSEMEL[String(row['סמל מוסד'] || '').trim()]; }
       (d.mipui || []).forEach(function (row) { var r = at(row); if (r) r.mipui.push(row); });
       (d.bikurim || []).forEach(function (row) { var r = at(row); if (r) r.bik.push(row); });
@@ -279,8 +280,9 @@
         r.mipui.sort(function (a, b) { return String(b['תאריך קליטת טופס']).localeCompare(String(a['תאריך קליטת טופס'])); });
         r.bik.sort(function (a, b) { return String(b['תאריך']).localeCompare(String(a['תאריך'])); });
       });
+      ST.sal = 'ok';
       loaded('pk', true);
-    }, function () { loaded('pk', false); });
+    }, function () { ST.sal = 'err'; loaded('pk', false); });
   }
   /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
   function loadMefVisits() {
@@ -327,12 +329,15 @@
       if (!r.menor || !r.menor.t) out.push({ k: 'menor', t: 'מנור: אין מורים רשומים לבית הספר' });
       else if (r.menor.r < r.menor.t) out.push({ k: 'menor', t: 'מנור: נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים · ' + (r.menor.t - r.menor.r) + ' טרם נרשמו' });
     }
+    salGap(r, out);
     return out;
   }
   function issues(r) { return gaps(r).map(function (g) { return g.t; }); }
+  /* סל תוכניות תשפ"ז (7.10.26) — חוסר רק כשלא הוגש. הערת האישור מוצגת בלשונית */
+  function salGap(r, out) { if (ST.sal === 'ok' && !r.sal) out.push({ k: 'sal', t: 'סל תוכניות לא הוגש' }); }
   /* מספר התלמידים: מהמצבת אם דווחה, אחרת מהמיפוי */
   function studentsOf(r) { return r.matz && r.matz.n ? r.matz.n : (r.mipui && r.mipui[0] ? field(r.mipui[0], 'מספר תלמידים מט') : ''); }
-  function allLoaded() { return ['nispach', 'menor', 'bs', 'rg'].every(function (k) { return ST[k] !== 'load'; }); }
+  function allLoaded() { return ['nispach', 'menor', 'bs', 'rg', 'sal'].every(function (k) { return ST[k] !== 'load'; }); }
 
   /* ===== דורש תשומת לב — אותות לפיקוח ===== */
   function field(row, prefix) {
@@ -376,7 +381,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F') return h;
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
     if (m && BYSEMEL[m[1]]) { STAB = TABS.some(function (t) { return t[0] === m[2]; }) ? m[2] : 'ov'; return 's:' + m[1]; }
     m = h.match(/^m=(ok|warn|bad|none)$/);
@@ -385,6 +390,8 @@
     if (m) return 'r:' + m[1];
     m = h.match(/^p=(.+)$/);
     if (m) return 'p:' + m[1];
+    m = h.match(/^f=(.+)$/);
+    if (m) return 'f:' + m[1];
     return '';
   }
   var FROM = null;   /* מאיזה עמוד רשימה נכנסו לעמוד פנימי — אליו מוביל "חזרה" */
@@ -433,6 +440,7 @@
     if (CUR === 'P' || c === 'p') return 'P';
     if (CUR === 'G') return 'G';
     if (CUR === 'A') return 'A';
+    if (CUR === 'F' || c === 'f') return 'F';
     return '';
   }
   function side() {
@@ -450,6 +458,7 @@
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
+      (adminView() ? item('F', I.doc, 'טפסים נקודתיים', fNavCount()) : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
       '<li class="sep"></li>' +
       (adminView() ? '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
@@ -509,7 +518,7 @@
   /* "חזרה" בראש עמוד פנימי */
   function backLink() {
     var at = FROM !== null ? FROM : section();
-    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים' }[at];
+    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים' }[at];
     return lbl ? '<button type="button" class="back" data-go="' + at + '">→ ' + lbl + '</button>' : '';
   }
 
@@ -533,6 +542,8 @@
     else if (CUR.charAt(0) === 'm') mapList(CUR.slice(2));
     else if (CUR === 'G') overview();
     else if (CUR === 'A') attPage();
+    else if (CUR === 'F') formsPage();
+    else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
     else dashboard();
   }
 
@@ -688,6 +699,7 @@
       '<div class="sumrow"><button type="button" class="sumh" data-go="A">דורש תשומת לב ←</button><div class="gc">' +
       chips(FLAG_KINDS, ac, 'data-ak', function (k) { return k === 'visit' ? (pk && ST.mv === 'ok') : pk; }) + '</div></div></div>';
 
+    h += dashForms();
     $('main').innerHTML = h;
     var ok = $('welcomeOk');
     if (ok) ok.onclick = function () { WELCOME_NOW = false; dashboard(); };
@@ -785,7 +797,7 @@
   }
   function drawGaps() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-gview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-gview') === GVIEW); });
-    var waiting = ['nispach', 'menor', 'bs', 'rg'].filter(function (k) { return ST[k] === 'load'; }).length;
+    var waiting = ['nispach', 'menor', 'bs', 'rg', 'sal'].filter(function (k) { return ST[k] === 'load'; }).length;
     var failed = GAP_KINDS.filter(function (k) { return ST[k[0]] === 'err'; }).map(function (k) { return k[1]; });
     var rows = gapRows();
     /* מונה לכל סוג — על כל בתי הספר, בלי הסינונים */
@@ -1004,25 +1016,47 @@
     /* לשוניות (מיטל, 7.10.26: "הדף ארוך מדי") — הכותרת תמיד למעלה, מתחתיה תפריט משנה */
     var K = pikuahSecs(r);
     var ppl = cSum, lrn = [mSum, hSum.join(' · ')].filter(Boolean).join(' · ');
+    var SL = salTab(r);
     var fl = flags(r);
     var T = {
       ov: (fl.length ? '<div class="card"><p class="eyebrow">' + I.chart + 'דורש תשומת לב</p><div class="gc">' +
             fl.map(function (z) { return '<span class="chip k-' + z.k + '">' + esc(z.t) + '</span>'; }).join('') + '</div></div>' : '') +
           '<div class="card"><ul class="tabsum">' +
-          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['lrn', I.book, lrn]]
+          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
             .map(function (z) {
               var lbl = TABS.filter(function (t) { return t[0] === z[0]; })[0][1];
               return '<li><button type="button" data-tab="' + z[0] + '"><span class="st">' + z[1] + esc(lbl) + '</span><span class="sum">' + (z[2] || '') + '</span><span class="go">←</span></button></li>';
-            }).join('') + '</ul></div>',
+            }).join('') + '</ul></div>' + schoolForms(s),
       ppl: P.contacts + P.roles + P.sherut,
       map: K.yaad + K.mipui,
       vis: K.bik + P.visits + P.tasks,
+      sal: SL.body,
       lrn: P.megamot + P.hisht + P.menor
     };
     h += '<nav class="tabs" id="schTabs" role="tablist" aria-label="חלקי העמוד">' + TABS.map(function (t) {
       return '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (STAB === t[0]) + '">' + esc(t[1]) + '</button>';
     }).join('') + '</nav><div class="tabp" role="tabpanel">' + (T[STAB] || T.ov) + '</div>';
     $('main').innerHTML = h;
+  }
+
+  /* ----- לשונית סל תוכניות: סטטוס, הערת האישור, המסמך (בדרייב של אורט, משותף עם רויטל ועם המפקח.ת) ----- */
+  function salTab(r) {
+    if (ST.sal !== 'ok') return { sum: ST.sal === 'load' ? 'טוען…' : 'לא נטען', body: '<div class="card">' + pending('sal') + '</div>' };
+    var x = r.sal;
+    if (!x) return { sum: tag('k-sal', 'לא הוגש'),
+      body: '<div class="card"><p class="eyebrow">' + I.doc + 'סל תוכניות להעשרה וטיפוח הלומד · תשפ״ז</p><div class="gc"><span class="chip k-sal">סל התוכניות לא הוגש</span></div>' +
+        '<div class="small">אין מסמך הגשה של בית הספר בקובץ שהתקבל.</div></div>' };
+    var note = String(x['הערה'] || '').trim(), fid = String(x['מזהה קובץ בדרייב'] || '').trim();
+    return {
+      sum: tag('ok', 'הוגש') + (note ? ' ' + tag('warn', note) : ''),
+      body: '<div class="card"><p class="eyebrow">' + I.doc + 'סל תוכניות להעשרה וטיפוח הלומד · תשפ״ז</p>' +
+        '<div class="gc">' + tag('ok', 'הוגש') + '</div>' +
+        (note ? '<div class="note" style="margin-top:10px"><b>הערה לאישור:</b> ' + esc(note) + '</div>' : '') +
+        '<div class="acts" style="margin-top:10px">' + (fid
+          ? '<a class="btn primary" href="https://drive.google.com/file/d/' + encodeURIComponent(fid) + '/view" target="_blank" rel="noopener">' + I.doc + 'פתיחת המסמך' + I.ext + '</a>'
+          : '<span class="small">המסמך עוד לא הועלה לדרייב.</span>') + '</div>' +
+        '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח בדרייב, ורק למי שהוא שותף איתו.</div></div>'
+    };
   }
 
   /* ----- עמוד בית ספר: יעדים, מיפוי, ביקורי תשפ״ו (pikuah-data) ----- */
@@ -1348,6 +1382,190 @@
     $('main').innerHTML = h;
   }
 
+  /* ===== טפסים נקודתיים (7.10.26) =====
+     טפסי רישום/דיווח זמניים. שרת וגיליון משלהם ("טפסים נקודתיים — הבית של רויטל"); הטופס הציבורי: tfasim/f.html?id=<מזהה>.
+     טופס חדש = שורה בלשונית "טפסים". סגירה = כפתור כאן — הטופס עובר לארכיון והפניות נשמרות.
+     אדמין בלבד: השרת מאמת את הטוקן מול השער (מרחב all). */
+  var FORMS_EXEC = GAS + 'AKfycbylxc_Y8ozHXD7a2qQH1ICT-68ctUpvyARL2jNazaSOj1GxygU3zI8flb2xNndvGLMe/exec';
+  var FORM_URL = 'https://tfasim.pedagogiamh.co.il/f.html?id=';
+  var F_DONE = 'טופל', F_OPEN = 'פתוח';
+  var FORMS = [], FFILT = 'open';
+  ST.forms = 'load';
+  function loadForms() {
+    if (!adminView()) { ST.forms = 'na'; return; }
+    fetchJson(FORMS_EXEC, { method: 'POST', body: JSON.stringify({ action: 'admin', token: token() }) }, 45000).then(function (d) {
+      if (!d || !d.ok) throw new Error((d && d.error) || 'fail');
+      FORMS = d.forms || [];
+      loaded('forms', true);
+    }).catch(function () { loaded('forms', false); });
+  }
+  function fPost(body) {
+    body.token = token();
+    return fetchJson(FORMS_EXEC, { method: 'POST', body: JSON.stringify(body) }, 45000).then(function (d) {
+      if (!d || !d.ok) throw new Error((d && d.error) || 'fail');
+      return d;
+    });
+  }
+  function fById(id) { return FORMS.filter(function (f) { return f.id === id; })[0] || null; }
+  function fIsDone(r) { return String(r['סטטוס']) === F_DONE; }
+  function fOpenN(f) { return (f.rows || []).filter(function (r) { return !fIsDone(r); }).length; }
+  function fNavCount() {
+    if (ST.forms !== 'ok') return '';
+    var n = 0;
+    FORMS.forEach(function (f) { if (f.open) n += fOpenN(f); });
+    return n ? String(n) : '';
+  }
+  /* 'yyyy-MM-ddTHH:mm' → '7.10.26 · 14:30' */
+  function fDate(v, dayOnly) {
+    var m = String(v || '').match(/^(\d{4})-(\d{2})-(\d{2})(?:T(\d{2}:\d{2}))?/);
+    if (!m) return String(v || '');
+    var d = (+m[3]) + '.' + (+m[2]) + '.' + m[1].slice(2);
+    return dayOnly || !m[4] ? d : d + ' · ' + m[4];
+  }
+  /* תוכן הפנייה — השדה הארוך הראשון (למשל "מהות התקלה") */
+  function fMainField(f) { return (f.fields || []).filter(function (x) { return x.type === 'textarea'; })[0] || null; }
+  function fRoleOf(f, r) {
+    var x = (f.fields || []).filter(function (y) { return y.type === 'select'; })[0];
+    return x ? String(r[x.label] || '') : '';
+  }
+
+  function formsPage() {
+    var h = '<div class="card head"><h1>טפסים נקודתיים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div></div>';
+    if (ST.forms !== 'ok') { $('main').innerHTML = h + '<div class="card">' + pending('forms') + '</div>'; return; }
+    var open = FORMS.filter(function (f) { return f.open; }), closed = FORMS.filter(function (f) { return !f.open; });
+    h += '<div class="card"><p class="eyebrow">' + I.doc + 'טפסים פתוחים</p>' +
+      (open.length ? '<div class="tiles">' + open.map(fTile).join('') + '</div>' : '<div class="empty">אין כרגע טפסים פתוחים.</div>') + '</div>';
+    if (closed.length) {
+      h += '<details class="card sec" data-k="farch"' + (OPENSEC.farch ? ' open' : '') + '><summary><span class="st">' + I.doc + 'ארכיון</span><span class="sum">' +
+        (closed.length === 1 ? 'טופס סגור אחד' : closed.length + ' טפסים סגורים') + '</span>' + I.car + '</summary>' +
+        '<div class="sb"><div class="tiles">' + closed.map(fTile).join('') + '</div></div></details>';
+    }
+    $('main').innerHTML = h;
+  }
+  function fTile(f) {
+    var n = (f.rows || []).length, o = fOpenN(f);
+    return '<button type="button" class="tile ftile" data-go="f:' + esc(f.id) + '">' + I.doc + '<span><b>' + esc(f.title) + '</b><small>' +
+      (n ? n + ' פניות' + (o ? ' · ' + o + ' פתוחות' : ' · כולן טופלו') : 'אין פניות עדיין') +
+      (f.open ? ' · נפתח ' + esc(fDate(f.opened, true)) : (f.closed ? ' · נסגר ' + esc(fDate(f.closed, true)) : '')) + '</small></span></button>';
+  }
+
+  function formPage(id) {
+    var f = fById(id);
+    if (ST.forms !== 'ok' || !f) {
+      $('main').innerHTML = backLink() + '<div class="card">' + (ST.forms === 'ok' ? '<div class="empty">הטופס לא נמצא.</div>' : pending('forms')) + '</div>';
+      return;
+    }
+    MAILS = {};
+    var rows = (f.rows || []).slice().reverse();   /* החדשות למעלה */
+    var o = fOpenN(f), done = rows.length - o;
+    var shown = rows.filter(function (r) { return FFILT === 'all' || (FFILT === 'done') === fIsDone(r); });
+    var link = FORM_URL + encodeURIComponent(f.id);
+    LISTS.formLink = link;
+    LISTS.form = fTsv(f, shown);
+    var h = backLink() + '<div class="card head"><h1>' + esc(f.title) + '</h1><div class="meta">' +
+      (f.open ? tag('ok', 'פתוח') + ' · נפתח ' + esc(fDate(f.opened, true)) : tag('warn', 'סגור') + (f.closed ? ' · נסגר ' + esc(fDate(f.closed, true)) : '')) +
+      ' · <b>' + rows.length + '</b> פניות · <b>' + o + '</b> פתוחות</div>' +
+      '<div class="views"><div class="seg" role="group" aria-label="סינון">' +
+      [['open', 'פתוחות (' + o + ')'], ['done', 'טופלו (' + done + ')'], ['all', 'הכול (' + rows.length + ')']].map(function (b) {
+        return '<button type="button" data-ffilt="' + b[0] + '" aria-pressed="' + (FFILT === b[0]) + '">' + b[1] + '</button>';
+      }).join('') + '</div>' +
+      '<div class="acts"><button type="button" class="btn" data-copy="formLink">' + I.copy + 'העתקת הקישור לטופס</button>' +
+      '<a class="btn" href="' + esc(link) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחת הטופס</a>' +
+      (shown.length ? '<button type="button" class="btn" data-copy="form">' + I.copy + 'העתקה לאקסל</button>' : '') +
+      '<button type="button" class="btn" data-fopen="' + (f.open ? '0' : '1') + '" data-fid="' + esc(f.id) + '">' + (f.open ? 'סגירת הטופס' : 'פתיחה מחדש') + '</button>' +
+      '</div></div></div>';
+    h += shown.length ? shown.map(function (r) { return fItem(f, r); }).join('')
+      : '<div class="card"><div class="empty">' + (FFILT === 'open' ? (rows.length ? 'כל הפניות טופלו.' : 'עוד לא הגיעו פניות.') : 'אין פניות להצגה.') + '</div></div>';
+    $('main').innerHTML = h;
+  }
+  function fItem(f, r) {
+    var done = fIsDone(r), rid = String(r['מזהה פנייה'] || ''), role = fRoleOf(f, r);
+    var sum = esc(r['שם מלא']) + (role ? ' · ' + esc(role) : '') + ' · ' + esc(fDate(r['חותמת זמן'])) + ' ' + (done ? tag('ok', F_DONE) : tag('warn', F_OPEN));
+    var body = (f.fields || []).filter(function (x) { return x.type !== 'select'; }).map(function (x) {
+      return '<div class="fv"><span>' + esc(x.label) + '</span><div>' + esc(r[x.label]).replace(/\n/g, '<br>') + '</div></div>';
+    }).join('') +
+      '<div class="small">' + esc(r['שם מלא']) + (role ? ' · ' + esc(role) : '') + ' · ' + mailA(r['מייל']) +
+      (done && r['עודכן'] ? ' · סומן כטופל ' + esc(fDate(r['עודכן'])) : '') + '</div>' +
+      '<div class="acts" style="margin-top:12px">' + mailBtn('fm-' + rid, fReplyMail(f, r), 'מענה במייל') +
+      '<button type="button" class="btn" data-fst="' + (done ? F_OPEN : F_DONE) + '" data-fid="' + esc(f.id) + '" data-rid="' + esc(rid) + '">' +
+      (done ? 'החזרה לפתוח' : I.check + 'סימון כטופל') + '</button></div>';
+    return sec('f-' + rid, I.doc, r['בית ספר'], sum, body);
+  }
+  function fReplyMail(f, r) {
+    var me = ($('meName').textContent || '').trim(), name = String(r['שם מלא'] || '').trim();
+    var mf = fMainField(f), said = mf ? String(r[mf.label] || '').trim() : '', day = fDate(r['חותמת זמן'], true);
+    var hello = 'שלום' + (name ? ' ' + name : '') + ',';
+    var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">' +
+      esc(hello) + '<br><br>תודה על הפנייה מ-' + esc(day) + ' (' + esc(f.title) + ').' +
+      (said ? '<div style="margin:8px 0;padding:8px 12px;border-right:3px solid #c9d6ff;background:#f6f8fd;color:#3d4a70">' + esc(said).replace(/\n/g, '<br>') + '</div>' : '<br>') +
+      '<br><br>בברכה,<br>' + esc(me) + '</div>';
+    var text = hello + '\n\nתודה על הפנייה מ-' + day + ' (' + f.title + ').' + (said ? '\n\n> ' + said.replace(/\n/g, '\n> ') : '') +
+      '\n\n\n\nבברכה,\n' + me;
+    return { to: cleanMails([r['מייל']]), subject: 'בנוגע לפנייה שלך · ' + f.title, html: html, text: text };
+  }
+  function fTsv(f, rows) {
+    var head = (f.head || []).filter(function (k) { return k !== 'מזהה פנייה'; });
+    function cell(v) { return String(v == null ? '' : v).replace(/[\t\r\n]+/g, ' ').trim(); }
+    return [head.join('\t')].concat(rows.map(function (r) {
+      return head.map(function (k) { return cell(/^(חותמת זמן|עודכן)$/.test(k) ? fDate(r[k]) : r[k]); }).join('\t');
+    })).join('\n');
+  }
+  function fSetStatus(id, rid, status) {
+    var f = fById(id), r = f && (f.rows || []).filter(function (x) { return String(x['מזהה פנייה']) === rid; })[0];
+    if (!r) return;
+    var prev = r['סטטוס'], prevUp = r['עודכן'];
+    r['סטטוס'] = status;
+    r['עודכן'] = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+    side(); render();
+    fPost({ action: 'setStatus', id: id, rid: rid, status: status }).then(function () {
+      toast(status === F_DONE ? 'סומן כטופל' : 'הוחזר לפתוח');
+    }, function () {
+      r['סטטוס'] = prev; r['עודכן'] = prevUp;
+      side(); render();
+      toast('השמירה לא הצליחה. נסי שוב');
+    });
+  }
+  function fSetOpen(id, open) {
+    var f = fById(id);
+    if (!f) return;
+    if (!open && !window.confirm('לסגור את הטופס "' + f.title + '"?\nמי שייכנס לקישור יראה "הטופס נסגר". הפניות נשמרות, והטופס עובר לארכיון.')) return;
+    fPost({ action: 'setOpen', id: id, open: open }).then(function () {
+      f.open = open;
+      if (open) f.closed = ''; else f.closed = new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+      toast(open ? 'הטופס נפתח מחדש' : 'הטופס נסגר');
+      side(); render();
+    }, function () { toast('הפעולה לא הצליחה. נסי שוב'); });
+  }
+  /* דשבורד — שורה מרוכזת אחת, רק כשיש טופס פתוח */
+  function dashForms() {
+    if (!adminView() || ST.forms !== 'ok') return '';
+    var open = FORMS.filter(function (f) { return f.open; });
+    if (!open.length) return '';
+    var n = 0;
+    open.forEach(function (f) { n += fOpenN(f); });
+    return '<div class="card" id="dashForms"><h2 class="h2">טפסים נקודתיים</h2><div class="sumrow">' +
+      '<button type="button" class="sumh" data-go="F">' + (n ? n + ' פניות פתוחות' : 'אין פניות פתוחות') + ' · ' +
+      (open.length === 1 ? 'טופס פתוח אחד' : open.length + ' טפסים פתוחים') + ' ←</button><div class="gc">' +
+      open.map(function (f) {
+        var o = fOpenN(f);
+        return '<button type="button" class="chip ' + (o ? 'warn' : 'ok') + '" data-go="f:' + esc(f.id) + '">' + esc(f.title) + ' · ' + o + '</button>';
+      }).join('') + '</div></div></div>';
+  }
+  /* עמוד בית ספר (סקירה) — הפניות של בית הספר מכל הטפסים */
+  function schoolForms(s) {
+    if (!adminView() || ST.forms !== 'ok') return '';
+    var items = [];
+    FORMS.forEach(function (f) {
+      (f.rows || []).forEach(function (r) { if (SN.canon(String(r['בית ספר'] || '').trim()) === s.name) items.push({ f: f, r: r }); });
+    });
+    if (!items.length) return '';
+    items.sort(function (a, b) { return String(b.r['חותמת זמן']).localeCompare(String(a.r['חותמת זמן'])); });
+    return '<div class="card"><p class="eyebrow">' + I.doc + 'פניות בטפסים נקודתיים</p><ul class="list">' + items.map(function (z) {
+      return '<li><button type="button" data-go="f:' + esc(z.f.id) + '">' + esc(z.f.title) + ' · ' + esc(z.r['שם מלא']) +
+        '<span>' + esc(fDate(z.r['חותמת זמן'], true)) + ' · ' + (fIsDone(z.r) ? F_DONE : F_OPEN) + '</span></button></li>';
+    }).join('') + '</ul></div>';
+  }
+
   /* ===== אירועים ===== */
   document.addEventListener('toggle', function (e) {
     var d = e.target;
@@ -1375,6 +1593,12 @@
     if (av) { AVIEW = av.getAttribute('data-aview'); try { localStorage.setItem('revital.attview', AVIEW); } catch (err) {} drawAtt(); return; }
     var ak = t.closest('[data-akind]');
     if (ak) { var ka = ak.getAttribute('data-akind'); AKIND = AKIND === ka ? '' : ka; drawAtt(); return; }
+    var ff = t.closest('[data-ffilt]');
+    if (ff) { FFILT = ff.getAttribute('data-ffilt'); render(); return; }
+    var fs = t.closest('[data-fst]');
+    if (fs) { fSetStatus(fs.getAttribute('data-fid'), fs.getAttribute('data-rid'), fs.getAttribute('data-fst')); return; }
+    var fo = t.closest('[data-fopen]');
+    if (fo) { fSetOpen(fo.getAttribute('data-fid'), fo.getAttribute('data-fopen') === '1'); return; }
     var rv = t.closest('[data-rview]');
     if (rv) { ROLEVIEW = rv.getAttribute('data-rview'); try { localStorage.setItem('revital.roleview', ROLEVIEW); } catch (err) {} render(); return; }
     var ml = t.closest('[data-mail]');
