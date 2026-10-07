@@ -58,6 +58,18 @@
   };
 
   var $ = function (id) { return document.getElementById(id); };
+  /* ===== מי נכנס.ה (7.10.26: הבית נפתח גם למפקחים) =====
+     all (רויטל, מיטל) = כל בתי הספר. pikuah = רק בתי הספר של המפקח.ת (גם השרת מסנן — זה רק התצוגה).
+     ?as=<שם> — אדמין רואה את הבית בדיוק כמו המפקח.ת הזה/ו (לבדיקה ולהדגמה). */
+  var ME = null, IS_ADMIN = false, AS = '', SUPNAME = '';
+  function whoAmI() {
+    ME = (window.PMH_AUTH && PMH_AUTH.user()) || {};
+    IS_ADMIN = (ME.spaces || []).some(function (x) { return String(x).trim() === 'all'; });
+    var m = location.search.match(/[?&]as=([^&]+)/);
+    AS = IS_ADMIN && m ? decodeURIComponent(m[1].replace(/\+/g, ' ')).trim() : '';
+    SUPNAME = IS_ADMIN ? AS : String(ME.name || '').trim();
+  }
+  function adminView() { return IS_ADMIN && !AS; }
   var SN = window.SchoolNames || { canon: function (n) { return n; } };
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -153,6 +165,14 @@
         var r = { s: s, nispach: null, menor: null, matz: null };
         BY[s.name] = r; BYSEMEL[String(s.semel)] = r;
       });
+      if (SUPNAME) SCHOOLS = SCHOOLS.filter(function (s) { return supsOf(s).indexOf(SUPNAME) > -1; });
+      var mine = {}; SCHOOLS.forEach(function (s) { mine[String(s.semel)] = 1; });
+      Object.keys(BYSEMEL).forEach(function (k) { if (!mine[k]) delete BYSEMEL[k]; });
+      $('meCount').textContent = SCHOOLS.length + ' בתי ספר';
+      if (!SCHOOLS.length) {
+        $('main').innerHTML = '<div class="card"><b>עוד לא משויכים לחשבון הזה בתי ספר.</b><div class="small">אם זו טעות, כתבו למיטל — היא תעדכן את השיוך.</div></div>';
+        return;
+      }
       CUR = fromHash();
       side(); render();
       document.dispatchEvent(new Event('revital:ready'));
@@ -430,9 +450,9 @@
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
-      item('P', I.mail, 'מפקחים · מצב ושליחה', '') +
+      (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
       '<li class="sep"></li>' +
-      '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' +
+      (adminView() ? '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
   }
 
@@ -440,7 +460,7 @@
   var SQ = '', SSUP = '';
   function schoolsPage() {
     if (!$('schBox')) {
-      $('main').innerHTML = '<div class="card head" id="schBox"><h1>בתי הספר</h1><div class="meta">64 בתי ספר · לחיצה על בית ספר פותחת את כל מה שיש עליו</div>' +
+      $('main').innerHTML = '<div class="card head" id="schBox"><h1>בתי הספר</h1><div class="meta">' + SCHOOLS.length + ' בתי ספר · לחיצה על בית ספר פותחת את כל מה שיש עליו</div>' +
         '<div class="filters"><input id="sq" type="search" placeholder="חיפוש בית ספר, רשת או סמל" value="' + esc(SQ) + '">' +
         '<select id="ssup"><option value="">כל המפקחים</option>' + supNames().map(function (n) {
           return '<option' + (n === SSUP ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div></div>' +
@@ -768,7 +788,7 @@
     var waiting = ['nispach', 'menor', 'bs', 'rg'].filter(function (k) { return ST[k] === 'load'; }).length;
     var failed = GAP_KINDS.filter(function (k) { return ST[k[0]] === 'err'; }).map(function (k) { return k[1]; });
     var rows = gapRows();
-    /* מונה לכל סוג — על כל 64, בלי הסינונים */
+    /* מונה לכל סוג — על כל בתי הספר, בלי הסינונים */
     var cnt = {};
     SCHOOLS.forEach(function (s) { gaps(BY[s.name]).forEach(function (x) { cnt[x.k] = (cnt[x.k] || 0) + 1; }); });
     $('gapKinds').innerHTML = GAP_KINDS.map(function (k) {
@@ -1305,7 +1325,8 @@
       (c ? ' · ' + telA(c['טלפון'] || c['e164']) + (cMail(c) ? ' · ' + mailA(cMail(c)) : '') : '') + '</div>' +
       '<div class="views"><div class="small" style="margin:0">' + (M.to.length ? 'המייל כולל טבלת מצב לכל בית ספר ואת כל בעלי התפקידים.' :
         'אין מייל של המפקח.ת בגיליון אנשי הקשר.') + '</div>' +
-      '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') + '</div></div></div>';
+      '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') +
+      '<a class="btn" href="?as=' + encodeURIComponent(name) + '" target="_blank" rel="noopener">' + I.home + 'הבית כמו ש' + esc(name) + ' רואה' + I.ext + '</a></div></div></div>';
     var bad = list.filter(function (r) { return issues(r).length; });
     h += sec('sup-state', I.chart, 'מצב בתי הספר', bad.length ? tag('', bad.length + ' עם משהו פתוח') : tag('ok', 'הכול תקין'),
       '<ul class="list">' + list.map(function (r) {
@@ -1382,8 +1403,18 @@
   var started = false;
   function boot() {
     if (started) return; started = true;
-    var u = window.PMH_AUTH && PMH_AUTH.user();
-    $('meName').textContent = (u && u.name) || 'מטה';
+    whoAmI();
+    var nm = SUPNAME || ME.name || 'מטה';
+    $('meName').textContent = nm;
+    var first = String(nm).split(/\s+/)[0];
+    $('brandName').textContent = 'הבית של ' + first;
+    document.title = 'הבית של ' + first;
+    if (AS) {
+      var bar = document.createElement('div');
+      bar.className = 'asbar';
+      bar.innerHTML = 'תצוגה כמו ש<b>' + esc(AS) + '</b> רואה את הבית · <a href="' + location.pathname + '">חזרה לתצוגה שלי</a>';
+      document.body.insertBefore(bar, document.body.firstChild);
+    }
     $('out').onclick = function () { PMH_AUTH.logout(); };
 
     start();

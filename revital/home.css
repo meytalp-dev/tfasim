@@ -324,3 +324,7 @@ footer a{color:var(--navy)}
 .tour-skip{background:none;border:0;color:var(--muted);text-decoration:underline;margin-inline-start:auto}
 .welcome .btn.primary{background:#fff;color:var(--navy);border-color:#fff}
 @media (max-width:960px){ .sumrow{flex-direction:column;gap:6px} .sumh{min-width:0} }
+
+/* תצוגה כמו מפקח.ת (?as=) */
+.asbar{background:#fff3e2;color:#7a4a08;text-align:center;font-size:14px;padding:8px 12px;border-bottom:1px solid #f1d9b4}
+.asbar a{color:#7a4a08;font-weight:700}
