@@ -363,7 +363,7 @@ function askAgent(s, q) {
   var w = document.createElement("div"); w.className = "wait"; w.innerHTML = "<i></i>הסוכן חושב… זה יכול לקחת עד חצי דקה";
   msgs.appendChild(w);
   post({ action: "ask", subject: s, code: state.code || "", freeMegama: state.code === "" ? $("freeMegama").value : "",
-         grades: state.grades.slice(), history: c.history, cid: CID }, 0)
+         grades: state.grades.slice(), history: c.history, cid: CID }, 1)   // ניסיון חוזר אחד: Apps Script מחזיר לפעמים "הדף לא נמצא" רגעי
     .then(function (res) {
       w.remove();
       if (!res || !res.ok) throw res || {};
