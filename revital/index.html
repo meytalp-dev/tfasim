@@ -6,29 +6,30 @@
 <meta name="robots" content="noindex, nofollow">
 <title>הבית של רויטל</title>
 <script src="https://pedagogiamh.co.il/auth.js" data-space="all"></script>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 11l9-7 9 7'/><path d='M5 10v10h14V10'/><path d='M10 20v-6h4v6'/></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d3a80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M3 11l9-7 9 7'/><path d='M5 10v10h14V10'/><path d='M10 20v-6h4v6'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../baaley-tafkidim/style.css">
 <link rel="stylesheet" href="home.css">
 </head>
 <body>
-<div class="strip"></div>
+<header class="top"><div class="top-in">
+  <button type="button" class="burger" id="burger" aria-label="תפריט"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  <div class="brand"><b>הבית של רויטל</b><small>המנהל להכשרה מקצועית · משרד העבודה</small></div>
+  <button type="button" class="out" id="out">יציאה</button>
+</div></header>
+
 <div class="wrap">
-  <header class="top">
-    <h1>הבית של רויטל</h1>
-    <p>כל 64 בתי הספר במקום אחד: מה פתוח, מה חסר, ותיק לכל בית ספר</p>
-    <div class="who" id="who" hidden></div>
-  </header>
-  <main id="main"></main>
-  <footer>
-    <div>המנהל להכשרה מקצועית · משרד העבודה</div>
-    <div class="credit">נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
-  </footer>
+  <aside class="side" aria-label="בתי הספר">
+    <div class="me"><b id="meName"></b><span>64 בתי ספר · לפי מפקח.ת</span></div>
+    <div class="find"><input id="find" type="search" placeholder="חיפוש בית ספר או סמל"></div>
+    <ul class="nav" id="nav"></ul>
+    <div class="legend"><span><i class="dot bad"></i>יש משהו פתוח</span><span><i class="dot ok"></i>הכול תקין</span></div>
+  </aside>
+  <main class="main" id="main"></main>
 </div>
 <div class="scrim" id="scrim"></div>
-<aside class="drawer" id="drawer" aria-label="תיק בית ספר"></aside>
+<footer>נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></footer>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="https://pedagogiamh.co.il/school-names.js"></script>
 <script src="app.js"></script>
