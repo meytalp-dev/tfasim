@@ -223,9 +223,17 @@
       else if (st.indexOf('ממתין') > -1) out.push({ k: 'bs', t: 'השתלמות מוסדית ממתינה לאישור המפקח.ת' });
       else if (st.indexOf('נדח') > -1 || st.indexOf('הוחזר') > -1) out.push({ k: 'bs', t: 'השתלמות מוסדית: ' + st + ' · צריך להגיש מחדש' });
     }
-    if (ST.rg === 'ok' && !rgTotal(r)) out.push({ k: 'rg', t: 'לא נרשם אף אחד להשתלמויות' });
-    var x = rate(r);
-    if (ST.menor === 'ok' && x !== null && x < MENOR_LOW) out.push({ k: 'menor', t: 'מנור: ' + (r.menor.t - r.menor.r) + ' מתוך ' + r.menor.t + ' מורים טרם נרשמו' });
+    /* כל השתלמות בנפרד (מיטל, 7.10.26): בית ספר שאף אחד ממנו לא נרשם להשתלמות מסוימת = חוסר */
+    if (ST.rg === 'ok') {
+      var noWs = WS.filter(function (w) { return !(Number(r.rg && r.rg[w[0]]) > 0); }).map(function (w) { return w[1]; });
+      if (noWs.length === WS.length) out.push({ k: 'rg', t: 'לא נרשם אף אחד לאף השתלמות' });
+      else if (noWs.length) out.push({ k: 'rg', t: 'לא נרשמו ל: ' + noWs.join(', ') });
+    }
+    /* מנור: המצב של כל בית ספר, לא רק מתחת לסף — כל מורה שלא נרשם נחשב */
+    if (ST.menor === 'ok') {
+      if (!r.menor || !r.menor.t) out.push({ k: 'menor', t: 'מנור: אין מורים רשומים לבית הספר' });
+      else if (r.menor.r < r.menor.t) out.push({ k: 'menor', t: 'מנור: נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים · ' + (r.menor.t - r.menor.r) + ' טרם נרשמו' });
+    }
     if (ST.matz === 'ok' && !r.matz) out.push({ k: 'matz', t: 'מצבת התלמידים לא דווחה' });
     return out;
   }
