@@ -18,6 +18,7 @@
     matz:    GAS + 'AKfycbyozBbEf78cLV61ODLyzhzLSyI2auAUMd8YVgp0qZLGs3O4MYAFhAQuVG7NIxjX0Mq7Lw/exec?mode=list'
   };
   var MENOR_LINK = 'https://pedagogiamh.co.il/hadrachot/ministry/rishum-morim.html';
+  var MENOR_VIEW = 'https://pedagogiamh.co.il/hadrachot/ministry/';   /* "מבט ארצי" — רויטל = ministry במנור */
   /* הבית של המפקח — ביקורים, דוחות, משימות ומסמכים. רויטל = "מטה" בלשונית מפקחים שם, ורואה את כל המפקחים */
   var MEF_EXEC = GAS + 'AKfycbxyhvbkVUtydT70TH5Q2fYXu-MpFfAv0qxX7K-RzsSvt7UWXoxwjHun1zwK6MJQj6_K/exec';
   var MENOR_LOW = 0.5;
@@ -31,6 +32,7 @@
     chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5M4 19h16M8 16V9M13 16V6M18 16v-4"/></svg>',
     doc:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg>',
     check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 7-7"/><rect x="3" y="4" width="18" height="16" rx="3"/></svg>',
+    ext:   '<svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
     copy:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>'
   };
 
@@ -221,6 +223,7 @@
     var q = norm($('find').value);
     var cur = CUR.charAt(0) === 's' ? BYSEMEL[CUR.slice(2)].s : null;
     var h = '<li><button type="button" class="home" data-go=""' + (CUR ? '' : ' aria-current="true"') + '>' + I.home + 'סקירה</button></li>';
+    h += '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>';
 
     /* לפי תפקיד */
     if (!q && ST.nispach === 'ok') {
