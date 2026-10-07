@@ -6,6 +6,8 @@
      נספח mode:view (טוקן)        — בעלי התפקידים עם פרטים ומה חסר
      מנור registration.count      — מספרי רישום המורים לבית ספר
      מצבת ?mode=list              — מספר תלמידים
+     pikuah-data (שער)            — מיפוי בית ספר, ביקורי תשפ״ו, יעדים מהוועדה (מוגן, מסונן לפי מפקח.ת בשרת)
+     הבית של המפקח visit.list     — תאריכי הביקורים החדשים, ל"דורש תשומת לב"
    שום מפתח ושום פרט אישי לא יושבים בקובץ הזה. */
 (function () {
   'use strict';
@@ -33,6 +35,12 @@
   /* סוגי החוסרים — הסדר הזה הוא הסדר בכל הרשימות */
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
                    ['menor', 'רישום מורים למנור'], ['matz', 'מצבת תלמידים']];
+  /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
+  var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה']];
+  var VISIT_DAYS = 90;
+  var LV = { 'יציב ומתקדם': 'ok', 'בתהליך/דורש חיזוק': 'warn', 'במצב סיכון': 'bad' };
+  /* קבוצות המדדים במיפוי — כל קבוצה מתחילה במדד הזה, לפי סדר העמודות */
+  var LV_GROUPS = [['אקלים בית ספרי', 'אקלים, חוסן ומענים'], ['איכות ההוראה', 'הוראה ולמידה'], ['הערכה כללית של המנהל', 'ניהול']];
 
   var I = {
     home:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
@@ -84,7 +92,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -144,6 +152,7 @@
       CUR = fromHash();
       side(); render();
       loadContacts(); loadSherut(); loadNispach(); loadMenor(); loadMatz(); loadBs(); loadRg();
+      loadPikuah(); loadMefVisits();
     }).catch(function () {
       $('main').innerHTML = '<div class="card"><b>לא הצלחתי לטעון את רשימת בתי הספר.</b> <button class="btn" id="retry">לנסות שוב</button></div>';
       $('retry').onclick = start;
@@ -229,6 +238,40 @@
     }).catch(function () { loaded('rg', false); });
   }
 
+  /* מיפוי, ביקורי תשפ״ו ויעדים — מהשער. השרת מחזיר רק את בתי הספר של המחובר.ת (all = הכול) */
+  function loadPikuah() {
+    if (!window.PMH_AUTH || !PMH_AUTH.load) return loaded('pk', false);
+    PMH_AUTH.load('pikuah-data').then(function (res) {
+      var d = res && res.ok && res.data;
+      if (!d || d.error) return loaded('pk', false);
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; });
+      function at(row) { return BYSEMEL[String(row['סמל מוסד'] || '').trim()]; }
+      (d.mipui || []).forEach(function (row) { var r = at(row); if (r) r.mipui.push(row); });
+      (d.bikurim || []).forEach(function (row) { var r = at(row); if (r) r.bik.push(row); });
+      (d.yaadim || []).forEach(function (row) { var r = at(row); if (r) r.yaad = String(row['יעדים מהוועדה האחרונה'] || '').trim(); });
+      SCHOOLS.forEach(function (s) {
+        var r = BY[s.name];
+        r.mipui.sort(function (a, b) { return String(b['תאריך קליטת טופס']).localeCompare(String(a['תאריך קליטת טופס'])); });
+        r.bik.sort(function (a, b) { return String(b['תאריך']).localeCompare(String(a['תאריך'])); });
+      });
+      loaded('pk', true);
+    }, function () { loaded('pk', false); });
+  }
+  /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
+  function loadMefVisits() {
+    fetchJson(MEF_EXEC, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'visit.list', token: token() })
+    }, 45000, 2).then(function (d) {
+      if (!d || !d.ok) throw new Error();
+      (d.visits || []).forEach(function (v) {
+        var r = BYSEMEL[String(v.school_id)], dt = String(v.date || '').slice(0, 10);
+        if (r && dt && (!r.mvLast || dt > r.mvLast)) r.mvLast = dt;
+      });
+      loaded('mv', true);
+    }).catch(function () { loaded('mv', false); });
+  }
+
   /* ===== מה חסר בבית ספר — מקור אחד לרשימות, לנקודות בתפריט ולמיילים ===== */
   function rate(r) { return r.menor && r.menor.t ? r.menor.r / r.menor.t : null; }
   function rgTotal(r) {
@@ -264,6 +307,45 @@
   }
   function issues(r) { return gaps(r).map(function (g) { return g.t; }); }
   function allLoaded() { return ['nispach', 'menor', 'matz', 'bs', 'rg'].every(function (k) { return ST[k] !== 'load'; }); }
+
+  /* ===== דורש תשומת לב — אותות לפיקוח ===== */
+  function field(row, prefix) {
+    if (!row) return '';
+    for (var k in row) if (k.indexOf(prefix) === 0) return String(row[k] || '').trim();
+    return '';
+  }
+  /* מדדי המיפוי לפי הסדר, עם הקבוצה של כל מדד */
+  function levels(row) {
+    var out = [], grp = 'כללי';
+    Object.keys(row || {}).forEach(function (k) {
+      LV_GROUPS.forEach(function (g) { if (k.indexOf(g[0]) === 0) grp = g[1]; });
+      var v = String(row[k] || '').trim();
+      if (LV[v]) out.push({ name: k, v: v, cls: LV[v], grp: grp });
+    });
+    return out;
+  }
+  function riskOf(r) { return r.mipui && r.mipui[0] ? levels(r.mipui[0]).filter(function (x) { return x.cls === 'bad'; }) : []; }
+  function lastVisit(r) {
+    var a = r.bik && r.bik[0] ? String(r.bik[0]['תאריך']).slice(0, 10) : '', b = r.mvLast || '';
+    return a > b ? a : b;
+  }
+  function daysSince(iso) { return Math.floor((Date.now() - new Date(iso + 'T00:00:00').getTime()) / 864e5); }
+  function flags(r) {
+    var out = [];
+    /* ביקור: צריך גם את הקובץ וגם את הבית של המפקח — בלי אחד מהם כמעט הכול ייראה "בלי ביקור" */
+    if (ST.pk === 'ok' && ST.mv === 'ok') {
+      var lv = lastVisit(r);
+      if (!lv) out.push({ k: 'visit', t: 'לא תועד אף ביקור' });
+      else if (daysSince(lv) > VISIT_DAYS) out.push({ k: 'visit', t: 'ביקור אחרון ' + fmtDate(lv) + ' · לפני ' + Math.round(daysSince(lv) / 30) + ' חודשים' });
+    }
+    if (ST.pk === 'ok') {
+      var rk = riskOf(r), overall = field(r.mipui[0], 'דירוג כולל');
+      if (rk.length) out.push({ k: 'risk', t: 'במצב סיכון: ' + rk.map(function (x) { return x.name; }).join(', ') });
+      else if (overall.indexOf('סיכון') === 0) out.push({ k: 'risk', t: overall });
+      if (!r.yaad) out.push({ k: 'goals', t: 'אין יעדים מהוועדה המלווה האחרונה' });
+    }
+    return out;
+  }
 
   /* ===== ניתוב ===== */
   function fromHash() {
@@ -487,12 +569,85 @@
           return '<option' + (n === GSUP ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
         '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
         '<button type="button" data-gview="all">רשימה אחת</button><button type="button" data-gview="sup">לפי מפקח.ת</button></div>' +
-        '<div class="acts"><button class="btn" data-copy="gaps">' + I.copy + 'העתקה לאקסל</button></div></div></div><div id="gapList"></div>';
+        '<div class="acts"><button class="btn" data-copy="gaps">' + I.copy + 'העתקה לאקסל</button></div></div></div><div id="gapList"></div>' +
+        /* דורש תשומת לב — מקטע נפרד מתחת, עם סינון משלו */
+        '<div class="card head att" id="attBox"><h2>דורש תשומת לב</h2><div class="meta" id="attMeta"></div>' +
+        '<div class="kinds" id="attKinds"></div>' +
+        '<div class="filters"><select id="asup"><option value="">כל המפקחים</option>' + supNames().map(function (n) {
+          return '<option' + (n === ASUP ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
+        '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
+        '<button type="button" data-aview="all">רשימה אחת</button><button type="button" data-aview="sup">לפי מפקח.ת</button></div>' +
+        '<div class="acts"><button class="btn" data-copy="att">' + I.copy + 'העתקה לאקסל</button></div></div></div><div id="attList"></div>';
       $('gq').oninput = function () { GQ = this.value; drawGaps(); };
       $('gkind').onchange = function () { GKIND = this.value; drawGaps(); };
       $('gsup').onchange = function () { GSUP = this.value; drawGaps(); };
+      $('asup').onchange = function () { ASUP = this.value; drawAtt(); };
     }
     drawGaps();
+  }
+
+  var ASUP = '', AKIND = '', AVIEW = 'all';
+  try { AVIEW = localStorage.getItem('revital.attview') === 'sup' ? 'sup' : 'all'; } catch (e) {}
+  function attRows() {
+    return SCHOOLS.map(function (s) {
+      var r = BY[s.name];
+      return { r: r, g: flags(r).filter(function (x) { return !AKIND || x.k === AKIND; }) };
+    }).filter(function (z) { return z.g.length && (!ASUP || supsOf(z.r.s).indexOf(ASUP) > -1); });
+  }
+  function attLi(z, withSup) {
+    return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
+      (withSup ? '<small>' + esc(supsOf(z.r.s).join(' · ')) + '</small>' : '') + '</span><span class="gc">' +
+      z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button></li>';
+  }
+  function attMail(name, rows) {
+    var c = contactByName(name), to = cleanMails([cMail(c)]);
+    var date = new Date().toLocaleDateString('he-IL'), me = ($('meName').textContent || '').trim();
+    var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">' +
+      'שלום ' + esc(name) + ',<br><br>אלה בתי הספר שלך שדורשים תשומת לב, נכון ל-' + esc(date) + ':<br>' +
+      rows.map(function (z) {
+        return '<div style="margin:12px 0 2px;font-weight:bold">' + esc(z.r.s.name) + '</div><ul style="margin:0;padding-right:20px">' +
+          z.g.map(function (x) { return '<li>' + esc(x.t) + '</li>'; }).join('') + '</ul>';
+      }).join('') + '<br>אשמח שנדבר על זה.<br><br>תודה,<br>' + esc(me) + '</div>';
+    var text = 'שלום ' + name + ',\n\nאלה בתי הספר שלך שדורשים תשומת לב, נכון ל-' + date + ':\n\n' +
+      rows.map(function (z) { return z.r.s.name + ':\n' + z.g.map(function (x) { return '  • ' + x.t; }).join('\n'); }).join('\n\n') +
+      '\n\nאשמח שנדבר על זה.\n\nתודה,\n' + me;
+    return { to: to, subject: 'דורש תשומת לב · בתי הספר שלך · ' + date, html: html, text: text };
+  }
+  function drawAtt() {
+    if (!$('attList')) return;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-aview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-aview') === AVIEW); });
+    var cnt = {};
+    SCHOOLS.forEach(function (s) { flags(BY[s.name]).forEach(function (x) { cnt[x.k] = (cnt[x.k] || 0) + 1; }); });
+    function stOf(k) { return k === 'visit' ? (ST.pk === 'ok' && ST.mv === 'ok' ? 'ok' : (ST.pk === 'load' || ST.mv === 'load' ? 'load' : 'err')) : ST.pk; }
+    $('attKinds').innerHTML = FLAG_KINDS.map(function (k) {
+      var st = stOf(k[0]);
+      return '<button type="button" class="kind k-' + k[0] + (AKIND === k[0] ? ' on' : '') + '" data-akind="' + k[0] + '"><b>' +
+        (st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—')) + '</b>' + esc(k[1]) + '</button>';
+    }).join('');
+    var rows = attRows();
+    var fail = [];
+    if (ST.pk === 'err') fail.push('מיפוי, ביקורים ויעדים');
+    if (ST.mv === 'err') fail.push('הביקורים מהבית של המפקח');
+    $('attMeta').innerHTML = 'אותות לפיקוח, לא דברים שבית הספר צריך להשלים · ' + rows.length + ' בתי ספר' +
+      (ST.pk === 'load' || ST.mv === 'load' ? ' · טוען…' : '') +
+      (fail.length ? ' · <span style="color:var(--bad)">לא נטען: ' + esc(fail.join(', ')) + '</span>' : '');
+    LISTS.att = ['בית ספר', 'מפקח.ת', 'דורש תשומת לב'].join('\t') + '\n' + rows.map(function (z) {
+      return [z.r.s.name, supsOf(z.r.s).join(' · '), z.g.map(function (x) { return x.t; }).join(' | ')].join('\t');
+    }).join('\n');
+    var h = '';
+    if (!rows.length) h = '<div class="card"><div class="empty">' + (ST.pk === 'load' ? 'טוען…' : 'אין בתי ספר שמתאימים לסינון.') + '</div></div>';
+    else if (AVIEW === 'all') h = '<div class="card"><ul class="glist">' + rows.map(function (z) { return attLi(z, true); }).join('') + '</ul></div>';
+    else {
+      var bySup = {};
+      rows.forEach(function (z) { supsOf(z.r.s).forEach(function (n) { if (!ASUP || n === ASUP) (bySup[n] = bySup[n] || []).push(z); }); });
+      Object.keys(bySup).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n, k) {
+        var list = bySup[n], M = attMail(n, list);
+        h += sec('att-' + n, I.users, n, tag('', list.length + ' בתי ספר'),
+          '<div class="acts row-end">' + (M.to.length ? mailBtn('a' + k, M, 'שליחת הרשימה ל' + n) : '<span class="small">אין מייל של המפקח.ת בגיליון אנשי הקשר</span>') + '</div>' +
+          '<ul class="glist">' + list.map(function (z) { return attLi(z, false); }).join('') + '</ul>');
+      });
+    }
+    $('attList').innerHTML = h;
   }
   function drawGaps() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-gview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-gview') === GVIEW); });
@@ -528,6 +683,7 @@
       });
     }
     $('gapList').innerHTML = h;
+    drawAtt();   /* drawGaps מאפס את MAILS — ציור מחדש רושם שוב את מיילי "דורש תשומת לב" */
   }
 
   /* ----- אנשים ----- */
@@ -711,7 +867,78 @@
     h += sec('visits', I.doc, 'ביקורי פיקוח ודוחות', vSum, vBody);
     h += sec('tasks', I.check, 'משימות', tSum, tBody);
 
+    h += pikuahSecs(r);
     $('main').innerHTML = h;
+  }
+
+  /* ----- עמוד בית ספר: יעדים, מיפוי, ביקורי תשפ״ו (pikuah-data) ----- */
+  function para(t) { return '<div class="pre">' + esc(t) + '</div>'; }
+  function linksOf(t) {
+    return String(t || '').split(/[\s,]+/).filter(function (u) { return /^https?:\/\//.test(u); }).map(function (u, i) {
+      return '<a href="' + esc(u) + '" target="_blank" rel="noopener">קובץ ' + (i + 1) + I.ext + '</a>';
+    }).join(' · ');
+  }
+  function pikuahSecs(r) {
+    var h = '';
+    if (ST.pk !== 'ok') {
+      var sm = ST.pk === 'load' ? 'טוען…' : 'לא נטען';
+      return sec('yaad', I.check, 'יעדים מהוועדה המלווה', sm, pending('pk')) +
+        sec('mipui', I.chart, 'מיפוי בית הספר', sm, pending('pk')) +
+        sec('bik', I.doc, 'ביקורי פיקוח (מונדיי)', sm, pending('pk'));
+    }
+
+    /* יעדים */
+    h += sec('yaad', I.check, 'יעדים מהוועדה המלווה', r.yaad ? 'יש יעדים' : tag('k-goals', 'אין יעדים'),
+      r.yaad ? para(r.yaad) : '<div class="empty">אין יעדים מהוועדה המלווה האחרונה בקובץ.</div>');
+
+    /* מיפוי — לפעמים שני מיפויים (שני מפקחים). החדש למעלה */
+    var mp = r.mipui || [];
+    var mSum = 'אין מיפוי';
+    if (mp.length) {
+      var rk = riskOf(r), ov = field(mp[0], 'דירוג כולל');
+      mSum = (ov ? tag(ov.indexOf('סיכון') === 0 ? '' : (ov.indexOf('פערים') === 0 ? 'warn' : 'ok'), ov.split(',')[0]) : '') +
+        (rk.length ? ' ' + tag('', rk.length === 1 ? 'מדד אחד במצב סיכון' : rk.length + ' במצב סיכון') : '') +
+        ' · ' + fmtDate(field(mp[0], 'תאריך קליטת טופס'));
+    }
+    h += sec('mipui', I.chart, 'מיפוי בית הספר', mSum, mp.length ? mp.map(function (row, i) {
+      var who = esc(field(row, 'מפקח')) + ' · ' + fmtDate(field(row, 'תאריך קליטת טופס'));
+      /* מיפוי קודם (מפקח.ת נוסף.ת) — מקופל, שהעמוד לא יתארך */
+      if (i) return '<details class="vis"><summary><b>מיפוי קודם</b> · ' + who + '</summary><div class="vb">' + mipuiBody(row) + '</div></details>';
+      return (mp.length > 1 ? '<h4 class="subh">המיפוי האחרון · ' + who + '</h4>' : '<div class="small" style="margin:0 0 10px">מילא.ה: ' + who + '</div>') +
+        mipuiBody(row);
+    }).join('') : '<div class="empty">אין מיפוי לבית הספר הזה בקובץ (מרץ 2026).</div>');
+    function mipuiBody(row) {
+      var lv = levels(row), groups = [];
+      lv.forEach(function (x) { var g = groups[groups.length - 1]; if (!g || g.n !== x.grp) groups.push(g = { n: x.grp, l: [] }); g.l.push(x); });
+      var nums = [['מספר תלמידים מט', 'תלמידים ט–יב'], ['מספר תלמידי קורסים', 'תלמידי קורסים'],
+                  ['אחוז התלמידים הזכאים לתעודת מקצוע', 'זכאים לתעודת מקצוע %'], ['אחוז התלמידים הזכאים לתעודה טכנולוגית', 'זכאים לתעודה טכנולוגית %'],
+                  ['אחוז התלמידים הזכאים לתעודת בגרות', 'זכאים לבגרות %'], ['אחוז התלמידים המועסקים', 'מועסקים בתחום %'], ['אחוז גיוס', 'גיוס / שירות / מכינה %']]
+        .map(function (n) { return [n[1], field(row, n[0])]; }).filter(function (n) { return n[1]; });
+      var txts = [['תמונת מצב', 'תמונת מצב מחצית'], ['נימוק קצר', 'נימוק'], ['החלטה אופרטיבית', 'החלטה אופרטיבית למחצית ב׳'],
+                  ['יעד פיקוח מרכזי', 'יעד הפיקוח המרכזי עד סוף השנה'], ['מגמות לימוד', 'מגמות']]
+        .map(function (n) { return [n[1], field(row, n[0])]; }).filter(function (n) { return n[1]; });
+      return txts.map(function (t) { return '<div class="note"><b>' + esc(t[0]) + ':</b> ' + esc(t[1]) + '</div>'; }).join('') +
+        (nums.length ? '<div class="facts">' + nums.map(function (n) { return '<div class="fact"><span>' + esc(n[0]) + '</span><b>' + esc(n[1]) + '</b></div>'; }).join('') + '</div>' : '') +
+        groups.map(function (g) {
+          return '<h4 class="subh">' + esc(g.n) + '</h4><ul class="lvl">' + g.l.map(function (x) {
+            return '<li>' + esc(x.name) + '<span class="chip ' + (x.cls === 'bad' ? '' : x.cls) + '">' + esc(x.v) + '</span></li>';
+          }).join('') + '</ul>';
+        }).join('');
+    }
+
+    /* ביקורי פיקוח מהייצוא של מונדיי (תשפ״ו וגם תחילת תשפ״ז). כל ביקור מקופל בפני עצמו */
+    var bk = r.bik || [];
+    h += sec('bik', I.doc, 'ביקורי פיקוח (מונדיי)', bk.length ? (bk.length === 1 ? 'ביקור אחד' : bk.length + ' ביקורים') + ' · אחרון ' + fmtDate(bk[0]['תאריך']) : 'אין ביקורים',
+      bk.length ? bk.map(function (v) {
+        var parts = [['נוכחים', v['נוכחים']], ['מטרות', v['מטרות']], ['נושאים שעלו', v['נושאים']], ['סיכום', v['סיכום']], ['פעולות ונושאים למעקב', v['פעולות למעקב']]]
+          .filter(function (p) { return String(p[1] || '').trim(); });
+        var files = linksOf(v['מסמכים']);
+        return '<details class="vis"><summary><b>' + fmtDate(v['תאריך']) + '</b> · ' + esc(v['מפקח.ת']) +
+          (v['מטרות'] ? '<span>' + esc(String(v['מטרות']).slice(0, 80)) + '</span>' : '') + '</summary><div class="vb">' +
+          parts.map(function (p) { return '<h5>' + esc(p[0]) + '</h5>' + para(p[1]); }).join('') +
+          (files ? '<div class="small">קבצים במונדיי: ' + files + '</div>' : '') + '</div></details>';
+      }).join('') : '<div class="empty">אין ביקורים במונדיי לבית הספר הזה.</div>');
+    return h;
   }
 
   /* ----- לפי תפקיד ----- */
@@ -981,6 +1208,10 @@
     if (gv) { GVIEW = gv.getAttribute('data-gview'); try { localStorage.setItem('revital.gapview', GVIEW); } catch (err) {} drawGaps(); return; }
     var gk = t.closest('[data-gkind]');
     if (gk) { var kk = gk.getAttribute('data-gkind'); GKIND = GKIND === kk ? '' : kk; if ($('gkind')) $('gkind').value = GKIND; drawGaps(); return; }
+    var av = t.closest('[data-aview]');
+    if (av) { AVIEW = av.getAttribute('data-aview'); try { localStorage.setItem('revital.attview', AVIEW); } catch (err) {} drawAtt(); return; }
+    var ak = t.closest('[data-akind]');
+    if (ak) { var ka = ak.getAttribute('data-akind'); AKIND = AKIND === ka ? '' : ka; drawAtt(); return; }
     var rv = t.closest('[data-rview]');
     if (rv) { ROLEVIEW = rv.getAttribute('data-rview'); try { localStorage.setItem('revital.roleview', ROLEVIEW); } catch (err) {} render(); return; }
     var ml = t.closest('[data-mail]');
