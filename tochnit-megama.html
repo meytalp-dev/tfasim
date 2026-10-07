@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>העלאת תוכנית לימודים למגמה</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D3B66' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3'/></svg>">
+<title>אנגלית ומתמטיקה למגמה</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230D3B66' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2z'/><path d='M8 7h6M8 11h8'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -33,10 +33,10 @@ main{max-width:680px;margin:-18px auto 0;padding:0 16px}
 .hint{font-size:.85rem;color:var(--text2);margin-top:5px}
 .err{display:none;font-size:.85rem;color:var(--red);margin-top:5px;font-weight:600}
 .f.bad .err{display:block}
-.f.bad .in,.f.bad .chips,.f.bad .pick,.f.bad .drop{border-color:var(--red)}
+.f.bad .in,.f.bad .chips,.f.bad .pick{border-color:var(--red)}
 .in{width:100%;border:1px solid var(--border-strong);border-radius:10px;padding:11px 12px;font:500 1rem Assistant,sans-serif;background:#fff;color:var(--text)}
 .in:focus,.pick input:focus{outline:2px solid var(--accent);outline-offset:1px}
-select.in{appearance:auto}
+textarea.in{resize:vertical;line-height:1.5}
 .ltr{direction:ltr;text-align:right}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 /* בחירת מגמה */
@@ -56,23 +56,41 @@ select.in{appearance:auto}
 .chips{display:flex;gap:8px;flex-wrap:wrap;border:1px solid transparent;border-radius:12px}
 .chip{border:1px solid var(--border-strong);border-radius:999px;padding:8px 16px;font:600 .98rem Assistant,sans-serif;background:#fff;color:var(--text);cursor:pointer;transition:background .15s var(--ease)}
 .chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
-/* קבצים */
-.drop{position:relative;display:block;border:2px dashed var(--border-strong);border-radius:12px;padding:18px;text-align:center;background:var(--soft);color:var(--text2);cursor:pointer;font-size:.9rem}
-.drop:hover{border-color:var(--accent)}
-.drop.sm{padding:13px}
-.drop svg{width:26px;height:26px;color:var(--accent)}
-.drop b{display:block;color:var(--navy);margin:4px 0 1px;font-size:.98rem}
-.drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
-.file{display:none;align-items:center;gap:10px;border:1px solid var(--border);border-radius:10px;padding:9px 12px;margin-top:8px;background:#fff}
-.file.on{display:flex}
-.file span{flex:1;font-weight:600;overflow-wrap:anywhere}
-.file small{color:var(--text2);white-space:nowrap}
-.file button{border:0;background:none;color:var(--text2);cursor:pointer;padding:2px;display:grid}
-.file svg{color:var(--accent)}
-.file button svg{color:var(--text2)}
-.check{display:flex;gap:10px;align-items:flex-start;background:var(--soft);border-radius:10px;padding:12px;border:1px solid transparent}
-.f.bad .check{border-color:var(--red)}
-.check input{width:20px;height:20px;margin:2px 0 0;accent-color:var(--navy);flex:none}
+/* תחום: אנגלית / מתמטיקה */
+.subj{border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:16px;background:var(--soft)}
+.f.bad .subj{border-color:var(--red)}
+.f.bad .agent .in{border-color:var(--border-strong)}
+.subj-h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:4px}
+.subj-h label{font-weight:800;color:var(--navy);font-size:1.08rem}
+.subj .hint{margin:0 0 10px}
+.subj textarea{background:#fff}
+.agent-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--accent);background:#fff;color:var(--accent);border-radius:999px;padding:7px 14px;font:700 .92rem Assistant,sans-serif;cursor:pointer}
+.agent-btn:hover{background:var(--blue-100)}
+.agent-btn[aria-expanded="true"]{background:var(--accent);color:#fff}
+.agent{margin-top:12px;background:#fff;border:1px solid var(--border-strong);border-radius:12px;padding:14px}
+.agent .msgs{display:flex;flex-direction:column;gap:12px}
+.agent .q{align-self:flex-start;background:var(--blue-100);color:var(--navy);border-radius:12px;padding:8px 12px;font-weight:600;max-width:90%}
+.agent .a p{margin:0 0 8px}
+.agent .g{margin-top:10px}
+.agent .g h4{margin:0 0 6px;font-size:.98rem;color:var(--navy)}
+.agent .g ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.agent .g li{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;border:1px solid var(--border);border-radius:10px;padding:8px 10px;font-size:.95rem}
+.agent .g li span{flex:1}
+.agent .add{flex:none;display:inline-flex;align-items:center;gap:4px;border:0;background:var(--blue-100);color:var(--navy);border-radius:8px;padding:4px 9px;font:700 .82rem Assistant,sans-serif;cursor:pointer;white-space:nowrap}
+.agent .add.done{background:var(--green-bg);color:var(--green);cursor:default}
+.agent .add svg{width:14px;height:14px}
+.agent .next{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.agent .next button{border:1px solid var(--border-strong);background:#fff;border-radius:999px;padding:6px 12px;font:600 .88rem Assistant,sans-serif;color:var(--navy);cursor:pointer;text-align:right}
+.agent .next button:hover{background:var(--soft)}
+.agent .wait{color:var(--text2);font-size:.92rem;display:flex;align-items:center;gap:8px}
+.agent .wait i{width:14px;height:14px;border:2px solid var(--border-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.agent .aerr{background:var(--red-bg);color:var(--red);border-radius:10px;padding:9px 12px;font-weight:600;font-size:.92rem}
+.agent .row{display:flex;gap:8px;margin-top:12px}
+.agent .row input{flex:1}
+.agent .row button{flex:none;border:0;border-radius:10px;background:var(--navy);color:#fff;padding:0 16px;font:700 .95rem Assistant,sans-serif;cursor:pointer}
+.agent .row button:disabled{opacity:.55;cursor:wait}
+.agent .foot{font-size:.78rem;color:var(--text2);margin-top:8px}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:14px 22px;font:700 1.05rem Assistant,sans-serif;cursor:pointer;background:var(--navy);color:#fff;width:100%}
 .btn:disabled{opacity:.6;cursor:wait}
 .btn.soft{background:var(--blue-100);color:var(--navy);width:auto}
@@ -91,28 +109,23 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 .helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:9px 18px;margin-bottom:14px;color:var(--navy)}
 .helpbtn svg{width:17px;height:17px;color:var(--accent)}
 .credit{margin-top:6px;font-size:.8rem}
-.ask{background:var(--blue-100);border-right:4px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:.95rem;color:var(--text)}
-.ask>b:first-child{display:block;color:var(--navy);font-size:1.02rem;margin-bottom:4px}
-.ask .in-t{color:var(--navy)}
-.ask .how{display:block;margin-top:6px;font-size:.88rem;color:var(--text2)}
-.ask a{color:var(--navy);font-weight:700}
-@media(max-width:560px){.two{grid-template-columns:1fr}.hero h1{font-size:1.6rem}}
+@media(max-width:560px){.two{grid-template-columns:1fr}.hero h1{font-size:1.6rem}.subj{padding:14px 12px}.agent{padding:12px 10px}}
 </style>
 </head>
 <body>
 
 <svg style="display:none" aria-hidden="true">
-  <symbol id="i-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></symbol>
-  <symbol id="i-doc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m7 7 10 10M17 7 7 17"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z"/></symbol>
   <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="2.5"/></symbol>
 </svg>
 
 <header class="hero"><div class="in-w">
   <div class="kick">מינהל הכשרה מקצועית · מגמות מקצועיות</div>
-  <h1>העלאת תוכנית לימודים למגמה</h1>
-  <p>התוכנית תפורסם במרחב הפדגוגי לאחר אישור. אין צורך בהרשמה.</p>
+  <h1>אנגלית ומתמטיקה למגמה</h1>
+  <p>אנחנו פועלים לחבר את לימודי האנגלית והמתמטיקה למקצועות המגמות. ספרו לנו מה כדאי ללמד במגמה שלכם — ואם תרצו, היעזרו בסוכן כדי לחשוב על רעיונות. אין צורך בהרשמה.</p>
 </div></header>
 
 <main>
@@ -155,97 +168,54 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         <button type="button" class="chip" data-g="יא">י״א</button>
         <button type="button" class="chip" data-g="יב">י״ב</button>
       </div>
-      <div class="hint">קובץ אחד שמרכז את כל השכבות? בחרו "כל השכבות"</div>
       <div class="err">נא לבחור שכבה אחת לפחות</div>
     </div>
 
-    <div class="two">
-      <div class="f">
-        <label class="l" for="year">שנת התוכנית <span class="req">*</span></label>
-        <select class="in" id="year"><option selected>תשפ״ז</option><option>תשפ״ח</option></select>
+    <div class="f" id="w-topics">
+      <div class="subj">
+        <div class="subj-h">
+          <label for="english">אנגלית טכנית־מקצועית</label>
+          <button type="button" class="agent-btn" data-s="en" aria-expanded="false" aria-controls="agent-en"><svg><use href="#i-spark"/></svg>לחשוב עם הסוכן</button>
+        </div>
+        <div class="hint">מושגי יסוד, שיח בעבודה, קריאת הוראות ומפרטים, שלטי בטיחות, כתיבת דוח או מייל…</div>
+        <textarea class="in" id="english" rows="5" placeholder="נושאים, מושגים או מצבים מהעבודה שכדאי ללמד באנגלית"></textarea>
+        <div class="agent" id="agent-en" hidden></div>
       </div>
-      <div class="f" id="w-docType">
-        <label class="l" for="docType">סוג המסמך <span class="req">*</span></label>
-        <select class="in" id="docType">
-          <option value="">בחרו…</option>
-          <option value="מלאה">תוכנית לימודים מלאה</option>
-          <option value="שנתית">תוכנית שנתית</option>
-          <option value="סילבוס">סילבוס</option>
-          <option value="אחר">אחר</option>
-        </select>
-        <div class="err">נא לבחור סוג מסמך</div>
+      <div class="subj">
+        <div class="subj-h">
+          <label for="math">מתמטיקה יישומית</label>
+          <button type="button" class="agent-btn" data-s="math" aria-expanded="false" aria-controls="agent-math"><svg><use href="#i-spark"/></svg>לחשוב עם הסוכן</button>
+        </div>
+        <div class="hint">חישובים שעושים במקצוע: כמויות ועלויות, יחידות מידה, אחוזים, קנה מידה, קריאת גרפים…</div>
+        <textarea class="in" id="math" rows="5" placeholder="חישובים ונושאים במתמטיקה שהמקצוע דורש"></textarea>
+        <div class="agent" id="agent-math" hidden></div>
       </div>
-    </div>
-
-    <div class="f" id="w-f-program">
-      <span class="l">תוכנית הלימודים <span class="req">*</span></span>
-      <label class="drop"><svg><use href="#i-up"/></svg><b>גררו לכאן או לחצו לבחירת קובץ</b>PDF · Word · PowerPoint · עד 20MB
-        <input type="file" id="f-program" accept=".pdf,.doc,.docx,.ppt,.pptx"></label>
-      <div class="file" id="f-program-row"></div>
-      <div class="err" id="f-program-err">נא לצרף את קובץ התוכנית</div>
-    </div>
-
-    <div class="two">
-      <div class="f" id="w-f-exam">
-        <span class="l">מבחן לדוגמה</span>
-        <label class="drop sm"><svg><use href="#i-up"/></svg><b>העלאת קובץ</b>לא חובה
-          <input type="file" id="f-exam" accept=".pdf,.doc,.docx,.ppt,.pptx"></label>
-        <div class="file" id="f-exam-row"></div>
-        <div class="err" id="f-exam-err"></div>
-      </div>
-      <div class="f" id="w-f-rubric">
-        <span class="l">מחוון</span>
-        <label class="drop sm"><svg><use href="#i-up"/></svg><b>העלאת קובץ</b>לא חובה
-          <input type="file" id="f-rubric" accept=".pdf,.doc,.docx,.ppt,.pptx"></label>
-        <div class="file" id="f-rubric-row"></div>
-        <div class="err" id="f-rubric-err"></div>
-      </div>
-    </div>
-
-    <div class="f" id="w-f-approval">
-      <span class="l">אישור הפעלה למגמה</span>
-      <label class="drop sm"><svg><use href="#i-up"/></svg><b>העלאת מסמך אישור ההפעלה</b>PDF או תמונה · לא חובה
-        <input type="file" id="f-approval" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png"></label>
-      <div class="file" id="f-approval-row"></div>
-      <div class="err" id="f-approval-err"></div>
-      <label class="hint" for="approvalNo" style="display:block;margin-top:10px">מספר האישור (אם יש)</label>
-      <input class="in" id="approvalNo" placeholder="לדוגמה 5204/26" style="max-width:220px;margin-top:4px">
-    </div>
-
-    <div class="ask">
-      <b>מתמטיקה ואנגלית שמחוברות למגמה</b>
-      אנחנו פועלים להתאים את לימודי המתמטיקה והאנגלית למקצועות המגמות. נשמח אם תשתפו אותנו בחומרים שיש לכם בנושא, או בנושאים שהייתם רוצים לראות ב<b class="in-t">אנגלית טכנית־מקצועית</b> וב<b class="in-t">מתמטיקה יישומית</b> המחוברות למגמה.
-      <span class="how">אפשר לכתוב אותם בשדה ההערות שמתחת, ולשלוח קבצים במייל ל-<a href="mailto:mlypeleg@gmail.com?subject=%D7%97%D7%95%D7%9E%D7%A8%D7%99%D7%9D%20%D7%9C%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94%20%D7%95%D7%90%D7%A0%D7%92%D7%9C%D7%99%D7%AA%20%D7%91%D7%9E%D7%92%D7%9E%D7%94" dir="ltr">mlypeleg@gmail.com</a></span>
+      <div class="err">נא למלא לפחות אחד מהשניים — אנגלית או מתמטיקה</div>
     </div>
 
     <div class="f">
       <label class="l" for="notes">הערות</label>
-      <textarea class="in" id="notes" rows="3" placeholder="למשל: זו גרסה מעודכנת לתוכנית הקודמת, או נושאים למתמטיקה ולאנגלית במגמה"></textarea>
+      <textarea class="in" id="notes" rows="3" placeholder="למשל: חומרים שכבר יש לכם בנושא, או מורה שכבר מלמד.ת כך"></textarea>
+      <div class="hint">יש לכם קבצים בנושא? אפשר לשלוח אותם במייל ל-<a href="mailto:mlypeleg@gmail.com?subject=%D7%97%D7%95%D7%9E%D7%A8%D7%99%D7%9D%20%D7%9C%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94%20%D7%95%D7%90%D7%A0%D7%92%D7%9C%D7%99%D7%AA%20%D7%91%D7%9E%D7%92%D7%9E%D7%94" dir="ltr">mlypeleg@gmail.com</a></div>
     </div>
 
-    <div class="f" id="w-consent">
-      <label class="check"><input type="checkbox" id="consent">
-        <span>אני מאשר.ת שהמסמכים אינם כוללים פרטים אישיים של תלמידים או מורים <span class="req">*</span></span></label>
-      <div class="err">נא לאשר</div>
-    </div>
-
-    <button class="btn" type="submit" id="send"><svg><use href="#i-up"/></svg>שליחת התוכנית</button>
+    <button class="btn" type="submit" id="send"><svg><use href="#i-send"/></svg>שליחה</button>
     <div id="progress" aria-live="polite"></div>
     <div id="errBox" role="alert"></div>
   </form>
 
   <div class="box" id="okBox" role="status">
     <div class="ic"><svg><use href="#i-ok"/></svg></div>
-    <h2>התוכנית התקבלה, תודה</h2>
+    <h2>התקבל, תודה</h2>
     <p id="okText"></p>
-    <button class="btn soft" type="button" id="again"><svg><use href="#i-up"/></svg>העלאת תוכנית נוספת</button>
+    <button class="btn soft" type="button" id="again"><svg><use href="#i-plus"/></svg>שליחה למגמה נוספת</button>
     <div class="hint">השם, המייל והטלפון יישארו ממולאים</div>
   </div>
 </div>
 </main>
 
 <footer>
-  <a class="helpbtn" href="mailto:mlypeleg@gmail.com?subject=%D7%A0%D7%AA%D7%A7%D7%9C%D7%AA%D7%99%20%D7%91%D7%91%D7%A2%D7%99%D7%94%20-%20%D7%94%D7%A2%D7%9C%D7%90%D7%AA%20%D7%AA%D7%95%D7%9B%D7%A0%D7%99%D7%AA%20%D7%9C%D7%9E%D7%92%D7%9E%D7%94">
+  <a class="helpbtn" href="mailto:mlypeleg@gmail.com?subject=%D7%A0%D7%AA%D7%A7%D7%9C%D7%AA%D7%99%20%D7%91%D7%91%D7%A2%D7%99%D7%94%20-%20%D7%98%D7%95%D7%A4%D7%A1%20%D7%90%D7%A0%D7%92%D7%9C%D7%99%D7%AA%20%D7%95%D7%9E%D7%AA%D7%9E%D7%98%D7%99%D7%A7%D7%94%20%D7%9C%D7%9E%D7%92%D7%9E%D7%94">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v12H8l-4 3z"/><path d="M12 9v3M12 14h.01"/></svg>
     נתקלתם בבעיה? שלחו הודעה
   </a>
@@ -256,16 +226,21 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 <script src="megamot-list.js"></script>
 <script>
 var API_URL = "https://script.google.com/macros/s/AKfycbzn2IAI0ZHHPgBAJa5_mKQ9bFNoZaaUq95h4LCPTeiG6OSUxpVuLvnSL-XMQISnP1e7cA/exec";
-var KINDS = ["program", "exam", "rubric", "approval"];
-var LABEL = { program: "את התוכנית", exam: "את המבחן לדוגמה", rubric: "את המחוון", approval: "את אישור ההפעלה" };
-var DONE = { program: "תוכנית", exam: "מבחן לדוגמה", rubric: "מחוון", approval: "אישור הפעלה" };
 var GL = { all: "כל השכבות", "ט": "ט׳", "י": "י׳", "יא": "י״א", "יב": "י״ב" };
-var DOC_EXT = ["pdf", "doc", "docx", "ppt", "pptx"], IMG_EXT = ["jpg", "jpeg", "png"];
-var MAX = 20 * 1024 * 1024;
+var FIELD = { en: "english", math: "math" };
 var LIST = window.MEGAMOT_LIST || [];
 var state = { code: null, grades: [] };
+var chat = { en: null, math: null };      // { key, history:[{role,text}], busy }
 function $(id) { return document.getElementById(id); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+
+/* מזהה דפדפן לתקרה היומית של הסוכן — לא מזהה אדם */
+var CID = (function () {
+  var k = "tm-cid", v = "";
+  try { v = localStorage.getItem(k) || ""; } catch (e) {}
+  if (!v) { v = Math.random().toString(36).slice(2) + Date.now().toString(36); try { localStorage.setItem(k, v); } catch (e) {} }
+  return v;
+})();
 
 /* ---------- מגמה ---------- */
 function renderMegamot() {
@@ -283,6 +258,7 @@ function pickMegama(code) {
   $("chosen").textContent = m ? "נבחרה: " + m.name + " · " + m.code : "";
   $("freeMegama").hidden = code !== "";
   if (code === "") $("freeMegama").focus();
+  if (code !== null) $("w-megama").classList.remove("bad");
   renderMegamot();
 }
 $("megamaSearch").addEventListener("input", renderMegamot);
@@ -291,6 +267,9 @@ $("megama").addEventListener("click", function (e) {
 });
 
 /* ---------- שכבות ---------- */
+function paintGrades() {
+  document.querySelectorAll("#grades [data-g]").forEach(function (x) { x.classList.toggle("on", state.grades.indexOf(x.dataset.g) > -1); });
+}
 $("grades").addEventListener("click", function (e) {
   var b = e.target.closest("[data-g]"); if (!b) return;
   var g = b.dataset.g, i = state.grades.indexOf(g);
@@ -299,114 +278,164 @@ $("grades").addEventListener("click", function (e) {
     state.grades = state.grades.filter(function (x) { return x !== "all"; });
     if (i > -1) state.grades.splice(state.grades.indexOf(g), 1); else state.grades.push(g);
   }
-  document.querySelectorAll("#grades [data-g]").forEach(function (x) { x.classList.toggle("on", state.grades.indexOf(x.dataset.g) > -1); });
+  if (state.grades.length) $("w-grades").classList.remove("bad");
+  paintGrades();
 });
 
-/* ---------- קבצים ---------- */
-function size(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + "MB" : Math.max(1, Math.round(n / 1024)) + "KB"; }
-function fileErr(kind, file) {
-  var ext = file.name.split(".").pop().toLowerCase();
-  var ok = DOC_EXT.concat(kind === "approval" ? IMG_EXT : []);
-  if (ok.indexOf(ext) < 0 || file.size > MAX)
-    return kind === "approval" ? "רק PDF, Word, PowerPoint או תמונה, עד 20MB" : "רק PDF, Word או PowerPoint, עד 20MB";
-  return "";
-}
-function showFile(kind) {
-  var inp = $("f-" + kind), row = $("f-" + kind + "-row"), f = inp.files[0];
-  row.classList.toggle("on", !!f);
-  row.innerHTML = f ? '<svg><use href="#i-doc"/></svg><span>' + esc(f.name) + "</span><small>" + size(f.size) +
-    '</small><button type="button" aria-label="הסרת הקובץ"><svg><use href="#i-x"/></svg></button>' : "";
-  if (f) row.querySelector("button").onclick = function () { inp.value = ""; showFile(kind); };
-}
-KINDS.forEach(function (kind) {
-  $("f-" + kind).addEventListener("change", function () {
-    var inp = this, f = inp.files[0], w = $("w-f-" + kind), msg = f ? fileErr(kind, f) : "";
-    if (msg) { inp.value = ""; $("f-" + kind + "-err").textContent = msg; w.classList.add("bad"); }
-    else { w.classList.remove("bad"); if (kind === "program") $("f-program-err").textContent = "נא לצרף את קובץ התוכנית"; }
-    showFile(kind);
-  });
-});
-
-/* ---------- שליחה ---------- */
+/* ---------- רשת ---------- */
 function post(d, tries) {
   tries = tries == null ? 1 : tries;
   return fetch(API_URL, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(d) })
     .then(function (r) { return r.json(); })
     .catch(function (e) { if (tries > 0) return post(d, tries - 1); throw e; });
 }
-function b64(file) {
-  return new Promise(function (res, rej) {
-    var fr = new FileReader();
-    fr.onload = function () { res(String(fr.result).split(",")[1] || ""); };
-    fr.onerror = rej; fr.readAsDataURL(file);
-  });
+
+/* ---------- הסוכן ---------- */
+function megamaKey() { return (state.code || "") + "|" + (state.code === "" ? $("freeMegama").value.trim() : "") + "|" + state.grades.join(","); }
+function megamaReady() { return state.code ? true : state.code === "" && !!$("freeMegama").value.trim(); }
+var AGENT_ERR = {
+  "bot-user": "הגעתם ל-15 שאלות לסוכן להיום. אפשר להמשיך מחר — ובינתיים לכתוב בשדה בעצמכם.",
+  "bot-day": "הסוכן הגיע לתקרה היומית שלו. אפשר להמשיך מחר — ובינתיים לכתוב בשדה בעצמכם.",
+  "bot-off": "הסוכן עוד לא זמין. אפשר לכתוב בשדה בעצמכם.",
+  fields: "בחרו קודם מגמה, ואז נסו שוב."
+};
+
+function toggleAgent(s) {
+  var btn = document.querySelector('.agent-btn[data-s="' + s + '"]'), box = $("agent-" + s);
+  // סגירה רק כשמוצגת שיחה על המגמה הנוכחית; אחרת (הודעת "בחרו מגמה" / מגמה שהתחלפה) — פתיחה מחדש
+  if (!box.hidden && chat[s] && chat[s].key === megamaKey()) { box.hidden = true; btn.setAttribute("aria-expanded", "false"); return; }
+  box.hidden = false; btn.setAttribute("aria-expanded", "true");
+  if (!megamaReady()) {
+    box.innerHTML = '<div class="aerr">כדי שהסוכן יידע על מה לחשוב — בחרו קודם מגמה למעלה.</div>';
+    $("w-megama").scrollIntoView({ block: "center", behavior: "smooth" });
+    return;
+  }
+  if (!chat[s] || chat[s].key !== megamaKey()) {
+    chat[s] = { key: megamaKey(), history: [], busy: false };
+    box.innerHTML = '<div class="msgs"></div><div class="row"><input class="in" placeholder="שאלה נוספת לסוכן…" aria-label="שאלה לסוכן" maxlength="600"><button type="button">שאלה</button></div>' +
+      '<div class="foot">הסוכן מציע רעיונות לחשיבה — אתם מחליטים מה נכנס. מה שתוסיפו ייכנס לשדה למעלה.</div>';
+    var inp = box.querySelector(".row input"), go = box.querySelector(".row button");
+    go.onclick = function () { var q = inp.value.trim(); if (q) { inp.value = ""; askAgent(s, q); } };
+    inp.addEventListener("keydown", function (e) { if (e.key === "Enter") { e.preventDefault(); go.click(); } });
+    askAgent(s, null);
+  }
 }
+document.querySelectorAll(".agent-btn").forEach(function (b) { b.addEventListener("click", function () { toggleAgent(b.dataset.s); }); });
+
+function addToField(s, text, btn) {
+  var t = $(FIELD[s]), cur = t.value.replace(/\s+$/, "");
+  t.value = (cur ? cur + "\n" : "") + "• " + text;
+  btn.classList.add("done"); btn.disabled = true; btn.innerHTML = '<svg><use href="#i-ok"/></svg>נוסף';
+  $("w-topics").classList.remove("bad");
+}
+
+function digest(r) {
+  return [r.intro].concat((r.groups || []).map(function (g) { return g.title + ":\n- " + (g.items || []).join("\n- "); })).join("\n\n");
+}
+
+/* קטעים באנגלית בתוך משפט בעברית — מבודדים, כדי שסימני פיסוק לא יקפצו לצד הלא נכון */
+function bidi(s) {
+  return esc(s).replace(/[A-Za-z][A-Za-z0-9 ,.'’:;!?()\/&+-]*[A-Za-z0-9.?!)]|[A-Za-z]/g, function (m) { return '<bdi dir="ltr">' + m + "</bdi>"; });
+}
+function renderReply(s, r, msgs) {
+  var a = document.createElement("div"); a.className = "a";
+  var html = r.intro ? "<p>" + bidi(r.intro) + "</p>" : "";
+  (r.groups || []).forEach(function (g) {
+    html += '<div class="g"><h4>' + bidi(g.title) + "</h4><ul>" + (g.items || []).map(function (it) {
+      return '<li><span>' + bidi(it) + '</span><button type="button" class="add" data-t="' + esc(it) + '"><svg><use href="#i-plus"/></svg>הוספה</button></li>';
+    }).join("") + "</ul></div>";
+  });
+  if ((r.next || []).length) html += '<div class="next">' + r.next.map(function (n) { return '<button type="button">' + bidi(n) + "</button>"; }).join("") + "</div>";
+  a.innerHTML = html;
+  a.querySelectorAll(".add").forEach(function (b) { b.onclick = function () { addToField(s, b.dataset.t, b); }; });
+  a.querySelectorAll(".next button").forEach(function (b) { b.onclick = function () { askAgent(s, b.textContent); }; });
+  msgs.appendChild(a);
+}
+
+function askAgent(s, q) {
+  var c = chat[s], box = $("agent-" + s), msgs = box.querySelector(".msgs"), go = box.querySelector(".row button");
+  if (!c || c.busy) return;
+  c.busy = true; go.disabled = true;
+  if (q) {
+    var qe = document.createElement("div"); qe.className = "q"; qe.textContent = q; msgs.appendChild(qe);
+    c.history.push({ role: "user", text: q });
+  }
+  var w = document.createElement("div"); w.className = "wait"; w.innerHTML = "<i></i>הסוכן חושב… זה יכול לקחת עד חצי דקה";
+  msgs.appendChild(w);
+  post({ action: "ask", subject: s, code: state.code || "", freeMegama: state.code === "" ? $("freeMegama").value : "",
+         grades: state.grades.slice(), history: c.history, cid: CID }, 0)
+    .then(function (res) {
+      w.remove();
+      if (!res || !res.ok) throw res || {};
+      c.history.push({ role: "assistant", text: digest(res.reply) });
+      renderReply(s, res.reply, msgs);
+    })
+    .catch(function (err) {
+      w.remove();
+      if (q) c.history.pop();
+      var m = document.createElement("div"); m.className = "aerr";
+      m.textContent = AGENT_ERR[err && err.error] || "הסוכן לא הצליח לענות הפעם. נסו שוב בעוד רגע.";
+      msgs.appendChild(m);
+      if (!c.history.length && !q) chat[s] = null;   // פתיחה שנכשלה — לחיצה הבאה תנסה מחדש
+    })
+    .then(function () { c.busy = false; go.disabled = false; });
+}
+
+/* ---------- שליחה ---------- */
 function collect() {
   return {
     name: $("name").value, email: $("email").value, phone: $("phone").value,
     code: state.code === null ? "" : state.code, freeMegama: state.code === "" ? $("freeMegama").value : "",
-    grades: state.grades.slice(), year: $("year").value, docType: $("docType").value,
-    approvalNo: $("approvalNo").value, notes: $("notes").value, consent: $("consent").checked
+    grades: state.grades.slice(), english: $("english").value, math: $("math").value, notes: $("notes").value
   };
 }
 function validate(f) {
   var bad = {
     name: !f.name.trim(), email: !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim()),
     megama: state.code === null || (state.code === "" && !f.freeMegama.trim()),
-    grades: !f.grades.length, docType: !f.docType, consent: !f.consent,
-    "f-program": !$("f-program").files[0]
+    grades: !f.grades.length, topics: !f.english.trim() && !f.math.trim()
   };
   Object.keys(bad).forEach(function (k) { $("w-" + k).classList.toggle("bad", bad[k]); });
   var first = document.querySelector(".f.bad");
   if (first) first.scrollIntoView({ block: "center", behavior: "smooth" });
   return !first;
 }
-function progress(t) { $("progress").textContent = t || ""; }
 function showErr(code) {
   var m = {
     rate: "הרבה הגשות בשעה האחרונה. נסו שוב בעוד כמה דקות.",
-    type: "אחד הקבצים לא בפורמט הנכון או גדול מ-20MB.", size: "אחד הקבצים לא בפורמט הנכון או גדול מ-20MB.",
-    token: "עבר יותר מדי זמן. שלחו שוב.",
     busy: "השרת עמוס כרגע. נסו לשלוח שוב בעוד דקה."
   }[code] || "משהו השתבש בשליחה. נסו שוב, ואם זה חוזר, שלחו לנו הודעה בכפתור למטה.";
   $("errBox").textContent = m; $("errBox").classList.add("on");
 }
-function showOk(f, sent) {
+function showOk(f) {
   var meg = f.code ? (LIST.filter(function (x) { return x.code === f.code; })[0] || {}).name + " · " + f.code : f.freeMegama.trim();
   var gr = f.grades[0] === "all" ? GL.all : "שכבות " + f.grades.map(function (g) { return GL[g]; }).join(", ");
-  $("okText").innerHTML = esc(meg) + " · " + esc(gr) + "<br>" + esc(sent.map(function (k) { return DONE[k]; }).join(" + ")) +
-    "<br>התוכנית תפורסם באתר לאחר אישור.";
+  var what = [f.english.trim() ? "אנגלית" : "", f.math.trim() ? "מתמטיקה" : ""].filter(String).join(" + ");
+  $("okText").innerHTML = esc(meg) + " · " + esc(gr) + "<br>" + esc(what);
   $("form").hidden = true; $("okBox").classList.add("on"); window.scrollTo(0, 0);
 }
-$("form").addEventListener("submit", async function (e) {
+/* הסימון האדום יורד ברגע שמתחילים לתקן */
+[["name", "w-name"], ["email", "w-email"], ["freeMegama", "w-megama"], ["english", "w-topics"], ["math", "w-topics"]].forEach(function (p) {
+  $(p[0]).addEventListener("input", function () { if (this.value.trim()) $(p[1]).classList.remove("bad"); });
+});
+$("form").addEventListener("submit", function (e) {
   e.preventDefault();
   $("errBox").classList.remove("on");
   var f = collect(); if (!validate(f)) return;
-  $("send").disabled = true; progress("שולחים את הפרטים…");
-  try {
-    var s = await post({ action: "submit", f: f });   // ניסיון חוזר אחד — במקרה הגרוע נשארת טיוטה יתומה ב"לא הושלמו"
-    if (!s.ok) throw s;
-    var sent = [];
-    for (var i = 0; i < KINDS.length; i++) {
-      var file = $("f-" + KINDS[i]).files[0]; if (!file) continue;
-      progress("מעלים " + LABEL[KINDS[i]] + "…");
-      var u = await post({ action: "upload", id: s.id, t: s.t, kind: KINDS[i], name: file.name,
-                           type: file.type, data: await b64(file) });
-      if (!u.ok) throw u;
-      sent.push(KINDS[i]);
-    }
-    var fin = await post({ action: "finish", id: s.id, t: s.t });
-    if (!fin.ok) throw fin;
-    showOk(f, sent);
-  } catch (err) { showErr(err && err.error); }
-  finally { $("send").disabled = false; progress(""); }
+  $("send").disabled = true; $("progress").textContent = "שולחים…";
+  post({ action: "submitTopics", f: f })
+    .then(function (s) { if (!s.ok) throw s; showOk(f); })
+    .catch(function (err) { showErr(err && err.error); })
+    .then(function () { $("send").disabled = false; $("progress").textContent = ""; });
 });
 $("again").addEventListener("click", function () {
-  ["freeMegama", "approvalNo", "notes", "megamaSearch"].forEach(function (id) { $(id).value = ""; });
-  $("docType").value = ""; $("year").selectedIndex = 0; $("consent").checked = false;
-  KINDS.forEach(function (k) { $("f-" + k).value = ""; showFile(k); });
-  state.grades = []; document.querySelectorAll("#grades [data-g]").forEach(function (x) { x.classList.remove("on"); });
+  ["freeMegama", "english", "math", "notes", "megamaSearch"].forEach(function (id) { $(id).value = ""; });
+  state.grades = []; paintGrades();
   pickMegama(null); $("freeMegama").hidden = true;
+  ["en", "math"].forEach(function (s) {
+    chat[s] = null; $("agent-" + s).hidden = true; $("agent-" + s).innerHTML = "";
+    document.querySelector('.agent-btn[data-s="' + s + '"]').setAttribute("aria-expanded", "false");
+  });
   $("okBox").classList.remove("on"); $("form").hidden = false; window.scrollTo(0, 0);
 });
 renderMegamot();
