@@ -935,7 +935,8 @@
         if (!g.length) return '';
         return '<div class="views"><div class="gc">' + g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') +
           '</div>' + principalBtn(r, g, 'pm-head') + '</div>';
-      })() + '</div>';
+      })() + '</div>' +
+      '<div data-tovi-slot="' + esc(s.semel) + '"></div>';   /* תובי: תדריך לפני ביקור (tovi.js) */
 
     /* אנשי קשר */
     var cBody = '', cSum = '';
@@ -2048,8 +2049,37 @@
     firstSchool: function () {
       var s = SCHOOLS.filter(function (x) { return BY[x.name].mipui && BY[x.name].mipui.length; })[0] || SCHOOLS[0];
       return s ? 's:' + s.semel : '';
+    },
+    /* תובי (7.10.26): מה שהדף מחשב ולשרת של תובי אין — חוסרים, דגלים, מנור, נספח, הבית של המפקח.
+       רק בתי הספר שבתצוגה. השרת של תובי מקבל רק סמלים שהשער אישר למחובר.ת */
+    token: function () { return token(); },
+    snap: function () {
+      var out = {};
+      SCHOOLS.forEach(function (s) { out[s.semel] = snapOf(BY[s.name]); });
+      return out;
     }
   };
+  function snapOf(r) {
+    var s = r.s, x = r.nispach, mf = MEF[String(s.semel)], mef = [];
+    if (mf && mf.st === 'ok') {
+      (mf.d.visits || []).forEach(function (v) {
+        mef.push('ביקור ' + String(v.date || '').slice(0, 10) + (v.purpose ? ' · ' + v.purpose : '') +
+          ' · ' + (v.status === 'open' ? 'ביקור פתוח' : (v.hasReport ? 'דוח מאושר' : 'דוח ממתין')));
+      });
+      (mf.d.tasks || []).filter(function (t) { return t.status !== 'done'; }).forEach(function (t) {
+        mef.push('משימה פתוחה: ' + t.title + (t.owner_role ? ' · ' + t.owner_role : '') + (t.due ? ' · עד ' + t.due : '') + (t.late ? ' · באיחור' : ''));
+      });
+    }
+    return {
+      n: s.name, sup: supsOf(s).join(', '),
+      gaps: gaps(r).map(function (g) { return g.t; }),
+      flags: flags(r).map(function (f) { return f.t; }),
+      menor: r.menor && r.menor.t ? 'נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים' : '',
+      roles: ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? 'הנספח לא הוגש' :
+        'הוגש ' + x.ts + ' · ' + x.people.length + ' בעלי תפקידים' + (x.missing.length ? ' · חסרים: ' + x.missing.join(', ') : '')),
+      mef: mef, lastMef: r.mvLast || ''
+    };
+  }
 
   var started = false;
   function boot() {
