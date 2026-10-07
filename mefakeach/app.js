@@ -1,17 +1,21 @@
 /* הבית של המפקח — לקוח משותף.
    הדפים ב-tfasim/mefakeach/ טוענים אותו אחרי auth.js של האתר (data-space="pikuah").
-   הטוקן נקרא מהסשן של auth.js (sessionStorage.pmh_auth) ונשלח לשרת בכל קריאה. */
+   הטוקן נקרא מהסשן של auth.js (pmh_auth) ונשלח לשרת בכל קריאה.
+   מ-24.9.26 auth.js שומר ב-localStorage (30 יום); sessionStorage נשאר לסשנים ישנים. */
 (function (w, d) {
   "use strict";
   var EXEC = "https://script.google.com/macros/s/AKfycbxyhvbkVUtydT70TH5Q2fYXu-MpFfAv0qxX7K-RzsSvt7UWXoxwjHun1zwK6MJQj6_K/exec";
   var PICK_KEY = "mefakeach.school";
 
   function token() {
-    try {
-      var s = JSON.parse(w.sessionStorage.getItem("pmh_auth") || "null");
-      if (!s || !s.token || !s.exp || s.exp < Date.now()) return "";
-      return s.token;
-    } catch (e) { return ""; }
+    var stores = ["localStorage", "sessionStorage"];
+    for (var i = 0; i < stores.length; i++) {
+      try {
+        var s = JSON.parse(w[stores[i]].getItem("pmh_auth") || "null");
+        if (s && s.token && s.exp && s.exp > Date.now()) return s.token;
+      } catch (e) { /* אחסון חסום */ }
+    }
+    return "";
   }
   /* אפס סקריפט נופל לפעמים ל-302→404 רגעי או לא עונה — פסק זמן 25ש' ושני ניסיונות חוזרים, אבל רק לקריאות:
      ביטול בצד הלקוח לא מבטל את הבקשה בשרת, וניסיון חוזר על כתיבה (docs.upload, tasks.add, visit.open) היה מכפיל שורות. */
