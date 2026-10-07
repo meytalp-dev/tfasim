@@ -1082,6 +1082,13 @@
       return '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (STAB === t[0]) + '">' + esc(t[1]) + '</button>';
     }).join('') + '</nav><div class="tabp" role="tabpanel">' + (T[STAB] || T.ov) + '</div>';
     $('main').innerHTML = h;
+    /* בנייד הלשוניות גוללות לרוחב — הלשונית הנבחרת נכנסת למסך (רק בתוך הפס, בלי לגלול את הדף) */
+    var nav = $('schTabs'), sel = nav && nav.querySelector('[aria-selected="true"]');
+    if (sel) {
+      var a = nav.getBoundingClientRect(), b = sel.getBoundingClientRect();
+      if (b.right > a.right) nav.scrollLeft += b.right - a.right + 8;
+      else if (b.left < a.left) nav.scrollLeft -= a.left - b.left + 8;
+    }
   }
 
   /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
