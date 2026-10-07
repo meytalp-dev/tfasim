@@ -18,7 +18,7 @@
 .tovi-b h3{font:700 14.5px Rubik,sans-serif;color:var(--navy);margin:14px 0 6px}
 .tovi-b ul{margin:0;padding-inline-start:20px}
 .tovi-b li{margin:4px 0}
-.tovi-src{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:0 8px;margin-inline-start:4px;white-space:nowrap}
+.tovi-src{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:0 8px;margin-inline-start:4px;max-width:100%;overflow-wrap:anywhere}
 .tovi-none,.tovi-miss{color:var(--muted);font-size:14px;margin:4px 0}
 .tovi-foot{color:var(--muted);font-size:12.5px;margin:14px 0 0;border-top:1px solid var(--line);padding-top:10px}
 
@@ -35,7 +35,7 @@
 .tovi-panel>header small{color:#a9bbdf;font-size:12.5px}
 .tovi-x{margin-inline-start:auto;border:0;background:none;color:#fff;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px}
 .tovi-x svg{width:20px;height:20px}
-.tovi-log{flex:1;overflow-y:auto;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
+.tovi-log{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
 .tovi-hi p{margin:0 0 10px;font-size:14.5px;color:var(--muted)}
 .tovi-ex{display:flex;flex-direction:column;gap:6px}
 .tovi-ex button{text-align:right;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font:inherit;font-size:14px;color:var(--navy);cursor:pointer;min-height:44px}

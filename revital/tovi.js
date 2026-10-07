@@ -31,6 +31,14 @@
   };
 
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  /* מקור = תגית. "ביקור X; ספר ההפעלה › פרק › … › סעיף" → תגית לכל מקור, ובספרים רק הספר + הסעיף
+     (הנתיב המלא ארוך מדי ושבר את רוחב החלונית, 7.10.26). הנתיב המלא — בריחוף */
+  function srcHtml(s) {
+    return String(s || '').split(/\s*;\s*/).filter(Boolean).map(function (p) {
+      var parts = p.split(/\s*›\s*/), short = parts.length > 2 ? parts[0] + ' › ' + parts[parts.length - 1] : p;
+      return '<span class="tovi-src" title="' + esc(p) + '">' + esc(short) + '</span>';
+    }).join(' ');
+  }
   function errText(d) { return (d && ERR[d.error]) || 'משהו השתבש. אפשר לנסות שוב.'; }
 
   /* קריאה לשרת. ניסיון חוזר אחד — Apps Script מחזיר לפעמים דף ריק רגעי */
@@ -59,7 +67,7 @@
       var list = br[p[0]] || [];
       if (!list.length) return p[0] === 'changed' ? '<h3>' + p[1] + '</h3><p class="tovi-none">לא נמצא בנתונים שינוי מתוארך מאז הביקור האחרון.</p>' : '';
       return '<h3>' + p[1] + '</h3><ul>' + list.map(function (i) {
-        return '<li>' + esc(i.t) + (i.src ? ' <span class="tovi-src">' + esc(i.src) + '</span>' : '') + '</li>';
+        return '<li>' + esc(i.t) + (i.src ? ' ' + srcHtml(i.src) : '') + '</li>';
       }).join('') + '</ul>';
     }).join('');
     if (br.missing) body += '<p class="tovi-miss">חסר לתמונה מלאה: ' + esc(br.missing) + '</p>';
@@ -131,7 +139,7 @@
     H.forEach(function (m) {
       if (m.role === 'user') h += '<div class="tovi-m me">' + esc(m.content) + '</div>';
       else h += '<div class="tovi-m bot' + (m.err ? ' err' : '') + '">' + fmt(m.content) +
-        (m.sources && m.sources.length ? '<div class="tovi-srcs">' + m.sources.map(function (s) { return '<span class="tovi-src">' + esc(s) + '</span>'; }).join('') + '</div>' : '') + '</div>';
+        (m.sources && m.sources.length ? '<div class="tovi-srcs">' + m.sources.map(srcHtml).join('') + '</div>' : '') + '</div>';
     });
     if (busy) h += '<div class="tovi-m bot tovi-wait">תובי בודק בנתונים…</div>';
     log.innerHTML = h;
