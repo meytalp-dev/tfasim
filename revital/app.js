@@ -397,10 +397,10 @@
       var st = ST[k[0]];
       return '<button type="button" class="kind' + (GKIND === k[0] ? ' on' : '') + '" data-gkind="' + k[0] + '"><b>' +
         (st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—')) + '</b>' + esc(k[1]) + '</button>';
-    }).join('');
+    }).join('') + '<div class="kind soon"><b>בבנייה</b>הגשת תוכנית עבודה</div>';
     $('gapMeta').innerHTML = rows.length + ' בתי ספר עם חוסרים' + (waiting ? ' · עוד ' + waiting + ' מקורות נטענים…' : '') +
       (failed.length ? ' · <span style="color:var(--bad)">לא נטען: ' + esc(failed.join(', ')) + '</span>' : '') +
-      ' · תוכנית עבודה: אין עדיין מערכת שאוספת הגשות';
+      '';
     LISTS.gaps = ['בית ספר', 'מפקח.ת', 'מה חסר'].join('\t') + '\n' + rows.map(function (z) {
       return [z.r.s.name, supsOf(z.r.s).join(' · '), z.g.map(function (x) { return x.t; }).join(' | ')].join('\t');
     }).join('\n');

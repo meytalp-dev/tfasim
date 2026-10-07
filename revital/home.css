@@ -191,3 +191,5 @@ footer a{color:var(--navy)}
 .gapi .chip{font-weight:600;font-size:12.5px}
 .gapi .chip{border-radius:9px;text-align:right}
 @media (max-width:960px){ .gapi .gn{min-width:0;flex-basis:100%} .gapi .gc{flex-basis:100%} }
+.kind.soon{cursor:default;border-style:dashed;background:#fff}
+.kind.soon b{color:var(--muted);font-size:16px}
