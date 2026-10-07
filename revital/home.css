@@ -204,3 +204,15 @@ footer a{color:var(--navy)}
 .kind[class*="k-"]{border-inline-start:4px solid var(--kc)}
 .kind[class*="k-"] b{color:var(--kc)}
 .kind[class*="k-"].on{background:var(--ks);border-color:var(--kc);color:var(--kc)}
+
+/* מייל למנהל.ת בשורת "מה חסר" */
+.gapw{display:flex;align-items:stretch;gap:6px;background:var(--paper);border-radius:12px}
+.gapw .gapi{background:none;flex:1;min-width:0}
+.gapw:hover{background:var(--blue-soft)}
+.pmail{display:flex;align-items:center;gap:6px;padding:8px 10px 8px 12px;flex:none}
+.pmail.muted{color:var(--muted);font-size:12.5px}
+.btn.sm{min-height:34px;padding:5px 10px;font-size:13px}
+.head .gc{display:flex;flex-wrap:wrap;gap:5px;flex:1}
+.head .gc .chip{border-radius:9px;font-size:12.5px;font-weight:600}
+.head .gc .chip[class*="k-"]{background:var(--ks);color:var(--kc)}
+@media (max-width:960px){ .gapw{flex-direction:column;gap:0} .pmail{padding:0 12px 10px} }

@@ -377,10 +377,38 @@
       return !q || norm(z.r.s.name + ' ' + z.r.s.network + ' ' + z.r.s.semel).indexOf(q) > -1;
     });
   }
+  /* שורה = כפתור שפותח את בית הספר + כפתור מייל למנהל.ת (מחוץ לכפתור — אין כפתור בתוך כפתור) */
   function gapLi(z, withSup) {
-    return '<li><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
+    return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
       (withSup ? '<small>' + esc(supsOf(z.r.s).join(' · ')) + '</small>' : '') + '</span><span class="gc">' +
-      z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button></li>';
+      z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button>' +
+      principalBtn(z.r, z.g, 'pm-' + z.r.s.semel) + '</li>';
+  }
+  /* מייל למנהל.ת עם החוסרים — המייל מגיליון אנשי הקשר (שורת המנהל.ת לפי סמל) */
+  function principalOf(r) {
+    var cs = ST.contacts === 'ok' ? contactsFor(r.s) : [];
+    var c = cs.filter(function (x) { return /מנהל/.test(String(x['תפקיד'] || x['סוג'] || '')); })[0] || cs[0];
+    return { name: c ? c['שם'] : ((r.nispach && r.nispach.principal) || ''), mails: cleanMails([cMail(c)]) };
+  }
+  function principalMail(r, g) {
+    var pr = principalOf(r), me = ($('meName').textContent || '').trim(), date = new Date().toLocaleDateString('he-IL');
+    var hello = 'שלום' + (pr.name ? ' ' + pr.name : '') + ',';
+    var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">' +
+      esc(hello) + '<br><br>ריכזנו מה עוד חסר ב' + esc(r.s.name) + ', נכון ל-' + esc(date) + ':<ul style="margin:6px 0;padding-right:20px">' +
+      g.map(function (x) { return '<li>' + esc(x.t) + '</li>'; }).join('') + '</ul>אשמח להשלמה בהקדם. אם משהו כאן לא מדויק, כתבו לי.<br><br>תודה,<br>' + esc(me) + '</div>';
+    var text = hello + '\n\nריכזנו מה עוד חסר ב' + r.s.name + ', נכון ל-' + date + ':\n' +
+      g.map(function (x) { return '• ' + x.t; }).join('\n') + '\n\nאשמח להשלמה בהקדם. אם משהו כאן לא מדויק, כתבו לי.\n\nתודה,\n' + me;
+    return { to: pr.mails, cc: [], subject: 'מה חסר · ' + r.s.name, html: html, text: text };
+  }
+  function principalBtn(r, g, id) {
+    if (!g.length) return '';
+    if (ST.contacts !== 'ok') return '<span class="pmail muted">' + (ST.contacts === 'load' ? '…' : '') + '</span>';
+    var M = principalMail(r, g);
+    if (!M.to.length) return '<span class="pmail muted" title="אין מייל של המנהל.ת בגיליון אנשי הקשר">אין מייל למנהל.ת</span>';
+    MAILS[id] = M;
+    var href = esc(mailHref(M));
+    return '<span class="pmail"><a class="btn sm primary" data-mail="' + esc(id) + '" href="' + href + '">' + I.mail + 'מייל למנהל.ת</a>' +
+      (IS_MOBILE ? '' : '<a class="btn sm" href="' + href + '" title="בתוכנת המייל (Outlook)">Outlook</a>') + '</span>';
   }
   function gapsMail(name, rows) {
     var c = contactByName(name);
@@ -510,7 +538,12 @@
       '<div class="fact"><span>בעלי תפקידים</span><b>' + (x && x.submitted ? x.people.length : (ST.nispach === 'ok' ? '—' : '…')) + '</b></div>' +
       '<div class="fact"><span>מורים שנרשמו למנור</span><b class="' + (p === null ? '' : (p < MENOR_LOW ? 'bad' : 'ok')) + '">' +
         (r.menor && r.menor.t ? r.menor.r + '/' + r.menor.t : (ST.menor === 'ok' ? '—' : '…')) + '</b></div>' +
-      '</div></div>';
+      '</div>' + (function () {
+        var g = gaps(r);
+        if (!g.length) return '';
+        return '<div class="views"><div class="gc">' + g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') +
+          '</div>' + principalBtn(r, g, 'pm-head') + '</div>';
+      })() + '</div>';
 
     /* אנשי קשר */
     var cBody = '', cSum = '';
