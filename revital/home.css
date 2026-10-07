@@ -1,8 +1,11 @@
 /* הבית של רויטל — מעטפת עם תפריט צד, באותו דפוס של אדווה ומנור.
    מובייל תחילה: מתחת ל-960px תפריט הצד הופך למגירה. מטרות נגיעה 44px. */
 :root{
-  --navy:#1d3a80; --blue:#185CFF; --blue-soft:#e8efff; --night:#16264f;
-  --ink:#16203c; --muted:#66728f; --line:#e3e8f2; --paper:#f4f6fb; --bg:#f6f7fb;
+  /* פלטת תובה (7.10.26, מהלוח של מיטל): סגול #A48DD3 · תכלת #87BAEF · ירוק #9AB084 · כהה #3D2643 · רקע #F2EBFD.
+     --blue = הסגול לפעולות (#6B4FB0, ניגודיות 6.2 מול לבן); הסגול הבהיר של הלוגו רק למסגרות והדגשות */
+  --navy:#3D2643; --blue:#6B4FB0; --blue-soft:#F2EBFD; --night:#3D2643;
+  --brand:#A48DD3; --brand-sky:#87BAEF; --brand-sage:#9AB084;
+  --ink:#231a2b; --muted:#6c6478; --line:#e9e3f1; --paper:#f7f4fb; --bg:#faf8fc;
   --ok:#0f8a74; --ok-soft:#e1f5f0; --bad:#c43c47; --bad-soft:#fdecee; --warn:#a8620b; --warn-soft:#fff3e2;
   --r:18px;
 }
@@ -196,7 +199,7 @@ footer a{color:var(--navy)}
 
 /* צבע לכל תחום חוסר — אותו צבע בכרטיס המונה ובתגיות שברשימה */
 .k-nispach{--kc:#c43c47;--ks:#fdecee}
-.k-bs{--kc:#7b3fbf;--ks:#f2eafc}
+.k-bs{--kc:#8a5a2b;--ks:#f6ece2}   /* היה סגול — הוזז כדי לא להתבלבל עם הסגול של תובה */
 .k-rg{--kc:#b8620b;--ks:#fff1df}
 .k-menor{--kc:#1659d6;--ks:#e6efff}
 .k-matz{--kc:#0f7f6c;--ks:#e0f4ef}
@@ -253,7 +256,7 @@ footer a{color:var(--navy)}
 @media (max-width:960px){ .lvl li{flex-direction:column;align-items:flex-start;gap:4px} }
 
 /* ===== דשבורד (7.10.26) ===== */
-.welcome{background:linear-gradient(135deg,#16264f,#1d3a80);color:#fff;border:0}
+.welcome{background:linear-gradient(135deg,#3D2643,#5E44A3);color:#fff;border:0;position:relative;overflow:hidden}
 .welcome h1{font:700 26px/1.25 Rubik,sans-serif;margin:0 0 8px}
 .welcome p{margin:0 0 14px;font-size:16.5px;line-height:1.7;color:#dfe7fb;max-width:640px}
 .welcome .btn{border-color:rgba(255,255,255,.35)}
@@ -312,7 +315,7 @@ footer a{color:var(--navy)}
 .card .gc{display:flex;flex-wrap:wrap;gap:6px}
 
 /* ===== סיור ===== */
-.tour-hole{position:fixed;z-index:9998;border-radius:14px;pointer-events:none;box-shadow:0 0 0 9999px rgba(14,22,48,.6);outline:3px solid #8fb0ff;transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease}
+.tour-hole{position:fixed;z-index:9998;border-radius:14px;pointer-events:none;box-shadow:0 0 0 9999px rgba(14,22,48,.6);outline:3px solid var(--brand);transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease}
 .tour-box{position:fixed;z-index:9999;background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 18px 40px rgba(0,0,0,.28);border-top:4px solid var(--blue);transition:top .3s ease,left .3s ease}
 .tour-box h3{margin:2px 0 6px;font:700 17px Rubik,sans-serif;color:var(--navy)}
 .tour-box p{margin:0 0 12px;font-size:14.5px;line-height:1.65;color:var(--ink)}
@@ -366,3 +369,27 @@ footer a{color:var(--navy)}
 .fv>span{display:block;font-size:12.5px;color:var(--muted);font-weight:700}
 .fv>div{font-size:15px;line-height:1.6;white-space:normal;word-break:break-word}
 .k-sal{--kc:#5f6b12;--ks:#f1f3dc}
+
+/* ===== מיתוג תובה ===== */
+.top-in .brand{padding-inline-start:46px;background:url(brand/tuva-symbol.png) right center/36px no-repeat;min-height:40px;display:flex;flex-direction:column;justify-content:center}
+.welcome::after{content:'';position:absolute;inset-inline-end:18px;bottom:-14px;width:150px;height:150px;background:url(brand/tuva-symbol-white.png) center/contain no-repeat;opacity:.12;pointer-events:none}
+.welcome>*{position:relative;z-index:1}
+.welcome p{color:#efe8fb}
+.me{background:linear-gradient(135deg,#3D2643,#4d3577)}
+.me span{color:#d8cdef}
+.stat.neutral{--kc:var(--blue)}
+@media (max-width:960px){ .welcome::after{width:96px;height:96px} }
+/* מספרי הדשבורד — "כמה מתוך N" עם פס, בצבעי הלוגו (7.10.26) */
+.head64{display:flex;align-items:baseline;gap:8px;margin:16px 4px 8px;color:var(--muted);font-size:15px}
+.head64 b{font:700 22px Rubik,sans-serif;color:var(--navy)}
+.pstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.pstat{display:flex;flex-direction:column;align-items:stretch;gap:4px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;font:inherit;text-align:right;cursor:pointer;color:inherit}
+.pstat:hover{border-color:var(--brand);background:var(--paper)}
+.pstat .t{font-size:14.5px;color:var(--muted);font-weight:600}
+.pstat .v{font:600 28px/1.15 Rubik,sans-serif;color:var(--navy)}
+.pstat .v em{font-style:normal;font-size:15px;color:var(--muted);font-weight:500}
+.pstat .bar{display:block;height:8px;border-radius:99px;background:var(--blue-soft);overflow:hidden;margin-top:4px}
+.pstat .bar i{display:block;height:100%;border-radius:99px;transition:width .4s}
+.pstat .hint{font-size:12.5px;color:var(--muted)}
+@media (max-width:960px){ .pstats{grid-template-columns:1fr} }
+@media (max-width:960px){ .pstats{gap:8px} .pstat{padding:10px 14px;gap:2px} .pstat .v{font-size:22px} .pstat .hint{display:none} .head64{margin-top:12px} }

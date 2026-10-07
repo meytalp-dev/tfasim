@@ -653,21 +653,24 @@
     var name = firstName(), h = '';
 
     h += WELCOME_NOW
-      ? '<div class="card welcome" id="welcome"><h1>' + (name ? 'שלום ' + esc(name) + ', ' : '') + 'ברוכים הבאים</h1>' +
-        '<p>שמחים שאת/ה איתנו. מטרת הבית היא לעזור לך לייעל את תהליכי העבודה ואת העבודה מול הצוותים השונים.</p>' +
+      ? '<div class="card welcome" id="welcome"><h1>' + (name ? 'שלום ' + esc(name) + ', ' : '') + 'ברוכים הבאים לתובה</h1>' +
+        '<p>שמחים שאת/ה איתנו. מטרת תובה היא לעזור לך לייעל את תהליכי העבודה ואת העבודה מול הצוותים השונים.</p>' +
         '<div class="acts"><button type="button" class="btn primary" data-tour-start>' + I.flag + 'לסיור במערכת</button>' +
         '<button type="button" class="btn" id="welcomeOk">לדשבורד</button></div></div>'
       : '<div class="hello" id="hello">' + (name ? 'שלום ' + esc(name) + ' · ' : '') + 'טוב לראות אותך שוב' +
         '<button type="button" class="linkbtn" data-tour-start>' + I.flag + 'סיור במערכת</button></div>';
 
-    function stat(go, num, label, cls, extra) {
-      return '<button type="button" class="stat ' + (cls || '') + '" data-go="' + go + '"' + (extra || '') + '><b>' + (num === null ? '…' : num) + '</b><span>' + label + '</span></button>';
+    /* "כמה מתוך N" עם פס (מיטל, 7.10.26: חלופה ב׳, בצבעי הלוגו) — המספר ביחס לכלל בתי הספר */
+    function stat(go, num, label, hint, color, extra) {
+      var pc = num === null || !n ? 0 : Math.round(100 * num / n);
+      return '<button type="button" class="pstat" data-go="' + go + '"' + (extra || '') + '><span class="t">' + label + '</span>' +
+        '<span class="v">' + (num === null ? '…' : num) + ' <em>מתוך ' + n + '</em></span>' +
+        '<span class="bar"><i style="width:' + pc + '%;background:' + color + '"></i></span><span class="hint">' + hint + '</span></button>';
     }
-    h += '<div class="stats" id="dashStats">' +
-      stat('S', n, 'בתי ספר', 'neutral') +
-      stat('G', gapN, 'עם חוסרים להשלמה', '', ' data-gk=""') +
-      stat('A', attN, 'דורשים תשומת לב', 'k-visit', ' data-ak=""') +
-      stat('A', riskN, 'עם מדד במצב סיכון', 'k-risk', ' data-ak="risk"') + '</div>';
+    h += '<div id="dashStats"><div class="head64"><b>' + n + '</b> בתי ספר</div><div class="pstats">' +
+      stat('G', gapN, 'עם חוסרים להשלמה', 'נספח, השתלמויות, מנור, סל תוכניות', 'var(--brand)', ' data-gk=""') +
+      stat('A', attN, 'דורשים תשומת לב', 'ביקור, מדדים בסיכון, יעדים', 'var(--brand-sky)', ' data-ak=""') +
+      stat('A', riskN, 'עם מדד במצב סיכון', 'לפי המיפוי האחרון', 'var(--blue)', ' data-ak="risk"') + '</div></div>';
 
     /* מצב במיפוי — פס אחד לפי הדירוג הכולל, עם מקרא שהוא גם הטבלה */
     var cnt = { ok: 0, warn: 0, bad: 0, none: 0 };
@@ -1942,8 +1945,9 @@
     var nm = SUPNAME || ME.name || 'מטה';
     $('meName').textContent = nm;
     var first = String(nm).split(/\s+/)[0];
-    $('brandName').textContent = 'הבית של ' + first;
-    document.title = 'הבית של ' + first;
+    /* "תובה" = שם המערכת (מיטל, 7.10.26); השם של המחובר.ת נשאר בתפריט הצד */
+    $('brandName').textContent = 'תובה';
+    document.title = 'תובה · ' + first;
     if (AS) {
       var bar = document.createElement('div');
       bar.className = 'asbar';
