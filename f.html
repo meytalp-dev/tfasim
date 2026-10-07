@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>טופס</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14 3H6v18h12V7z'/><path d='M14 3v4h4M9 12h6M9 16h6'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- טפסים נקודתיים (7.10.26): דף אחד לכל טופס זמני. ההגדרה (כותרת, שדות, פתוח/סגור) מגיעה מהשרת לפי ?id=
+     טופס חדש = שורה בלשונית "טפסים" בגיליון. הפניות מוצגות לרויטל בבית: tfasim/revital/#F -->
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5; --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px;position:relative}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+.site{padding:24px 0 4px}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;display:block}
+@media (max-width:480px){.logo{height:46px}}
+.hero{text-align:center;padding:18px 0 0}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,6vw,36px);line-height:1.2;margin:8px 0 10px;font-weight:700;color:var(--navy)}
+.hero p{font-size:17.5px;color:#3d4a70;max-width:52ch;margin:0 auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:28px;margin-top:22px}
+@media (max-width:560px){.card{padding:22px 16px}}
+.q + .q,#extra .q{margin-top:22px}
+label.ql{display:block;font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;margin-bottom:8px}
+label.ql .req{color:var(--blue)}
+.hint{color:var(--muted);font-size:15px;margin:-4px 0 10px;line-height:1.5}
+input[type=text],input[type=email],textarea,select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+input[type=email]{direction:ltr;text-align:right}
+select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
+textarea{min-height:130px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:6px}
+.err.on{display:block}
+.other{display:none;margin-top:10px}
+.other.on{display:block}
+#form input.hp{position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+.actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26);transition:transform .16s var(--ease)}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:default}
+.msg{display:none;border-radius:18px;padding:26px 22px;margin-top:22px;text-align:center}
+.msg.on{display:block}
+.msg.ok{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1}
+.msg.fail{background:#fff7f8;border:1px solid #f4c9ce}
+.msg.info{background:#fff;border:1px solid var(--line)}
+.msg svg{width:42px;height:42px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msg.ok svg{stroke:var(--mint)} .msg.fail svg{stroke:var(--danger)} .msg.info svg{stroke:var(--muted)}
+.msg h2{font-family:'Rubik',sans-serif;font-size:22px;margin:10px 0 6px;color:var(--navy)}
+.msg p{margin:0;color:#3d4a70;font-size:16.5px}
+.msg .again{margin-top:16px;background:#fff;border:2px solid var(--navy);color:var(--navy);box-shadow:none;width:auto;padding:10px 22px;font-size:16px}
+.loading{text-align:center;color:var(--muted);padding:40px 0}
+footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.credit{margin-top:10px;font-size:13.5px;opacity:.85}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header class="site"><div class="wrap">
+  <img class="logo" src="https://pedagogiamh.co.il/logo.png" alt="משרד העבודה — המנהיגות הפדגוגית היוצרת" onerror="this.style.display='none'">
+</div></header>
+
+<main class="wrap">
+  <div class="loading" id="loading">טוען את הטופס…</div>
+  <section class="hero" id="hero" hidden><h1 id="title"></h1><p id="intro"></p></section>
+
+  <form class="card" id="form" novalidate hidden>
+    <div class="q">
+      <label class="ql" for="f_school">בית ספר <span class="req">*</span></label>
+      <select id="f_school" required><option value="" disabled selected>בחרו בית ספר</option></select>
+      <div class="err" id="e_school">נא לבחור בית ספר</div>
+    </div>
+    <div class="q">
+      <label class="ql" for="f_name">שם מלא <span class="req">*</span></label>
+      <input type="text" id="f_name" autocomplete="name" maxlength="80" required>
+      <div class="err" id="e_name">נא לכתוב שם מלא</div>
+    </div>
+    <div class="q">
+      <label class="ql" for="f_email">מייל לחזרה אליכם <span class="req">*</span></label>
+      <input type="email" id="f_email" autocomplete="email" inputmode="email" maxlength="120" dir="ltr" required>
+      <div class="err" id="e_email">נא לכתוב כתובת מייל תקינה</div>
+    </div>
+    <div id="extra"></div>
+    <input type="text" class="hp" id="f_website" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <div class="actions"><button type="submit" class="btn" id="send">שליחה</button></div>
+  </form>
+
+  <div class="msg ok" id="okMsg" role="status">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12.5l3 3 5-6"/></svg>
+    <h2>הפנייה התקבלה</h2>
+    <p>תודה. נחזור אליכם במייל.</p>
+    <button type="button" class="btn again" id="another">פנייה נוספת</button>
+  </div>
+  <div class="msg fail" id="failMsg" role="alert">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 7v6M12 16.5v.5"/></svg>
+    <h2>השליחה לא הצליחה</h2>
+    <p id="failText">ייתכן שיש תקלה רגעית בחיבור. הפרטים שמילאתם נשמרו בטופס — נסו לשלוח שוב.</p>
+  </div>
+  <div class="msg info" id="infoMsg">
+    <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+    <h2 id="infoTitle">הטופס נסגר</h2>
+    <p id="infoText">הטופס כבר לא מקבל פניות. תודה לכל מי שפנה.</p>
+  </div>
+</main>
+
+<footer>
+  <div>המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>
+</footer>
+
+<script src="https://pedagogiamh.co.il/school-names.js"></script>
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbylxc_Y8ozHXD7a2qQH1ICT-68ctUpvyARL2jNazaSOj1GxygU3zI8flb2xNndvGLMe/exec';
+  var $ = function (id) { return document.getElementById(id); };
+  var ID = (new URLSearchParams(location.search).get('id') || '').trim();
+  var FORM = null;
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function info(title, text) {
+    $('loading').hidden = true;
+    $('infoTitle').textContent = title;
+    $('infoText').textContent = text;
+    $('infoMsg').classList.add('on');
+  }
+  function fetchJson(url, opts, ms) {
+    return new Promise(function (res, rej) {
+      var done = false;
+      var t = setTimeout(function () { if (!done) { done = true; rej(new Error('timeout')); } }, ms || 30000);
+      fetch(url, opts).then(function (r) { return r.json(); })
+        .then(function (j) { if (!done) { done = true; clearTimeout(t); res(j); } })
+        .catch(function (e) { if (!done) { done = true; clearTimeout(t); rej(e); } });
+    });
+  }
+  function load(tries) {
+    fetchJson(API + '?mode=form&id=' + encodeURIComponent(ID), {}, 30000).then(function (d) {
+      if (!d.ok) return info('הטופס לא נמצא', 'ייתכן שהקישור לא מלא. בדקו את הקישור שקיבלתם.');
+      FORM = d.form;
+      document.title = FORM.title;
+      $('title').textContent = FORM.title;
+      $('intro').textContent = FORM.intro || '';
+      $('hero').hidden = false;
+      if (!FORM.open) return info('הטופס נסגר', 'הטופס כבר לא מקבל פניות. תודה לכל מי שפנה.');
+      build();
+    }).catch(function () {
+      if (tries > 1) return load(tries - 1);
+      info('הטופס לא נטען', 'ייתכן שיש תקלה רגעית בחיבור. רעננו את הדף כדי לנסות שוב.');
+    });
+  }
+
+  function build() {
+    var list = (window.SchoolNames && SchoolNames.list) || [];
+    $('f_school').insertAdjacentHTML('beforeend', list.map(function (n) { return '<option>' + esc(n) + '</option>'; }).join(''));
+    $('extra').innerHTML = (FORM.fields || []).map(function (f) {
+      var id = 'f_' + f.k, h = '<div class="q"><label class="ql" for="' + id + '">' + esc(f.label) + (f.req ? ' <span class="req">*</span>' : '') + '</label>' +
+        (f.hint ? '<div class="hint">' + esc(f.hint) + '</div>' : '');
+      if (f.type === 'select') {
+        h += '<select id="' + id + '"><option value="" disabled selected>בחרו</option>' +
+          (f.options || []).map(function (o) { return '<option>' + esc(o) + '</option>'; }).join('') + '</select>';
+        if (f.other) h += '<input type="text" class="other" id="' + id + '_other" maxlength="80" placeholder="פרטו כאן">';
+      } else if (f.type === 'textarea') {
+        h += '<textarea id="' + id + '" maxlength="3000"></textarea>';
+      } else {
+        h += '<input type="text" id="' + id + '" maxlength="300">';
+      }
+      return h + '<div class="err" id="e_' + f.k + '">' + (f.type === 'select' ? 'נא לבחור' : 'נא למלא') + '</div></div>';
+    }).join('');
+    (FORM.fields || []).forEach(function (f) {
+      if (f.type === 'select' && f.other) {
+        $('f_' + f.k).addEventListener('change', function () {
+          $('f_' + f.k + '_other').classList.toggle('on', this.value === 'אחר');
+        });
+      }
+    });
+    $('loading').hidden = true;
+    $('form').hidden = false;
+  }
+
+  function val(f) {
+    var el = $('f_' + f.k), v = (el.value || '').trim();
+    if (f.type === 'select' && f.other && v === 'אחר') {
+      var o = ($('f_' + f.k + '_other').value || '').trim();
+      return o ? 'אחר: ' + o : '';
+    }
+    return v;
+  }
+  function mark(k, bad, el) {
+    $('e_' + k).classList.toggle('on', bad);
+    (el || $('f_' + k)).classList.toggle('bad', bad);
+    return bad;
+  }
+
+  $('form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var data = { school: $('f_school').value, name: $('f_name').value.trim(), email: $('f_email').value.trim(), website: $('f_website').value };
+    var first = null;
+    function chk(k, bad, el) { if (mark(k, bad, el) && !first) first = el || $('f_' + k); }
+    chk('school', !data.school);
+    chk('name', data.name.length < 2);
+    chk('email', !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email));
+    (FORM.fields || []).forEach(function (f) {
+      var v = val(f);
+      data[f.k] = v;
+      var el = f.type === 'select' && f.other && $('f_' + f.k).value === 'אחר' ? $('f_' + f.k + '_other') : $('f_' + f.k);
+      chk(f.k, !!f.req && !v, el);
+    });
+    if (first) { first.focus(); first.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+
+    var btn = $('send');
+    btn.disabled = true; btn.textContent = 'שולח…';
+    $('failMsg').classList.remove('on');
+    fetchJson(API, { method: 'POST', body: JSON.stringify({ action: 'submit', id: ID, data: data }) }, 45000).then(function (d) {
+      if (!d.ok) throw new Error(d.error || 'fail');
+      $('form').hidden = true;
+      $('okMsg').classList.add('on');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }).catch(function (err) {
+      if (String(err && err.message) === 'closed') $('failText').textContent = 'הטופס נסגר בינתיים ולא מקבל עוד פניות.';
+      $('failMsg').classList.add('on');
+    }).then(function () { btn.disabled = false; btn.textContent = 'שליחה'; });
+  });
+
+  /* פנייה נוספת — אותו בית ספר, שם ומייל; התוכן מתאפס */
+  $('another').addEventListener('click', function () {
+    (FORM.fields || []).forEach(function (f) {
+      var el = $('f_' + f.k);
+      el.value = '';
+      if (f.type === 'select') el.selectedIndex = 0;
+      var o = $('f_' + f.k + '_other'); if (o) { o.value = ''; o.classList.remove('on'); }
+    });
+    $('okMsg').classList.remove('on');
+    $('form').hidden = false;
+  });
+
+  /* כל שדה שתוקן — הסימון האדום יורד */
+  document.addEventListener('input', function (e) {
+    var id = e.target.id || '';
+    var k = id.replace(/^f_/, '').replace(/_other$/, '');
+    if ($('e_' + k)) mark(k, false, e.target);
+  });
+
+  if (!ID) info('הטופס לא נמצא', 'ייתכן שהקישור לא מלא. בדקו את הקישור שקיבלתם.');
+  else load(3);
+})();
+</script>
+</body>
+</html>

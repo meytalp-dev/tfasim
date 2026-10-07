@@ -329,7 +329,34 @@ footer a{color:var(--navy)}
 .asbar{background:#fff3e2;color:#7a4a08;text-align:center;font-size:14px;padding:8px 12px;border-bottom:1px solid #f1d9b4}
 .asbar a{color:#7a4a08;font-weight:700}
 /* טפסים נקודתיים (#F) */
-.ftile>svg{width:20px;height:20px;color:var(--blue);flex:none}
+.ftile{cursor:default;align-items:flex-start}
+.ftile>svg{width:20px;height:20px;color:var(--blue);flex:none;margin-top:3px}
+.ftx{flex:1;min-width:0}
+.fttl{display:block;border:0;background:none;padding:0;font:700 15px Assistant,sans-serif;color:var(--ink);cursor:pointer;text-align:right}
+.fttl:hover{color:var(--blue);text-decoration:underline}
+.fbt{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+/* בונה טפסים (#N) */
+.nfl{display:block;font-weight:700;color:var(--navy);font-size:15px;margin-bottom:14px}
+.nfl:last-child{margin-bottom:0}
+.nf input[type=text],.nf input:not([type]),.nf textarea,.nf select{display:block;width:100%;margin-top:6px;font:inherit;font-size:15px;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--paper);color:var(--ink)}
+.nf .req{color:var(--blue)}
+.nfq{padding:12px 0;border-top:1px solid var(--line)}
+.nfq:first-of-type{border-top:0;padding-top:0}
+.nfrow{display:flex;gap:8px;align-items:center}
+.nfrow input{flex:1 1 auto;margin-top:0!important}
+.nfrow select{flex:0 0 150px;width:auto!important;margin-top:0!important}
+.nfn{flex:none;width:26px;height:26px;border-radius:50%;background:var(--blue-soft);color:var(--navy);font:700 13px Rubik,sans-serif;display:flex;align-items:center;justify-content:center}
+.nfq textarea{margin-top:8px}
+.nfrow2{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:center;margin-top:8px;font-size:14px}
+.nfrow2 label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.nfq+.btn{margin-top:6px}
+.nfchk{display:flex;gap:10px;align-items:flex-start;cursor:pointer}
+.nfchk input{margin-top:5px;width:18px;height:18px;flex:none}
+.nfchk b{display:block;color:var(--navy)}
+.nfchk small{display:block;color:var(--muted);font-size:13.5px}
+.nferr{color:var(--bad);font-weight:700;font-size:14px;margin-top:10px}
+.nferr:empty{display:none}
+@media (max-width:560px){ .nfrow{flex-wrap:wrap} .nfrow select{flex:1 1 100%} }
 .fv{margin-bottom:10px}
 .fv>span{display:block;font-size:12.5px;color:var(--muted);font-weight:700}
 .fv>div{font-size:15px;line-height:1.6;white-space:normal;word-break:break-word}

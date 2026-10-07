@@ -381,7 +381,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N') return h;
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
     if (m && BYSEMEL[m[1]]) { STAB = TABS.some(function (t) { return t[0] === m[2]; }) ? m[2] : 'ov'; return 's:' + m[1]; }
     m = h.match(/^m=(ok|warn|bad|none)$/);
@@ -397,6 +397,7 @@
   var FROM = null;   /* מאיזה עמוד רשימה נכנסו לעמוד פנימי — אליו מוביל "חזרה" */
   function go(to) {
     to = to || '';
+    if (CUR === 'N') nfSync();   /* טיוטת טופס חדש נשמרת גם כשיוצאים מהעמוד */
     if (to.indexOf(':') > -1) { if (CUR.indexOf(':') < 0) FROM = CUR; }
     else FROM = null;
     if (to !== CUR && to.charAt(0) === 's') STAB = 'ov';   /* בית ספר אחר נפתח בסקירה */
@@ -440,7 +441,7 @@
     if (CUR === 'P' || c === 'p') return 'P';
     if (CUR === 'G') return 'G';
     if (CUR === 'A') return 'A';
-    if (CUR === 'F' || c === 'f') return 'F';
+    if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
   function side() {
@@ -543,6 +544,7 @@
     else if (CUR === 'G') overview();
     else if (CUR === 'A') attPage();
     else if (CUR === 'F') formsPage();
+    else if (CUR === 'N') { if (adminView()) newFormPage(); else formsPage(); }
     else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
     else dashboard();
   }
@@ -1391,13 +1393,93 @@
   var F_DONE = 'טופל', F_OPEN = 'פתוח';
   var FORMS = [], FFILT = 'open';
   ST.forms = 'load';
-  function loadForms() {
+  function loadForms(then) {
     if (!adminView()) { ST.forms = 'na'; return; }
     fetchJson(FORMS_EXEC, { method: 'POST', body: JSON.stringify({ action: 'admin', token: token() }) }, 45000).then(function (d) {
       if (!d || !d.ok) throw new Error((d && d.error) || 'fail');
       FORMS = d.forms || [];
-      loaded('forms', true);
+      if (then) { ST.forms = 'ok'; then(); } else loaded('forms', true);
     }).catch(function () { loaded('forms', false); });
+  }
+
+  /* ----- בונה טפסים: רויטל יוצרת טופס בעצמה (מיטל, 7.10.26) -----
+     השדות הקבועים (בית ספר מ-64, שם מלא, מייל) נוספים תמיד בדף הטופס — כאן רק השאלות הנוספות.
+     "כן / לא" נשמר כבחירה מרשימה עם שתי אפשרויות. הטיוטה נשמרת ב-NF עד היצירה. */
+  var NF = null;
+  var NF_TYPES = [['text', 'טקסט קצר'], ['textarea', 'טקסט ארוך'], ['select', 'בחירה מרשימה'], ['yesno', 'כן / לא']];
+  var NF_RESERVED = ['חותמת זמן', 'מזהה פנייה', 'בית ספר', 'שם מלא', 'מייל', 'סטטוס', 'עודכן'];
+  function nfReset() { NF = { title: '', intro: '', track: false, fields: [{ label: '', type: 'textarea', req: true, options: '', other: false }] }; }
+  function newFormPage(force) {
+    if ($('nfBox') && !force) return;   /* render() מכל מקור שנטען לא מוחק את מה שהוקלד */
+    if (!NF) nfReset();
+    var h = backLink() + '<div class="card head" id="nfBox"><h1>טופס חדש</h1><div class="meta">בכל טופס יש תמיד: <b>בית ספר</b> (בחירה מ-64), <b>שם מלא</b> ו<b>מייל לחזרה</b>. כאן מוסיפים את השאר.</div></div>' +
+      '<div class="card nf"><label class="nfl">כותרת הטופס <span class="req">*</span><input id="nfTitle" maxlength="120" value="' + esc(NF.title) + '" placeholder="למשל: רישום ליום עיון רכזים"></label>' +
+      '<label class="nfl">הסבר קצר שיופיע מתחת לכותרת<textarea id="nfIntro" maxlength="1000" rows="3">' + esc(NF.intro) + '</textarea></label></div>' +
+      '<div class="card nf"><p class="eyebrow">' + I.doc + 'השאלות</p>' + NF.fields.map(function (f, i) {
+        var sel = f.type === 'select';
+        return '<div class="nfq" data-i="' + i + '"><div class="nfrow"><span class="nfn">' + (i + 1) + '</span>' +
+          '<input class="nfLabel" maxlength="150" placeholder="השאלה, למשל: תפקיד" value="' + esc(f.label) + '">' +
+          '<select class="nfType" aria-label="סוג התשובה">' + NF_TYPES.map(function (t) {
+            return '<option value="' + t[0] + '"' + (f.type === t[0] ? ' selected' : '') + '>' + t[1] + '</option>'; }).join('') + '</select></div>' +
+          (sel ? '<textarea class="nfOpts" rows="4" placeholder="אפשרות אחת בכל שורה">' + esc(f.options) + '</textarea>' : '') +
+          '<div class="nfrow2"><label><input type="checkbox" class="nfReq"' + (f.req ? ' checked' : '') + '> חובה</label>' +
+          (sel ? '<label><input type="checkbox" class="nfOther"' + (f.other ? ' checked' : '') + '> אפשרות "אחר" עם שדה כתיבה</label>' : '') +
+          (NF.fields.length > 1 ? '<button type="button" class="linkbtn" data-nfdel="' + i + '">הסרת השאלה</button>' : '') + '</div></div>';
+      }).join('') + '<button type="button" class="btn" data-nfadd>+ הוספת שאלה</button></div>' +
+      '<div class="card nf"><label class="nfchk"><input type="checkbox" id="nfTrack"' + (NF.track ? ' checked' : '') + '><span><b>לעקוב מי לא מילא</b>' +
+      '<small>בדף המעקב תופיע רשימת בתי הספר שטרם מילאו, עם העתקה ומייל למנהלים. מתאים לרישום שכל בתי הספר צריכים למלא.</small></span></label>' +
+      '<div class="nferr" id="nfErr" role="alert"></div>' +
+      '<div class="acts" style="margin-top:14px"><button type="button" class="btn primary" id="nfCreate">יצירת הטופס</button></div></div>';
+    $('main').innerHTML = h;
+  }
+  function nfSync() {
+    if (!$('nfBox') || !NF) return;
+    NF.title = $('nfTitle').value; NF.intro = $('nfIntro').value; NF.track = $('nfTrack').checked;
+    Array.prototype.forEach.call(document.querySelectorAll('.nfq'), function (q) {
+      var f = NF.fields[+q.getAttribute('data-i')];
+      if (!f) return;
+      f.label = q.querySelector('.nfLabel').value;
+      f.type = q.querySelector('.nfType').value;
+      f.req = q.querySelector('.nfReq').checked;
+      var o = q.querySelector('.nfOpts'); if (o) f.options = o.value;
+      var ot = q.querySelector('.nfOther'); if (ot) f.other = ot.checked;
+    });
+  }
+  function nfCreate() {
+    nfSync();
+    var err = '', seen = {}, fields = [];
+    var title = NF.title.trim();
+    if (!title) err = 'חסרה כותרת לטופס.';
+    NF.fields.forEach(function (f, i) {
+      var label = f.label.trim();
+      if (err || !label) return;
+      if (NF_RESERVED.indexOf(label) > -1) { err = 'השאלה "' + label + '" כבר קיימת בכל טופס — אין צורך להוסיף אותה.'; return; }
+      if (seen[label]) { err = 'השאלה "' + label + '" מופיעה פעמיים.'; return; }
+      seen[label] = 1;
+      var x = { label: label, type: f.type, req: f.req };
+      if (f.type === 'yesno') { x.type = 'select'; x.options = ['כן', 'לא']; }
+      else if (f.type === 'select') {
+        x.options = f.options.split('\n').map(function (o) { return o.trim(); }).filter(Boolean);
+        x.other = f.other;
+        if (!x.options.length) { err = 'בשאלה ' + (i + 1) + ' ("' + label + '") חסרות אפשרויות לבחירה.'; return; }
+      }
+      fields.push(x);
+    });
+    $('nfErr').textContent = err;
+    if (err) return;
+    var btn = $('nfCreate');
+    btn.disabled = true; btn.textContent = 'יוצר את הטופס…';
+    fPost({ action: 'createForm', title: title, intro: NF.intro.trim(), fields: fields, track: NF.track }).then(function (d) {
+      NF = null;
+      loadForms(function () {
+        go('f:' + d.id);
+        copy(FORM_URL + encodeURIComponent(d.id));
+        toast('הטופס נוצר והקישור הועתק');
+      });
+    }, function () {
+      btn.disabled = false; btn.textContent = 'יצירת הטופס';
+      $('nfErr').textContent = 'היצירה לא הצליחה. נסי שוב בעוד רגע.';
+    });
   }
   function fPost(body) {
     body.token = token();
@@ -1430,7 +1512,8 @@
   }
 
   function formsPage() {
-    var h = '<div class="card head"><h1>טפסים נקודתיים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div></div>';
+    var h = '<div class="card head"><h1>טפסים נקודתיים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div>' +
+      '<div class="acts" style="margin-top:12px"><button type="button" class="btn primary" data-go="N">+ טופס חדש</button></div></div>';
     if (ST.forms !== 'ok') { $('main').innerHTML = h + '<div class="card">' + pending('forms') + '</div>'; return; }
     var open = FORMS.filter(function (f) { return f.open; }), closed = FORMS.filter(function (f) { return !f.open; });
     h += '<div class="card"><p class="eyebrow">' + I.doc + 'טפסים פתוחים</p>' +
@@ -1442,11 +1525,44 @@
     }
     $('main').innerHTML = h;
   }
+  /* אריח = כותרת + שני כפתורים: הטופס עצמו (נפתח בלשונית חדשה) ודף המעקב (מיטל, 7.10.26) */
   function fTile(f) {
     var n = (f.rows || []).length, o = fOpenN(f);
-    return '<button type="button" class="tile ftile" data-go="f:' + esc(f.id) + '">' + I.doc + '<span><b>' + esc(f.title) + '</b><small>' +
+    return '<div class="tile ftile">' + I.doc + '<span class="ftx"><button type="button" class="fttl" data-go="f:' + esc(f.id) + '">' + esc(f.title) + '</button><small>' +
+      (f.track ? 'מילאו ' + fFilled(f).n + ' מתוך ' + SCHOOLS.length + ' · ' : '') +
       (n ? n + ' פניות' + (o ? ' · ' + o + ' פתוחות' : ' · כולן טופלו') : 'אין פניות עדיין') +
-      (f.open ? ' · נפתח ' + esc(fDate(f.opened, true)) : (f.closed ? ' · נסגר ' + esc(fDate(f.closed, true)) : '')) + '</small></span></button>';
+      (f.open ? ' · נפתח ' + esc(fDate(f.opened, true)) : (f.closed ? ' · נסגר ' + esc(fDate(f.closed, true)) : '')) + '</small>' +
+      '<span class="fbt"><a class="btn sm" href="' + esc(FORM_URL + encodeURIComponent(f.id)) + '" target="_blank" rel="noopener">' + I.ext + 'הטופס</a>' +
+      '<button type="button" class="btn sm primary" data-go="f:' + esc(f.id) + '">' + I.chart + 'מעקב</button></span></span></div>';
+  }
+  /* בתי הספר שמילאו (לפי השם האחיד) — לטפסים עם מעקב */
+  function fFilled(f) {
+    var set = {}, n = 0;
+    (f.rows || []).forEach(function (r) { set[SN.canon(String(r['בית ספר'] || '').trim())] = 1; });
+    SCHOOLS.forEach(function (s) { if (set[s.name]) n++; });
+    return { set: set, n: n };
+  }
+  /* "טרם מילאו" — מקופל, עם העתקה ומייל למנהלים (עותק מוסתר) */
+  function fMissing(f) {
+    var fl = fFilled(f), miss = SCHOOLS.filter(function (s) { return !fl.set[s.name]; });
+    if (!miss.length) return '<div class="card"><p class="eyebrow">' + I.check + 'מעקב</p><div class="empty">כל ' + SCHOOLS.length + ' בתי הספר מילאו.</div></div>';
+    LISTS.formMiss = ['בית ספר\tמפקח.ת'].concat(miss.map(function (s) { return s.name + '\t' + supsOf(s).join(', '); })).join('\n');
+    var link = FORM_URL + encodeURIComponent(f.id), mailPart = '';
+    if (ST.contacts === 'ok') {
+      var bcc = [], noMail = 0;
+      miss.forEach(function (s) { var m = principalOf(BY[s.name]).mails; if (m.length) bcc = bcc.concat(m); else noMail++; });
+      var me = ($('meName').textContent || '').trim();
+      var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">שלום,<br><br>' +
+        'עוד לא קיבלנו מבית הספר שלכם את "' + esc(f.title) + '".<br>אפשר למלא כאן: <a href="' + esc(link) + '" dir="ltr">' + esc(link) + '</a><br><br>תודה,<br>' + esc(me) + '</div>';
+      var text = 'שלום,\n\nעוד לא קיבלנו מבית הספר שלכם את "' + f.title + '".\nאפשר למלא כאן: ' + link + '\n\nתודה,\n' + me;
+      mailPart = mailBtn('fmiss-' + f.id, { to: [], bcc: cleanMails(bcc), subject: 'תזכורת · ' + f.title, html: html, text: text }, 'מייל למנהלים (' + (miss.length - noMail) + ')') +
+        (noMail ? '<span class="small">' + noMail + ' בלי מייל של מנהל.ת בגיליון אנשי הקשר</span>' : '');
+    } else mailPart = '<span class="small">' + (ST.contacts === 'load' ? 'טוען את אנשי הקשר…' : 'אנשי הקשר לא נטענו — אין כרגע מייל למנהלים') + '</span>';
+    return sec('fmiss', I.check, 'טרם מילאו', tag('warn', miss.length + ' בתי ספר') + ' · מילאו ' + fl.n + ' מתוך ' + SCHOOLS.length,
+      '<div class="acts" style="margin-bottom:12px"><button type="button" class="btn" data-copy="formMiss">' + I.copy + 'העתקת הרשימה</button>' + mailPart + '</div>' +
+      '<ul class="list">' + miss.map(function (s) {
+        return '<li><button type="button" data-go="s:' + esc(s.semel) + '">' + esc(s.name) + '<span>' + esc(supsOf(s).join(' · ')) + '</span></button></li>';
+      }).join('') + '</ul>');
   }
 
   function formPage(id) {
@@ -1474,6 +1590,7 @@
       (shown.length ? '<button type="button" class="btn" data-copy="form">' + I.copy + 'העתקה לאקסל</button>' : '') +
       '<button type="button" class="btn" data-fopen="' + (f.open ? '0' : '1') + '" data-fid="' + esc(f.id) + '">' + (f.open ? 'סגירת הטופס' : 'פתיחה מחדש') + '</button>' +
       '</div></div></div>';
+    if (f.track) h += fMissing(f);
     h += shown.length ? shown.map(function (r) { return fItem(f, r); }).join('')
       : '<div class="card"><div class="empty">' + (FFILT === 'open' ? (rows.length ? 'כל הפניות טופלו.' : 'עוד לא הגיעו פניות.') : 'אין פניות להצגה.') + '</div></div>';
     $('main').innerHTML = h;
@@ -1593,6 +1710,10 @@
     if (av) { AVIEW = av.getAttribute('data-aview'); try { localStorage.setItem('revital.attview', AVIEW); } catch (err) {} drawAtt(); return; }
     var ak = t.closest('[data-akind]');
     if (ak) { var ka = ak.getAttribute('data-akind'); AKIND = AKIND === ka ? '' : ka; drawAtt(); return; }
+    if (t.closest('[data-nfadd]')) { nfSync(); NF.fields.push({ label: '', type: 'text', req: false, options: '', other: false }); newFormPage(true); return; }
+    var nd = t.closest('[data-nfdel]');
+    if (nd) { nfSync(); NF.fields.splice(+nd.getAttribute('data-nfdel'), 1); newFormPage(true); return; }
+    if (t.closest('#nfCreate')) { nfCreate(); return; }
     var ff = t.closest('[data-ffilt]');
     if (ff) { FFILT = ff.getAttribute('data-ffilt'); render(); return; }
     var fs = t.closest('[data-fst]');
@@ -1611,6 +1732,10 @@
     if (c) { e.preventDefault(); copy(LISTS[c.getAttribute('data-copy')] || ''); return; }
     if (t.closest('#burger')) { document.body.classList.toggle('nav-on'); return; }
     if (t.closest('#scrim')) { document.body.classList.remove('nav-on'); return; }
+  });
+  /* בונה הטפסים: שינוי סוג תשובה מציג/מסתיר את שדה האפשרויות */
+  document.addEventListener('change', function (e) {
+    if (e.target && e.target.classList && e.target.classList.contains('nfType')) { nfSync(); newFormPage(true); }
   });
   window.addEventListener('hashchange', function () { CUR = fromHash(); side(); render(); });
 
