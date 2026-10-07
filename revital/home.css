@@ -251,3 +251,76 @@ footer a{color:var(--navy)}
 .vis h5{margin:10px 0 4px;font:700 13.5px Rubik,sans-serif;color:var(--navy)}
 .vis h5:first-child{margin-top:0}
 @media (max-width:960px){ .lvl li{flex-direction:column;align-items:flex-start;gap:4px} }
+
+/* ===== דשבורד (7.10.26) ===== */
+.welcome{background:linear-gradient(135deg,#16264f,#1d3a80);color:#fff;border:0}
+.welcome h1{font:700 26px/1.25 Rubik,sans-serif;margin:0 0 8px}
+.welcome p{margin:0 0 14px;font-size:16.5px;line-height:1.7;color:#dfe7fb;max-width:640px}
+.welcome .btn{border-color:rgba(255,255,255,.35)}
+.welcome .btn:not(.primary){background:transparent;color:#fff}
+.welcome .acts{display:flex;gap:8px;flex-wrap:wrap}
+.hello{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font:700 18px Rubik,sans-serif;color:var(--navy);padding:2px 4px 6px}
+.linkbtn{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--blue);font:inherit;font-size:14px;font-weight:700;cursor:pointer;padding:6px 4px;min-height:40px}
+.linkbtn svg,.btn svg{width:16px;height:16px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.stat{display:flex;flex-direction:column;align-items:flex-start;gap:2px;background:#fff;border:1px solid var(--line);border-inline-start:4px solid var(--kc,var(--bad));border-radius:14px;padding:12px 14px;font:inherit;text-align:right;cursor:pointer;color:var(--muted);font-size:14px;min-height:84px}
+.stat:hover{background:var(--paper)}
+.stat b{font:700 30px/1.1 Rubik,sans-serif;color:var(--kc,var(--bad))}
+.stat.neutral{--kc:var(--navy)}
+.h2{font:700 18px/1.3 Rubik,sans-serif;color:var(--navy);margin:0 0 2px}
+#dashMap .meta,#dashSum .meta{color:var(--muted);font-size:13.5px}
+/* פס המיפוי — מקטעים עם רווח 2px, מספר בתוך מקטע רחב, מקרא = טבלה */
+.mbar{display:flex;gap:2px;height:38px;margin:14px 0 10px}
+.mbar button{border:0;min-width:6px;flex-basis:0;color:#fff;font:700 15px Rubik,sans-serif;cursor:pointer;padding:0}
+.mbar button:first-child{border-radius:0 6px 6px 0}
+.mbar button:last-child{border-radius:6px 0 0 6px}
+.mbar button:only-child{border-radius:6px}
+.mbar button:hover{filter:brightness(1.08)}
+.seg-ok{background:#0f8a74}
+.seg-warn{background:#d08a1c}
+.seg-bad{background:#c43c47}
+.seg-none{background:#aab3c5}
+.mbar .seg-none{color:#16203c}
+.mleg{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.mleg button{width:100%;display:flex;align-items:center;flex-wrap:wrap;gap:4px 6px;border:0;background:var(--paper);border-radius:10px;padding:8px 10px;font:inherit;font-size:14px;color:var(--ink);cursor:pointer;text-align:right;min-height:44px}
+.mleg button:hover{background:var(--blue-soft)}
+.mleg small{flex-basis:100%;color:var(--muted);font-size:12.5px;padding-inline-start:18px}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;flex:none;vertical-align:middle}
+.tile .sw{width:10px;height:10px}
+.sumrow{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--line)}
+.sumrow:first-of-type{border-top:0}
+.sumh{border:0;background:none;font:700 15px Rubik,sans-serif;color:var(--navy);cursor:pointer;padding:4px 0;min-width:170px;text-align:right}
+.sumrow .gc{display:flex;flex-wrap:wrap;gap:6px;flex:1}
+.sumrow .chip{border:0;cursor:pointer;font:inherit;font-size:13px;font-weight:600;border-radius:9px;padding:6px 10px;min-height:34px}
+@media (max-width:960px){ .stats{grid-template-columns:repeat(2,minmax(0,1fr))} .mleg{grid-template-columns:repeat(2,minmax(0,1fr))} .welcome h1{font-size:22px} }
+
+/* ===== לשוניות בעמוד בית ספר ===== */
+.tabs{display:flex;gap:4px;overflow-x:auto;margin:14px 0 0;padding:4px;background:#fff;border:1px solid var(--line);border-radius:14px;scrollbar-width:none;position:sticky;top:66px;z-index:5}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;border:0;background:none;font:inherit;font-weight:700;font-size:14.5px;color:var(--muted);padding:9px 14px;border-radius:10px;cursor:pointer;min-height:42px;white-space:nowrap}
+.tabs button:hover{background:var(--paper)}
+.tabs button[aria-selected=true]{background:var(--blue);color:#fff}
+.tabp{margin-top:12px}
+.tabp>.card:first-child,.tabp>.sec:first-child{margin-top:0}
+.tabsum{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tabsum button{width:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:0;background:var(--paper);border-radius:12px;padding:12px 14px;font:inherit;cursor:pointer;text-align:right;color:var(--ink);min-height:52px}
+.tabsum button:hover{background:var(--blue-soft)}
+.tabsum .st{display:inline-flex;align-items:center;gap:8px;font:700 15.5px Rubik,sans-serif;color:var(--navy);min-width:160px}
+.tabsum .st svg{width:18px;height:18px;color:var(--blue)}
+.tabsum .sum{color:var(--muted);font-size:14px;flex:1;display:inline-flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tabsum .go{color:var(--blue);font-weight:700}
+.card .gc{display:flex;flex-wrap:wrap;gap:6px}
+
+/* ===== סיור ===== */
+.tour-hole{position:fixed;z-index:9998;border-radius:14px;pointer-events:none;box-shadow:0 0 0 9999px rgba(14,22,48,.6);outline:3px solid #8fb0ff;transition:top .3s ease,left .3s ease,width .3s ease,height .3s ease}
+.tour-box{position:fixed;z-index:9999;background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 18px 40px rgba(0,0,0,.28);border-top:4px solid var(--blue);transition:top .3s ease,left .3s ease}
+.tour-box h3{margin:2px 0 6px;font:700 17px Rubik,sans-serif;color:var(--navy)}
+.tour-box p{margin:0 0 12px;font-size:14.5px;line-height:1.65;color:var(--ink)}
+.tour-count{font-size:12px;font-weight:700;color:var(--muted)}
+.tour-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tour-actions button{font:inherit;font-size:14px;font-weight:700;cursor:pointer;border-radius:999px;padding:8px 18px;min-height:40px}
+.tour-next{background:var(--blue);color:#fff;border:1px solid var(--blue)}
+.tour-prev{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.tour-skip{background:none;border:0;color:var(--muted);text-decoration:underline;margin-inline-start:auto}
+.welcome .btn.primary{background:#fff;color:var(--navy);border-color:#fff}
+@media (max-width:960px){ .sumrow{flex-direction:column;gap:6px} .sumh{min-width:0} }
