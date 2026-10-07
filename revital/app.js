@@ -5,7 +5,7 @@
      admin-contacts (שער)         — מנהלים ומפקחים עם טלפון ומייל (מוגן, מרחב all/mosdot)
      נספח mode:view (טוקן)        — בעלי התפקידים עם פרטים ומה חסר
      מנור registration.count      — מספרי רישום המורים לבית ספר
-     מצבת ?mode=list              — מספר תלמידים
+     מצבת ?mode=list              — מספר תלמידים בלבד (לא חוסר — הוסר 7.10.26)
      pikuah-data (שער)            — מיפוי בית ספר, ביקורי תשפ״ו, יעדים מהוועדה (מוגן, מסונן לפי מפקח.ת בשרת)
      הבית של המפקח visit.list     — תאריכי הביקורים החדשים, ל"דורש תשומת לב"
    שום מפתח ושום פרט אישי לא יושבים בקובץ הזה. */
@@ -34,7 +34,7 @@
             ['honchim', 'מורים חונכים'], ['ped', 'רכזים פדגוגיים'], ['sherut', 'שירות לאומי']];
   /* סוגי החוסרים — הסדר הזה הוא הסדר בכל הרשימות */
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
-                   ['menor', 'רישום מורים למנור'], ['matz', 'מצבת תלמידים']];
+                   ['menor', 'רישום מורים למנור']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
   /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
   var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה']];
   var VISIT_DAYS = 90;
@@ -307,11 +307,12 @@
       if (!r.menor || !r.menor.t) out.push({ k: 'menor', t: 'מנור: אין מורים רשומים לבית הספר' });
       else if (r.menor.r < r.menor.t) out.push({ k: 'menor', t: 'מנור: נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים · ' + (r.menor.t - r.menor.r) + ' טרם נרשמו' });
     }
-    if (ST.matz === 'ok' && !r.matz) out.push({ k: 'matz', t: 'מצבת התלמידים לא דווחה' });
     return out;
   }
   function issues(r) { return gaps(r).map(function (g) { return g.t; }); }
-  function allLoaded() { return ['nispach', 'menor', 'matz', 'bs', 'rg'].every(function (k) { return ST[k] !== 'load'; }); }
+  /* מספר התלמידים: מהמצבת אם דווחה, אחרת מהמיפוי */
+  function studentsOf(r) { return r.matz && r.matz.n ? r.matz.n : (r.mipui && r.mipui[0] ? field(r.mipui[0], 'מספר תלמידים מט') : ''); }
+  function allLoaded() { return ['nispach', 'menor', 'bs', 'rg'].every(function (k) { return ST[k] !== 'load'; }); }
 
   /* ===== דורש תשומת לב — אותות לפיקוח ===== */
   function field(row, prefix) {
@@ -536,7 +537,7 @@
     return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
       (withSup ? '<small>' + esc(supsOf(z.r.s).join(' · ')) + '</small>' : '') + '</span><span class="gc">' +
       z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button>' +
-      principalBtn(z.r, z.g, 'pm-' + z.r.s.semel) + '</li>';
+      principalBtn(z.r, gaps(z.r), 'pm-' + z.r.s.semel) + '</li>';
   }
   /* מייל למנהל.ת עם החוסרים — המייל מגיליון אנשי הקשר (שורת המנהל.ת לפי סמל) */
   function principalOf(r) {
@@ -764,7 +765,7 @@
   }
   function drawGaps() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-gview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-gview') === GVIEW); });
-    var waiting = ['nispach', 'menor', 'matz', 'bs', 'rg'].filter(function (k) { return ST[k] === 'load'; }).length;
+    var waiting = ['nispach', 'menor', 'bs', 'rg'].filter(function (k) { return ST[k] === 'load'; }).length;
     var failed = GAP_KINDS.filter(function (k) { return ST[k[0]] === 'err'; }).map(function (k) { return k[1]; });
     var rows = gapRows();
     /* מונה לכל סוג — על כל 64, בלי הסינונים */
@@ -852,7 +853,7 @@
       esc(s.network) + ' · סמל <b>' + esc(s.semel) + '</b> · ' + esc(s.district) + ' · ' + esc(s.sector) +
       (office ? ' · טלפון בית הספר ' + telA(office) : '') + '</div>' +
       '<div class="facts">' +
-      '<div class="fact"><span>תלמידים</span><b>' + (r.matz ? r.matz.n : (ST.matz === 'ok' ? '—' : '…')) + '</b></div>' +
+      '<div class="fact"><span>תלמידים</span><b>' + (studentsOf(r) || (ST.matz === 'load' || ST.pk === 'load' ? '…' : '—')) + '</b></div>' +
       '<div class="fact"><span>כיתות</span><b>' + (x && x.classes ? x.classes : (ST.nispach === 'ok' ? '—' : '…')) + '</b></div>' +
       '<div class="fact"><span>בעלי תפקידים</span><b>' + (x && x.submitted ? x.people.length : (ST.nispach === 'ok' ? '—' : '…')) + '</b></div>' +
       '<div class="fact"><span>מורים שנרשמו למנור</span><b class="' + (p === null ? '' : (p < MENOR_LOW ? 'bad' : 'ok')) + '">' +
@@ -1266,14 +1267,13 @@
     var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#16203c">' +
       'שלום ' + esc(name) + ',<br><br>זו תמונת המצב של בתי הספר שלך, נכון ל-' + esc(date) + '.<br><br>' +
       '<table dir="rtl" cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%">' +
-      '<tr><th ' + th + '>בית הספר</th><th ' + th + '>נספח בעלי תפקידים</th><th ' + th + '>מנור</th><th ' + th + '>מצבת</th></tr>' +
+      '<tr><th ' + th + '>בית הספר</th><th ' + th + '>נספח בעלי תפקידים</th><th ' + th + '>מנור</th></tr>' +
       list.map(function (r) {
         var x = r.nispach;
         var nis = ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? '<b style="color:#c43c47">לא הוגש</b>' :
           (x.missing.length ? '<span style="color:#c43c47">חסר: ' + esc(x.missing.map(shortRole).join(', ')) + '</span>' : 'מאויש'));
         var men = r.menor && r.menor.t ? r.menor.r + ' מתוך ' + r.menor.t : '';
-        var mz = r.matz ? r.matz.n + ' תלמידים' : (ST.matz === 'ok' ? '<span style="color:#c43c47">לא דווחה</span>' : '');
-        return '<tr><td ' + td + '><b>' + esc(r.s.name) + '</b></td><td ' + td + '>' + nis + '</td><td ' + td + '>' + men + '</td><td ' + td + '>' + mz + '</td></tr>';
+        return '<tr><td ' + td + '><b>' + esc(r.s.name) + '</b></td><td ' + td + '>' + nis + '</td><td ' + td + '>' + men + '</td></tr>';
       }).join('') + '</table><br>';
     list.forEach(function (r) {
       var x = r.nispach;
