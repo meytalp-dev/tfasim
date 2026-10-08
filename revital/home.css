@@ -418,3 +418,12 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .akw{grid-column:1}
   .akv{min-width:0}
 }
+
+/* "מה מחכה לך?" בדשבורד (8.10.26) */
+#dashWait .h2{display:flex;align-items:center;gap:8px}
+#dashWait .wn{background:var(--blue);color:#fff;border-radius:999px;font-size:13px;min-width:24px;height:24px;display:inline-grid;place-items:center;padding:0 7px}
+.list.wait a.li{padding:10px 12px;border:1px solid var(--line)}
+.list.wait .li>.wt{margin:0;display:grid;gap:2px;flex:1 1 220px;min-width:0}
+.list.wait .wt small{color:var(--muted);font-size:13px}
+.list.wait .li>.btn{flex:0 0 auto}
+@media (max-width:640px){.list.wait .li>.btn{width:100%;justify-content:center}}

@@ -110,7 +110,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', wait: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -182,13 +182,27 @@
       side(); render();
       document.dispatchEvent(new Event('revital:ready'));
       loadContacts(); loadSherut(); loadNispach(); loadMenor(); loadMatz(); loadBs(); loadRg();
-      loadPikuah(); loadMefVisits(); loadForms();
+      loadPikuah(); loadMefVisits(); loadForms(); loadWait();
     }).catch(function () {
       $('main').innerHTML = '<div class="card"><b>לא הצלחתי לטעון את רשימת בתי הספר.</b> <button class="btn" id="retry">לנסות שוב</button></div>';
       $('retry').onclick = start;
     });
   }
   function loaded(k, ok) { ST[k] = ok ? 'ok' : 'err'; side(); render(); }
+
+  /* "מה מחכה לך?" (מיטל, 8.10.26) — בקשות השתלמות מוסדית שממתינות לאישור, עם הקישור האישי.
+     מגיע רק דרך השער, מסונן לבתי הספר של המחובר.ת. חוזרים לטאב אחרי אישור → נטען מחדש */
+  var WAIT = [];
+  function loadWait() {
+    if (!window.PMH_AUTH || !PMH_AUTH.load) return loaded('wait', false);
+    PMH_AUTH.load('hishtal-wait').then(function (res) {
+      if (!(res && res.ok && Array.isArray(res.data))) return loaded('wait', false);
+      WAIT = res.data; loaded('wait', true);
+    }, function () { loaded('wait', false); });
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible' && ST.wait && ST.wait !== 'load' && SCHOOLS.length) loadWait();
+  });
 
   function loadContacts() {
     if (!window.PMH_AUTH || !PMH_AUTH.load) return loaded('contacts', false);
@@ -678,6 +692,34 @@
   }
   var WELCOME_NOW = false;
   try { if (localStorage.getItem('revital.welcome') !== 'seen') { WELCOME_NOW = true; localStorage.setItem('revital.welcome', 'seen'); } } catch (e) { WELCOME_NOW = true; }
+  /* מה מחכה לפעולה של המפקח.ת. היום: אישור השתלמות מוסדית. סוג חדש = עוד push ב-waitItems() */
+  function waitItems() {
+    var out = [];
+    WAIT.forEach(function (w) {
+      var byName = BY[SN.canon(String(w['בית הספר'] || '').trim())];
+      var r = BYSEMEL[String(w['סמל מוסד'] || '').trim()] || (byName && BYSEMEL[String(byName.s.semel)]);
+      if (!r) return;                      /* לא מבתי הספר שבתצוגה (?as=) */
+      out.push({
+        t: 'אישור השתלמות מוסדית', school: r.s.name, sups: supsOf(r.s),
+        sub: [w['שם ההשתלמות'], w['חריגים'] ? 'חורגת מתנאי הסף — לשיחה עם המנהל.ת' : ''].filter(Boolean).join(' · '),
+        when: String(w['חותמת זמן'] || '').split(' ')[0], href: String(w['קישור'] || ''), act: 'לאישור הבקשה'
+      });
+    });
+    return out;
+  }
+  function dashWait() {
+    var adm = adminView(), items = ST.wait === 'ok' ? waitItems() : [];
+    var body = ST.wait === 'load' ? '<div class="empty">טוען…</div>'
+      : ST.wait !== 'ok' ? '<div class="empty">לא הצלחתי לטעון כרגע.</div>'
+      : !items.length ? '<div class="empty">' + (adm ? 'אין כרגע בקשות שממתינות למפקחים.' : 'אין כרגע משהו שמחכה לך.') + '</div>'
+      : '<ul class="list wait">' + items.map(function (x) {
+          return '<li><a class="li" href="' + esc(x.href) + '" target="_blank" rel="noopener"><span class="wt"><b>' + esc(x.t) + ' · ' + esc(x.school) + '</b>' +
+            '<small>' + esc(x.sub) + (x.when ? ' · הוגשה ' + esc(x.when) : '') + (adm ? ' · ' + esc(x.sups.join(' · ')) : '') + '</small></span>' +
+            '<span class="btn primary">' + esc(x.act) + ' ←</span></a></li>';
+        }).join('') + '</ul>';
+    return '<div class="card" id="dashWait"><h2 class="h2">' + (adm ? 'מה מחכה למפקחים' : 'מה מחכה לך?') +
+      (items.length ? ' <span class="wn">' + items.length + '</span>' : '') + '</h2>' + body + '</div>';
+  }
   function firstName() { return String(($('meName').textContent || '').trim()).split(/\s+/)[0] || ''; }
   function dashboard() {
     var n = SCHOOLS.length, done = allLoaded(), pk = ST.pk === 'ok';
@@ -693,6 +735,8 @@
         '<button type="button" class="btn" id="welcomeOk">לדשבורד</button></div></div>'
       : '<div class="hello" id="hello">' + (name ? 'שלום ' + esc(name) + ' · ' : '') + 'טוב לראות אותך שוב' +
         '<button type="button" class="linkbtn" data-tour-start>' + I.flag + 'סיור במערכת</button></div>';
+
+    h += dashWait();
 
     /* "כמה מתוך N" עם פס (מיטל, 7.10.26: חלופה ב׳, בצבעי הלוגו) — המספר ביחס לכלל בתי הספר */
     function stat(go, num, label, hint, color, extra) {
