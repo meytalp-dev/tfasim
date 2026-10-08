@@ -530,3 +530,21 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .repck input{width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px}
 .repck small{display:block;color:var(--muted);font-size:13px;margin-inline-start:26px}
 .dckbody>.sec{margin-bottom:12px}
+
+/* דוח ביקור בהקלטה (8.10.26) */
+.recbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:12px 0;padding:14px;border:1px dashed var(--line);border-radius:14px;background:var(--paper)}
+.recbox .btn svg,.recgo svg{width:18px;height:18px}
+.recgo{min-height:48px;font-size:16px;padding-inline:20px}
+.recbox.on{border:2px solid var(--bad);background:var(--bad-soft)}
+.recbox.on b{font-size:20px;font-variant-numeric:tabular-nums;color:var(--bad)}
+.recdot{width:14px;height:14px;border-radius:50%;background:var(--bad);animation:recpulse 1.2s ease-in-out infinite}
+@keyframes recpulse{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.recdot{animation:none}}
+.recbox.done{display:grid;gap:8px}
+.recbox audio{width:100%;max-width:420px}
+.reptype{margin:8px 0;border:1px solid var(--line);border-radius:12px;background:#fff}
+.reptype>summary{cursor:pointer;padding:10px 12px;font-weight:700;font-size:14px}
+.reptype>.reptext{margin:0 12px;width:calc(100% - 24px)}
+.reptype>.acts,.reptype>p,.reptype>ul{margin-inline:12px}
+.repckbox{margin-top:16px}
+.drp .h2 svg{color:var(--bad)}

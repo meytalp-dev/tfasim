@@ -831,6 +831,7 @@
       : '<div class="hello" id="hello">' + (name ? 'שלום ' + esc(name) + ' · ' : '') + 'טוב לראות אותך שוב' +
         '<button type="button" class="linkbtn" data-tour-start>' + I.flag + 'סיור במערכת</button></div>';
 
+    h += dashRep();   /* דוח ביקור בהקלטה — כרטיס משלו (8.10.26) */
     h += dashCk();
     h += dashWait();
 
@@ -1409,8 +1410,8 @@
       .slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
     if (DCK.semel && !list.some(function (s) { return String(s.semel) === DCK.semel; })) DCK.semel = '';
     var r = DCK.semel ? BYSEMEL[DCK.semel] : null;
-    var h = '<div class="card dck" id="dashCk"><h2 class="h2">' + I.check + 'צ׳ק ליסט ודוח ביקור</h2>' +
-      '<div class="meta">בוחרים בית ספר. בזמן הביקור מסמנים את הצ׳ק ליסט, ואחריו מכתיבים דוח ותובי מסדר אותו. הכול נשמר.</div><div class="dckpick">' +
+    var h = '<div class="card dck" id="dashCk"><h2 class="h2">' + I.check + 'צ׳ק ליסט ביקור</h2>' +
+      '<div class="meta">בוחרים בית ספר ומסמנים תוך כדי הביקור. הכול נשמר לבד.</div><div class="dckpick">' +
       (admin ? '<label>מפקח.ת<select id="dckSup"><option value="">כל המפקחים</option>' + sups.map(function (n) {
         return '<option value="' + esc(n) + '"' + (n === DCK.sup ? ' selected' : '') + '>' + esc(n) + '</option>';
       }).join('') + '</select></label>' : '') +
@@ -1418,8 +1419,7 @@
         return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DCK.semel ? ' selected' : '') + '>' + esc(s.name) + '</option>';
       }).join('') + '</select></label>' +
       (r ? '<button type="button" class="btn sm" data-go="s:' + esc(DCK.semel) + '&t=vis">לעמוד בית הספר ←</button>' : '') + '</div>';
-    /* דוח ביקור בהכתבה (8.10.26, מיטל: "גם לדשבורד במקום בולט") — מקופל, מתחת לבחירת בית הספר */
-    return h + (r ? '<div class="dckbody">' + repSec(r) + ckBody(r) + '</div>' : '') + '</div>';
+    return h + (r ? '<div class="dckbody">' + ckBody(r) + '</div>' : '') + '</div>';
   }
   /* שמירה: מחכים שנייה וחצי אחרי השינוי האחרון; שמירה אחת בכל רגע לכל בית ספר */
   function ckLater(semel) {
@@ -1529,19 +1529,22 @@
     setTimeout(function () { w.focus(); w.print(); }, 300);
   }
 
-  /* ===== דוח ביקור מהכתבה (מיטל, 8.10.26) =====
-     המפקח.ת לוחצ.ת על המיקרופון במקלדת של הטלפון ומספר.ת מה היה בביקור. תובי (report בשרת של תובי) מסדר
-     את זה לשדות של "תשפ"ו - טופס פיקוח פדגוגי" במונדיי ומציע סימונים לצ׳ק ליסט. עורכים, ואז:
-     שמירה בתובה (bikurSave בשער → לשונית "ביקורים", ליד ביקורי המונדיי) · הורדת Excel למונדיי · הוספה לצ׳ק ליסט.
-     התאריך = התאריך של הצ׳ק ליסט (אותו ביקור). הטיוטה נשמרת בדפדפן עד השמירה.
-     אם ההכתבה במקלדת לא תעבוד טוב — שלב ב׳: כפתור הקלטה + תמלול בשרת (מיטל) */
+  /* ===== דוח ביקור בהקלטה (מיטל, 8.10.26) =====
+     המפקח.ת מקליט.ה בדף מה היה בביקור (MediaRecorder) → transcribe בשרת של תובי (OpenAI) → הטקסט נכנס לתיבה →
+     report בשרת של תובי מסדר לשדות של "תשפ"ו - טופס פיקוח פדגוגי" במונדיי. אפשר גם להקליד. עורכים, ואז:
+     שמירה בתובה (bikurSave בשער → לשונית "ביקורים", ליד ביקורי המונדיי) · הורדת Excel למונדיי · ורשות: העברה לצ׳ק ליסט.
+     נפרד מהצ׳ק ליסט (מיטל: "צריך להפריד... כרגע זה לא ברור"): מקטע וכרטיס משלו בדשבורד, ותאריך משלו.
+     ההכתבה במקלדת לא עבדה (מיטל) — לכן הקלטה. הטיוטה (טקסט ודוח, לא השמע) נשמרת בדפדפן עד השמירה. */
   var REP_PRESENT = ['מנהל/ת בית הספר', 'רכז/ת פדגוגי/ת', 'רכז/ת חניכות', 'מת"לית', 'צוות הנהלה', 'אחר'];
   var REP_GOALS = ['ביקור שוטף', 'ועדה מלווה', 'סיור / אירוע / פרויקט', 'חניכות', 'ועדת התמדה / ועדת משמעת', 'נוכחות תלמידים', 'אחר'];
   var REP_TOPICS = ['הכרות וזהות מוסדית', 'מצבת תלמידים וגיוס תלמידים', 'נוכחות וביקור סדיר של תלמידים הורים', 'תוכניות עבודה', 'חניכות', 'פיתוח צוות', 'תצפיות בשיעורים', 'אחר'];
   /* נוכחים במונדיי → כפתורי הנוכחים בצ׳ק ליסט */
   var REP_ROLE_CK = { 'מנהל/ת בית הספר': 'מנהל.ת', 'רכז/ת פדגוגי/ת': 'רכז.ת פדגוגי.ת', 'רכז/ת חניכות': 'רכז.ת חניכות', 'מת"לית': 'מת״לית' };
   var REP_ERR = { short: 'ההכתבה קצרה מדי. כדאי לספר עוד קצת על הביקור.', noschool: 'אין לתובי נתונים על בית הספר הזה.',
-    badsession: 'החיבור פג. צריך להיכנס מחדש', nodata: 'נתוני הפיקוח לא נטענו כרגע. אפשר לנסות שוב בעוד רגע.' };
+    badsession: 'החיבור פג. צריך להיכנס מחדש', nodata: 'נתוני הפיקוח לא נטענו כרגע. אפשר לנסות שוב בעוד רגע.',
+    'no-stt-key': 'התמלול עוד לא מחובר. מיטל משלימה את ההגדרה.', sttfail: 'התמלול לא הצליח. ההקלטה עדיין כאן, אפשר לשלוח שוב.',
+    toolong: 'ההקלטה ארוכה מדי לשליחה אחת.', sttlimit: 'הגעת לתקרת דקות ההקלטה להיום.', badaudio: 'סוג ההקלטה לא נתמך בדפדפן הזה.', noaudio: 'ההקלטה ריקה.' };
+  var I_MIC = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
   var REP = {};   /* סמל → { date, text, st, msg, r, ck: {id: false = לא להוסיף}, saved } */
   function repKey(semel) { return 'revital.rep.' + semel; }
   function repGet(semel) {
@@ -1554,12 +1557,12 @@
   function repKeep(semel) {
     var x = REP[semel]; if (!x) return;
     try {
-      if (!x.text && !x.r) localStorage.removeItem(repKey(semel));
+      if (!x.text && !x.r && !x.date) localStorage.removeItem(repKey(semel));
       else localStorage.setItem(repKey(semel), JSON.stringify({ date: x.date, text: x.text, r: x.r, saved: x.saved }));
     } catch (e) {}
   }
-  /* הדוח הוא תמיד של הביקור שפתוח בצ׳ק ליסט. טיוטה מתאריך אחר — עוברת איתה (המפקח.ת מחליט.ה) */
-  function repDate(r) { return ckDraft(r).date; }
+  /* לדוח תאריך משלו (ברירת מחדל: היום) — לא תלוי בצ׳ק ליסט */
+  function repDate(r) { return repGet(r.s.semel).date || ckToday(); }
   function repPrincipal(r) {
     var b = (r.bik || []).filter(function (v) { return String(v['מנהל.ת'] || '').trim(); })[0];
     return b ? String(b['מנהל.ת']).trim() : principalOf(r).name || '';
@@ -1570,16 +1573,14 @@
     }).join('') + '</div>';
   }
   function repBody(r) {
-    if (ST.ck !== 'ok') return pending('ck');   /* התאריך והצ׳ק ליסט באים מאותו מקור — בלי זה הטיוטה של הצ׳ק ליסט נוצרת ריקה */
     var sm = esc(r.s.semel), x = repGet(r.s.semel), date = repDate(r);
-    var b = '<p class="small ckintro">אחרי הביקור לוחצים על <b>המיקרופון במקלדת</b> של הטלפון ומספרים מה היה: מי נכח, מה עלה, מה סוכם ומה הלאה. ' +
-      'תובי מסדר את זה לדוח בפורמט של טופס הביקור במונדיי, ומציע סימונים לצ׳ק ליסט. לפני השמירה אפשר לתקן הכול.</p>' +
-      '<div class="ckbar"><label>תאריך הביקור<input type="date" data-repdate="' + sm + '" value="' + esc(date) + '" max="' + ckToday() + '"></label>' +
-      '<span class="small">אותו תאריך כמו בצ׳ק ליסט</span></div>' +
+    var b = '<div class="ckbar"><label>תאריך הביקור<input type="date" data-repdate="' + sm + '" value="' + esc(date) + '" max="' + ckToday() + '"></label></div>' +
+      recHtml(sm, x) +
+      '<details class="reptype"' + (x.text ? ' open' : '') + '><summary>' + (x.text ? 'הטקסט של הביקור (אפשר לתקן)' : 'או להקליד במקום להקליט') + '</summary>' +
       '<textarea class="reptext" rows="7" maxlength="12000" data-ckf="rep-text" data-reptext="' + sm + '" placeholder="למשל: נפגשתי עם המנהלת ורכזת החניכות. דיברנו על השיבוץ בחניכות…">' + esc(x.text) + '</textarea>' +
-      '<div class="acts"><button type="button" class="btn primary sm" data-repgo="' + sm + '"' + (x.st === 'busy' ? ' disabled' : '') + '>' + I.doc +
-      (x.r ? 'תובי: לסדר מחדש מההכתבה' : 'תובי: הפוך לדוח ביקור') + '</button>' +
-      (x.st === 'busy' ? '<span class="small" aria-live="polite">תובי כותב את הדוח… (עד דקה)</span>' : '') +
+      '<div class="acts"><button type="button" class="btn sm" data-repgo="' + sm + '"' + (x.st === 'busy' ? ' disabled' : '') + '>' + I.doc +
+      (x.r ? 'תובי: לסדר מחדש מהטקסט' : 'תובי: הפוך לדוח ביקור') + '</button></div></details>' +
+      '<div class="acts">' + (x.st === 'busy' ? '<span class="small" aria-live="polite">תובי כותב את הדוח… (עד דקה)</span>' : '') +
       (x.st === 'err' ? '<span class="small repbad" aria-live="polite">' + esc(x.msg) + '</span>' : '') + '</div>';
     if (!x.r) return b;
     var R = x.r;
@@ -1599,19 +1600,20 @@
     var cks = (R.checklist || []).filter(function (c) { return ckItemText(c.id); });
     var steps = (R.steps || []).filter(function (s) { return s && s.t; });
     if (cks.length || steps.length) {
-      b += '<h4 class="subh">הצעות של תובי לצ׳ק ליסט</h4><p class="small">מסמנים מה להוסיף. סימון שכבר קיים בצ׳ק ליסט יוחלף.</p><ul class="repck">' +
+      b += '<details class="reptype repckbox"><summary>רשות: להעביר לצ׳ק ליסט של אותו ביקור (' + (cks.length + (steps.length ? 1 : 0)) + ')</summary>' +
+        '<p class="small">תובי זיהה בהקלטה סעיפים מהצ׳ק ליסט. מסמנים מה להעביר; סימון שכבר קיים בצ׳ק ליסט של ' + esc(fmtDate(date)) + ' יוחלף.</p><ul class="repck">' +
         cks.map(function (c) {
           return '<li><label><input type="checkbox" data-repck="' + esc(c.id) + '" data-repsemel="' + sm + '"' + (x.ck[c.id] === false ? '' : ' checked') + '> ' +
             tag(CK_ST[c.s][1], CK_ST[c.s][0]) + ' ' + esc(ckItemText(c.id)) + (c.n ? '<small>' + esc(c.n) + '</small>' : '') + '</label></li>';
         }).join('') + '</ul>' +
         (steps.length ? '<p class="small"><b>צעדי פעולה</b> (נכנסים רק אם בצ׳ק ליסט עוד אין):</p>' + ckStepsHtml(steps) : '') +
-        '<div class="acts"><button type="button" class="btn sm" data-repckapply="' + sm + '">' + I.check + 'הוספה לצ׳ק ליסט</button></div>';
+        '<div class="acts"><button type="button" class="btn sm" data-repckapply="' + sm + '">' + I.check + 'העברה לצ׳ק ליסט</button></div></details>';
     }
     return b + '</div>';
   }
   function repSec(r) {
     var x = repGet(r.s.semel);
-    return sec('rep', I.doc, 'דוח ביקור בהכתבה', x.saved ? 'נשמר ' + esc(x.saved) : x.r ? tag('warn', 'טיוטה, עוד לא נשמרה') : 'מכתיבים, ותובי מסדר לפורמט של המונדיי', repBody(r));
+    return sec('rep', I_MIC, 'דוח ביקור בהקלטה', REC.semel === String(r.s.semel) && REC.st === 'rec' ? tag('bad', 'מקליט') : x.saved ? 'נשמר ' + esc(x.saved) : x.r ? tag('warn', 'טיוטה, עוד לא נשמרה') : 'מקליטים, ותובי כותב דוח בפורמט של המונדיי', repBody(r));
   }
   function repInput(el) {
     var semel = el.getAttribute('data-reptext') || el.getAttribute('data-repsemel'), x = repGet(semel);
@@ -1631,7 +1633,7 @@
     if (!r || x.st === 'busy') return;
     if (String(x.text).trim().length < 30) { x.st = 'err'; x.msg = REP_ERR.short; return render(); }
     if (!window.TOVI_POST) { x.st = 'err'; x.msg = 'תובי לא נטען בדף. רענון הדף ינסה שוב.'; return render(); }
-    if (x.r && !confirm('הדוח שבעריכה יוחלף בדוח חדש מההכתבה. להמשיך?')) return;
+    if (x.r && !confirm('הדוח שבעריכה יוחלף בדוח חדש מהטקסט של הביקור. להמשיך?')) return;
     x.st = 'busy'; x.msg = ''; render();
     window.TOVI_POST({ action: 'report', semel: String(semel), date: repDate(r), sup: SUPNAME || (ME && ME.name) || '', text: x.text }).then(function (d) {
       if (d && d.ok && d.limited) throw new Error(d.message);
@@ -1640,7 +1642,7 @@
       repKeep(semel);
     }).catch(function (err) {
       x.st = 'err'; x.msg = String(err && err.message || '') || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.';
-      if (/fetch|network|json/i.test(x.msg)) x.msg = 'אין חיבור לתובי כרגע. ההכתבה שמורה, אפשר לנסות שוב.';
+      if (/fetch|network|json/i.test(x.msg)) x.msg = 'אין חיבור לתובי כרגע. הטקסט שמור, אפשר לנסות שוב.';
     }).then(function () { OPENSEC.rep = true; render(); });
   }
   /* השדות כפי שהם בטופס במונדיי. נוכחים שלא ברשימה הנפתחת של המונדיי — שורה בראש הסיכום */
@@ -1719,7 +1721,11 @@
   /* הצעות תובי → הצ׳ק ליסט של אותו ביקור. צעדי פעולה ונוכחים — רק אם עוד ריקים בצ׳ק ליסט */
   function repCkApply(semel) {
     var r = BYSEMEL[semel], x = repGet(semel); if (!r || !x.r) return;
-    var d = ckDraft(r), n = 0;
+    if (ST.ck !== 'ok') { toast('הצ׳ק ליסט לא נטען כרגע. אפשר לנסות שוב בעוד רגע.'); return; }
+    /* לצ׳ק ליסט של אותו תאריך כמו הדוח. צ׳ק ליסט פתוח בתאריך אחר — קודם נשמר מה שבדרך */
+    var date = repDate(r);
+    if (CKD[semel] && CKD[semel].date !== date && CK_T[semel]) ckSave(semel);
+    var d = CKD[semel] && CKD[semel].date === date ? CKD[semel] : ckLoad(r, date), n = 0;
     (x.r.checklist || []).forEach(function (c) {
       if (x.ck[c.id] === false || !ckItemText(c.id)) return;
       var m = d.marks[c.id] || {};
@@ -1737,8 +1743,111 @@
     }
     ckLater(semel);
     OPENSEC.ck = true;
-    toast(n ? (n === 1 ? 'סעיף אחד נוסף לצ׳ק ליסט' : n + ' סעיפים נוספו לצ׳ק ליסט') : 'הצ׳ק ליסט עודכן');
+    toast((n ? (n === 1 ? 'סעיף אחד הועבר' : n + ' סעיפים הועברו') : 'הצ׳ק ליסט עודכן') + ' · צ׳ק ליסט ' + fmtDate(date));
     render();
+  }
+
+  /* ----- הקלטה (MediaRecorder) — אחת בכל רגע. השמע נשאר רק בזיכרון של הדף עד השליחה ----- */
+  var REC = { semel: '', st: '' };   /* st: '' | rec | done | send */
+  var REC_MAX = 35 * 60;             /* 35 דקות — מעבר לזה הקובץ גדול מדי לשליחה אחת */
+  function recMime() {
+    var c = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4;codecs=mp4a.40.2', 'audio/mp4'];
+    for (var i = 0; i < c.length; i++) if (window.MediaRecorder && MediaRecorder.isTypeSupported && MediaRecorder.isTypeSupported(c[i])) return c[i];
+    return '';
+  }
+  function recClock(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); }
+  function recHtml(sm, x) {
+    var mine = REC.semel === sm, other = REC.semel && !mine && (REC.st === 'rec' || REC.st === 'send');
+    if (!window.MediaRecorder || !navigator.mediaDevices) return '<div class="repwarn">הדפדפן הזה לא מאפשר הקלטה. אפשר להקליד למטה, או לפתוח את תובה ב-Chrome או ב-Safari.</div>';
+    if (other) return '<div class="small">יש הקלטה פעילה בבית ספר אחר.</div>';
+    if (mine && REC.st === 'rec') return '<div class="recbox on"><span class="recdot" aria-hidden="true"></span><b id="recT">' + recClock((Date.now() - REC.t0) / 1000) + '</b>' +
+      '<span class="small">מקליט… להשאיר את המסך דלוק</span><button type="button" class="btn primary" data-recstop="' + sm + '">סיום הקלטה</button></div>';
+    if (mine && REC.st === 'send') return '<div class="recbox"><span class="small" aria-live="polite">' + esc(REC.msg || 'מתמלל את ההקלטה…') + '</span></div>';
+    if (mine && REC.st === 'done') return '<div class="recbox done"><b>הקלטה של ' + recClock(REC.secs) + '</b><audio controls preload="metadata" src="' + REC.url + '"></audio>' +
+      '<div class="acts"><button type="button" class="btn primary" data-recsend="' + sm + '">' + I_MIC + 'שליחה לתובי</button>' +
+      '<button type="button" class="btn sm" data-recdrop="' + sm + '">מחיקה והקלטה מחדש</button></div></div>';
+    return '<div class="recbox"><button type="button" class="btn primary recgo" data-recstart="' + sm + '">' + I_MIC + (x.text ? 'הקלטה נוספת' : 'התחלת הקלטה') + '</button>' +
+      '<span class="small">' + (x.text ? 'מה שיוקלט יתווסף לטקסט הקיים.' : 'מספרים מה היה: מי נכח, מה עלה, מה סוכם ומה הלאה. בסיום לוחצים "סיום הקלטה" ושולחים לתובי.') + '</span></div>';
+  }
+  function recClear() {
+    if (REC.timer) clearInterval(REC.timer);
+    if (REC.stream) REC.stream.getTracks().forEach(function (t) { t.stop(); });
+    if (REC.wake) { try { REC.wake.release(); } catch (e) {} }
+    if (REC.url) { try { URL.revokeObjectURL(REC.url); } catch (e) {} }
+    REC = { semel: '', st: '' };
+  }
+  function recStart(semel) {
+    if (REC.st === 'rec' || REC.st === 'send') return;
+    if (REC.st === 'done' && !confirm('יש הקלטה שעוד לא נשלחה. למחוק אותה ולהקליט מחדש?')) return;
+    recClear();
+    var mime = recMime();
+    if (!mime) { toast('הדפדפן הזה לא מאפשר הקלטה. אפשר להקליד.'); return; }
+    navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } }).then(function (stream) {
+      var mr = new MediaRecorder(stream, { mimeType: mime, audioBitsPerSecond: 32000 }), chunks = [];
+      REC = { semel: String(semel), st: 'rec', stream: stream, mr: mr, mime: mime, t0: Date.now() };
+      mr.ondataavailable = function (e) { if (e.data && e.data.size) chunks.push(e.data); };
+      mr.onstop = function () {
+        var secs = (Date.now() - REC.t0) / 1000;
+        if (REC.timer) clearInterval(REC.timer);
+        stream.getTracks().forEach(function (t) { t.stop(); });
+        if (REC.wake) { try { REC.wake.release(); } catch (e) {} REC.wake = null; }
+        REC.blob = new Blob(chunks, { type: mime.split(';')[0] });
+        REC.secs = secs; REC.st = 'done'; REC.url = URL.createObjectURL(REC.blob);
+        OPENSEC.rep = true; render();
+      };
+      mr.start(1000);
+      REC.timer = setInterval(function () {
+        var t = (Date.now() - REC.t0) / 1000, el = $('recT');
+        if (el) el.textContent = recClock(t);
+        if (t >= REC_MAX && REC.mr && REC.mr.state === 'recording') { toast('הגענו ל-35 דקות. ההקלטה נעצרה.'); REC.mr.stop(); }
+      }, 1000);
+      /* מסך שנכבה עוצר את ההקלטה בטלפון — מבקשים להשאיר אותו דלוק */
+      if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then(function (w) { REC.wake = w; }, function () {});
+      OPENSEC.rep = true; render();
+    }, function () { toast('אין גישה למיקרופון. צריך לאשר לדפדפן להשתמש במיקרופון.'); });
+  }
+  function recStop() { if (REC.mr && REC.mr.state === 'recording') REC.mr.stop(); }
+  function recSend(semel) {
+    var r = BYSEMEL[semel], x = repGet(semel);
+    if (!r || REC.st !== 'done' || REC.semel !== String(semel)) return;
+    if (!window.TOVI_POST) { toast('תובי לא נטען בדף. רענון הדף ינסה שוב.'); return; }
+    if (REC.secs < 3) { toast('ההקלטה קצרה מדי.'); return; }
+    REC.st = 'send'; REC.msg = 'מתמלל את ההקלטה… (עד דקה)'; x.st = ''; render();
+    var fr = new FileReader();
+    fr.onload = function () {
+      var b64 = String(fr.result || '').replace(/^data:[^,]*,/, '');
+      window.TOVI_POST({ action: 'transcribe', semel: String(semel), audio: b64, mime: REC.mime, secs: Math.round(REC.secs) }).then(function (d) {
+        if (!d || !d.ok || !d.text) throw new Error(REP_ERR[d && d.error] || REP_ERR.sttfail);
+        x.text = (String(x.text || '').trim() ? String(x.text).trim() + '\n\n' : '') + d.text;
+        repKeep(semel);
+        recClear();
+        repGo(semel);
+      }).catch(function (err) {
+        var m = String(err && err.message || '');
+        if (/fetch|network|json/i.test(m)) m = 'אין חיבור לתובי כרגע. ההקלטה עדיין כאן, אפשר לשלוח שוב.';
+        REC.st = 'done'; x.st = 'err'; x.msg = m || REP_ERR.sttfail; render();
+      });
+    };
+    fr.onerror = function () { REC.st = 'done'; toast('לא הצלחתי לקרוא את ההקלטה.'); render(); };
+    fr.readAsDataURL(REC.blob);
+  }
+  window.addEventListener('beforeunload', function (e) {
+    if (REC.st === 'rec' || REC.st === 'done' || REC.st === 'send') { e.preventDefault(); e.returnValue = ''; }
+  });
+  /* כרטיס נפרד בדשבורד (מיטל: "להפריד בין הצ׳ק ליסט להקלטה"). בחירת בית הספר נשמרת בדפדפן */
+  var DRP = '';
+  try { DRP = String(localStorage.getItem('revital.drp') || ''); } catch (e) {}
+  function dashRep() {
+    var list = SCHOOLS.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
+    if (DRP && !list.some(function (s) { return String(s.semel) === DRP; })) DRP = '';
+    var r = DRP ? BYSEMEL[DRP] : null;
+    return '<div class="card dck drp" id="dashRep"><h2 class="h2">' + I_MIC + 'דוח ביקור בהקלטה</h2>' +
+      '<div class="meta">אחרי הביקור: מקליטים מה היה, ותובי כותב דוח בפורמט של טופס הביקור במונדיי.</div><div class="dckpick">' +
+      '<label>בית ספר<select id="drpSchool"><option value="">בחירת בית ספר…</option>' + list.map(function (s) {
+        return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DRP ? ' selected' : '') + '>' + esc(s.name) + '</option>';
+      }).join('') + '</select></label>' +
+      (r ? '<button type="button" class="btn sm" data-go="s:' + esc(DRP) + '&t=vis">לעמוד בית הספר ←</button>' : '') + '</div>' +
+      (r ? '<div class="dckbody">' + repBody(r) + '</div>' : '') + '</div>';
   }
 
   /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
@@ -2854,6 +2963,12 @@
     var ckc = t.closest('[data-ckcopy]');
     if (ckc) { copy(ckText(ckc.getAttribute('data-ckcopy'))); return; }
     /* דוח ביקור בהכתבה */
+    var rcs = t.closest('[data-recstart]');
+    if (rcs) { recStart(rcs.getAttribute('data-recstart')); return; }
+    if (t.closest('[data-recstop]')) { recStop(); return; }
+    var rcd = t.closest('[data-recsend]');
+    if (rcd) { recSend(rcd.getAttribute('data-recsend')); return; }
+    if (t.closest('[data-recdrop]')) { if (confirm('למחוק את ההקלטה?')) { recClear(); render(); } return; }
     var rpc = t.closest('[data-repchip]');
     if (rpc) { repChip(rpc); return; }
     var rpg = t.closest('[data-repgo]');
@@ -2929,7 +3044,12 @@
     if (e.target && e.target.id === 'dckSup') { DCK.sup = e.target.value; DCK.semel = ''; dckKeep(); dashboard(); return; }
     if (e.target && e.target.id === 'dckSchool') { DCK.semel = e.target.value; dckKeep(); dashboard(); return; }
     if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repck')) { repGet(e.target.getAttribute('data-repsemel')).ck[e.target.getAttribute('data-repck')] = e.target.checked; return; }
-    if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repdate')) { ckSwitch(e.target.getAttribute('data-repdate'), e.target.value); return; }
+    if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repdate')) {
+      var rds = e.target.getAttribute('data-repdate');
+      if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { repGet(rds).date = e.target.value; repKeep(rds); }
+      return;
+    }
+    if (e.target && e.target.id === 'drpSchool') { DRP = e.target.value; try { localStorage.setItem('revital.drp', DRP); } catch (err) {} dashboard(); return; }
     if (e.target && e.target.id === 'ckDate') ckSwitch(e.target.getAttribute('data-cksemel'), e.target.value);
     else if (e.target && e.target.type === 'date' && e.target.hasAttribute('data-ckstep')) ckInput(e.target);
   });
