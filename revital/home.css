@@ -462,3 +462,38 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .list.wait .wt small{color:var(--muted);font-size:13px}
 .list.wait .li>.btn{flex:0 0 auto}
 @media (max-width:640px){.list.wait .li>.btn{width:100%;justify-content:center}}
+/* צ׳ק ליסט ביקור (8.10.26) — בנייד: הסעיף בשורה, הכפתורים מתחתיו בגודל אצבע */
+.ckintro{margin:0 0 10px}
+.ckbar{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 16px;margin-bottom:6px;padding:10px 12px;background:var(--paper);border-radius:12px}
+.ckbar label{display:grid;gap:4px;font-weight:700;font-size:13.5px}
+.ckbar input,.ckstep input{font:inherit;font-size:15px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:#fff;color:var(--ink)}
+.ckprog{font-weight:700;color:var(--navy)}
+.ckmore{margin-top:18px}
+.ckl{list-style:none;margin:0;padding:0}
+.ckl li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.ckq{font-size:14.5px}
+.ckb{display:flex;gap:6px;flex-wrap:wrap}
+.ckv{border:1px solid var(--line);background:#fff;color:var(--muted);font:inherit;font-size:13px;font-weight:700;border-radius:99px;padding:5px 12px;min-height:36px;cursor:pointer}
+.ckv:hover{border-color:var(--brand)}
+.ck-y[aria-pressed=true]{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.ck-p[aria-pressed=true]{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.ck-n[aria-pressed=true]{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.cknb{border-style:dashed}
+.cknote{grid-column:1/-1;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--paper);color:var(--ink)}
+.ckstep{margin:6px 0 12px;padding-inline-start:22px;display:grid;gap:8px}
+.ckstep li{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,150px);gap:6px}
+.ckstep input{min-width:0;width:100%}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.ckold{border:1px solid var(--line);border-radius:12px;margin:6px 0;background:#fff}
+.ckold>summary{cursor:pointer;padding:10px 12px;font-size:14px}
+.ckob{padding:0 12px 12px}
+.ckpast,.cksteps{margin:4px 0 8px;padding-inline-start:20px}
+.ckpast li,.cksteps li{margin:4px 0;font-size:14px}
+.ckpast small,.cksteps small{display:block;color:var(--muted);font-size:13px}
+@media (max-width:640px){
+  .ckl li{grid-template-columns:1fr}
+  .ckv{flex:1 1 0;min-height:42px}
+  .ckstep{padding-inline-start:18px;gap:16px}
+  .ckstep li{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .ckstep li input:first-child{grid-column:1/-1}
+}
