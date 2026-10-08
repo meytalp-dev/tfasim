@@ -497,3 +497,17 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .ckstep li{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .ckstep li input:first-child{grid-column:1/-1}
 }
+/* צ׳ק ליסט בדשבורד (8.10.26) — כרטיס בולט בראש הדף */
+.dck{border:2px solid var(--brand);background:linear-gradient(180deg,var(--blue-soft),#fff 120px)}
+.dck .h2{display:flex;align-items:center;gap:8px}
+.dck .h2 svg{width:20px;height:20px;color:var(--blue)}
+.dckpick{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:10px 0 4px}
+.dckpick label{display:grid;gap:4px;font-weight:700;font-size:13.5px;flex:1 1 220px;max-width:340px}
+.dckpick select{font:inherit;font-size:15px;font-weight:400;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:#fff;color:var(--ink);min-height:44px}
+.dckbody{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+@media (max-width:640px){ .dckpick label{max-width:none} .dckpick .btn{width:100%;justify-content:center} }
+.ckpres{margin:10px 0 4px}
+.ckpl{display:block;font-weight:700;font-size:13.5px;margin-bottom:6px}
+.ckpres .cknote{display:block;width:100%;margin-top:8px}
+.ck-r[aria-pressed=true]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
+@media (max-width:640px){ .ck-r{flex:1 1 calc(50% - 6px)} }
