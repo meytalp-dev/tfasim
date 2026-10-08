@@ -33,13 +33,31 @@
 .tovi-panel>header svg{width:18px;height:18px}
 .tovi-panel>header b{font:700 16px Rubik,sans-serif}
 .tovi-panel>header small{color:#a9bbdf;font-size:12.5px}
-.tovi-x{margin-inline-start:auto;border:0;background:none;color:#fff;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px}
+.tovi-new{margin-inline-start:auto;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(255,255,255,.35);background:none;color:#fff;font:inherit;font-size:13px;font-weight:700;border-radius:99px;padding:6px 12px;min-height:36px;cursor:pointer;white-space:nowrap;flex:none}
+.tovi-new[hidden]{display:none}
+.tovi-new svg{width:15px;height:15px}
+.tovi-new:hover{background:rgba(255,255,255,.12)}
+.tovi-new[hidden]+.tovi-x{margin-inline-start:auto}
+.tovi-x{border:0;background:none;color:#fff;width:44px;height:44px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px}
 .tovi-x svg{width:20px;height:20px}
+.tovi-pick{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:#fff;font-size:13.5px}
+.tovi-pick label{font-weight:700;color:var(--navy);white-space:nowrap}
+.tovi-pick select{flex:1;min-width:0;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:6px 10px;background:var(--paper);min-height:38px}
 .tovi-log{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px;background:var(--bg);display:flex;flex-direction:column;gap:10px}
 .tovi-hi p{margin:0 0 10px;font-size:14.5px;color:var(--muted)}
 .tovi-ex{display:flex;flex-direction:column;gap:6px}
 .tovi-ex button{text-align:right;border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font:inherit;font-size:14px;color:var(--navy);cursor:pointer;min-height:44px}
 .tovi-ex button:hover{border-color:var(--blue)}
+.tovi-lbl{font-weight:700;color:var(--navy)!important;font-size:13.5px!important;margin:4px 0 6px!important}
+.tovi-topics{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.tovi-topics button{border:1px solid var(--line);background:#fff;color:var(--ink);font:inherit;font-size:13.5px;font-weight:600;border-radius:99px;padding:5px 12px;min-height:36px;cursor:pointer}
+.tovi-topics button[aria-selected=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+.tovi-tip{font-size:12.5px!important;margin:10px 0 0!important}
+/* הדפסה / העתקה / מייל — בתדריך ומתחת לכל תשובה */
+.tovi-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tovi-acts .btn svg{width:14px;height:14px}
+.tovi-m .tovi-acts{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.tovi-m .tovi-acts .btn{min-height:32px;padding:4px 9px;font-size:12.5px}
 .tovi-m{max-width:90%;border-radius:14px;padding:9px 13px;font-size:14.5px;line-height:1.5}
 .tovi-m p{margin:0 0 6px}.tovi-m p:last-child{margin:0}
 .tovi-m ul{margin:4px 0;padding-inline-start:18px}
@@ -58,5 +76,16 @@
   .tovi-fab{left:12px;bottom:12px;padding:10px 14px;min-height:46px}
   .tovi-panel{left:0;bottom:0;width:100vw;max-width:100vw;height:100dvh;border-radius:0;border:0}
   body.tovi-on{overflow:hidden}
+  .tovi-panel>header small{display:none}
 }
-@media print{.tovi-fab,.tovi-panel,.tovi-call{display:none!important}}
+@media print{.tovi-fab,.tovi-panel,.tovi-call,.tovi-acts{display:none!important}}
+/* הדפסת תדריך: רק #tovi-print */
+#tovi-print{display:none}
+@media print{
+  body.tovi-printing>*:not(#tovi-print){display:none!important}
+  body.tovi-printing #tovi-print{display:block;font-size:13px;line-height:1.55;color:#000}
+  #tovi-print h1{font:700 19px Rubik,sans-serif;margin:0 0 4px}
+  #tovi-print h3{font:700 14.5px Rubik,sans-serif;margin:14px 0 4px}
+  #tovi-print ul{margin:0;padding-inline-start:20px}
+  #tovi-print .tovi-src{border:0;background:none;padding:0;font-size:11px}
+}
