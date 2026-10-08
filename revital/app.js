@@ -1052,7 +1052,7 @@
   }
   /* צ׳ק ליסט: נתון שנטען באמצע הקלדה מצייר את הדף מחדש — מחזירים את הפוקוס לאותו שדה */
   function setMainKeepCk(h) {
-    var ae = document.activeElement, ckf = ae && ae.getAttribute && ae.getAttribute('data-ckf'), cpos = ckf && ae.type === 'text' ? ae.selectionStart : null;
+    var ae = document.activeElement, ckf = ae && ae.getAttribute && ae.getAttribute('data-ckf'), cpos = ckf && (ae.type === 'text' || ae.type === 'textarea') ? ae.selectionStart : null;
     $('main').innerHTML = h;
     if (ckf) {
       var back = document.querySelector('[data-ckf="' + ckf + '"]');
@@ -1231,7 +1231,7 @@
       map: K.yaad + K.mipui,
       vaad: VD.body,
       akl: AK.body,
-      vis: ckSec(r) + '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
+      vis: ckSec(r) + repSec(r) + '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
       sal: SL.body + (r.sal ? '<div data-tovi-insight="sal:' + esc(s.semel) + '"></div>' : ''),   /* תובי: הסל מול הצרכים (tovi.js) */
       lrn: P.megamot + P.hisht + P.menor
     };
@@ -1409,8 +1409,8 @@
       .slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
     if (DCK.semel && !list.some(function (s) { return String(s.semel) === DCK.semel; })) DCK.semel = '';
     var r = DCK.semel ? BYSEMEL[DCK.semel] : null;
-    var h = '<div class="card dck" id="dashCk"><h2 class="h2">' + I.check + 'צ׳ק ליסט ביקור</h2>' +
-      '<div class="meta">בוחרים בית ספר ומסמנים תוך כדי הביקור. הכול נשמר לבד.</div><div class="dckpick">' +
+    var h = '<div class="card dck" id="dashCk"><h2 class="h2">' + I.check + 'צ׳ק ליסט ודוח ביקור</h2>' +
+      '<div class="meta">בוחרים בית ספר. בזמן הביקור מסמנים את הצ׳ק ליסט, ואחריו מכתיבים דוח ותובי מסדר אותו. הכול נשמר.</div><div class="dckpick">' +
       (admin ? '<label>מפקח.ת<select id="dckSup"><option value="">כל המפקחים</option>' + sups.map(function (n) {
         return '<option value="' + esc(n) + '"' + (n === DCK.sup ? ' selected' : '') + '>' + esc(n) + '</option>';
       }).join('') + '</select></label>' : '') +
@@ -1418,7 +1418,8 @@
         return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DCK.semel ? ' selected' : '') + '>' + esc(s.name) + '</option>';
       }).join('') + '</select></label>' +
       (r ? '<button type="button" class="btn sm" data-go="s:' + esc(DCK.semel) + '&t=vis">לעמוד בית הספר ←</button>' : '') + '</div>';
-    return h + (r ? '<div class="dckbody">' + ckBody(r) + '</div>' : '') + '</div>';
+    /* דוח ביקור בהכתבה (8.10.26, מיטל: "גם לדשבורד במקום בולט") — מקופל, מתחת לבחירת בית הספר */
+    return h + (r ? '<div class="dckbody">' + repSec(r) + ckBody(r) + '</div>' : '') + '</div>';
   }
   /* שמירה: מחכים שנייה וחצי אחרי השינוי האחרון; שמירה אחת בכל רגע לכל בית ספר */
   function ckLater(semel) {
@@ -1526,6 +1527,218 @@
     if (!w) { toast('הדפדפן חסם חלון חדש'); return; }
     w.document.open(); w.document.write(h); w.document.close();
     setTimeout(function () { w.focus(); w.print(); }, 300);
+  }
+
+  /* ===== דוח ביקור מהכתבה (מיטל, 8.10.26) =====
+     המפקח.ת לוחצ.ת על המיקרופון במקלדת של הטלפון ומספר.ת מה היה בביקור. תובי (report בשרת של תובי) מסדר
+     את זה לשדות של "תשפ"ו - טופס פיקוח פדגוגי" במונדיי ומציע סימונים לצ׳ק ליסט. עורכים, ואז:
+     שמירה בתובה (bikurSave בשער → לשונית "ביקורים", ליד ביקורי המונדיי) · הורדת Excel למונדיי · הוספה לצ׳ק ליסט.
+     התאריך = התאריך של הצ׳ק ליסט (אותו ביקור). הטיוטה נשמרת בדפדפן עד השמירה.
+     אם ההכתבה במקלדת לא תעבוד טוב — שלב ב׳: כפתור הקלטה + תמלול בשרת (מיטל) */
+  var REP_PRESENT = ['מנהל/ת בית הספר', 'רכז/ת פדגוגי/ת', 'רכז/ת חניכות', 'מת"לית', 'צוות הנהלה', 'אחר'];
+  var REP_GOALS = ['ביקור שוטף', 'ועדה מלווה', 'סיור / אירוע / פרויקט', 'חניכות', 'ועדת התמדה / ועדת משמעת', 'נוכחות תלמידים', 'אחר'];
+  var REP_TOPICS = ['הכרות וזהות מוסדית', 'מצבת תלמידים וגיוס תלמידים', 'נוכחות וביקור סדיר של תלמידים הורים', 'תוכניות עבודה', 'חניכות', 'פיתוח צוות', 'תצפיות בשיעורים', 'אחר'];
+  /* נוכחים במונדיי → כפתורי הנוכחים בצ׳ק ליסט */
+  var REP_ROLE_CK = { 'מנהל/ת בית הספר': 'מנהל.ת', 'רכז/ת פדגוגי/ת': 'רכז.ת פדגוגי.ת', 'רכז/ת חניכות': 'רכז.ת חניכות', 'מת"לית': 'מת״לית' };
+  var REP_ERR = { short: 'ההכתבה קצרה מדי. כדאי לספר עוד קצת על הביקור.', noschool: 'אין לתובי נתונים על בית הספר הזה.',
+    badsession: 'החיבור פג. צריך להיכנס מחדש', nodata: 'נתוני הפיקוח לא נטענו כרגע. אפשר לנסות שוב בעוד רגע.' };
+  var REP = {};   /* סמל → { date, text, st, msg, r, ck: {id: false = לא להוסיף}, saved } */
+  function repKey(semel) { return 'revital.rep.' + semel; }
+  function repGet(semel) {
+    if (REP[semel]) return REP[semel];
+    var x = null;
+    try { x = JSON.parse(localStorage.getItem(repKey(semel)) || 'null'); } catch (e) {}
+    REP[semel] = x && typeof x === 'object' ? { date: x.date || '', text: String(x.text || ''), r: x.r || null, saved: x.saved || '', ck: {}, st: '' } : { date: '', text: '', r: null, saved: '', ck: {}, st: '' };
+    return REP[semel];
+  }
+  function repKeep(semel) {
+    var x = REP[semel]; if (!x) return;
+    try {
+      if (!x.text && !x.r) localStorage.removeItem(repKey(semel));
+      else localStorage.setItem(repKey(semel), JSON.stringify({ date: x.date, text: x.text, r: x.r, saved: x.saved }));
+    } catch (e) {}
+  }
+  /* הדוח הוא תמיד של הביקור שפתוח בצ׳ק ליסט. טיוטה מתאריך אחר — עוברת איתה (המפקח.ת מחליט.ה) */
+  function repDate(r) { return ckDraft(r).date; }
+  function repPrincipal(r) {
+    var b = (r.bik || []).filter(function (v) { return String(v['מנהל.ת'] || '').trim(); })[0];
+    return b ? String(b['מנהל.ת']).trim() : principalOf(r).name || '';
+  }
+  function repChips(semel, f, list, sel) {
+    return '<div class="ckb">' + list.map(function (x) {
+      return '<button type="button" class="ckv ck-r" data-repchip="' + f + '" data-v="' + esc(x) + '" data-repsemel="' + semel + '" aria-pressed="' + (sel.indexOf(x) > -1) + '">' + esc(x) + '</button>';
+    }).join('') + '</div>';
+  }
+  function repBody(r) {
+    if (ST.ck !== 'ok') return pending('ck');   /* התאריך והצ׳ק ליסט באים מאותו מקור — בלי זה הטיוטה של הצ׳ק ליסט נוצרת ריקה */
+    var sm = esc(r.s.semel), x = repGet(r.s.semel), date = repDate(r);
+    var b = '<p class="small ckintro">אחרי הביקור לוחצים על <b>המיקרופון במקלדת</b> של הטלפון ומספרים מה היה: מי נכח, מה עלה, מה סוכם ומה הלאה. ' +
+      'תובי מסדר את זה לדוח בפורמט של טופס הביקור במונדיי, ומציע סימונים לצ׳ק ליסט. לפני השמירה אפשר לתקן הכול.</p>' +
+      '<div class="ckbar"><label>תאריך הביקור<input type="date" data-repdate="' + sm + '" value="' + esc(date) + '" max="' + ckToday() + '"></label>' +
+      '<span class="small">אותו תאריך כמו בצ׳ק ליסט</span></div>' +
+      '<textarea class="reptext" rows="7" maxlength="12000" data-ckf="rep-text" data-reptext="' + sm + '" placeholder="למשל: נפגשתי עם המנהלת ורכזת החניכות. דיברנו על השיבוץ בחניכות…">' + esc(x.text) + '</textarea>' +
+      '<div class="acts"><button type="button" class="btn primary sm" data-repgo="' + sm + '"' + (x.st === 'busy' ? ' disabled' : '') + '>' + I.doc +
+      (x.r ? 'תובי: לסדר מחדש מההכתבה' : 'תובי: הפוך לדוח ביקור') + '</button>' +
+      (x.st === 'busy' ? '<span class="small" aria-live="polite">תובי כותב את הדוח… (עד דקה)</span>' : '') +
+      (x.st === 'err' ? '<span class="small repbad" aria-live="polite">' + esc(x.msg) + '</span>' : '') + '</div>';
+    if (!x.r) return b;
+    var R = x.r;
+    b += '<div class="repout"><h4 class="subh">הדוח לטופס במונדיי</h4>' +
+      ((R.unclear || []).length ? '<div class="repwarn"><b>כדאי להשלים:</b><ul>' + R.unclear.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul></div>' : '') +
+      '<label class="repl">שם מנהל.ת בית הספר<input type="text" maxlength="120" data-ckf="rep-pr" data-repf="principal" data-repsemel="' + sm + '" value="' + esc(R.principal || '') + '"></label>' +
+      '<span class="ckpl">נוכחים בביקור</span>' + repChips(sm, 'present', REP_PRESENT, R.present || []) +
+      '<input type="text" class="cknote repother" maxlength="300" placeholder="נוכחים נוספים (שמות או תפקידים)" data-ckf="rep-po" data-repf="presentOther" data-repsemel="' + sm + '" value="' + esc(R.presentOther || '') + '">' +
+      '<span class="ckpl">מטרות הביקור</span>' + repChips(sm, 'goals', REP_GOALS, R.goals || []) +
+      '<span class="ckpl">נושאים שעלו בביקור</span>' + repChips(sm, 'topics', REP_TOPICS, R.topics || []) +
+      '<label class="repl">סיכום הביקור<textarea rows="9" data-ckf="rep-sum" data-repf="summary" data-repsemel="' + sm + '">' + esc(R.summary || '') + '</textarea></label>' +
+      '<label class="repl">פעולות נדרשות ונושאים למעקב<textarea rows="4" data-ckf="rep-fu" data-repf="followup" data-repsemel="' + sm + '">' + esc(R.followup || '') + '</textarea></label>' +
+      '<div class="acts"><button type="button" class="btn primary sm" data-repsave="' + sm + '"' + (x.st === 'saving' ? ' disabled' : '') + '>' + I.check + (x.st === 'saving' ? 'שומר…' : 'שמירה בתובה') + '</button>' +
+      '<button type="button" class="btn sm" data-repxl="' + sm + '">' + I.doc + 'הורדה למונדיי (Excel)</button>' +
+      '<button type="button" class="btn sm" data-repcopy="' + sm + '">' + I.doc + 'העתקה</button>' +
+      (x.saved ? '<span class="small">נשמר בתובה ' + esc(x.saved) + ' · מופיע ב"ביקורי פיקוח"</span>' : '') + '</div>';
+    var cks = (R.checklist || []).filter(function (c) { return ckItemText(c.id); });
+    var steps = (R.steps || []).filter(function (s) { return s && s.t; });
+    if (cks.length || steps.length) {
+      b += '<h4 class="subh">הצעות של תובי לצ׳ק ליסט</h4><p class="small">מסמנים מה להוסיף. סימון שכבר קיים בצ׳ק ליסט יוחלף.</p><ul class="repck">' +
+        cks.map(function (c) {
+          return '<li><label><input type="checkbox" data-repck="' + esc(c.id) + '" data-repsemel="' + sm + '"' + (x.ck[c.id] === false ? '' : ' checked') + '> ' +
+            tag(CK_ST[c.s][1], CK_ST[c.s][0]) + ' ' + esc(ckItemText(c.id)) + (c.n ? '<small>' + esc(c.n) + '</small>' : '') + '</label></li>';
+        }).join('') + '</ul>' +
+        (steps.length ? '<p class="small"><b>צעדי פעולה</b> (נכנסים רק אם בצ׳ק ליסט עוד אין):</p>' + ckStepsHtml(steps) : '') +
+        '<div class="acts"><button type="button" class="btn sm" data-repckapply="' + sm + '">' + I.check + 'הוספה לצ׳ק ליסט</button></div>';
+    }
+    return b + '</div>';
+  }
+  function repSec(r) {
+    var x = repGet(r.s.semel);
+    return sec('rep', I.doc, 'דוח ביקור בהכתבה', x.saved ? 'נשמר ' + esc(x.saved) : x.r ? tag('warn', 'טיוטה, עוד לא נשמרה') : 'מכתיבים, ותובי מסדר לפורמט של המונדיי', repBody(r));
+  }
+  function repInput(el) {
+    var semel = el.getAttribute('data-reptext') || el.getAttribute('data-repsemel'), x = repGet(semel);
+    if (el.hasAttribute('data-reptext')) x.text = el.value;
+    else if (x.r) x.r[el.getAttribute('data-repf')] = el.value;
+    repKeep(semel);
+  }
+  function repChip(btn) {
+    var semel = btn.getAttribute('data-repsemel'), x = repGet(semel); if (!x.r) return;
+    var f = btn.getAttribute('data-repchip'), v = btn.getAttribute('data-v'), a = (x.r[f] = x.r[f] || []), i = a.indexOf(v);
+    if (i > -1) a.splice(i, 1); else a.push(v);
+    btn.setAttribute('aria-pressed', i < 0);
+    repKeep(semel);
+  }
+  function repGo(semel) {
+    var r = BYSEMEL[semel], x = repGet(semel);
+    if (!r || x.st === 'busy') return;
+    if (String(x.text).trim().length < 30) { x.st = 'err'; x.msg = REP_ERR.short; return render(); }
+    if (!window.TOVI_POST) { x.st = 'err'; x.msg = 'תובי לא נטען בדף. רענון הדף ינסה שוב.'; return render(); }
+    if (x.r && !confirm('הדוח שבעריכה יוחלף בדוח חדש מההכתבה. להמשיך?')) return;
+    x.st = 'busy'; x.msg = ''; render();
+    window.TOVI_POST({ action: 'report', semel: String(semel), date: repDate(r), sup: SUPNAME || (ME && ME.name) || '', text: x.text }).then(function (d) {
+      if (d && d.ok && d.limited) throw new Error(d.message);
+      if (!d || !d.ok || !d.report) throw new Error(REP_ERR[d && d.error] || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.');
+      x.r = d.report; x.r.principal = repPrincipal(r); x.ck = {}; x.saved = ''; x.st = '';
+      repKeep(semel);
+    }).catch(function (err) {
+      x.st = 'err'; x.msg = String(err && err.message || '') || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.';
+      if (/fetch|network|json/i.test(x.msg)) x.msg = 'אין חיבור לתובי כרגע. ההכתבה שמורה, אפשר לנסות שוב.';
+    }).then(function () { OPENSEC.rep = true; render(); });
+  }
+  /* השדות כפי שהם בטופס במונדיי. נוכחים שלא ברשימה הנפתחת של המונדיי — שורה בראש הסיכום */
+  function repFields(r) {
+    var x = repGet(r.s.semel), R = x.r || {};
+    var other = String(R.presentOther || '').trim();
+    var present = (R.present || []).slice();
+    if (other && present.indexOf('אחר') < 0) present.push('אחר');
+    return { principal: String(R.principal || '').trim(), present: present.join(', '), goals: (R.goals || []).join(', '), topics: (R.topics || []).join(', '),
+             summary: (other ? 'נוכחים נוספים: ' + other + '\n\n' : '') + String(R.summary || '').trim(), followup: String(R.followup || '').trim() };
+  }
+  function repSave(semel, replace) {
+    var r = BYSEMEL[semel], x = repGet(semel); if (!r || !x.r) return;
+    var f = repFields(r);
+    if (!f.summary) { toast('הסיכום ריק'); return; }
+    x.st = 'saving'; render();
+    var body = { action: 'bikurSave', token: token(), semel: String(semel), school: r.s.name, date: repDate(r), principal: f.principal,
+                 present: f.present, goals: f.goals, topics: f.topics, summary: f.summary, followup: f.followup, replace: !!replace };
+    fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 45000, 1).then(function (res) {
+      x.st = '';
+      if (res && res.error === 'exists') {
+        render();
+        if (confirm('כבר שמור ביקור שלך בבית הספר הזה בתאריך ' + fmtDate(body.date) + ' (אולי מהמונדיי). להחליף אותו בדוח הזה?')) repSave(semel, true);
+        return;
+      }
+      if (!res || !res.ok) throw new Error(res && res.error || 'err');
+      r.bik = (r.bik || []).filter(function (v) { return !(String(v['תאריך']).slice(0, 10) === res.row['תאריך'] && v['מפקח.ת'] === res.row['מפקח.ת']); });
+      r.bik.push(res.row);
+      r.bik.sort(function (a, b) { return String(b['תאריך']).localeCompare(String(a['תאריך'])); });
+      var now = new Date();
+      x.saved = fmtDate(body.date) + ', ' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+      repKeep(semel);
+      toast(res.updated ? 'הביקור עודכן בתובה' : 'הדוח נשמר בתובה');
+      render();
+    }).catch(function (err) {
+      var m = String(err && err.message);
+      x.st = ''; render();
+      toast(m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש' : m === 'notyours' ? 'בית הספר לא משויך לחשבון הזה' : 'השמירה לא הצליחה. הדוח שמור בדפדפן, אפשר לנסות שוב.');
+    });
+  }
+  function repText(r) {
+    var f = repFields(r);
+    return ['דוח ביקור · ' + r.s.name + ' · ' + fmtDate(repDate(r)), 'מפקח.ת: ' + (SUPNAME || (ME && ME.name) || ''),
+      f.principal ? 'מנהל.ת: ' + f.principal : '', 'נוכחים: ' + f.present, 'מטרות הביקור: ' + f.goals, 'נושאים שעלו: ' + f.topics, '',
+      'סיכום הביקור:', f.summary, '', f.followup ? 'פעולות נדרשות ונושאים למעקב:\n' + f.followup : ''].filter(function (l, i) { return l || i > 5; }).join('\n').trim();
+  }
+  /* Excel בעמודות של ייצוא הלוח במונדיי — לייבוא לאותו לוח. SheetJS נטען רק כשצריך */
+  var XLSX_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  function xlsxLib() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    return new Promise(function (ok, no) {
+      var s = document.createElement('script');
+      s.src = XLSX_SRC; s.onload = function () { window.XLSX ? ok(window.XLSX) : no(new Error('xlsx')); }; s.onerror = no;
+      document.head.appendChild(s);
+    });
+  }
+  function repXl(semel) {
+    var r = BYSEMEL[semel]; if (!r || !repGet(semel).r) return;
+    var f = repFields(r), date = repDate(r), sup = SUPNAME || (ME && ME.name) || '';
+    var MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    var dd = date.split('-'), school = r.s.semel + ' - ' + r.s.name;
+    var row = {
+      'Name': school + ' - ' + dd[2] + ' ' + MON[+dd[1] - 1] + ' ' + dd[0], 'שם בית הספר': school, 'מחוז': '',
+      'שם מנהל.ת בית הספר': f.principal, 'תאריך הביקור': date, 'שם מפקח.ת פדגוגי.ת': sup,
+      'נוכחים בביקור': f.present, 'מטרות הביקור': f.goals, 'נושאים שעלו בביקור': f.topics,
+      'סיכום הביקור': f.summary, 'פעולות נדרשות ונושאים למעקב': f.followup
+    };
+    xlsxLib().then(function (X) {
+      var ws = X.utils.json_to_sheet([row]), wb = X.utils.book_new();
+      ws['!cols'] = Object.keys(row).map(function (k) { return { wch: /סיכום|פעולות/.test(k) ? 60 : 22 }; });
+      X.utils.book_append_sheet(wb, ws, 'טופס פיקוח פדגוגי');
+      wb.Workbook = { Views: [{ RTL: true }] };
+      X.writeFile(wb, 'דוח ביקור - ' + r.s.name.replace(/[\\\/:*?"<>|]/g, ' ') + ' - ' + date + '.xlsx');
+    }).catch(function () { toast('ההורדה לא הצליחה. אפשר להשתמש בהעתקה.'); });
+  }
+  /* הצעות תובי → הצ׳ק ליסט של אותו ביקור. צעדי פעולה ונוכחים — רק אם עוד ריקים בצ׳ק ליסט */
+  function repCkApply(semel) {
+    var r = BYSEMEL[semel], x = repGet(semel); if (!r || !x.r) return;
+    var d = ckDraft(r), n = 0;
+    (x.r.checklist || []).forEach(function (c) {
+      if (x.ck[c.id] === false || !ckItemText(c.id)) return;
+      var m = d.marks[c.id] || {};
+      d.marks[c.id] = { s: c.s, n: m.n || c.n || '' };
+      if (!d.marks[c.id].n) delete d.marks[c.id].n;
+      n++;
+    });
+    var steps = (x.r.steps || []).filter(function (s) { return s && s.t; });
+    if (steps.length && !d.steps.some(function (s) { return s && s.t; })) {
+      d.steps = steps.slice(0, 3).map(function (s) { return { t: s.t, who: s.who || '', due: /^\d{4}-\d{2}-\d{2}$/.test(s.due) ? s.due : '' }; });
+    }
+    if (!d.present) {
+      var roles = (x.r.present || []).map(function (p) { return REP_ROLE_CK[p]; }).filter(Boolean);
+      if (roles.length || x.r.presentOther) ckPresSet(d, roles, String(x.r.presentOther || '').trim());
+    }
+    ckLater(semel);
+    OPENSEC.ck = true;
+    toast(n ? (n === 1 ? 'סעיף אחד נוסף לצ׳ק ליסט' : n + ' סעיפים נוספו לצ׳ק ליסט') : 'הצ׳ק ליסט עודכן');
+    render();
   }
 
   /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
@@ -1779,7 +1992,7 @@
 
     /* ביקורי פיקוח מהייצוא של מונדיי (תשפ״ו וגם תחילת תשפ״ז). כל ביקור מקופל בפני עצמו */
     var bk = r.bik || [];
-    K.bik = sec('bik', I.doc, 'ביקורי פיקוח (מונדיי)', bk.length ? (bk.length === 1 ? 'ביקור אחד' : bk.length + ' ביקורים') + ' · אחרון ' + fmtDate(bk[0]['תאריך']) : 'אין ביקורים',
+    K.bik = sec('bik', I.doc, 'ביקורי פיקוח (מונדיי ותובה)', bk.length ? (bk.length === 1 ? 'ביקור אחד' : bk.length + ' ביקורים') + ' · אחרון ' + fmtDate(bk[0]['תאריך']) : 'אין ביקורים',
       bk.length ? bk.map(function (v) {
         var parts = [['נוכחים', v['נוכחים']], ['מטרות', v['מטרות']], ['נושאים שעלו', v['נושאים']], ['סיכום', v['סיכום']], ['פעולות ונושאים למעקב', v['פעולות למעקב']]]
           .filter(function (p) { return String(p[1] || '').trim(); });
@@ -2640,6 +2853,19 @@
     if (cke) { ckSwitch(cke.getAttribute('data-cksemel'), cke.getAttribute('data-ckedit')); return; }
     var ckc = t.closest('[data-ckcopy]');
     if (ckc) { copy(ckText(ckc.getAttribute('data-ckcopy'))); return; }
+    /* דוח ביקור בהכתבה */
+    var rpc = t.closest('[data-repchip]');
+    if (rpc) { repChip(rpc); return; }
+    var rpg = t.closest('[data-repgo]');
+    if (rpg) { repGo(rpg.getAttribute('data-repgo')); return; }
+    var rps = t.closest('[data-repsave]');
+    if (rps) { repSave(rps.getAttribute('data-repsave')); return; }
+    var rpx = t.closest('[data-repxl]');
+    if (rpx) { repXl(rpx.getAttribute('data-repxl')); return; }
+    var rpy = t.closest('[data-repcopy]');
+    if (rpy) { var rr = BYSEMEL[rpy.getAttribute('data-repcopy')]; if (rr) copy(repText(rr)); return; }
+    var rpa = t.closest('[data-repckapply]');
+    if (rpa) { repCkApply(rpa.getAttribute('data-repckapply')); return; }
     var ckp = t.closest('[data-ckprint]');
     if (ckp) { ckPrint(ckp.getAttribute('data-ckprint')); return; }
     if (t.closest('#msgGmail')) { e.preventDefault(); msgGmail(); return; }
@@ -2702,6 +2928,8 @@
     if (e.target && e.target.classList && e.target.classList.contains('nfType')) { nfSync(); newFormPage(true); }
     if (e.target && e.target.id === 'dckSup') { DCK.sup = e.target.value; DCK.semel = ''; dckKeep(); dashboard(); return; }
     if (e.target && e.target.id === 'dckSchool') { DCK.semel = e.target.value; dckKeep(); dashboard(); return; }
+    if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repck')) { repGet(e.target.getAttribute('data-repsemel')).ck[e.target.getAttribute('data-repck')] = e.target.checked; return; }
+    if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repdate')) { ckSwitch(e.target.getAttribute('data-repdate'), e.target.value); return; }
     if (e.target && e.target.id === 'ckDate') ckSwitch(e.target.getAttribute('data-cksemel'), e.target.value);
     else if (e.target && e.target.type === 'date' && e.target.hasAttribute('data-ckstep')) ckInput(e.target);
   });
@@ -2709,6 +2937,7 @@
   document.addEventListener('input', function (e) {
     var el = e.target;
     if (el && el.type !== 'date' && (el.hasAttribute && (el.hasAttribute('data-ckn') || el.hasAttribute('data-ckstep') || el.hasAttribute('data-ckpres')))) ckInput(el);
+    if (el && el.hasAttribute && (el.hasAttribute('data-reptext') || el.hasAttribute('data-repf'))) repInput(el);
   });
   window.addEventListener('hashchange', function () { CUR = fromHash(); side(); render(); });
 

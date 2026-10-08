@@ -511,3 +511,22 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .ckpres .cknote{display:block;width:100%;margin-top:8px}
 .ck-r[aria-pressed=true]{background:var(--blue-soft);border-color:var(--blue);color:var(--blue)}
 @media (max-width:640px){ .ck-r{flex:1 1 calc(50% - 6px)} }
+
+/* דוח ביקור בהכתבה (8.10.26) */
+.reptext{display:block;width:100%;box-sizing:border-box;min-height:150px;margin-top:8px;font:inherit;font-size:16px;line-height:1.6;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;color:var(--ink);resize:vertical}
+.repbad{color:var(--bad);font-weight:700}
+.repout{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.repout .ckpl{margin-top:12px}
+.repout .ckb{margin-bottom:4px}
+.repother{display:block;width:100%;box-sizing:border-box;margin-top:8px}
+.repl{display:grid;gap:5px;margin-top:12px;font-weight:700;font-size:13.5px}
+.repl input,.repl textarea{width:100%;box-sizing:border-box;font:inherit;font-size:16px;font-weight:400;line-height:1.6;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:#fff;color:var(--ink)}
+.repl textarea{resize:vertical}
+.repwarn{margin:8px 0;padding:10px 12px;border-radius:12px;background:var(--warn-soft);color:var(--ink);font-size:14px}
+.repwarn ul{margin:4px 0 0;padding-inline-start:20px}
+.repck{list-style:none;margin:6px 0;padding:0}
+.repck li{padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.repck label{display:block;cursor:pointer}
+.repck input{width:18px;height:18px;vertical-align:-3px;margin-inline-end:6px}
+.repck small{display:block;color:var(--muted);font-size:13px;margin-inline-start:26px}
+.dckbody>.sec{margin-bottom:12px}

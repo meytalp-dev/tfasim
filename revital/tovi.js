@@ -69,6 +69,8 @@
       .then(function (r) { return r.json(); })
       .catch(function (e) { if ((tries || 0) < 1) return post(body, 1); throw e; });
   }
+  /* דוח ביקור בהכתבה (app.js, 8.10.26) — אותה קריאה, בלי ניסיון חוזר (קריאה ארוכה שעולה כסף) */
+  window.TOVI_POST = function (body) { return post(body, 1); };
 
   /* ===== העתקה, מייל, הדפסה ===== */
   var OUT = {};   /* מפתח → { subject, text, html } — התוכן להעתקה ולמייל */
