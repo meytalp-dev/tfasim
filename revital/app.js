@@ -75,7 +75,9 @@
     ext:   '<svg class="ext" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg>',
     mail:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
     copy:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
-    flag:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>'
+    flag:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>',
+    chat:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1.1-4.6A8 8 0 1 1 21 12z"/></svg>',
+    send:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-7 18-4-7-7-4z"/></svg>'
   };
 
   var $ = function (id) { return document.getElementById(id); };
@@ -126,7 +128,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load', tg: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -303,8 +305,12 @@
     if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = ST.akl = ST.vaad = 'err'; return loaded('pk', false); }
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
-      if (!d || d.error) { ST.sal = ST.akl = ST.vaad = 'err'; return loaded('pk', false); }
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; });
+      if (!d || d.error) { ST.sal = ST.akl = ST.vaad = ST.tg = 'err'; return loaded('pk', false); }
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; });
+      /* תגובות מפקחים על חוסרים (8.10.26) — החדשה ראשונה */
+      ST.tg = Array.isArray(d.tguvot) ? 'ok' : 'err';
+      (d.tguvot || []).forEach(function (row) { var r = at(row); if (r) r.tg.push(row); });
+      SCHOOLS.forEach(function (s) { BY[s.name].tg.sort(function (a, b) { return String(b['תאריך']).localeCompare(String(a['תאריך'])); }); });
       /* ועדות מלוות (8.10.26): בשער שלפני כן אין את המפתח — אז "לא נטען", ולא חוסר לכולם */
       ST.vaad = Array.isArray(d.vaadot) && d.vaadot.length ? 'ok' : 'err';
       (d.vaadot || []).forEach(function (row) { var r = at(row); if (r) r.vaad.push(row); });
@@ -324,7 +330,7 @@
       });
       ST.sal = 'ok';
       loaded('pk', true);
-    }, function () { ST.sal = 'err'; ST.akl = 'err'; ST.vaad = 'err'; loaded('pk', false); });
+    }, function () { ST.sal = 'err'; ST.akl = 'err'; ST.vaad = 'err'; ST.tg = 'err'; loaded('pk', false); });
   }
   /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
   function loadMefVisits() {
@@ -447,7 +453,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M') return h;
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
     if (m && BYSEMEL[m[1]]) { STAB = TABS.some(function (t) { return t[0] === m[2]; }) ? m[2] : 'ov'; return 's:' + m[1]; }
     m = h.match(/^m=(ok|warn|bad|none)$/);
@@ -510,6 +516,7 @@
     if (CUR === 'P' || c === 'p') return 'P';
     if (CUR === 'G') return 'G';
     if (CUR === 'A') return 'A';
+    if (CUR === 'M') return 'M';
     if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
@@ -528,6 +535,7 @@
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
+      item('M', I.send, 'הודעה למנהלים', '') +
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
       '<li class="sep"></li>' +
@@ -612,6 +620,7 @@
     else if (CUR.charAt(0) === 'm') mapList(CUR.slice(2));
     else if (CUR === 'G') overview();
     else if (CUR === 'A') attPage();
+    else if (CUR === 'M') msgPage();
     else if (CUR === 'F') formsPage();
     else if (CUR === 'N') { if (adminView()) newFormPage(); else formsPage(); }
     else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
@@ -638,8 +647,69 @@
   function gapLi(z, withSup) {
     return '<li class="gapw"><button type="button" class="gapi" data-go="s:' + esc(z.r.s.semel) + '"><span class="gn">' + esc(z.r.s.name) +
       (withSup ? '<small>' + esc(supsOf(z.r.s).join(' · ')) + '</small>' : '') + '</span><span class="gc">' +
-      z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span></button>' +
-      principalBtn(z.r, gaps(z.r), 'pm-' + z.r.s.semel) + '</li>';
+      z.g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') + '</span>' +
+      tgLast(z.r) + '</button>' +
+      principalBtn(z.r, gaps(z.r), 'pm-' + z.r.s.semel) + replyBtn(z.r) + '</li>';
+  }
+  /* ===== תגובת מפקח.ת על חוסר (מיטל, 8.10.26) =====
+     נשמרת בשער (לשונית "תגובות מפקחים") ונשלחת משם במייל לרויטל ולמיטל, עם replyTo של המפקח.ת.
+     הכפתור למפקחים (וגם באדמין בתצוגת ?as=). התגובות עצמן מוצגות לכולם */
+  function tgWhen(row) { var m = String(row['תאריך'] || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? (+m[3]) + '.' + (+m[2]) : ''; }
+  function tgLast(r) {
+    var x = r.tg && r.tg[0];
+    if (!x) return '';
+    var t = String(x['תגובה'] || '');
+    return '<span class="tgl">' + I.chat + '<span><b>' + esc(x['מפקח.ת']) + ' · ' + esc(tgWhen(x)) + ':</b> ' + esc(t.length > 160 ? t.slice(0, 160) + '…' : t) + '</span></span>';
+  }
+  function tgList(r) {
+    if (!r.tg || !r.tg.length) return '';
+    return '<ul class="tglist">' + r.tg.map(function (x) {
+      return '<li>' + I.chat + '<div><div class="tgh"><b>' + esc(x['מפקח.ת']) + '</b> · ' + esc(tgWhen(x)) +
+        (x['החוסר'] && x['החוסר'] !== 'כל החוסרים' ? ' · ' + esc(x['החוסר']) : '') + '</div><div class="pre">' + esc(x['תגובה']) + '</div></div></li>';
+    }).join('') + '</ul>';
+  }
+  function replyBtn(r) {
+    if (adminView() || ST.tg !== 'ok' || !gaps(r).length) return '';
+    return '<span class="pmail"><button type="button" class="btn sm" data-reply="' + esc(r.s.semel) + '">' + I.chat + 'תגובה</button></span>';
+  }
+  function replyOpen(semel) {
+    var r = BYSEMEL[semel];
+    if (!r) return;
+    var g = gaps(r), box = document.createElement('div');
+    box.className = 'tgdlg';
+    box.innerHTML = '<form class="tgcard" role="dialog" aria-modal="true" aria-labelledby="tgT">' +
+      '<h2 id="tgT">תגובה על חוסר · ' + esc(r.s.name) + '</h2>' +
+      '<label>על מה התגובה<select id="tgGap"><option value="">כל החוסרים</option>' +
+      g.map(function (x, i) { return '<option value="' + i + '">' + esc(x.t) + '</option>'; }).join('') + '</select></label>' +
+      '<label>התגובה<textarea id="tgTxt" rows="5" maxlength="3000" placeholder="למשל: המנהל הבטיח להגיש עד יום ראשון"></textarea></label>' +
+      '<p class="small">התגובה תישמר בתובה, ליד החוסר, ותישלח במייל לרויטל ולמיטל. תשובה מהן תגיע ישירות למייל שלך.</p>' +
+      '<div class="acts"><button type="submit" class="btn primary" id="tgSend">שליחה</button><button type="button" class="btn" id="tgCancel">ביטול</button></div></form>';
+    document.body.appendChild(box);
+    function close() { if (box.parentNode) box.parentNode.removeChild(box); document.removeEventListener('keydown', onKey); }
+    function onKey(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', onKey);
+    box.addEventListener('click', function (e) { if (e.target === box) close(); });
+    $('tgCancel').onclick = close;
+    $('tgTxt').focus();
+    box.querySelector('form').onsubmit = function (e) {
+      e.preventDefault();
+      var text = $('tgTxt').value.trim(), gi = $('tgGap').value;
+      if (!text) { $('tgTxt').focus(); return; }
+      var btn = $('tgSend'); btn.disabled = true; btn.textContent = 'שולח…';
+      fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'gapReply', token: token(), semel: String(r.s.semel), school: r.s.name,
+          gap: gi === '' ? 'כל החוסרים' : g[+gi].t, text: text }) }, 60000, 1).then(function (d) {
+        if (!d || !d.ok) throw new Error(d && d.error || 'err');
+        r.tg.unshift(d.row);
+        close();
+        toast(d.mailed ? 'התגובה נשמרה ונשלחה' : 'התגובה נשמרה (המייל לא נשלח)');
+        render();
+      }).catch(function (err) {
+        btn.disabled = false; btn.textContent = 'שליחה';
+        var m = String(err.message);
+        toast(m === 'quota' ? 'הגעת למספר התגובות היומי' : m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש' : m === 'notyours' ? 'בית הספר לא משויך לחשבון הזה' : 'השליחה לא הצליחה. נסו שוב בעוד רגע.');
+      });
+    };
   }
   /* מייל למנהל.ת עם החוסרים — המייל מגיליון אנשי הקשר (שורת המנהל.ת לפי סמל) */
   function principalOf(r) {
@@ -999,9 +1069,9 @@
         (r.menor && r.menor.t ? r.menor.r + '/' + r.menor.t : (ST.menor === 'ok' ? '—' : '…')) + '</b></div>' +
       '</div>' + (function () {
         var g = gaps(r);
-        if (!g.length) return '';
+        if (!g.length) return tgList(r);
         return '<div class="views"><div class="gc">' + g.map(function (x) { return '<span class="chip k-' + x.k + '">' + esc(x.t) + '</span>'; }).join('') +
-          '</div>' + principalBtn(r, g, 'pm-head') + '</div>';
+          '</div>' + principalBtn(r, g, 'pm-head') + replyBtn(r) + '</div>' + tgList(r);
       })() + '</div>' +
       '<div data-tovi-slot="' + esc(s.semel) + '"></div>';   /* תובי: תדריך לפני ביקור (tovi.js) */
 
@@ -1502,6 +1572,117 @@
     } else {
       window.open(url, '_blank', 'noopener');
     }
+  }
+
+  /* ----- הודעה למנהלים (מיטל, 8.10.26) -----
+     המפקח.ת כותב.ת או מדביק.ה הודעה (עם עיצוב וקישורים), והיא נפתחת כטיוטה מהמייל שלו/ה,
+     כשהמנהלים של בתי הספר שלו/ה בעותק מוסתר. קבצים מצרפים בטיוטה. בלי שליחה מהשרת ובלי עותק לרויטל.
+     הטיוטה נשמרת בזיכרון הדף (MSG) — מעבר לעמוד אחר וחזרה לא מוחק אותה */
+  var MSG = { subject: '', html: '', off: {} };
+  function msgRecips() {
+    return SCHOOLS.map(function (s) { var r = BY[s.name], pr = principalOf(r); return { s: s, name: pr.name, mails: pr.mails }; })
+      .sort(function (a, b) { return a.s.name.localeCompare(b.s.name, 'he'); });
+  }
+  function msgPage() {
+    if (ST.contacts !== 'ok') {
+      $('main').innerHTML = '<div class="card head"><h1>הודעה למנהלים</h1>' + pending('contacts') + '</div>';
+      return;
+    }
+    if (!$('msgBox')) {
+      $('main').innerHTML = '<div class="card head" id="msgBox"><h1>הודעה למנהלים</h1>' +
+        '<div class="meta">כותבים או מדביקים הודעה, והיא נפתחת כטיוטה מהמייל שלך. המנהלים בעותק מוסתר (bcc), ולא רואים זה את זה.</div></div>' +
+        '<div class="card msgw">' +
+        '<label class="fl" for="msub">נושא</label><input id="msub" class="fi" type="text" value="' + esc(MSG.subject) + '" placeholder="למשל: עדכון לקראת ביקורי אוקטובר">' +
+        '<label class="fl" for="med">ההודעה</label>' +
+        '<div id="med" class="editor" contenteditable="true" dir="rtl" role="textbox" aria-multiline="true" data-ph="כותבים כאן, או מדביקים הודעה מוכנה. ההדגשות והקישורים נשמרים."></div>' +
+        '<div class="mlink"><input id="mlUrl" class="fi" type="url" dir="ltr" placeholder="https://"><input id="mlTxt" class="fi" type="text" placeholder="טקסט הקישור (לא חובה)">' +
+        '<button type="button" class="btn" id="mlAdd">' + I.ext + 'הוספת קישור</button></div>' +
+        '<p class="small">' + I.doc + ' <b>קבצים</b> מצרפים בטיוטה שנפתחת' + (IS_MOBILE ? ' (סמל האטב באפליקציית המייל).' : ' (סמל האטב ב-Gmail או ב-Outlook).') + '</p>' +
+        '<div class="acts msgacts" id="msgActs"></div></div>' +
+        '<details class="card sec" data-k="msgto"' + (OPENSEC.msgto ? ' open' : '') + '><summary><span class="st">' + I.users + 'נמענים</span><span class="sum" id="msgSum"></span>' + I.car + '</summary>' +
+        '<div class="sb"><div class="acts" style="margin-bottom:8px"><button type="button" class="btn sm" data-msgall="1">סימון הכול</button><button type="button" class="btn sm" data-msgall="0">ניקוי</button></div>' +
+        '<ul class="mto" id="msgTo"></ul></div></details>';
+      $('med').innerHTML = MSG.html;
+      $('med').oninput = function () { MSG.html = this.innerHTML; msgActs(); };
+      $('msub').oninput = function () { MSG.subject = this.value; msgActs(); };
+      $('msgTo').onchange = function (e) {
+        var cb = e.target;
+        if (cb && cb.getAttribute('data-msgto')) { if (cb.checked) delete MSG.off[cb.getAttribute('data-msgto')]; else MSG.off[cb.getAttribute('data-msgto')] = 1; msgActs(); }
+      };
+      $('mlUrl').onkeydown = $('mlTxt').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); msgAddLink(); } };
+    }
+    msgTo();
+  }
+  function msgTo() {
+    $('msgTo').innerHTML = msgRecips().map(function (x) {
+      var k = String(x.s.semel), has = x.mails.length;
+      return '<li><label' + (has ? '' : ' class="off"') + '><input type="checkbox" data-msgto="' + esc(k) + '"' + (has && !MSG.off[k] ? ' checked' : '') + (has ? '' : ' disabled') + '>' +
+        '<span><b>' + esc(x.s.name) + '</b><small>' + (x.name ? esc(x.name) + ' · ' : '') + (has ? '<span dir="ltr">' + esc(x.mails.join(', ')) + '</span>' : 'אין מייל בגיליון אנשי הקשר') + '</small></span></label></li>';
+    }).join('');
+    msgActs();
+  }
+  function msgSetAll(on) {
+    msgRecips().forEach(function (x) { if (on) delete MSG.off[x.s.semel]; else MSG.off[x.s.semel] = 1; });
+    msgTo();
+  }
+  function msgChosen() {
+    var out = [], n = 0;
+    msgRecips().forEach(function (x) { if (x.mails.length && !MSG.off[x.s.semel]) { n++; out = out.concat(x.mails); } });
+    return { n: n, bcc: cleanMails(out) };
+  }
+  /* טקסט פשוט מהעורך — לנייד ול-Outlook (mailto לא נושא HTML). קישור = "טקסט (כתובת)" */
+  function htmlToText(node) {
+    var out = '';
+    Array.prototype.forEach.call(node.childNodes, function (c) {
+      if (c.nodeType === 3) { out += c.nodeValue.replace(/\s+/g, ' '); return; }
+      if (c.nodeType !== 1) return;
+      var tg = c.tagName;
+      if (tg === 'BR') { out += '\n'; return; }
+      if (tg === 'STYLE' || tg === 'SCRIPT') return;
+      var inner = htmlToText(c);
+      if (tg === 'A') { var u = c.getAttribute('href') || ''; out += inner && u && inner.trim() !== u ? inner + ' (' + u + ')' : (u || inner); return; }
+      if (tg === 'LI') { out += '\n• ' + inner.trim(); return; }
+      if (/^(P|DIV|H[1-6]|UL|OL|TR|BLOCKQUOTE|TABLE)$/.test(tg)) { out += '\n' + inner + '\n'; return; }
+      out += inner;
+    });
+    return out;
+  }
+  function msgText() { return htmlToText($('med')).replace(/[ \t]+\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim(); }
+  function msgMail() {
+    var ch = msgChosen();
+    return { to: [], bcc: ch.bcc, n: ch.n, subject: MSG.subject.trim(), text: msgText(),
+      html: '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">' + $('med').innerHTML + '</div>' };
+  }
+  function msgActs() {
+    if (!$('msgActs')) return;
+    var M = msgMail(), href = esc(mailHref(M));
+    $('msgSum').innerHTML = tag(M.n ? 'ok' : '', M.n + ' מנהלים מתוך ' + SCHOOLS.length);
+    if (!M.n) { $('msgActs').innerHTML = '<span class="small">לא נבחרו נמענים.</span>'; return; }
+    /* נייד = <a href="mailto:"> אמיתי שמתעדכן בכל הקלדה; מחשב = Gmail (HTML מועתק) + Outlook */
+    $('msgActs').innerHTML = IS_MOBILE
+      ? '<a class="btn primary" href="' + href + '">' + I.mail + 'פתיחת טיוטה ל-' + M.n + ' מנהלים</a>' +
+        '<button type="button" class="btn" data-copy="msgtext">' + I.copy + 'העתקת ההודעה</button>'
+      : '<button type="button" class="btn primary" id="msgGmail">' + I.mail + 'טיוטה ב-Gmail ל-' + M.n + ' מנהלים</button>' +
+        '<a class="btn" href="' + href + '">' + I.mail + 'בתוכנת המייל (Outlook)</a>';
+    LISTS.msgtext = M.text;
+    if (IS_MOBILE && M.text.length > 1500) $('msgActs').innerHTML += '<p class="small">הודעה ארוכה: אם היא נקטעת בטיוטה, מדביקים אותה מ"העתקת ההודעה".</p>';
+  }
+  function msgGmail() {
+    var M = msgMail();
+    if (!M.n) return;
+    if (!M.subject && !confirm('אין נושא להודעה. לפתוח בכל זאת?')) return;
+    openDraft(M);
+  }
+  function msgAddLink() {
+    var u = $('mlUrl').value.trim(), t = $('mlTxt').value.trim();
+    if (!u) { $('mlUrl').focus(); return; }
+    if (!/^(https?:|mailto:)/i.test(u)) u = 'https://' + u;
+    var a = '<a href="' + esc(u) + '">' + esc(t || u) + '</a>';
+    $('med').innerHTML += (MSG.html.trim() ? '<br>' : '') + a + '&nbsp;';
+    MSG.html = $('med').innerHTML;
+    $('mlUrl').value = ''; $('mlTxt').value = '';
+    msgActs();
+    toast('הקישור נוסף');
   }
 
   /* ----- לפי תפקיד ----- */
@@ -2145,6 +2326,12 @@
     /* לפני data-go: כפתור שמסנן ואז עובר לרשימה */
     var sd = t.closest('[data-saldoc]');
     if (sd) { e.preventDefault(); openSalDoc(sd.getAttribute('data-saldoc')); return; }
+    var rp = t.closest('[data-reply]');
+    if (rp) { e.preventDefault(); replyOpen(rp.getAttribute('data-reply')); return; }
+    if (t.closest('#msgGmail')) { e.preventDefault(); msgGmail(); return; }
+    if (t.closest('#mlAdd')) { e.preventDefault(); msgAddLink(); return; }
+    var ma = t.closest('[data-msgall]');
+    if (ma) { msgSetAll(ma.getAttribute('data-msgall') === '1'); return; }
     var vd = t.closest('[data-vaadadoc]');
     if (vd) { e.preventDefault(); openSalDoc(vd.getAttribute('data-semel'), vd.getAttribute('data-vaadadoc')); return; }
     var gk2 = t.closest('[data-gk]');
