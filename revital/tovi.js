@@ -191,11 +191,83 @@
       '<p class="tovi-foot">תובי מסכם רק את מה שיש בתובה. כדאי לבדוק כל נתון לפני שמסתמכים עליו.</p></div></details>';
   }
   function fillSlots() {
-    var slots = document.querySelectorAll('[data-tovi-slot]');
-    for (var i = 0; i < slots.length; i++) {
-      var s = slots[i].getAttribute('data-tovi-slot'), h = briefHtml(s);
-      if (slots[i].getAttribute('data-h') !== h) { slots[i].innerHTML = h; slots[i].setAttribute('data-h', h); }
+    function fill(attr, render) {
+      var slots = document.querySelectorAll('[' + attr + ']');
+      for (var i = 0; i < slots.length; i++) {
+        var h = render(slots[i].getAttribute(attr));
+        if (slots[i].getAttribute('data-h') !== h) { slots[i].innerHTML = h; slots[i].setAttribute('data-h', h); }
+      }
     }
+    fill('data-tovi-slot', briefHtml);
+    fill('data-tovi-insight', insightHtml);
+  }
+
+  /* ===== כפתורי תובנות (8.10.26) — [data-tovi-insight="<סוג>:<סמל>"] בדף; הסוגים בשרת (INSIGHTS) ===== */
+  var INS = {
+    goals: { btn: 'תובנות להשגת היעדים', title: 'תובנות להשגת היעדים',
+             desc: 'לכל יעד: איפה הוא עומד לפי הנתונים, פעולות אפשריות, ואיך נדע שזה עובד.' }
+  };
+  var IN = {};   /* "סוג:סמל" → { st, d } */
+  var INS_ERR = { nogoals: 'אין לבית הספר הזה יעדים מהוועדה המלווה.' };
+  function insightOut(cfg, d) {
+    var j = d.insight || {}, title = cfg.title + ' — ' + (d.school || ''), text = [title, 'נוצר ' + (d.at || ''), ''], html = '';
+    (j.items || []).forEach(function (it) {
+      text.push(it.title, it.status);
+      html += '<h3 style="font-size:15px;margin:14px 0 4px;color:#3d2645">' + esc(it.title) + '</h3><p style="margin:0 0 4px">' + esc(it.status) + '</p>';
+      [['evidence', 'מה רואים בנתונים'], ['actions', 'פעולות אפשריות']].forEach(function (g) {
+        var list = it[g[0]] || [];
+        if (!list.length) return;
+        text.push(g[1] + ':');
+        html += '<p style="margin:6px 0 2px;font-weight:bold">' + g[1] + '</p><ul style="margin:0;padding-right:20px">';
+        list.forEach(function (i) {
+          var s = srcPlain(i.src);
+          text.push('- ' + i.t + (s ? ' (' + s + ')' : ''));
+          html += '<li style="margin:3px 0">' + esc(i.t) + (s ? ' <span style="color:#66728f;font-size:12px">(' + esc(s) + ')</span>' : '') + '</li>';
+        });
+        html += '</ul>';
+      });
+      if (it.measure) { text.push('איך נדע שזה עובד: ' + it.measure); html += '<p style="margin:6px 0 0"><b>איך נדע שזה עובד:</b> ' + esc(it.measure) + '</p>'; }
+      text.push('');
+    });
+    if (j.missing) { text.push('חסר בנתונים: ' + j.missing); html += '<p style="margin:12px 0 0;color:#66728f">חסר בנתונים: ' + esc(j.missing) + '</p>'; }
+    text.push('', 'נוצר על ידי תובי · תובה. כדאי לבדוק כל נתון לפני שמסתמכים עליו.');
+    return { subject: title, text: text.join('\n'), html: mailWrap(title, html) };
+  }
+  function insightHtml(key) {
+    var kind = key.split(':')[0], cfg = INS[kind], b = IN[key];
+    if (!cfg) return '';
+    if (!b) return '<div class="tovi-call"><button type="button" class="btn primary" data-tovi-ins="' + esc(key) + '">' + I.spark + esc(cfg.btn) + '</button><span>' + esc(cfg.desc) + '</span></div>';
+    if (b.st === 'load') return '<div class="tovi-call"><span class="tovi-wait">' + I.spark + 'תובי חושב… זה לוקח עד דקה.</span></div>';
+    if (b.st === 'err') return '<div class="tovi-call"><span class="tovi-err">' + esc(b.msg) + '</span><button type="button" class="btn sm" data-tovi-ins="' + esc(key) + '">לנסות שוב</button></div>';
+    var d = b.d, j = d.insight || {};
+    var body = (j.items || []).map(function (it) {
+      var h = '<div class="tovi-item"><h3>' + esc(it.title) + '</h3><p class="tovi-status">' + esc(it.status) + '</p>';
+      [['evidence', 'מה רואים בנתונים'], ['actions', 'פעולות אפשריות']].forEach(function (g) {
+        var list = it[g[0]] || [];
+        if (list.length) h += '<p class="tovi-sub">' + g[1] + '</p><ul>' + list.map(function (i) {
+          return '<li>' + esc(i.t) + (i.src ? ' ' + srcHtml(i.src) : '') + '</li>';
+        }).join('') + '</ul>';
+      });
+      if (it.measure) h += '<p class="tovi-measure"><b>איך נדע שזה עובד:</b> ' + esc(it.measure) + '</p>';
+      return h + '</div>';
+    }).join('');
+    if (j.missing) body += '<p class="tovi-miss">חסר בנתונים: ' + esc(j.missing) + '</p>';
+    var o = insightOut(cfg, d);
+    o.printHtml = '<h1>' + esc(o.subject) + '</h1><p class="tovi-none">נוצר ' + esc(d.at || '') + '</p>' + body +
+      '<p class="tovi-foot">נוצר על ידי תובי · תובה. כדאי לבדוק כל נתון לפני שמסתמכים עליו.</p>';
+    return '<details class="card tovi-brief" open><summary>' + I.spark + '<b>' + esc(cfg.title) + '</b><span>נוצר ' + esc(d.at || '') + '</span></summary>' +
+      '<div class="tovi-b">' + body + actions('i:' + key, o, true) +
+      '<p class="tovi-foot">"איפה זה עומד" היא הסקה של תובי מהנתונים, לא נתון רשמי. כדאי לבדוק לפני שמסתמכים.</p></div></details>';
+  }
+  function insight(key) {
+    var p = key.split(':');
+    IN[key] = { st: 'load' }; fillSlots();
+    post({ action: 'insight', kind: p[0], semel: p[1] }).then(function (d) {
+      if (d && d.ok && d.limited) IN[key] = { st: 'err', msg: d.message };
+      else if (d && d.ok && d.insight) IN[key] = { st: 'ok', d: d };
+      else IN[key] = { st: 'err', msg: (d && INS_ERR[d.error]) || errText(d) };
+      fillSlots();
+    }).catch(function () { IN[key] = { st: 'err', msg: 'אין חיבור לתובי כרגע. אפשר לנסות שוב.' }; fillSlots(); });
   }
   function brief(semel) {
     B[semel] = { st: 'load' }; fillSlots();
@@ -352,6 +424,7 @@
     var t = e.target.closest ? e.target : null, el;
     if (!t) return;
     if ((el = t.closest('[data-tovi-brief]'))) { brief(el.getAttribute('data-tovi-brief')); return; }
+    if ((el = t.closest('[data-tovi-ins]'))) { insight(el.getAttribute('data-tovi-ins')); return; }
     if ((el = t.closest('[data-tovi-topic]'))) { TOPIC = +el.getAttribute('data-tovi-topic'); paint(); return; }
     if ((el = t.closest('[data-tovi-q]'))) { ask(el.getAttribute('data-tovi-q')); return; }
     if ((el = t.closest('[data-tovi-print]'))) { printOut(el.getAttribute('data-tovi-print')); return; }

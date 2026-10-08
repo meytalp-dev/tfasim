@@ -1241,7 +1241,8 @@
 
     /* יעדים */
     K.yaad = sec('yaad', I.check, 'יעדים מהוועדה המלווה', r.yaad ? 'יש יעדים' : tag('k-goals', 'אין יעדים'),
-      r.yaad ? para(r.yaad) : '<div class="empty">אין יעדים מהוועדה המלווה האחרונה בקובץ.</div>');
+      r.yaad ? para(r.yaad) + '<div data-tovi-insight="goals:' + esc(r.s.semel) + '"></div>'   /* תובי: תובנות להשגת היעדים (tovi.js) */
+        : '<div class="empty">אין יעדים מהוועדה המלווה האחרונה בקובץ.</div>');
 
     /* מיפוי — לפעמים שני מיפויים (שני מפקחים). החדש למעלה */
     var mp = r.mipui || [];

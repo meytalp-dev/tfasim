@@ -19,6 +19,10 @@
 .tovi-b ul{margin:0;padding-inline-start:20px}
 .tovi-b li{margin:4px 0}
 .tovi-src{display:inline-block;font-size:11.5px;color:var(--muted);background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:0 8px;margin-inline-start:4px;max-width:100%;overflow-wrap:anywhere}
+.tovi-item+.tovi-item{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+.tovi-status{margin:0 0 6px}
+.tovi-sub{font-weight:700;font-size:13.5px;color:var(--navy);margin:8px 0 2px}
+.tovi-measure{margin:8px 0 0;font-size:14px;background:var(--paper);border-radius:10px;padding:6px 10px}
 .tovi-none,.tovi-miss{color:var(--muted);font-size:14px;margin:4px 0}
 .tovi-foot{color:var(--muted);font-size:12.5px;margin:14px 0 0;border-top:1px solid var(--line);padding-top:10px}
 
