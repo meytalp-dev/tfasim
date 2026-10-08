@@ -34,7 +34,7 @@
             ['honchim', 'מורים חונכים'], ['ped', 'רכזים פדגוגיים'], ['sherut', 'שירות לאומי']];
   /* סוגי החוסרים — הסדר הזה הוא הסדר בכל הרשימות */
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
-                   ['menor', 'רישום מורים למנור'], ['sal', 'סל תוכניות']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
+                   ['menor', 'רישום מורים למנור'], ['sal', 'סל תוכניות'], ['vaad', 'ועדה מלווה']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
   /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
   var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה'],
                     ['aklim', 'אקלים: פער או ירידה']];
@@ -110,7 +110,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', wait: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -118,7 +118,7 @@
   var MEF = {};     /* סמל → {st:'load'|'ok'|'err'|'noaccess', d} */
   var OPENSEC = { head: true };   /* אילו מקטעים פתוחים — נשמר בין בתי ספר */
   /* לשוניות בעמוד בית ספר (מיטל, 7.10.26: "הדף ארוך מדי") — "פיקוח" מפוצל לשתיים */
-  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['akl', 'אקלים'], ['vis', 'ביקורים ומשימות'], ['sal', 'סל תוכניות'], ['lrn', 'למידה']];
+  var TABS = [['ov', 'סקירה'], ['ppl', 'אנשים'], ['map', 'מיפוי ויעדים'], ['vaad', 'ועדה מלווה'], ['akl', 'אקלים'], ['vis', 'ביקורים ומשימות'], ['sal', 'סל תוכניות'], ['lrn', 'למידה']];
   var STAB = 'ov';
 
   function supsOf(s) { return s.sups && s.sups.length ? s.sups : [s.sup]; }
@@ -284,11 +284,14 @@
 
   /* מיפוי, ביקורי תשפ״ו ויעדים — מהשער. השרת מחזיר רק את בתי הספר של המחובר.ת (all = הכול) */
   function loadPikuah() {
-    if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = ST.akl = 'err'; return loaded('pk', false); }
+    if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = ST.akl = ST.vaad = 'err'; return loaded('pk', false); }
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
-      if (!d || d.error) { ST.sal = ST.akl = 'err'; return loaded('pk', false); }
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; });
+      if (!d || d.error) { ST.sal = ST.akl = ST.vaad = 'err'; return loaded('pk', false); }
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; });
+      /* ועדות מלוות (8.10.26): בשער שלפני כן אין את המפתח — אז "לא נטען", ולא חוסר לכולם */
+      ST.vaad = Array.isArray(d.vaadot) && d.vaadot.length ? 'ok' : 'err';
+      (d.vaadot || []).forEach(function (row) { var r = at(row); if (r) r.vaad.push(row); });
       /* אקלים: בשער שלפני 7.10.26 אין את המפתח — אז "לא נטען", לא "לא התקבל דוח" */
       ST.akl = Array.isArray(d.aklim) && d.aklim.length ? 'ok' : 'err';
       (d.aklim || []).forEach(function (row) { var r = at(row); if (r) r.akl.push(row); });
@@ -305,7 +308,7 @@
       });
       ST.sal = 'ok';
       loaded('pk', true);
-    }, function () { ST.sal = 'err'; ST.akl = 'err'; loaded('pk', false); });
+    }, function () { ST.sal = 'err'; ST.akl = 'err'; ST.vaad = 'err'; loaded('pk', false); });
   }
   /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
   function loadMefVisits() {
@@ -353,6 +356,8 @@
       else if (r.menor.r < r.menor.t) out.push({ k: 'menor', t: 'מנור: נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים · ' + (r.menor.t - r.menor.r) + ' טרם נרשמו' });
     }
     salGap(r, out);
+    /* ועדה מלווה (מיטל, 8.10.26): נוסח שנכון גם אם הוועדה התקיימה ורק המסמך לא הגיע */
+    if (ST.vaad === 'ok' && !(r.vaad && r.vaad.length)) out.push({ k: 'vaad', t: 'חסר מסמך ועדה מלווה תשפ״ו' });
     return out;
   }
   function issues(r) { return gaps(r).map(function (g) { return g.t; }); }
@@ -360,7 +365,7 @@
   function salGap(r, out) { if (ST.sal === 'ok' && !r.sal) out.push({ k: 'sal', t: 'סל תוכניות לא הוגש' }); }
   /* מספר התלמידים: מהמצבת אם דווחה, אחרת מהמיפוי */
   function studentsOf(r) { return r.matz && r.matz.n ? r.matz.n : (r.mipui && r.mipui[0] ? field(r.mipui[0], 'מספר תלמידים מט') : ''); }
-  function allLoaded() { return ['nispach', 'menor', 'bs', 'rg', 'sal'].every(function (k) { return ST[k] !== 'load'; }); }
+  function allLoaded() { return ['nispach', 'menor', 'bs', 'rg', 'sal', 'vaad'].every(function (k) { return ST[k] !== 'load'; }); }
 
   /* ===== דורש תשומת לב — אותות לפיקוח ===== */
   function field(row, prefix) {
@@ -883,7 +888,7 @@
   }
   function drawGaps() {
     Array.prototype.forEach.call(document.querySelectorAll('[data-gview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-gview') === GVIEW); });
-    var waiting = ['nispach', 'menor', 'bs', 'rg', 'sal'].filter(function (k) { return ST[k] === 'load'; }).length;
+    var waiting = ['nispach', 'menor', 'bs', 'rg', 'sal', 'vaad'].filter(function (k) { return ST[k] === 'load'; }).length;
     var failed = GAP_KINDS.filter(function (k) { return ST[k[0]] === 'err'; }).map(function (k) { return k[1]; });
     var rows = gapRows();
     /* מונה לכל סוג — על כל בתי הספר, בלי הסינונים */
@@ -1105,6 +1110,7 @@
     var K = pikuahSecs(r);
     var ppl = cSum, lrn = [mSum, hSum.join(' · ')].filter(Boolean).join(' · ');
     var SL = salTab(r);
+    var VD = vaadTab(r);
     var AK = aklimTab(r);
     var fl = flags(r);
     var T = {
@@ -1114,13 +1120,14 @@
                 : '<span class="chip k-' + z.k + '">' + esc(z.t) + '</span>';
             }).join('') + '</div></div>' : '') +
           '<div class="card"><ul class="tabsum">' +
-          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['akl', I.chart, AK.sum], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
+          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vaad', I.doc, VD.sum], ['akl', I.chart, AK.sum], ['vis', I.doc, [K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
             .map(function (z) {
               var lbl = TABS.filter(function (t) { return t[0] === z[0]; })[0][1];
               return '<li><button type="button" data-tab="' + z[0] + '"><span class="st">' + z[1] + esc(lbl) + '</span><span class="sum">' + (z[2] || '') + '</span><span class="go">←</span></button></li>';
             }).join('') + '</ul></div>' + schoolForms(s),
       ppl: P.contacts + P.roles + P.sherut,
       map: K.yaad + K.mipui,
+      vaad: VD.body,
       akl: AK.body,
       vis: '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
       sal: SL.body + (r.sal ? '<div data-tovi-insight="sal:' + esc(s.semel) + '"></div>' : ''),   /* תובי: הסל מול הצרכים (tovi.js) */
@@ -1251,15 +1258,75 @@
       (j.notes ? '<div class="small">' + esc(j.notes) + '</div>' : '') + '</div>';
   }
 
+  /* ----- לשונית ועדה מלווה (מיטל, 8.10.26): ועדות תשפ״ו, החדשה למעלה. ועדה = סמל + שלב;
+     לכל ועדה התקציר המובנה (עמודת "תקציר", JSON — רק מה שכתוב במסמך) וכפתור לכל מסמך ----- */
+  var VAAD_SECS = [['topics', 'נושאים מרכזיים'], ['strengths', 'חוזקות'], ['gaps', 'פערים ואתגרים'], ['decisions', 'החלטות וצעדים להמשך'], ['facts', 'נתונים']];
+  function vaadTab(r) {
+    var head = '<p class="eyebrow">' + I.doc + 'ועדה מלווה · תשפ״ו</p>';
+    if (ST.vaad !== 'ok') return { sum: ST.vaad === 'load' ? 'טוען…' : 'לא נטען', body: '<div class="card">' + pending('vaad') + '</div>' };
+    var rows = r.vaad || [];
+    if (!rows.length) return { sum: tag('k-vaad', 'חסר מסמך'),
+      body: '<div class="card">' + head + '<div class="gc"><span class="chip k-vaad">חסר מסמך ועדה מלווה תשפ״ו</span></div>' +
+        '<div class="small">לא התקבל מסמך של ועדה מלווה מתשפ״ו. ייתכן שהוועדה התקיימה והמסמך לא הועבר.</div></div>' };
+    var by = {}, order = [];
+    rows.forEach(function (x) {
+      var st = String(x['שלב'] || '').trim() || 'ועדה מלווה';
+      if (!by[st]) { by[st] = []; order.push(st); }
+      by[st].push(x);
+    });
+    function dateOf(st) { return by[st].map(function (x) { return String(x['תאריך'] || ''); }).sort().pop() || ''; }
+    order.sort(function (a, b) {   /* החדשה למעלה: סוף שנה לפני תחילת שנה, ואז לפי תאריך */
+      var ra = a === 'סוף שנה' ? 2 : a === 'תחילת שנה' ? 1 : 0, rb = b === 'סוף שנה' ? 2 : b === 'תחילת שנה' ? 1 : 0;
+      return rb - ra || dateOf(b).localeCompare(dateOf(a));
+    });
+    var last = order.map(dateOf).filter(Boolean).sort().pop();
+    var cards = order.map(function (st, i) {
+      var docs = by[st], d = dateOf(st), J = {}, ppl = [], seen = {};
+      docs.forEach(function (x) {
+        var j = null;
+        try { j = JSON.parse(String(x['תקציר'] || '')); } catch (e) { j = null; }
+        if (!j) return;
+        VAAD_SECS.forEach(function (k) { (j[k[0]] || []).forEach(function (t) { J[k[0]] = J[k[0]] || []; if (J[k[0]].indexOf(t) < 0) J[k[0]].push(t); }); });
+        (j.participants || []).forEach(function (t) { if (ppl.indexOf(t) < 0) ppl.push(t); });
+      });
+      var btns = docs.map(function (x) {
+        var fid = String(x['מזהה קובץ בדרייב'] || '').trim(), kind = String(x['סוג'] || 'מסמך');
+        var lbl = 'פתיחה: ' + kind + (seen[kind] ? ' (עותק נוסף)' : '');
+        seen[kind] = 1;
+        return fid ? '<button type="button" class="btn" data-semel="' + esc(r.s.semel) + '" data-vaadadoc="' + esc(fid) + '">' + I.doc + esc(lbl) + '</button>'
+          : '<span class="small">' + esc(kind) + ' עוד לא הועלה לדרייב.</span>';
+      }).join('');
+      var body = (ppl.length ? '<div class="note"><b>משתתפים:</b> ' + esc(ppl.join(' · ')) + '</div>' : '') +
+        VAAD_SECS.map(function (k) {
+          var L = J[k[0]] || [];
+          return L.length ? '<h4 class="subh">' + esc(k[1]) + '</h4><ul class="lvl">' + L.map(function (t) { return '<li><span>' + esc(t) + '</span></li>'; }).join('') + '</ul>' : '';
+        }).join('') +
+        (!J.decisions ? '<div class="small">במסמך לא נרשמו החלטות.</div>' : '');
+      return '<div class="card"><p class="eyebrow">' + I.doc + 'ועדה מלווה · ' + esc(st === 'ועדה מלווה' ? 'תשפ״ו' : st) +
+          '<span class="end">' + (d ? esc(fmtDate(d)) : 'תאריך לא מצוין') + '</span></p>' +
+        '<div class="acts">' + btns + '</div>' +
+        '<div class="small">המסמכים נפתחים דרך הבית, רק למי שבית הספר משויך אליו/ה.</div>' +
+        /* הוועדה החדשה פתוחה; הקודמת מקופלת (מיטל: "תקפל כל מה שאפשר") */
+        (i === 0 ? body : '<details class="vis" style="margin-top:12px"><summary><b>התקציר</b></summary><div class="vb">' + body + '</div></details>') +
+        '</div>';
+    }).join('');
+    return {
+      sum: tag('ok', order.length === 1 ? 'ועדה אחת' : order.length + ' ועדות') + (last ? ' · אחרונה ' + esc(fmtDate(last)) : ''),
+      body: cards
+    };
+  }
+
   /* פתיחת מסמך הסל: חלון נפתח מיד בלחיצה (אחרת הדפדפן חוסם), והמסמך נטען אליו מהשער.
      השער בודק שבית הספר משויך למי שנכנס.ה — בלי שיתוף בדרייב (מיטל, 7.10.26) */
   var GATE_EXEC = GAS + 'AKfycbynKp-eTNj7pY5lTaSD5_S_qhBH2RgEeLWOPW5ZeF2dTQ5hifL3Q7Lb4KDdQYJ_4Vz9/exec';
-  function openSalDoc(semel) {
+  /* fid = מסמך ועדה מלווה (vaadaDoc, 8.10.26) — אותו מסלול, השער בודק שהקובץ שייך לבית הספר */
+  function openSalDoc(semel, fid) {
     var w = window.open('', '_blank');
     if (w) w.document.write('<p dir="rtl" style="font-family:Arial,sans-serif;padding:24px">טוען את המסמך…</p>');
     toast('טוען את המסמך…');
+    var req = fid ? { action: 'vaadaDoc', token: token(), semel: semel, fid: fid } : { action: 'salDoc', token: token(), semel: semel };
     fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'salDoc', token: token(), semel: semel }) }, 90000, 1).then(function (d) {
+      body: JSON.stringify(req) }, 120000, 1).then(function (d) {
       if (!d || !d.ok) throw new Error(d && d.error || 'err');
       var bin = atob(d.b64), arr = new Uint8Array(bin.length);
       for (var i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
@@ -2044,6 +2111,8 @@
     /* לפני data-go: כפתור שמסנן ואז עובר לרשימה */
     var sd = t.closest('[data-saldoc]');
     if (sd) { e.preventDefault(); openSalDoc(sd.getAttribute('data-saldoc')); return; }
+    var vd = t.closest('[data-vaadadoc]');
+    if (vd) { e.preventDefault(); openSalDoc(vd.getAttribute('data-semel'), vd.getAttribute('data-vaadadoc')); return; }
     var gk2 = t.closest('[data-gk]');
     if (gk2) { GKIND = gk2.getAttribute('data-gk'); go('G'); return; }
     var ak2 = t.closest('[data-ak]');

@@ -369,6 +369,7 @@ footer a{color:var(--navy)}
 .fv>span{display:block;font-size:12.5px;color:var(--muted);font-weight:700}
 .fv>div{font-size:15px;line-height:1.6;white-space:normal;word-break:break-word}
 .k-sal{--kc:#5f6b12;--ks:#f1f3dc}
+.k-vaad{--kc:#0f766e;--ks:#e3f4f1}   /* ועדה מלווה (8.10.26) */
 
 /* ===== מיתוג תובה ===== */
 .top-in .brand{padding-inline-start:46px;background:url(brand/tuva-symbol.png) right center/36px no-repeat;min-height:40px;display:flex;flex-direction:column;justify-content:center}
