@@ -25,6 +25,22 @@
   };
   var MENOR_LINK = 'https://pedagogiamh.co.il/hadrachot/ministry/rishum-morim.html';
   var MENOR_VIEW = 'https://pedagogiamh.co.il/hadrachot/ministry/';   /* "מבט ארצי" — רויטל = ministry במנור */
+  /* המבט של כל מפקח.ת במנור (8.10.26) — slug מ-TS_INSPECTORS ב-hadrachot/assets/guides.js. רביב ושרונה = מבט לפי בתי ספר */
+  var MABAT = { 'ליאת צבר': 'liat', 'סיגלית דאי': 'sigalit', 'יששכר חפץ': 'yisachar', 'רויטל אמיר': 'revital',
+                'ויסאם סואלחה': 'wesam', 'יסמין אמון': 'yasmin', 'רביב שורץ': 'raviv', 'שרונה בלוך': 'sharona' };
+  function myMenorView() {
+    if (adminView()) return MENOR_VIEW;
+    var n = SUPNAME.replace(/\s+/g, ' '), slug = MABAT[n];
+    if (!slug) Object.keys(MABAT).forEach(function (k) { if (!slug && n && (n.indexOf(k) > -1 || k.indexOf(n) > -1)) slug = MABAT[k]; });
+    return slug ? 'https://pedagogiamh.co.il/hadrachot/mabat/?i=' + slug : '';
+  }
+  /* קישורים פתוחים שמפקח.ת שולח.ת למנהלים ולבעלי התפקידים (8.10.26) — בראש "טפסים פעילים" */
+  var OPEN_LINKS = [
+    ['רישום להשתלמויות · בעלי התפקידים', 'רכזים חברתיים, מת״ליות, חונכים, רכזים פדגוגיים, נתיבים לקריירה ושירות לאומי', 'https://pedagogiamh.co.il/hishtalmuyot.html#rishum'],
+    ['השתלמות מוסדית · הטופס למנהלים', 'בקשה להשתלמות בית ספרית, שעוברת לאישור המפקח.ת', 'https://pedagogiamh.co.il/hishtalmut-beit-sifrit.html'],
+    ['נספח בעלי התפקידים · הטופס למנהלים', 'מי ממלא כל תפקיד בבית הספר', 'https://pedagogiamh.co.il/nispach-baaley-tafkidim.html'],
+    ['רישום מורים למנור', 'קישור אחד לכל המורים: מייל וקוד, השתלמות ויח״ל', 'https://pedagogiamh.co.il/hadrachot/teacher/']
+  ];
   /* הבית של המפקח — ביקורים, דוחות, משימות ומסמכים. רויטל = "מטה" בלשונית מפקחים שם, ורואה את כל המפקחים */
   var MEF_EXEC = GAS + 'AKfycbxyhvbkVUtydT70TH5Q2fYXu-MpFfAv0qxX7K-RzsSvt7UWXoxwjHun1zwK6MJQj6_K/exec';
   var MENOR_LOW = 0.5;
@@ -512,10 +528,10 @@
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
-      (adminView() ? item('F', I.doc, 'טפסים פעילים', fNavCount()) : '') +
+      item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
       '<li class="sep"></li>' +
-      (adminView() ? '<li><a class="home" href="' + MENOR_VIEW + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
+      (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
   }
 
@@ -1821,9 +1837,27 @@
     return x ? String(r[x.label] || '') : '';
   }
 
+  /* קישורים פתוחים (8.10.26): המבט האישי במנור + הטפסים הפתוחים שנשלחים לבתי הספר. גם למפקחים */
+  function openLinks() {
+    var mv = myMenorView(), h = '<div class="card"><p class="eyebrow">' + I.ext + 'קישורים פתוחים</p><div class="tiles">';
+    if (mv) h += '<div class="tile ftile">' + I.chart + '<span class="ftx"><b class="fttl">המבט שלי במנור</b><small>' +
+      (adminView() ? 'המבט הארצי' : 'המורים בבתי הספר שלך: רישום, השתלמות ונוכחות במפגשים') + ' · הכניסה בקוד שנשלח למייל · קישור אישי, לא להעביר</small>' +
+      '<span class="fbt"><a class="btn sm primary" href="' + esc(mv) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחה</a></span></span></div>';
+    OPEN_LINKS.forEach(function (l, i) {
+      LISTS['olink' + i] = l[2];
+      h += '<div class="tile ftile">' + I.doc + '<span class="ftx"><b class="fttl">' + esc(l[0]) + '</b><small>' + esc(l[1]) + '</small>' +
+        '<span class="fbt"><a class="btn sm" href="' + esc(l[2]) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחה</a>' +
+        '<button type="button" class="btn sm" data-copy="olink' + i + '">' + I.copy + 'העתקת הקישור</button></span></span></div>';
+    });
+    return h + '</div></div>';
+  }
   function formsPage() {
+    if (!adminView()) {
+      $('main').innerHTML = '<div class="card head"><h1>טפסים וקישורים</h1><div class="meta">הקישורים הפתוחים שאפשר לשלוח למנהלים ולבעלי התפקידים, והמבט שלך במנור.</div></div>' + openLinks();
+      return;
+    }
     var h = '<div class="card head"><h1>טפסים פעילים</h1><div class="meta">טפסי רישום ודיווח זמניים. טופס שנסגר עובר לארכיון, והפניות שלו נשמרות.</div>' +
-      '<div class="acts" style="margin-top:12px"><button type="button" class="btn primary" data-go="N">+ טופס חדש</button></div></div>';
+      '<div class="acts" style="margin-top:12px"><button type="button" class="btn primary" data-go="N">+ טופס חדש</button></div></div>' + openLinks();
     if (ST.forms !== 'ok') { $('main').innerHTML = h + '<div class="card">' + pending('forms') + '</div>'; return; }
     var open = FORMS.filter(function (f) { return f.open; }), closed = FORMS.filter(function (f) { return !f.open; });
     h += '<div class="card"><p class="eyebrow">' + I.doc + 'טפסים פתוחים</p>' +

@@ -337,6 +337,7 @@ footer a{color:var(--navy)}
 .ftx{flex:1;min-width:0}
 .fttl{display:block;border:0;background:none;padding:0;font:700 15px Assistant,sans-serif;color:var(--ink);cursor:pointer;text-align:right}
 .fttl:hover{color:var(--blue);text-decoration:underline}
+b.fttl{cursor:default}b.fttl:hover{color:var(--ink);text-decoration:none}
 .fbt{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .foutli{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px;background:var(--paper);border-radius:10px;padding:8px 12px;font-size:14.5px}
 .foutact{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
