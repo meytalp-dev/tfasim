@@ -445,10 +445,59 @@
     }).then(function () { busy = false; paint(); });
   }
 
+  /* ===== "מה תובי יכול לעשות?" — פריט קבוע בתפריט הצד + חלון הסבר (מיטל, 8.10.26) =====
+     app.js בונה את התפריט מחדש ב-innerHTML, ולכן הפריט מוחזר אחרי כל ציור (navItem + MutationObserver על #nav) */
+  var HELP = [
+    ['תדריך לפני ביקור', 'בעמוד של בית ספר: הכפתור "תדריך לפני ביקור". תוך כדקה מתקבלים תמונת מצב, מה השתנה מאז הביקור האחרון, נקודות לבדיקה והמלצות. אפשר להדפיס, להעתיק או לשלוח במייל.'],
+    ['תובנות במקום', 'כפתורים עם הסימן ' + I.spark + ' לאורך תובה: על מה להתמקד השבוע (בדשבורד), האקלים, המדדים החלשים, מה חוזר בביקורים, היעדים, הסל מול הצרכים, ואיזו השתלמות תקדם את בית הספר.'],
+    ['שאלה חופשית', 'הכפתור "תובי" בפינת המסך, בכל עמוד. למשל: "איזה בית ספר צריך הכי הרבה תשומת לב עכשיו?", "מה סוכם בביקור האחרון?", "מה ספר ההפעלה אומר על פירמידת החניכות?". בחלונית בוחרים על איזה בית ספר שואלים, וגם אפשר לבחור נושא ולקבל שאלות לדוגמה.'],
+    ['ידע מקצועי', 'תובי נשען על ספר ההפעלה ועל ספר החינוך היוצר, ומציע צעדים שמעוגנים בהם.']
+  ];
+  var HELP_WHY = ['הכנה לביקור בכמה דקות, בלי לעבור בין קבצים וטפסים', 'דפוסים שחוזרים בכמה בתי ספר — במבט אחד',
+    'הצעות לצעדים הבאים, מעוגנות בספר ההפעלה', 'סיכום מוכן לשיתוף עם המנהל.ת או הצוות'];
+  var HELP_NOTE = ['תובי רואה רק את בתי הספר שלך.', 'ליד כל טענה מופיע המקור — כדאי לבדוק אותו לפני שמחליטים.',
+    'תובי לא שולח מיילים ולא משנה נתונים בתובה.', 'השיחה נמחקת כשסוגרים את הלשונית.'];
+  var helpBox;
+  function navItem() {
+    var tl = document.getElementById('tourLink');
+    if (!tl || document.getElementById('toviHelpLink')) return;
+    var li = document.createElement('li');
+    li.innerHTML = '<button type="button" class="home" id="toviHelpLink">' + I.spark + 'מה תובי יכול לעשות?</button>';
+    tl.parentNode.parentNode.insertBefore(li, tl.parentNode);
+  }
+  function helpOpen() {
+    document.body.classList.remove('nav-on');   /* בטלפון — סוגרים את המגירה */
+    if (!helpBox) {
+      helpBox = document.createElement('div');
+      helpBox.className = 'tovi-help'; helpBox.hidden = true;
+      var li = function (a) { return '<ul>' + a.map(function (x) { return '<li>' + x + '</li>'; }).join('') + '</ul>'; };
+      helpBox.innerHTML = '<div class="tovi-help-card" role="dialog" aria-modal="true" aria-labelledby="toviHelpT">' +
+        '<button type="button" class="tovi-x" data-tovi-help-x aria-label="סגירה">' + I.x + '</button>' +
+        '<div class="tovi-help-head">' + AVATAR.replace('width="32" height="32"', 'width="56" height="56"') +
+        '<div><h2 id="toviHelpT">תובי — העוזר החכם של תובה</h2>' +
+        '<p>תובי קורא את כל מה שיש בתובה על בתי הספר שלך — מיפוי, יעדים, ביקורים, אקלים, סל תוכניות, בעלי תפקידים, השתלמויות ומנור — והופך את זה לתובנות.</p></div></div>' +
+        '<h3>מה תובי עושה</h3><div class="tovi-help-grid">' + HELP.map(function (h) {
+          return '<div><b>' + h[0] + '</b><p>' + h[1] + '</p></div>'; }).join('') + '</div>' +
+        '<h3>איך זה עוזר</h3>' + li(HELP_WHY) +
+        '<h3>חשוב לדעת</h3>' + li(HELP_NOTE) +
+        '<div class="tovi-help-acts"><button type="button" class="btn primary" data-tovi-help-ask>' + I.spark + 'לשאול את תובי</button>' +
+        '<button type="button" class="btn" data-tovi-help-x>סגירה</button></div></div>';
+      document.body.appendChild(helpBox);
+      helpBox.addEventListener('click', function (e) { if (e.target === helpBox) helpClose(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && helpBox && !helpBox.hidden) helpClose(); });
+    }
+    helpBox.hidden = false;
+    var b = helpBox.querySelector('[data-tovi-help-ask]'); if (b) b.focus({ preventScroll: true });
+  }
+  function helpClose() { if (helpBox) helpBox.hidden = true; }
+
   /* ===== חיבור לדף ===== */
   document.addEventListener('click', function (e) {
     var t = e.target.closest ? e.target : null, el;
     if (!t) return;
+    if (t.closest('#toviHelpLink')) { helpOpen(); return; }
+    if (t.closest('[data-tovi-help-x]')) { helpClose(); return; }
+    if (t.closest('[data-tovi-help-ask]')) { helpClose(); open(true); return; }
     if ((el = t.closest('[data-tovi-brief]'))) { brief(el.getAttribute('data-tovi-brief')); return; }
     if ((el = t.closest('[data-tovi-ins]'))) { insight(el.getAttribute('data-tovi-ins')); return; }
     if ((el = t.closest('[data-tovi-topic]'))) { TOPIC = +el.getAttribute('data-tovi-topic'); paint(); return; }
@@ -477,6 +526,9 @@
     buildChat();
     var main = document.getElementById('main');
     if (main && window.MutationObserver) new MutationObserver(fillSlots).observe(main, { childList: true });
+    var nav = document.getElementById('nav');
+    if (nav && window.MutationObserver) new MutationObserver(navItem).observe(nav, { childList: true });
+    navItem();
     fillSlots();
   }
   document.addEventListener('pmh:in', start);
