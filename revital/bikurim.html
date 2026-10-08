@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>עדכון ביקורי הפיקוח · תובה</title>
+<!-- bikurim: רק העלאת ייצוא הביקורים ממונדיי (שהאד, 8.10.26). all (רויטל, מיטל) נכנסות גם הן.
+     ההרשאה האמיתית בשער: bikurimImport בודק את המרחב, וכלום מהביקורים עצמם לא מוצג כאן -->
+<script src="https://pedagogiamh.co.il/auth.js" data-space="bikurim"></script>
+<link rel="icon" type="image/png" href="brand/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#3D2643; --blue:#6B4FB0; --blue-soft:#F2EBFD; --brand:#A48DD3;
+  --ink:#231a2b; --muted:#6c6478; --line:#e9e3f1; --paper:#f7f4fb; --bg:#faf8fc;
+  --ok:#0f8a74; --ok-soft:#e1f5f0; --bad:#c43c47; --bad-soft:#fdecee; --warn:#a8620b; --warn-soft:#fff3e2;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.55;color:var(--ink);background:var(--bg)}
+[dir=ltr]{unicode-bidi:isolate}
+[hidden]{display:none!important}
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.top-in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:12px}
+.brand b{font:700 17px/1.2 Rubik,sans-serif;color:var(--navy);display:block}
+.brand small{color:var(--muted);font-size:12.5px}
+.out{margin-inline-start:auto;border:0;background:none;color:var(--muted);font:inherit;font-size:13.5px;cursor:pointer;text-decoration:underline;min-height:44px}
+main{max-width:760px;margin:0 auto;padding:20px 16px 40px}
+h1{font:700 22px/1.3 Rubik,sans-serif;color:var(--navy);margin:0 0 6px}
+.lead{color:var(--muted);margin:0 0 18px}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:16px}
+.steps{margin:0;padding-inline-start:22px}
+.steps li{margin-bottom:6px}
+.pick{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:10px 18px;border-radius:12px;border:1px solid var(--blue);background:var(--blue);color:#fff;font:700 15.5px Assistant,sans-serif;cursor:pointer;text-decoration:none}
+.btn svg{width:18px;height:18px;flex:none}
+.btn.ghost{background:#fff;color:var(--blue)}
+.btn[disabled]{opacity:.45;cursor:default}
+.fname{color:var(--muted);font-size:14px;word-break:break-all}
+input[type=file]{position:absolute;width:1px;height:1px;opacity:0}
+.msg{padding:12px 14px;border-radius:12px;margin-top:14px}
+.msg.err{background:var(--bad-soft);color:var(--bad)}
+.msg.ok{background:var(--ok-soft);color:var(--ok)}
+.msg.wait{background:var(--paper);color:var(--muted)}
+.tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:4px 0 14px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center;background:var(--paper)}
+.tile b{display:block;font:700 26px/1.1 Rubik,sans-serif}
+.tile span{font-size:13.5px;color:var(--muted)}
+.tile.new b{color:var(--ok)} .tile.upd b{color:var(--blue)} .tile.skip b{color:var(--bad)}
+details{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;background:#fff}
+summary{cursor:pointer;padding:12px 14px;font-weight:700;min-height:44px}
+details ul{margin:0;padding:0 14px 12px;list-style:none;max-height:340px;overflow:auto}
+details li{padding:6px 0;border-top:1px solid var(--line);font-size:14.5px}
+details li small{color:var(--muted)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+footer{text-align:center;color:var(--muted);font-size:12.5px;padding:18px 16px 26px}
+footer a{color:var(--muted)}
+@media (max-width:560px){
+  .tiles{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .btn{width:100%}
+  .actions{flex-direction:column}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in">
+  <div class="brand"><b>תובה</b><small>עדכון ביקורי הפיקוח ממונדיי</small></div>
+  <button type="button" class="out" id="out">יציאה</button>
+</div></header>
+
+<main>
+  <h1>עדכון ביקורי הפיקוח</h1>
+  <p class="lead" id="hello">מעלים את הדוח ממונדיי, והביקורים נכנסים לתובה.</p>
+
+  <section class="card">
+    <ol class="steps">
+      <li>במונדיי, בלוח <b>"תשפ"ו - טופס פיקוח פדגוגי"</b>: תפריט הלוח ← ייצוא לאקסל.</li>
+      <li>בוחרים כאן את הקובץ שירד. אפשר כל פעם את הלוח המלא, ביקורים שכבר נמצאים בתובה לא ייכפלו.</li>
+      <li>בודקים את התצוגה המקדימה ולוחצים "שמירה בתובה".</li>
+    </ol>
+    <div class="pick">
+      <label class="btn" for="file">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+        בחירת קובץ אקסל
+      </label>
+      <input type="file" id="file" accept=".xlsx,.xls,.csv">
+      <span class="fname" id="fname" dir="ltr"></span>
+    </div>
+    <div id="status" hidden></div>
+  </section>
+
+  <section class="card" id="preview" hidden>
+    <div class="tiles">
+      <div class="tile new"><b id="nNew">0</b><span>ביקורים חדשים</span></div>
+      <div class="tile upd"><b id="nUpd">0</b><span>יעודכנו</span></div>
+      <div class="tile"><b id="nSame">0</b><span>כבר בתובה, בלי שינוי</span></div>
+      <div class="tile skip"><b id="nSkip">0</b><span>לא ייקלטו</span></div>
+    </div>
+    <div id="lists"></div>
+    <div class="actions">
+      <button type="button" class="btn" id="save">שמירה בתובה</button>
+      <button type="button" class="btn ghost" id="again">בחירת קובץ אחר</button>
+    </div>
+  </section>
+</main>
+
+<footer>המנהל להכשרה מקצועית · משרד העבודה · נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var GATE = 'https://script.google.com/macros/s/AKfycbynKp-eTNj7pY5lTaSD5_S_qhBH2RgEeLWOPW5ZeF2dTQ5hifL3Q7Lb4KDdQYJ_4Vz9/exec';
+  /* העמודות שהשער קורא — אותן כותרות כמו בייצוא של לוח הביקורים */
+  var COLS = ['Name', 'שם בית הספר', 'שם מנהל.ת בית הספר', 'תאריך הביקור', 'שם מפקח.ת פדגוגי.ת',
+              'נוכחים בביקור', 'מטרות הביקור', 'נושאים שעלו בביקור', 'סיכום הביקור',
+              'פעולות נדרשות ונושאים למעקב', 'מסמכים וקבצים רלוונטיים לביקור'];
+  var $ = function (id) { return document.getElementById(id); };
+  var rows = null, fileName = '';
+
+  function token() {
+    var keys = ['localStorage', 'sessionStorage'];
+    for (var i = 0; i < keys.length; i++) {
+      try {
+        var s = JSON.parse(window[keys[i]].getItem('pmh_auth') || 'null');
+        if (s && s.token && s.exp > Date.now()) return s.token;
+      } catch (e) { /* אחסון חסום */ }
+    }
+    return '';
+  }
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function heDate(iso) {
+    var m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    return m ? Number(m[3]) + '.' + Number(m[2]) + '.' + m[1].slice(2) : String(iso || '');
+  }
+  function status(kind, text) {
+    var el = $('status');
+    el.hidden = !text;
+    el.className = 'msg ' + kind;
+    el.textContent = text || '';
+  }
+  var ERR = {
+    badsession: 'פג תוקף הכניסה. יוצאים ונכנסים מחדש.',
+    nospace: 'אין לך הרשאה לעדכן ביקורים. פנו למיטל.',
+    empty: 'לא נמצאו ביקורים בקובץ.',
+    toobig: 'הקובץ גדול מדי (יותר מ-5,000 שורות).',
+    busy: 'עדכון אחר רץ ממש עכשיו. נסו שוב בעוד דקה.',
+    badtab: 'מבנה הגיליון בתובה השתנה. פנו למיטל.',
+    notab: 'לשונית הביקורים בתובה לא נמצאה. פנו למיטל.',
+    nosheet: 'גיליון נתוני הפיקוח לא מוגדר. פנו למיטל.'
+  };
+
+  function send(dry) {
+    return fetch(GATE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'bikurimImport', token: token(), dryRun: dry, file: fileName, rows: rows })
+    }).then(function (r) { return r.json(); });
+  }
+
+  /* קריאת האקסל: מאתרים את שורת הכותרות (עד 25 שורות פתיח), ולוקחים רק את העמודות שהשער צריך */
+  function parse(buf) {
+    var wb = XLSX.read(buf, { type: 'array' });
+    for (var s = 0; s < wb.SheetNames.length; s++) {
+      var a = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[s]], { header: 1, raw: true, defval: '' });
+      for (var h = 0; h < Math.min(a.length, 25); h++) {
+        var head = a[h].map(function (x) { return String(x).trim(); });
+        if (head.indexOf('תאריך הביקור') < 0 || head.indexOf('שם בית הספר') < 0) continue;
+        var idx = {};
+        COLS.forEach(function (c) { idx[c] = head.indexOf(c); });
+        var out = [];
+        for (var r = h + 1; r < a.length; r++) {
+          var row = a[r];
+          var filled = row.filter(function (x) { return String(x).trim() !== ''; }).length;
+          if (!filled) continue;
+          /* כותרת קבוצה ממונדיי (תא ראשון בלבד) או כותרות חוזרות — לא ביקור */
+          if (filled === 1 && String(row[0]).trim()) continue;
+          if (String(row[idx['תאריך הביקור']]).trim() === 'תאריך הביקור') continue;
+          var o = { _row: r + 1 };
+          COLS.forEach(function (c) { o[c] = idx[c] > -1 ? String(row[idx[c]] == null ? '' : row[idx[c]]) : ''; });
+          out.push(o);
+        }
+        return out;
+      }
+    }
+    return null;
+  }
+
+  function list(title, items, line, open) {
+    if (!items.length) return '';
+    return '<details' + (open ? ' open' : '') + '><summary>' + esc(title) + ' (' + items.length + ')</summary><ul>' +
+      items.map(function (x) { return '<li>' + line(x) + '</li>'; }).join('') + '</ul></details>';
+  }
+  function visit(x) {
+    return '<b>' + esc(heDate(x.date)) + '</b> · ' + esc(x.school) + ' <small>· ' + esc(x.sup) + '</small>';
+  }
+
+  function showPreview(d) {
+    $('nNew').textContent = d.added;
+    $('nUpd').textContent = d.updated;
+    $('nSame').textContent = d.same;
+    $('nSkip').textContent = d.skipped.length;
+    $('lists').innerHTML =
+      list('לא ייקלטו', d.skipped, function (x) {
+        return '<b>' + esc(x.why) + '</b> <small>· שורה ' + esc(x.row) + (x.date ? ' · ' + esc(heDate(x.date)) : '') +
+          (x.sup ? ' · ' + esc(x.sup) : '') + (x.name ? ' · ' + esc(x.name) : '') + '</small>';
+      }, true) +
+      list('ביקורים חדשים', d.addedList, visit, false) +
+      list('ביקורים שיעודכנו', d.updatedList, visit, false);
+    var change = d.added + d.updated;
+    $('save').disabled = !change;
+    $('save').textContent = change ? 'שמירה בתובה (' + change + ')' : 'אין מה לעדכן';
+    $('preview').hidden = false;
+  }
+
+  $('file').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    $('preview').hidden = true;
+    rows = null;
+    if (!f) return;
+    fileName = f.name;
+    $('fname').textContent = f.name;
+    status('wait', 'קוראים את הקובץ…');
+    var rd = new FileReader();
+    rd.onload = function () {
+      var got;
+      try { got = parse(new Uint8Array(rd.result)); }
+      catch (e) { return status('err', 'לא הצלחנו לקרוא את הקובץ. ודאו שזה הייצוא לאקסל ממונדיי.'); }
+      if (!got) return status('err', 'הקובץ לא נראה כמו ייצוא לוח הביקורים: לא נמצאו העמודות "שם בית הספר" ו"תאריך הביקור".');
+      if (!got.length) return status('err', 'לא נמצאו ביקורים בקובץ.');
+      rows = got;
+      status('wait', 'בודקים ' + got.length + ' שורות מול תובה…');
+      send(true).then(function (d) {
+        if (!d || !d.ok) return status('err', ERR[d && d.error] || 'תקלה רגעית. נסו שוב בעוד רגע.');
+        status('', '');
+        showPreview(d);
+      }).catch(function () { status('err', 'לא הצלחנו להתחבר לשרת. נסו שוב בעוד רגע.'); });
+    };
+    rd.onerror = function () { status('err', 'לא הצלחנו לקרוא את הקובץ.'); };
+    rd.readAsArrayBuffer(f);
+  });
+
+  $('save').addEventListener('click', function () {
+    if (!rows) return;
+    var b = this;
+    b.disabled = true;
+    b.textContent = 'שומרים…';
+    send(false).then(function (d) {
+      if (!d || !d.ok) {
+        b.disabled = false; b.textContent = 'שמירה בתובה';
+        return status('err', ERR[d && d.error] || 'תקלה רגעית. נסו שוב בעוד רגע.');
+      }
+      $('preview').hidden = true;
+      status('ok', 'נשמר. נוספו ' + d.added + ' ביקורים ועודכנו ' + d.updated + '. בתובה יש עכשיו ' +
+        d.totalAfter + ' ביקורים, האחרון מ-' + heDate(d.latest) + '.');
+      rows = null;
+      $('file').value = '';
+    }).catch(function () {
+      b.disabled = false; b.textContent = 'שמירה בתובה';
+      status('err', 'לא הצלחנו להתחבר לשרת. ייתכן שהשמירה לא הושלמה. נסו שוב, ביקורים לא ייכפלו.');
+    });
+  });
+
+  $('again').addEventListener('click', function () { $('file').click(); });
+  $('out').addEventListener('click', function () { if (window.PMH_AUTH) PMH_AUTH.logout(); });
+  function hello() {
+    var u = window.PMH_AUTH && PMH_AUTH.user();
+    if (u && u.name) $('hello').textContent = 'שלום ' + u.name + '. מעלים את הדוח ממונדיי, והביקורים נכנסים לתובה.';
+  }
+  document.addEventListener('pmh:in', hello);
+  if (document.documentElement.classList.contains('pmh-in')) hello();
+})();
+</script>
+</body>
+</html>
