@@ -1057,6 +1057,7 @@
       }).join('') + '</ul>' : '<div class="empty">אף אחד מבית הספר עוד לא נרשם להשתלמויות.</div>');
       hBody += '<div class="small"><a href="' + BS_LINK + '" target="_blank" rel="noopener">מעקב ההשתלמות המוסדית</a> · ' +
         '<a href="' + RG_LINK + '" target="_blank" rel="noopener">מעקב הרישום להשתלמויות</a></div>';
+      hBody += '<div data-tovi-insight="hisht:' + esc(s.semel) + '"></div>';   /* תובי: איזו השתלמות תקדם את בית הספר (tovi.js) */
     }
     P.hisht = sec('hisht', I.book, 'השתלמויות', hSum.join(' · ') || 'טוען…', hBody);
 
