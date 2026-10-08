@@ -749,6 +749,7 @@
       stat('G', gapN, 'עם חוסרים להשלמה', 'נספח, השתלמויות, מנור, סל תוכניות', 'var(--brand)', ' data-gk=""') +
       stat('A', attN, 'דורשים תשומת לב', 'ביקור, מדדים בסיכון, יעדים', 'var(--brand-sky)', ' data-ak=""') +
       stat('A', riskN, 'עם מדד במצב סיכון', 'לפי המיפוי האחרון', 'var(--blue)', ' data-ak="risk"') + '</div></div>';
+    h += '<div data-tovi-insight="focus:all"></div>';   /* תובי: על מה להתמקד השבוע — אותה תוצאה גם ב"דורש תשומת לב" (tovi.js) */
 
     /* מצב במיפוי — פס אחד לפי הדירוג הכולל, עם מקרא שהוא גם הטבלה */
     var cnt = { ok: 0, warn: 0, bad: 0, none: 0 };
@@ -809,7 +810,8 @@
           return '<option' + (n === ASUP ? ' selected' : '') + '>' + esc(n) + '</option>'; }).join('') + '</select></div>' +
         '<div class="views"><div class="seg" role="group" aria-label="תצוגה">' +
         '<button type="button" data-aview="all">רשימה אחת</button><button type="button" data-aview="sup">לפי מפקח.ת</button></div>' +
-        '<div class="acts"><button class="btn" data-copy="att">' + I.copy + 'העתקה לאקסל</button></div></div></div><div id="attList"></div>';
+        '<div class="acts"><button class="btn" data-copy="att">' + I.copy + 'העתקה לאקסל</button></div></div>' +
+        '<div data-tovi-insight="focus:all"></div></div><div id="attList"></div>';   /* תובי: על מה להתמקד השבוע (tovi.js) */
       $('asup').onchange = function () { ASUP = this.value; drawAtt(); };
     }
     drawAtt();
@@ -1119,8 +1121,8 @@
       ppl: P.contacts + P.roles + P.sherut,
       map: K.yaad + K.mipui,
       akl: AK.body,
-      vis: K.bik + P.visits + P.tasks,
-      sal: SL.body,
+      vis: '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
+      sal: SL.body + (r.sal ? '<div data-tovi-insight="sal:' + esc(s.semel) + '"></div>' : ''),   /* תובי: הסל מול הצרכים (tovi.js) */
       lrn: P.megamot + P.hisht + P.menor
     };
     h += '<nav class="tabs" id="schTabs" role="tablist" aria-label="חלקי העמוד">' + TABS.map(function (t) {
@@ -1198,7 +1200,8 @@
       sum: nBad ? tag('k-aklim', nBad === 1 ? 'ממד אחד חריג' : nBad + ' ממדים חריגים') : 'אין פער או ירידה',
       body: '<div class="card">' + head + '<div class="small">התקבלו: ' + esc(got.join(' · ')) +
         (got.length < 3 ? ' · לא התקבל: ' + esc(AKL_AUD.filter(function (a) { return got.indexOf(a) < 0; }).join(' · ')) : '') +
-        ' · חריג = ' + AKL_GAP + ' נקודות ומעלה מתחת להשוואה, או ירידה של ' + AKL_GAP + ' ומעלה מתשפ״ה</div></div>' + body
+        ' · חריג = ' + AKL_GAP + ' נקודות ומעלה מתחת להשוואה, או ירידה של ' + AKL_GAP + ' ומעלה מתשפ״ה</div></div>' +
+        '<div data-tovi-insight="aklim:' + esc(r.s.semel) + '"></div>' + body   /* תובי: תובנות על האקלים (tovi.js) */
     };
   }
 
@@ -1303,7 +1306,8 @@
       if (i) return '<details class="vis"><summary><b>מיפוי קודם</b> · ' + who + '</summary><div class="vb">' + mipuiBody(row) + '</div></details>';
       return (mp.length > 1 ? '<h4 class="subh">המיפוי האחרון · ' + who + '</h4>' : '<div class="small" style="margin:0 0 10px">מילא.ה: ' + who + '</div>') +
         mipuiBody(row);
-    }).join('') : '<div class="empty">אין מיפוי לבית הספר הזה בקובץ (מרץ 2026).</div>');
+    }).join('') + '<div data-tovi-insight="mipui:' + esc(r.s.semel) + '"></div>'   /* תובי: תובנות על המדדים החלשים (tovi.js) */
+      : '<div class="empty">אין מיפוי לבית הספר הזה בקובץ (מרץ 2026).</div>');
     function mipuiBody(row) {
       var lv = levels(row), groups = [];
       lv.forEach(function (x) { var g = groups[groups.length - 1]; if (!g || g.n !== x.grp) groups.push(g = { n: x.grp, l: [] }); g.l.push(x); });
@@ -1570,6 +1574,7 @@
         'אין מייל של המפקח.ת בגיליון אנשי הקשר.') + '</div>' +
       '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') +
       '<a class="btn" href="?as=' + encodeURIComponent(name) + '" target="_blank" rel="noopener">' + I.home + 'הבית כמו ש' + esc(name) + ' רואה' + I.ext + '</a></div></div></div>';
+    if (adminView() && list.length) h += '<div data-tovi-insight="sup:' + esc(name) + '"></div>';   /* תובי: תמונת מצב של המפקח.ת — אדמין בלבד, השרת בודק שוב (tovi.js) */
     var bad = list.filter(function (r) { return issues(r).length; });
     h += sec('sup-state', I.chart, 'מצב בתי הספר', bad.length ? tag('', bad.length + ' עם משהו פתוח') : tag('ok', 'הכול תקין'),
       '<ul class="list">' + list.map(function (r) {
@@ -2122,7 +2127,11 @@
       menor: r.menor && r.menor.t ? 'נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים' : '',
       roles: ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? 'הנספח לא הוגש' :
         'הוגש ' + x.ts + ' · ' + x.people.length + ' בעלי תפקידים' + (x.missing.length ? ' · חסרים: ' + x.missing.join(', ') : '')),
-      mef: mef, lastMef: r.mvLast || ''
+      mef: mef, lastMef: r.mvLast || '',
+      /* השתלמויות (8.10.26): המוסדית + כמה נרשמו לכל אחת מההשתלמויות המקוונות */
+      hisht: [ST.bs !== 'ok' ? '' : (r.bs ? 'השתלמות מוסדית: ' + r.bs.status + (r.bs.name ? ' · ' + r.bs.name : '') : 'השתלמות מוסדית: לא הוגשה'),
+        ST.rg !== 'ok' ? '' : 'נרשמו להשתלמויות המקוונות: ' + WS.map(function (w) { return w[1] + ' ' + (Number(r.rg && r.rg[w[0]]) || 0); }).join(', ')
+      ].filter(Boolean).join(' · ')
     };
   }
 

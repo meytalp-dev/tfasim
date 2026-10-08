@@ -203,12 +203,34 @@
   }
 
   /* ===== כפתורי תובנות (8.10.26) — [data-tovi-insight="<סוג>:<סמל>"] בדף; הסוגים בשרת (INSIGHTS) ===== */
+  /* חמישה בעמוד בית ספר + "על מה להתמקד" (דשבורד ודורש תשומת לב, אותה תוצאה) + מפקח.ת (אדמין; השרת בודק) */
   var INS = {
-    goals: { btn: 'תובנות להשגת היעדים', title: 'תובנות להשגת היעדים',
-             desc: 'לכל יעד: איפה הוא עומד לפי הנתונים, פעולות אפשריות, ואיך נדע שזה עובד.' }
+    goals:  { btn: 'תובנות להשגת היעדים', title: 'תובנות להשגת היעדים',
+              desc: 'לכל יעד: איפה הוא עומד לפי הנתונים, פעולות אפשריות, ואיך נדע שזה עובד.' },
+    aklim:  { btn: 'תובנות על האקלים', title: 'תובנות על האקלים',
+              desc: 'מה עומד מאחורי הממדים החריגים, איך זה מתיישב עם הביקורים והמיפוי, ומה אפשר לעשות.' },
+    mipui:  { btn: 'תובנות על המדדים החלשים', title: 'תובנות על המדדים החלשים',
+              desc: 'לכל מדד בסיכון או שדורש חיזוק: מה כנראה עומד מאחוריו לפי הביקורים, ומה מומלץ.' },
+    visits: { btn: 'תובנות מהביקורים', title: 'תובנות מהביקורים',
+              desc: 'מה חוזר מביקור לביקור, אילו פעולות למעקב עוד פתוחות, והצעה לסדר יום לביקור הבא.' },
+    sal:    { btn: 'הסל מול הצרכים', title: 'סל התוכניות מול הצרכים',
+              desc: 'האם התוכניות שנבחרו עונות על המדדים החלשים, היעדים והאקלים — ומה לא מכוסה.' },
+    focus:  { btn: 'על מה להתמקד השבוע', title: 'על מה להתמקד השבוע', wide: true,
+              desc: '3–5 בתי ספר שהכי צריכים תשומת לב עכשיו, לפי סדר עדיפות ועם נימוק.' },
+    sup:    { btn: 'תמונת מצב של המפקח.ת', title: 'תמונת מצב של המפקח.ת', wide: true,
+              desc: 'דפוסים שחוזרים בכל בתי הספר של המפקח.ת, ובמה המטה יכול לתמוך.' }
   };
-  var IN = {};   /* "סוג:סמל" → { st, d } */
-  var INS_ERR = { nogoals: 'אין לבית הספר הזה יעדים מהוועדה המלווה.' };
+  var IN = {};   /* "סוג:סמל" (או "focus:all", "sup:<שם>") → { st, d } */
+  var INS_ERR = {
+    nogoals: 'אין לבית הספר הזה יעדים מהוועדה המלווה.',
+    noaklim: 'אין לבית הספר הזה נתוני שאלון אקלים.',
+    nomipui: 'אין לבית הספר הזה מיפוי.',
+    noweak: 'כל המדדים במיפוי האחרון יציבים — אין מדד חלש לנתח.',
+    novisits: 'אין עדיין ביקורים מתועדים בבית הספר הזה.',
+    nosal: 'סל התוכניות לא הוגש, אז אין מה להשוות.',
+    notadmin: 'תמונת מצב של מפקח.ת זמינה רק למטה.',
+    nosup: 'לא נמצאו בתי ספר של המפקח.ת הזה.ת.'
+  };
   function insightOut(cfg, d) {
     var j = d.insight || {}, title = cfg.title + ' — ' + (d.school || ''), text = [title, 'נוצר ' + (d.at || ''), ''], html = '';
     (j.items || []).forEach(function (it) {
@@ -236,9 +258,10 @@
   function insightHtml(key) {
     var kind = key.split(':')[0], cfg = INS[kind], b = IN[key];
     if (!cfg) return '';
-    if (!b) return '<div class="tovi-call"><button type="button" class="btn primary" data-tovi-ins="' + esc(key) + '">' + I.spark + esc(cfg.btn) + '</button><span>' + esc(cfg.desc) + '</span></div>';
-    if (b.st === 'load') return '<div class="tovi-call"><span class="tovi-wait">' + I.spark + 'תובי חושב… זה לוקח עד דקה.</span></div>';
-    if (b.st === 'err') return '<div class="tovi-call"><span class="tovi-err">' + esc(b.msg) + '</span><button type="button" class="btn sm" data-tovi-ins="' + esc(key) + '">לנסות שוב</button></div>';
+    /* כפתורי התובנות קטנים ושקטים (התדריך נשאר הכפתור הבולט בעמוד) */
+    if (!b) return '<div class="tovi-call q"><button type="button" class="btn sm" data-tovi-ins="' + esc(key) + '">' + I.spark + esc(cfg.btn) + '</button><span>' + esc(cfg.desc) + '</span></div>';
+    if (b.st === 'load') return '<div class="tovi-call q"><span class="tovi-wait">' + I.spark + 'תובי חושב… זה לוקח עד דקה.</span></div>';
+    if (b.st === 'err') return '<div class="tovi-call q"><span class="tovi-err">' + esc(b.msg) + '</span><button type="button" class="btn sm" data-tovi-ins="' + esc(key) + '">לנסות שוב</button></div>';
     var d = b.d, j = d.insight || {};
     var body = (j.items || []).map(function (it) {
       var h = '<div class="tovi-item"><h3>' + esc(it.title) + '</h3><p class="tovi-status">' + esc(it.status) + '</p>';
@@ -260,9 +283,9 @@
       '<p class="tovi-foot">"איפה זה עומד" היא הסקה של תובי מהנתונים, לא נתון רשמי. כדאי לבדוק לפני שמסתמכים.</p></div></details>';
   }
   function insight(key) {
-    var p = key.split(':');
+    var kind = key.split(':')[0], arg = key.slice(kind.length + 1);
     IN[key] = { st: 'load' }; fillSlots();
-    post({ action: 'insight', kind: p[0], semel: p[1] }).then(function (d) {
+    post({ action: 'insight', kind: kind, semel: arg, sup: kind === 'sup' ? arg : '' }).then(function (d) {
       if (d && d.ok && d.limited) IN[key] = { st: 'err', msg: d.message };
       else if (d && d.ok && d.insight) IN[key] = { st: 'ok', d: d };
       else IN[key] = { st: 'err', msg: (d && INS_ERR[d.error]) || errText(d) };
