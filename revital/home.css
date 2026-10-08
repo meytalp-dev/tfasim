@@ -547,4 +547,7 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .reptype>.reptext{margin:0 12px;width:calc(100% - 24px)}
 .reptype>.acts,.reptype>p,.reptype>ul{margin-inline:12px}
 .repckbox{margin-top:16px}
-.drp .h2 svg{color:var(--bad)}
+.drp .st svg{color:var(--bad)}
+.dck>summary{min-height:64px}
+.dck .st{font-size:17px}
+.dck .dckbody{margin-top:10px}

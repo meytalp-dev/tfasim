@@ -1410,8 +1410,8 @@
       .slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
     if (DCK.semel && !list.some(function (s) { return String(s.semel) === DCK.semel; })) DCK.semel = '';
     var r = DCK.semel ? BYSEMEL[DCK.semel] : null;
-    var h = '<div class="card dck" id="dashCk"><h2 class="h2">' + I.check + 'צ׳ק ליסט ביקור</h2>' +
-      '<div class="meta">בוחרים בית ספר ומסמנים תוך כדי הביקור. הכול נשמר לבד.</div><div class="dckpick">' +
+    /* מקופל כברירת מחדל (מיטל, 8.10.26: "שלא ימלא את כל העמוד"). פתוח/סגור נזכר ב-OPENSEC */
+    var h = '<div class="meta">בוחרים בית ספר ומסמנים תוך כדי הביקור. הכול נשמר לבד.</div><div class="dckpick">' +
       (admin ? '<label>מפקח.ת<select id="dckSup"><option value="">כל המפקחים</option>' + sups.map(function (n) {
         return '<option value="' + esc(n) + '"' + (n === DCK.sup ? ' selected' : '') + '>' + esc(n) + '</option>';
       }).join('') + '</select></label>' : '') +
@@ -1419,7 +1419,9 @@
         return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DCK.semel ? ' selected' : '') + '>' + esc(s.name) + '</option>';
       }).join('') + '</select></label>' +
       (r ? '<button type="button" class="btn sm" data-go="s:' + esc(DCK.semel) + '&t=vis">לעמוד בית הספר ←</button>' : '') + '</div>';
-    return h + (r ? '<div class="dckbody">' + ckBody(r) + '</div>' : '') + '</div>';
+    h += r ? '<div class="dckbody">' + ckBody(r) + '</div>' : '';
+    return sec('dashck', I.check, 'צ׳ק ליסט ביקור', r ? esc(r.s.name) + ' · ' + ckSum(r) : 'בוחרים בית ספר ומסמנים תוך כדי הביקור', h)
+      .replace('<details class="card sec"', '<details id="dashCk" class="card sec dck"');
   }
   /* שמירה: מחכים שנייה וחצי אחרי השינוי האחרון; שמירה אחת בכל רגע לכל בית ספר */
   function ckLater(semel) {
@@ -1840,14 +1842,18 @@
   function dashRep() {
     var list = SCHOOLS.slice().sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
     if (DRP && !list.some(function (s) { return String(s.semel) === DRP; })) DRP = '';
-    var r = DRP ? BYSEMEL[DRP] : null;
-    return '<div class="card dck drp" id="dashRep"><h2 class="h2">' + I_MIC + 'דוח ביקור בהקלטה</h2>' +
+    var r = DRP ? BYSEMEL[DRP] : null, x = r ? repGet(r.s.semel) : null, live = REC.st === 'rec' || REC.st === 'send' || REC.st === 'done';
+    if (live) OPENSEC.dashrep = true;   /* הקלטה פעילה — הכרטיס לא נסגר */
+    var sum = REC.st === 'rec' ? tag('bad', 'מקליט') : REC.st === 'done' ? tag('warn', 'הקלטה ממתינה לשליחה') :
+      !r ? 'אחרי הביקור: מקליטים, ותובי כותב דוח בפורמט של המונדיי' : esc(r.s.name) + (x.saved ? ' · נשמר ' + esc(x.saved) : x.r ? ' · ' + tag('warn', 'טיוטה') : '');
+    return sec('dashrep', I_MIC, 'דוח ביקור בהקלטה', sum,
       '<div class="meta">אחרי הביקור: מקליטים מה היה, ותובי כותב דוח בפורמט של טופס הביקור במונדיי.</div><div class="dckpick">' +
       '<label>בית ספר<select id="drpSchool"><option value="">בחירת בית ספר…</option>' + list.map(function (s) {
         return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DRP ? ' selected' : '') + '>' + esc(s.name) + '</option>';
       }).join('') + '</select></label>' +
       (r ? '<button type="button" class="btn sm" data-go="s:' + esc(DRP) + '&t=vis">לעמוד בית הספר ←</button>' : '') + '</div>' +
-      (r ? '<div class="dckbody">' + repBody(r) + '</div>' : '') + '</div>';
+      (r ? '<div class="dckbody">' + repBody(r) + '</div>' : ''))
+      .replace('<details class="card sec"', '<details id="dashRep" class="card sec dck drp"');
   }
 
   /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
