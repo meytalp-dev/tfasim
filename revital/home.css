@@ -497,6 +497,13 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
   .ckstep li{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
   .ckstep li input:first-child{grid-column:1/-1}
 }
+
+/* מעקב בטפסים וקישורים + קובץ בהודעה (8.10.26) */
+.ol-sup{margin-top:16px}
+.ol-acts{margin:6px 0 2px}
+.mfile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 4px}
+.mfile .small{margin:0}
+details.sec[data-k^="olt"]{scroll-margin-top:84px}
 /* צ׳ק ליסט בדשבורד (8.10.26) — כרטיס בולט בראש הדף */
 .dck{border:2px solid var(--brand);background:linear-gradient(180deg,var(--blue-soft),#fff 120px)}
 .dck .h2{display:flex;align-items:center;gap:8px}
@@ -531,6 +538,26 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .repck small{display:block;color:var(--muted);font-size:13px;margin-inline-start:26px}
 .dckbody>.sec{margin-bottom:12px}
 
+/* תוכנית העבודה של המפקח.ת (8.10.26) */
+.plbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:10px}
+.placts{margin:4px 0 12px}
+.placts .btn svg{width:16px;height:16px}
+.plgen{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;background:var(--blue-soft);color:var(--navy);font-weight:600;margin:6px 0 10px}
+.plgen svg{width:20px;height:20px;flex:none;animation:plspin 1.6s ease-in-out infinite}
+@keyframes plspin{50%{opacity:.35;transform:scale(.9)}}
+@media (prefers-reduced-motion:reduce){.plgen svg{animation:none}}
+.pl-ta{display:block;width:100%;font:inherit;font-size:14.5px;line-height:1.6;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--paper);color:var(--ink);resize:vertical}
+.plschools{display:grid;gap:10px}
+.pls{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+.pls>b{display:block;margin-bottom:6px;color:var(--navy)}
+.pls label{display:grid;gap:4px;font-size:13px;font-weight:700;margin-bottom:6px}
+.pls input{font:inherit;font-size:14.5px;font-weight:400;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:var(--paper);color:var(--ink);min-width:0}
+.plm{display:block;margin:0 0 10px}
+.plm>span{display:block;font-weight:700;font-size:13.5px;margin-bottom:4px;color:var(--navy)}
+.plv{margin:4px 0 8px;padding-inline-start:20px}
+.plv li{margin:3px 0}
+.pls+.pls{margin-top:8px}
+
 /* דוח ביקור בהקלטה (8.10.26) */
 .recbox{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:12px 0;padding:14px;border:1px dashed var(--line);border-radius:14px;background:var(--paper)}
 .recbox .btn svg,.recgo svg{width:18px;height:18px}
@@ -551,10 +578,3 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .dck>summary{min-height:64px}
 .dck .st{font-size:17px}
 .dck .dckbody{margin-top:10px}
-
-/* מעקב בטפסים וקישורים + קובץ בהודעה (8.10.26) */
-.ol-sup{margin-top:16px}
-.ol-acts{margin:6px 0 2px}
-.mfile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 4px}
-.mfile .small{margin:0}
-details.sec[data-k^="olt"]{scroll-margin-top:84px}

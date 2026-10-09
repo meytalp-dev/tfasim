@@ -132,7 +132,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load', tg: 'load', ck: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load', tg: 'load', ck: 'load', plan: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -309,10 +309,14 @@
     if (!window.PMH_AUTH || !PMH_AUTH.load) { ST.sal = ST.akl = ST.vaad = ST.ck = 'err'; return loaded('pk', false); }
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
-      if (!d || d.error) { ST.sal = ST.akl = ST.vaad = ST.tg = ST.ck = 'err'; return loaded('pk', false); }
+      if (!d || d.error) { ST.sal = ST.akl = ST.vaad = ST.tg = ST.ck = ST.plan = 'err'; return loaded('pk', false); }
       SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; r.ck = []; });
       /* צ׳ק ליסט ביקור (8.10.26) — שורה לכל ביקור, החדש ראשון. בשער שלפני כן אין את המפתח */
       ST.ck = Array.isArray(d.checklist) ? 'ok' : 'err';
+      /* תוכניות עבודה של מפקחים (8.10.26) — מפקח.ת מקבל.ת רק את שלו/ה */
+      ST.plan = Array.isArray(d.plans) ? 'ok' : 'err';
+      PLANS = {};
+      (d.plans || []).forEach(function (row) { if (String(row['שנה'] || '') === 'תשפ"ז') PLANS[String(row['מפקח.ת'] || '').trim()] = planParse(row); });
       (d.checklist || []).forEach(function (row) { var r = at(row); if (r) r.ck.push(ckParse(row)); });
       SCHOOLS.forEach(function (s) { BY[s.name].ck.sort(function (a, b) { return b.date.localeCompare(a.date); }); });
       /* תגובות מפקחים על חוסרים (8.10.26) — החדשה ראשונה */
@@ -338,7 +342,7 @@
       });
       ST.sal = 'ok';
       loaded('pk', true);
-    }, function () { ST.sal = 'err'; ST.akl = 'err'; ST.vaad = 'err'; ST.tg = 'err'; ST.ck = 'err'; loaded('pk', false); });
+    }, function () { ST.sal = 'err'; ST.akl = 'err'; ST.vaad = 'err'; ST.tg = 'err'; ST.ck = 'err'; ST.plan = 'err'; loaded('pk', false); });
   }
   /* הביקורים החדשים (תשפ״ז) יושבים בבית של המפקח — רק התאריך האחרון לכל בית ספר */
   function loadMefVisits() {
@@ -461,7 +465,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W') return h;
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
     if (m && BYSEMEL[m[1]]) { STAB = TABS.some(function (t) { return t[0] === m[2]; }) ? m[2] : 'ov'; return 's:' + m[1]; }
     m = h.match(/^m=(ok|warn|bad|none)$/);
@@ -525,6 +529,7 @@
     if (CUR === 'G') return 'G';
     if (CUR === 'A') return 'A';
     if (CUR === 'M') return 'M';
+    if (CUR === 'W') return 'W';
     if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
@@ -545,7 +550,7 @@
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
       item('M', I.send, 'הודעה למנהלים', '') +
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
-      (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : '') +
+      (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : item('W', I.doc, 'תוכנית העבודה שלי', '')) +   /* מיטל, 8.10.26 */
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
@@ -599,7 +604,7 @@
         var bad = done ? list.filter(function (s) { return issues(BY[s.name]).length; }).length : 0;
         return '<button type="button" class="tile" data-go="p:' + esc(n) + '"><span><b>' + esc(n) + '</b><small>' + list.length + ' בתי ספר' +
           (done ? ' · ' + bad + ' עם חוסרים' : '') + '</small></span></button>';
-      }).join('') + '</div></div>';
+      }).join('') + '</div></div>' + planTrack();
   }
   /* "חזרה" בראש עמוד פנימי */
   function backLink() {
@@ -630,6 +635,7 @@
     else if (CUR === 'A') attPage();
     else if (CUR === 'M') msgPage();
     else if (CUR === 'F') formsPage();
+    else if (CUR === 'W') { if (adminView()) supsPage(); else planPage(); }
     else if (CUR === 'N') { if (adminView()) newFormPage(); else formsPage(); }
     else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
     else dashboard();
@@ -1860,6 +1866,208 @@
       .replace('<details class="card sec"', '<details id="dashRep" class="card sec dck drp"');
   }
 
+  /* ===== תוכנית העבודה של המפקח.ת (מיטל, 8.10.26) =====
+     תובי מכין טיוטה לפי נספח ב בהנחיות התפקיד (action 'plan' בשרת של תובי), המפקח.ת עורכ.ת — נשמר לבד כטיוטה —
+     ומגיש.ה. השמירה בשער (planSave → לשונית "תוכניות עבודה"). מפקח.ת: פריט "תוכנית העבודה שלי" בתפריט (#W).
+     אדמין: מקטע בעמוד המפקח.ת + "מי טרם הגיש" בעמוד המפקחים */
+  var PLAN_TOVI = 'https://script.google.com/macros/s/AKfycbxGnq5H1y9ubpgUCXRSE5T8aSNVPtEf-15RitWu2UofCvLszICoEUEzAFXpXEaOJzQg/exec';
+  var PL_SPARK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6 4.6 1.9-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>';
+  var PLAN_PERIODS = ['ספטמבר–אוקטובר', 'נובמבר–דצמבר', 'ינואר–פברואר', 'מרץ–אפריל', 'מאי', 'יוני', 'יולי–אוגוסט'];
+  var PLANS = {};      /* מפקח.ת → {status, content, updated, submitted, by} מהשער */
+  var PD = {};         /* מפקח.ת → טיוטה בעריכה */
+  var PL_T = {}, PL_BUSY = {}, PL_GEN = {}, PL_EDIT = {};
+  function planParse(row) {
+    var c = {};
+    try { c = JSON.parse(String(row['תוכן'] || '{}')) || {}; } catch (e) { c = {}; }
+    return { status: String(row['מצב'] || ''), content: c, updated: String(row['עודכן'] || ''), submitted: String(row['הוגש'] || ''), by: String(row['עודכן ע"י'] || '') };
+  }
+  function planSchoolsOf(name) {
+    return SCHOOLS.filter(function (s) { return supsOf(s).indexOf(name) > -1; }).sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
+  }
+  function planEmpty(name) {
+    return { focus: [], schools: planSchoolsOf(name).map(function (s) { return { name: s.name, freq: '', focus: [] }; }),
+             months: PLAN_PERIODS.map(function (p) { return { period: p, items: [] }; }), roles: [], mate: '', missing: '' };
+  }
+  function planDraft(name) {
+    if (!PD[name]) {
+      var p = PLANS[name];
+      PD[name] = p && p.content && p.content.months ? JSON.parse(JSON.stringify(p.content)) : planEmpty(name);
+    }
+    return PD[name];
+  }
+  function planHas(c) { return !!(c && ((c.focus || []).length || (c.months || []).some(function (m) { return (m.items || []).length; }) || c.mate)); }
+  function planState(name) {
+    var p = PLANS[name];
+    if (!p || !planHas(p.content)) return ['none', 'לא התחיל.ה'];
+    return p.status === 'הוגשה' ? ['ok', 'הוגשה ' + fmtDate(p.submitted)] : ['warn', 'טיוטה · עודכנה ' + fmtDate(p.updated)];
+  }
+  function planLines(a) { return (a || []).join('\n'); }
+  function planArr(v) { return String(v || '').split('\n').map(function (x) { return x.trim(); }).filter(Boolean); }
+  function planTa(name, key, val, rows, ph) {
+    return '<textarea class="pl-ta" rows="' + rows + '" data-pl="' + key + '" data-plsup="' + esc(name) + '" data-ckf="pl-' + esc(key) + '" placeholder="' + esc(ph || 'שורה לכל פריט') + '">' + esc(val) + '</textarea>';
+  }
+  function planBody(name) {
+    if (ST.plan !== 'ok') return pending('plan');
+    var p = PLANS[name], st = planState(name), d = planDraft(name), locked = p && p.status === 'הוגשה' && !PL_EDIT[name];
+    var nm = esc(name), has = planHas(d);
+    var h = '<div class="plbar"><span class="chip ' + (st[0] === 'none' ? '' : st[0]) + '">' + esc(st[1]) + '</span><span class="small" id="plSaved" aria-live="polite"></span></div>';
+    if (PL_GEN[name]) h += '<div class="plgen">' + PL_SPARK + '<span>תובי מכין טיוטה לפי נספח ב בהנחיות התפקיד ולפי הנתונים של בתי הספר. זה לוקח עד דקה וחצי.</span></div>';
+    h += '<div class="acts placts">';
+    if (locked) {
+      h += '<button type="button" class="btn" data-plopen="' + nm + '">פתיחה לעריכה</button>';
+    } else {
+      h += '<button type="button" class="btn primary" data-plgen="' + nm + '"' + (PL_GEN[name] ? ' disabled' : '') + '>' + PL_SPARK + (has ? 'טיוטה חדשה עם תובי' : 'הכנת טיוטה עם תובי') + '</button>' +
+        (has ? '<button type="button" class="btn" data-plsubmit="' + nm + '">' + I.check + 'הגשה</button>' : '');
+    }
+    if (has) h += '<button type="button" class="btn sm" data-plcopy="' + nm + '">' + I.copy + 'העתקה</button><button type="button" class="btn sm" data-plprint="' + nm + '">' + I.doc + 'הדפסה</button>';
+    h += '</div>';
+    if (!has && !PL_GEN[name]) {
+      h += '<p class="small">התוכנית נבנית לפי נספח ב בהנחיות התפקיד: תדירות ביקור לכל בית ספר, דגשים מהנתונים, גאנט חודשי וליווי בעלי תפקידים. ' +
+        'אפשר לבקש מתובי טיוטה ולערוך אותה, או למלא ישירות למטה. הכול נשמר לבד כטיוטה עד ההגשה.</p>';
+    }
+    if (locked) return h + planView(d);
+    h += '<h4 class="subh">שלושה מוקדים לשנה</h4>' + planTa(name, 'focus', planLines(d.focus), 3);
+    h += '<h4 class="subh">בתי הספר שלי</h4><div class="plschools">' + (d.schools || []).map(function (s, i) {
+      return '<div class="pls"><b>' + esc(s.name) + '</b><label>תדירות ביקור<input type="text" maxlength="80" data-pl="sfreq:' + i + '" data-plsup="' + nm + '" data-ckf="pl-sf' + i + '" value="' + esc(s.freq) + '" placeholder="למשל: אחת לחודש וחצי"></label>' +
+        planTa(name, 'sfocus:' + i, planLines(s.focus), 2, 'דגשים לשנה — שורה לכל דגש') + '</div>';
+    }).join('') + '</div>';
+    h += '<h4 class="subh">גאנט חודשי</h4>' + (d.months || []).map(function (m, i) {
+      return '<label class="plm"><span>' + esc(m.period) + '</span>' + planTa(name, 'month:' + i, planLines(m.items), 3) + '</label>';
+    }).join('');
+    h += '<h4 class="subh">ליווי בעלי תפקידים ומדריכים</h4>' + planTa(name, 'roles', planLines(d.roles), 4);
+    h += '<h4 class="subh">עבודת מטה</h4><p class="small">תחום המטה שלך, קהילות מקצועיות וליווי המדריכים. תובי לא ממלא את החלק הזה.</p>' + planTa(name, 'mate', d.mate || '', 3, 'מה את.ה מוביל.ה השנה');
+    if (d.missing) h += '<p class="small"><b>תובי:</b> ' + esc(d.missing) + '</p>';
+    return h;
+  }
+  function planView(d) {
+    function ul(a) { return (a || []).length ? '<ul class="plv">' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<div class="empty">—</div>'; }
+    return '<h4 class="subh">שלושה מוקדים לשנה</h4>' + ul(d.focus) +
+      '<h4 class="subh">בתי הספר שלי</h4>' + (d.schools || []).map(function (s) {
+        return '<div class="pls"><b>' + esc(s.name) + '</b>' + (s.freq ? '<span class="small"> · ' + esc(s.freq) + '</span>' : '') + ul(s.focus) + '</div>';
+      }).join('') +
+      '<h4 class="subh">גאנט חודשי</h4>' + (d.months || []).map(function (m) { return '<div class="plm"><span>' + esc(m.period) + '</span>' + ul(m.items) + '</div>'; }).join('') +
+      '<h4 class="subh">ליווי בעלי תפקידים ומדריכים</h4>' + ul(d.roles) +
+      '<h4 class="subh">עבודת מטה</h4>' + (d.mate ? '<p class="pre">' + esc(d.mate) + '</p>' : '<div class="empty">—</div>');
+  }
+  function planPage() {
+    var name = SUPNAME;
+    setMainKeepCk('<div class="card head"><h1>תוכנית העבודה שלי · תשפ״ז</h1><div class="meta">' + esc(name) + ' · ' + planSchoolsOf(name).length + ' בתי ספר · לפי נספח ב בהנחיות התפקיד</div></div>' +
+      '<div class="card plcard">' + planBody(name) + '</div>');
+  }
+  /* עמוד המפקחים (אדמין): מי הגיש, ומי טרם */
+  function planTrack() {
+    if (ST.plan !== 'ok') return '';
+    var names = supNames(), not = names.filter(function (n) { return !(PLANS[n] && PLANS[n].status === 'הוגשה'); });
+    LISTS.plannot = not.join('\n');
+    return sec('plantrack', I.doc, 'תוכניות עבודה תשפ״ז', not.length ? tag('warn', not.length + ' טרם הגישו') : tag('ok', 'כולם הגישו'),
+      (not.length ? '<div class="acts"><button type="button" class="btn sm" data-copy="plannot">' + I.copy + 'העתקת מי שטרם הגיש (' + not.length + ')</button></div>' : '') +
+      '<ul class="list">' + names.map(function (n) {
+        var st = planState(n);
+        return '<li><button type="button" data-go="p:' + esc(n) + '">' + esc(n) + '<span>' + tag(st[0] === 'none' ? '' : st[0], st[1]) + '</span></button></li>';
+      }).join('') + '</ul>');
+  }
+  function planRedraw() { if (CUR === 'W' || CUR.charAt(0) === 'p') render(); }
+  function planInput(el) {
+    var name = el.getAttribute('data-plsup'), d = planDraft(name), k = el.getAttribute('data-pl'), v = el.value;
+    var m = k.split(':'), i = +m[1];
+    if (k === 'focus') d.focus = planArr(v);
+    else if (k === 'roles') d.roles = planArr(v);
+    else if (k === 'mate') d.mate = v.trim();
+    else if (m[0] === 'sfreq' && d.schools[i]) d.schools[i].freq = v.trim();
+    else if (m[0] === 'sfocus' && d.schools[i]) d.schools[i].focus = planArr(v);
+    else if (m[0] === 'month' && d.months[i]) d.months[i].items = planArr(v);
+    planLater(name);
+  }
+  function planLater(name) {
+    clearTimeout(PL_T[name]);
+    var el = $('plSaved'); if (el) el.textContent = 'שומר…';
+    PL_T[name] = setTimeout(function () { planSave(name, 'draft'); }, 2000);
+  }
+  function planSave(name, status) {
+    clearTimeout(PL_T[name]); PL_T[name] = null;
+    if (PL_BUSY[name]) { PL_BUSY[name] = status === 'submitted' ? 'submit' : 'again'; return Promise.resolve(); }
+    PL_BUSY[name] = true;
+    var body = { action: 'planSave', token: token(), sup: name, status: status, content: JSON.stringify(planDraft(name)) };
+    return fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 45000, 2).then(function (res) {
+      if (!res || !res.ok) throw new Error(res && res.error || 'err');
+      PLANS[name] = planParse(res.row);
+      var now = new Date(), el = $('plSaved');
+      if (el) el.textContent = 'נשמר ' + ('0' + now.getHours()).slice(-2) + ':' + ('0' + now.getMinutes()).slice(-2);
+      if (status === 'submitted') { PL_EDIT[name] = false; toast('התוכנית הוגשה'); planRedraw(); }
+    }).catch(function (err) {
+      var m = String(err && err.message), el = $('plSaved');
+      if (el) el.textContent = 'לא נשמר';
+      toast(m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש' : m === 'toobig' ? 'התוכנית ארוכה מדי לשמירה' : 'השמירה לא הצליחה. ננסה שוב בשינוי הבא.');
+    }).then(function () {
+      var again = PL_BUSY[name];
+      PL_BUSY[name] = false;
+      if (again === 'submit') return planSave(name, 'submitted');
+      if (again === 'again') return planSave(name, 'draft');
+    });
+  }
+  function planGen(name) {
+    var d = planDraft(name);
+    if (planHas(d) && !confirm('הטיוטה של תובי תחליף את מה שכתוב עכשיו בתוכנית (חוץ מעבודת המטה). להמשיך?')) return;
+    PL_GEN[name] = true; planRedraw();
+    var list = planSchoolsOf(name), snap = {};
+    list.forEach(function (s) { snap[s.semel] = snapOf(BY[s.name]); });
+    var body = { action: 'plan', token: token(), sup: name, snap: snap };
+    if (AS) body.only = list.map(function (s) { return String(s.semel); });
+    fetchJson(PLAN_TOVI, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(body) }, 170000, 1).then(function (res) {
+      if (res && res.limited) throw new Error('limit:' + (res.message || ''));
+      if (!res || !res.ok || !res.plan) throw new Error(res && res.error || 'err');
+      var j = res.plan, mate = d.mate || '';
+      /* בתי הספר — לפי הרשימה בתובה; מה שתובי כתב מותאם לפי השם */
+      var bySchool = {};
+      (j.schools || []).forEach(function (s) { bySchool[SN.canon ? SN.canon(s.name) : s.name] = s; });
+      PD[name] = {
+        focus: (j.focus || []).slice(0, 5),
+        schools: list.map(function (s) { var t = bySchool[SN.canon ? SN.canon(s.name) : s.name] || {}; return { name: s.name, freq: t.freq || '', focus: t.focus || [] }; }),
+        months: PLAN_PERIODS.map(function (p, i) {
+          var t = (j.months || []).filter(function (m) { return m.period === p; })[0] || (j.months || [])[i] || {};
+          return { period: p, items: t.items || [] };
+        }),
+        roles: j.roles || [], mate: mate, missing: j.missing || '', at: res.at || ''
+      };
+      PL_GEN[name] = false; planRedraw();
+      return planSave(name, 'draft');
+    }).catch(function (err) {
+      PL_GEN[name] = false; planRedraw();
+      var m = String(err && err.message);
+      toast(m.indexOf('limit:') === 0 ? m.slice(6) || 'תובי הגיע לתקרה היומית' : m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש' : m === 'nosup' ? 'לא נמצאו בתי ספר למפקח.ת הזה.' : 'תובי לא הצליח להכין טיוטה. נסו שוב בעוד רגע.');
+    });
+  }
+  function planText(name) {
+    var d = planDraft(name), out = ['תוכנית עבודה תשפ״ז · ' + name, ''];
+    function list(t, a) { out.push(t + ':'); (a || []).forEach(function (x) { out.push('• ' + x); }); out.push(''); }
+    list('שלושה מוקדים לשנה', d.focus);
+    out.push('בתי הספר שלי:');
+    (d.schools || []).forEach(function (s) { out.push('◦ ' + s.name + (s.freq ? ' — ' + s.freq : '')); (s.focus || []).forEach(function (x) { out.push('   • ' + x); }); });
+    out.push('');
+    out.push('גאנט חודשי:');
+    (d.months || []).forEach(function (m) { out.push('◦ ' + m.period); (m.items || []).forEach(function (x) { out.push('   • ' + x); }); });
+    out.push('');
+    list('ליווי בעלי תפקידים ומדריכים', d.roles);
+    out.push('עבודת מטה:'); out.push(d.mate || '—');
+    return out.join('\n');
+  }
+  function planPrint(name) {
+    var d = planDraft(name);
+    var h = '<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><title>תוכנית עבודה · ' + esc(name) + '</title><style>' +
+      'body{font-family:Arial,sans-serif;font-size:13px;line-height:1.55;color:#231a2b;margin:24px;direction:rtl;text-align:right}h1{font-size:19px;margin:0 0 4px}h2{font-size:15px;margin:16px 0 4px;border-bottom:1px solid #d9d2e4;padding-bottom:3px}' +
+      'h3{font-size:13.5px;margin:10px 0 2px}ul{margin:2px 0 6px;padding-right:20px}.n{color:#6c6478;font-size:12px}</style></head><body>' +
+      '<h1>תוכנית עבודה תשפ״ז · ' + esc(name) + '</h1><div class="n">לפי נספח ב בהנחיות תפקיד המפקח.ת</div>';
+    function ul(a) { return '<ul>' + (a || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
+    h += '<h2>שלושה מוקדים לשנה</h2>' + ul(d.focus) + '<h2>בתי הספר שלי</h2>' + (d.schools || []).map(function (s) {
+      return '<h3>' + esc(s.name) + (s.freq ? ' <span class="n">· ' + esc(s.freq) + '</span>' : '') + '</h3>' + ul(s.focus);
+    }).join('') + '<h2>גאנט חודשי</h2>' + (d.months || []).map(function (m) { return '<h3>' + esc(m.period) + '</h3>' + ul(m.items); }).join('') +
+      '<h2>ליווי בעלי תפקידים ומדריכים</h2>' + ul(d.roles) + '<h2>עבודת מטה</h2><p>' + esc(d.mate || '—') + '</p></body></html>';
+    var w = window.open('', '_blank');
+    if (!w) { toast('הדפדפן חסם חלון חדש'); return; }
+    w.document.open(); w.document.write(h); w.document.close();
+    setTimeout(function () { w.focus(); w.print(); }, 300);
+  }
+
   /* ----- לשונית אקלים: כרטיס לכל קהל, פס לכל ממד מול ההשוואה, חץ מול תשפ"ה, 3 ההיגדים החלשים ----- */
   function aklimTab(r) {
     var head = '<p class="eyebrow">' + I.chart + 'שאלון אקלים תשפ״ו</p>';
@@ -2499,6 +2707,7 @@
         'אין מייל של המפקח.ת בגיליון אנשי הקשר.') + '</div>' +
       '<div class="acts">' + mailBtn('sup', M, 'שליחת המצב במייל') +
       '<a class="btn" href="?as=' + encodeURIComponent(name) + '" target="_blank" rel="noopener">' + I.home + 'הבית כמו ש' + esc(name) + ' רואה' + I.ext + '</a></div></div></div>';
+    if (adminView()) h += sec('plan', I.doc, 'תוכנית עבודה תשפ״ז', ST.plan === 'ok' ? esc(planState(name)[1]) : (ST.plan === 'load' ? 'טוען…' : 'לא נטען'), planBody(name));   /* מיטל, 8.10.26 */
     if (adminView() && list.length) h += '<div data-tovi-insight="sup:' + esc(name) + '"></div>';   /* תובי: תמונת מצב של המפקח.ת — אדמין בלבד, השרת בודק שוב (tovi.js) */
     var bad = list.filter(function (r) { return issues(r).length; });
     h += sec('sup-state', I.chart, 'מצב בתי הספר', bad.length ? tag('', bad.length + ' עם משהו פתוח') : tag('ok', 'הכול תקין'),
@@ -2518,7 +2727,7 @@
     }).join('');
     h += sec('sup-people', I.users, 'בעלי התפקידים בבתי הספר', ST.nispach === 'ok' ? people + ' בעלי תפקידים' : 'טוען…',
       ST.nispach === 'ok' ? body : pending('nispach'));
-    $('main').innerHTML = h;
+    setMainKeepCk(h);   /* תוכנית העבודה: שומר פוקוס בהקלדה */
   }
 
   /* ===== טפסים פעילים (נקראו בהתחלה "טפסים נקודתיים", 7.10.26) =====
@@ -3060,6 +3269,17 @@
     var rp = t.closest('[data-reply]');
     if (rp) { e.preventDefault(); replyOpen(rp.getAttribute('data-reply')); return; }
     /* צ׳ק ליסט ביקור */
+    /* תוכנית עבודה */
+    var plg = t.closest('[data-plgen]');
+    if (plg) { planGen(plg.getAttribute('data-plgen')); return; }
+    var pls = t.closest('[data-plsubmit]');
+    if (pls) { if (confirm('להגיש את תוכנית העבודה? אחרי ההגשה אפשר לפתוח אותה שוב לעריכה.')) planSave(pls.getAttribute('data-plsubmit'), 'submitted'); return; }
+    var plo = t.closest('[data-plopen]');
+    if (plo) { PL_EDIT[plo.getAttribute('data-plopen')] = true; render(); return; }
+    var plc = t.closest('[data-plcopy]');
+    if (plc) { copy(planText(plc.getAttribute('data-plcopy'))); return; }
+    var plp = t.closest('[data-plprint]');
+    if (plp) { planPrint(plp.getAttribute('data-plprint')); return; }
     var ckr = t.closest('[data-ckrole]');
     if (ckr) { ckRole(ckr); return; }
     var ckb = t.closest('[data-ck]');
@@ -3140,12 +3360,6 @@
       if (od) { od.open = true; OPENSEC[od.getAttribute('data-k')] = true; od.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
       return;
     }
-    var olt = t.closest('[data-olt]');
-    if (olt) {
-      var od = document.querySelector('details[data-k="olt' + olt.getAttribute('data-olt') + '"]');
-      if (od) { od.open = true; OPENSEC[od.getAttribute('data-k')] = true; od.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-      return;
-    }
     var ml = t.closest('[data-mail]');
     if (ml && !IS_MOBILE) {
       var M = MAILS[ml.getAttribute('data-mail')];
@@ -3175,6 +3389,7 @@
   /* צ׳ק ליסט: הערות וצעדי פעולה נשמרים תוך כדי הקלדה */
   document.addEventListener('input', function (e) {
     var el = e.target;
+    if (el && el.hasAttribute && el.hasAttribute('data-pl')) { planInput(el); return; }
     if (el && el.type !== 'date' && (el.hasAttribute && (el.hasAttribute('data-ckn') || el.hasAttribute('data-ckstep') || el.hasAttribute('data-ckpres')))) ckInput(el);
     if (el && el.hasAttribute && (el.hasAttribute('data-reptext') || el.hasAttribute('data-repf'))) repInput(el);
   });
