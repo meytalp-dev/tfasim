@@ -551,3 +551,10 @@ button.chip{border:0;font:inherit;font-size:13px;font-weight:700;cursor:pointer}
 .dck>summary{min-height:64px}
 .dck .st{font-size:17px}
 .dck .dckbody{margin-top:10px}
+
+/* מעקב בטפסים וקישורים + קובץ בהודעה (8.10.26) */
+.ol-sup{margin-top:16px}
+.ol-acts{margin:6px 0 2px}
+.mfile{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:12px 0 4px}
+.mfile .small{margin:0}
+details.sec[data-k^="olt"]{scroll-margin-top:84px}

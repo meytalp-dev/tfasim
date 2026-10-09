@@ -41,6 +41,10 @@
     ['נספח בעלי התפקידים · הטופס למנהלים', 'מי ממלא כל תפקיד בבית הספר', 'https://pedagogiamh.co.il/nispach-baaley-tafkidim.html'],
     ['רישום מורים למנור', 'קישור אחד לכל המורים: מייל וקוד, השתלמות ויח״ל', 'https://pedagogiamh.co.il/hadrachot/teacher/']
   ];
+  /* מעקב לכל קישור פתוח (מיטל, 8.10.26): מי מבתי הספר שבתצוגה מילא ומי לא — אותם נתונים כמו "מה חסר".
+     השתלמות מוסדית שממתינה לאישור, נספח עם תפקידים חסרים ורישום לחלק מההשתלמויות = מילאו, עם תגית. [מקור, מה חסר — לנוסח התזכורת] */
+  var OL_TRACK = [['rg', 'רישום בעלי התפקידים להשתלמויות'], ['bs', 'בקשת ההשתלמות המוסדית'],
+                  ['nispach', 'נספח בעלי התפקידים'], ['menor', 'רישום המורים למנור']];
   /* הבית של המפקח — ביקורים, דוחות, משימות ומסמכים. רויטל = "מטה" בלשונית מפקחים שם, ורואה את כל המפקחים */
   var MEF_EXEC = GAS + 'AKfycbxyhvbkVUtydT70TH5Q2fYXu-MpFfAv0qxX7K-RzsSvt7UWXoxwjHun1zwK6MJQj6_K/exec';
   var MENOR_LOW = 0.5;
@@ -2221,7 +2225,9 @@
         '<div id="med" class="editor" contenteditable="true" dir="rtl" role="textbox" aria-multiline="true" data-ph="כותבים כאן, או מדביקים הודעה מוכנה. ההדגשות והקישורים נשמרים."></div>' +
         '<div class="mlink"><input id="mlUrl" class="fi" type="url" dir="ltr" placeholder="https://"><input id="mlTxt" class="fi" type="text" placeholder="טקסט הקישור (לא חובה)">' +
         '<button type="button" class="btn" id="mlAdd">' + I.ext + 'הוספת קישור</button></div>' +
-        '<p class="small">' + I.doc + ' <b>קבצים</b> מצרפים בטיוטה שנפתחת' + (IS_MOBILE ? ' (סמל האטב באפליקציית המייל).' : ' (סמל האטב ב-Gmail או ב-Outlook).') + '</p>' +
+        '<div class="mfile"><label class="btn" for="mfIn">' + I.doc + 'הוספת קובץ</label>' +
+        '<input id="mfIn" type="file" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif,.txt,.csv,.odt,.ods,.odp">' +
+        '<span class="small" id="mfSt">הקובץ עולה לדרייב, וההודעה מקבלת קישור לצפייה בו. עד 10MB.</span></div>' +
         '<div class="acts msgacts" id="msgActs"></div></div>' +
         '<details class="card sec" data-k="msgto"' + (OPENSEC.msgto ? ' open' : '') + '><summary><span class="st">' + I.users + 'נמענים</span><span class="sum" id="msgSum"></span>' + I.car + '</summary>' +
         '<div class="sb"><div class="acts" style="margin-bottom:8px"><button type="button" class="btn sm" data-msgall="1">סימון הכול</button><button type="button" class="btn sm" data-msgall="0">ניקוי</button></div>' +
@@ -2234,6 +2240,7 @@
         if (cb && cb.getAttribute('data-msgto')) { if (cb.checked) delete MSG.off[cb.getAttribute('data-msgto')]; else MSG.off[cb.getAttribute('data-msgto')] = 1; msgActs(); }
       };
       $('mlUrl').onkeydown = $('mlTxt').onkeydown = function (e) { if (e.key === 'Enter') { e.preventDefault(); msgAddLink(); } };
+      $('mfIn').onchange = function () { if (this.files && this.files[0]) msgUpload(this.files[0]); this.value = ''; };
     }
     msgTo();
   }
@@ -2296,6 +2303,35 @@
     if (!M.n) return;
     if (!M.subject && !confirm('אין נושא להודעה. לפתוח בכל זאת?')) return;
     openDraft(M);
+  }
+  /* קובץ בהודעה (מיטל, 8.10.26): טיוטה מ-mailto/Gmail לא יכולה לשאת קובץ, ולכן הוא עולה דרך השער
+     לתיקייה בדרייב (msgFile), וההודעה מקבלת קישור לצפייה בו */
+  var MSGFILE_MAX = 10 * 1024 * 1024;
+  function msgUpload(f) {
+    var st = $('mfSt');
+    if (f.size > MSGFILE_MAX) { st.textContent = 'הקובץ גדול מ-10MB. אפשר לשתף אותו מהדרייב ולהוסיף כקישור.'; return; }
+    st.textContent = 'מעלה את ' + f.name + '…';
+    var rd = new FileReader();
+    rd.onerror = function () { st.textContent = 'לא הצלחתי לקרוא את הקובץ.'; };
+    rd.onload = function () {
+      var data = String(rd.result).split(',')[1] || '';
+      fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'msgFile', token: token(), name: f.name, mime: f.type, data: data }) }, 120000, 1).then(function (d) {
+        if (!d || !d.ok) throw new Error(d && d.error || 'err');
+        var a = '<a href="' + esc(d.url) + '">קובץ מצורף: ' + esc(d.name) + '</a>&nbsp;';
+        if ($('med')) { $('med').innerHTML += (MSG.html.trim() ? '<br>' : '') + a; MSG.html = $('med').innerHTML; msgActs(); }
+        else MSG.html += (MSG.html.trim() ? '<br>' : '') + a;
+        if ($('mfSt')) $('mfSt').textContent = 'הקובץ עלה, והקישור נוסף להודעה.';
+        toast('הקובץ נוסף להודעה כקישור');
+      }).catch(function (err) {
+        var m = String(err.message);
+        if ($('mfSt')) $('mfSt').textContent = m === 'toobig' ? 'הקובץ גדול מ-10MB.' :
+          m === 'badtype' ? 'סוג הקובץ לא נתמך. אפשר PDF, Word, Excel, PowerPoint ותמונות.' :
+          m === 'quota' ? 'הגעת למספר הקבצים היומי.' : m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש.' :
+          m === 'share' ? 'הקובץ לא שותף לצפייה. כתבו למיטל.' : 'ההעלאה לא הצליחה. נסו שוב בעוד רגע.';
+      });
+    };
+    rd.readAsDataURL(f);
   }
   function msgAddLink() {
     var u = $('mlUrl').value.trim(), t = $('mlTxt').value.trim();
@@ -2652,9 +2688,80 @@
       LISTS['olink' + i] = l[2];
       h += '<div class="tile ftile">' + I.doc + '<span class="ftx"><b class="fttl">' + esc(l[0]) + '</b><small>' + esc(l[1]) + '</small>' +
         '<span class="fbt"><a class="btn sm" href="' + esc(l[2]) + '" target="_blank" rel="noopener">' + I.ext + 'פתיחה</a>' +
-        '<button type="button" class="btn sm" data-copy="olink' + i + '">' + I.copy + 'העתקת הקישור</button></span></span></div>';
+        '<button type="button" class="btn sm" data-copy="olink' + i + '">' + I.copy + 'העתקת הקישור</button>' + olCount(i) + '</span></span></div>';
     });
-    return h + '</div></div>';
+    return h + '</div></div>' + olTrack();
+  }
+  /* מצב בית ספר אחד מול קישור פתוח: ok = מילאו, t = פירוט */
+  function olOne(k, r) {
+    if (k === 'nispach') {
+      if (!r.nispach || !r.nispach.submitted) return { ok: false, t: 'לא הוגש' };
+      return { ok: true, t: r.nispach.missing.length ? 'חסרים: ' + r.nispach.missing.map(shortRole).join(', ') : '' };
+    }
+    if (k === 'bs') {
+      if (!r.bs) return { ok: false, t: 'לא הוגשה' };
+      var st = String(r.bs.status || '');
+      if (st.indexOf('נדח') > -1 || st.indexOf('הוחזר') > -1) return { ok: false, t: st + ' · צריך להגיש מחדש' };
+      return { ok: true, t: st.indexOf('ממתין') > -1 ? (adminView() ? 'ממתינה לאישור המפקח.ת' : 'ממתינה לאישורך') : st };
+    }
+    if (k === 'rg') {
+      var no = WS.filter(function (w) { return !(Number(r.rg && r.rg[w[0]]) > 0); }).map(function (w) { return w[1]; });
+      if (no.length === WS.length) return { ok: false, t: 'לא נרשם אף אחד' };
+      return { ok: true, t: no.length ? 'לא נרשמו ל: ' + no.join(', ') : '' };
+    }
+    if (!r.menor || !r.menor.t) return { ok: false, t: 'אין מורים רשומים לבית הספר' };
+    return r.menor.r < r.menor.t ? { ok: false, t: (r.menor.t - r.menor.r) + ' מתוך ' + r.menor.t + ' מורים טרם נרשמו' } : { ok: true, t: 'כל ' + r.menor.t + ' המורים' };
+  }
+  function olStatus(i) {
+    var k = OL_TRACK[i][0], done = [], miss = [];
+    SCHOOLS.forEach(function (s) { var r = BY[s.name], x = olOne(k, r); (x.ok ? done : miss).push({ r: r, t: x.t }); });
+    return { done: done, miss: miss, all: SCHOOLS.length };
+  }
+  function olCount(i) {
+    if (ST[OL_TRACK[i][0]] !== 'ok') return '';
+    var t = olStatus(i);
+    return '<button type="button" class="btn sm" data-olt="' + i + '">' + I.chart + 'מילאו ' + t.done.length + ' מתוך ' + t.all + '</button>';
+  }
+  function olLi(z) {
+    return '<li><button type="button" data-go="s:' + esc(z.r.s.semel) + '">' + esc(z.r.s.name) + '<span>' + esc(z.t || '') + '</span></button></li>';
+  }
+  /* תזכורת למנהלים שטרם מילאו: טיוטה מהמייל של מי שלוחץ, המנהלים ב-bcc, הקישור בגוף ההודעה */
+  function olMail(i, list, id) {
+    if (ST.contacts !== 'ok') return '';
+    var bcc = [], n = 0;
+    list.forEach(function (z) { var m = principalOf(z.r).mails; if (m.length) { n++; bcc = bcc.concat(m); } });
+    if (!n) return '';
+    var me = ($('meName').textContent || '').trim(), what = OL_TRACK[i][1], url = OPEN_LINKS[i][2];
+    var text = 'שלום רב,\n\nתזכורת קטנה: לפי הנתונים אצלנו, עדיין חסר בבית הספר שלכם ' + what + '.\nהקישור: ' + url +
+      '\n\nאם כבר השלמתם, תודה רבה, ואפשר להתעלם מההודעה.\n\nבתודה,\n' + me;
+    var html = '<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:14px;line-height:1.7;color:#16203c">' +
+      'שלום רב,<br><br>תזכורת קטנה: לפי הנתונים אצלנו, עדיין חסר בבית הספר שלכם ' + esc(what) + '.<br>' +
+      '<a href="' + esc(url) + '">' + esc(OPEN_LINKS[i][0].split(' · ')[0]) + ' · לחצו כאן</a><br><br>' +
+      'אם כבר השלמתם, תודה רבה, ואפשר להתעלם מההודעה.<br><br>בתודה,<br>' + esc(me) + '</div>';
+    return mailBtn(id + 'm', { to: [], bcc: cleanMails(bcc), subject: 'תזכורת · ' + OPEN_LINKS[i][0].split(' · ')[0], text: text, html: html },
+      'תזכורת ל-' + n + ' מנהלים');
+  }
+  /* מקטע מעקב לכל קישור: טרם מילאו (העתקה + תזכורת; באדמין לפי מפקח.ת) ואחריו מילאו */
+  function olTrack() {
+    var h = '', multi = adminView() && supNames().length > 1;
+    OL_TRACK.forEach(function (o, i) {
+      var title = 'מעקב · ' + OPEN_LINKS[i][0].split(' · ')[0];
+      if (ST[o[0]] !== 'ok') { h += sec('olt' + i, I.chart, title, '', pending(o[0])); return; }
+      var t = olStatus(i), groups = {}, body = '';
+      t.miss.forEach(function (z) { (multi ? supsOf(z.r.s) : ['']).forEach(function (n) { (groups[n] = groups[n] || []).push(z); }); });
+      if (!t.miss.length) body += '<div class="empty">כל בתי הספר מילאו.</div>';
+      else body += '<p class="eyebrow">טרם מילאו · ' + t.miss.length + ' מתוך ' + t.all + '</p>';
+      Object.keys(groups).sort(function (a, b) { return groups[b].length - groups[a].length || a.localeCompare(b, 'he'); }).forEach(function (n, g) {
+        var list = groups[n], id = 'olm' + i + '_' + g;
+        LISTS[id] = list.map(function (z) { var p = principalOf(z.r); return z.r.s.name + (p.name ? ' · ' + p.name : '') + (z.t ? ' — ' + z.t : ''); }).join('\n');
+        body += (n ? '<p class="eyebrow ol-sup">' + esc(n) + ' · ' + list.length + '</p>' : '') +
+          '<div class="acts ol-acts"><button type="button" class="btn" data-copy="' + id + '">' + I.copy + 'העתקת הרשימה</button>' + olMail(i, list, id) + '</div>' +
+          '<ul class="list">' + list.map(olLi).join('') + '</ul>';
+      });
+      if (t.done.length) body += '<p class="eyebrow ol-sup">מילאו · ' + t.done.length + '</p><ul class="list">' + t.done.map(olLi).join('') + '</ul>';
+      h += sec('olt' + i, I.chart, title, tag(t.miss.length ? 'warn' : 'ok', 'מילאו ' + t.done.length + ' מתוך ' + t.all), body);
+    });
+    return h;
   }
   function formsPage() {
     if (!adminView()) {
@@ -3027,6 +3134,12 @@
     if (fo) { fSetOpen(fo.getAttribute('data-fid'), fo.getAttribute('data-fopen') === '1'); return; }
     var rv = t.closest('[data-rview]');
     if (rv) { ROLEVIEW = rv.getAttribute('data-rview'); try { localStorage.setItem('revital.roleview', ROLEVIEW); } catch (err) {} render(); return; }
+    var olt = t.closest('[data-olt]');
+    if (olt) {
+      var od = document.querySelector('details[data-k="olt' + olt.getAttribute('data-olt') + '"]');
+      if (od) { od.open = true; OPENSEC[od.getAttribute('data-k')] = true; od.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      return;
+    }
     var olt = t.closest('[data-olt]');
     if (olt) {
       var od = document.querySelector('details[data-k="olt' + olt.getAttribute('data-olt') + '"]');
