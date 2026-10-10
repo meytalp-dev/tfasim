@@ -465,7 +465,9 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W' || h === 'K') return h;
+    var km = h.match(/^k=([\w-]+)$/);
+    if (km && kitItem(km[1])) return 'k:' + km[1];
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
     if (m && BYSEMEL[m[1]]) { STAB = TABS.some(function (t) { return t[0] === m[2]; }) ? m[2] : 'ov'; return 's:' + m[1]; }
     m = h.match(/^m=(ok|warn|bad|none)$/);
@@ -530,6 +532,7 @@
     if (CUR === 'A') return 'A';
     if (CUR === 'M') return 'M';
     if (CUR === 'W') return 'W';
+    if (CUR === 'K' || c === 'k') return 'K';
     if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
@@ -551,6 +554,7 @@
       item('M', I.send, 'הודעה למנהלים', '') +
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : item('W', I.doc, 'תוכנית העבודה שלי', '')) +   /* מיטל, 8.10.26 */
+      item('K', I.book, 'ערכת המפקח.ת', '') +   /* במקום מרחב הפיקוח באתר (מיטל, 10.10.26) */
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
@@ -609,7 +613,7 @@
   /* "חזרה" בראש עמוד פנימי */
   function backLink() {
     var at = FROM !== null ? FROM : section();
-    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים' }[at];
+    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים', K: 'לערכת המפקח.ת' }[at];
     return lbl ? '<button type="button" class="back" data-go="' + at + '">→ ' + lbl + '</button>' : '';
   }
 
@@ -638,7 +642,148 @@
     else if (CUR === 'W') { if (adminView()) supsPage(); else planPage(); }
     else if (CUR === 'N') { if (adminView()) newFormPage(); else formsPage(); }
     else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
+    else if (CUR === 'K') kitPage();
+    else if (CUR.charAt(0) === 'k') kitDocPage(CUR.slice(2));
     else dashboard();
+  }
+
+  /* ===== ערכת המפקח.ת (מיטל, 10.10.26) =====
+     מחליפה את "מרחב הפיקוח" באתר: כל הידע במקום אחד, בתוך תובה.
+     המסמכים לא מועתקים — נטענים מהאתר (מקור אחד) ומוצגים במסגרת בלי התפריט והתחתית של האתר.
+     הצ׳ק ליסט הישן בדף הביקור (נשמר בדפדפן בלבד) מוחלף בהפניה לצ׳ק ליסט של תובה.
+     קבוצה: [כותרת, פריטים]. פריט: [מזהה, כותרת, תיאור, סוג] — page = דף מהאתר, img = תמונה, ext = קישור חיצוני */
+  var SITE = 'https://pedagogiamh.co.il/';
+  var KIT = [
+    ['התפקיד', [
+      ['tafkid-mefakeach', 'תפקיד המפקח.ת הפדגוגי.ת', 'התפיסה, העקרונות, תחומי הפעולה, חלוקת הזמן ומדדי ההצלחה', 'page'],
+      ['pikuah-shnati', 'תוכנית העבודה השנתית', 'ליווי בעלי התפקידים, שגרות העבודה והגאנט החודשי', 'page'],
+      ['madrich-pedagogi', 'המדריך.ה הפדגוגי.ת למקצוע', 'הגדרת התפקיד, מדדי ההצלחה ואיך מלווים את המדריכים', 'page']]],
+    ['הביקור, הדוח והוועדה', [
+      ['bikur-mefakeach', 'הביקור בבית הספר', 'מבנה יום הביקור וטבלת הפעולות', 'page'],
+      ['doch-pedagogi', 'הדוח הפדגוגי', 'עקרונות הכתיבה, מבנה הדוח ומתי מדווחים למפקחת הארצית', 'page'],
+      ['vaada-mefakeach', 'ועדה מלווה · צד המפקח.ת', 'ההכנה, הניהול והמעקב, וטופס הרמזורים', 'page'],
+      ['vaada-melava', 'ועדות מלוות · המבנה', 'מבנה הוועדה, סדר יום מומלץ ותבנית סיכום', 'page']]],
+    ['בתי הספר והמגמות', [
+      ['prisat-pikuah', 'פריסת הפיקוח · תשפ״ז', 'מי מלווה כל מוסד, לפי מפקח.ת, מחוז, רשת ומגזר', 'page'],
+      ['pikuah-miktzoi', 'פיקוח מקצועי · מגמות ומפקחים', 'כל המגמות בכל מוסד ומי המפקח.ת המקצועי.ת', 'page'],
+      ['tashpaz', 'תכנון תשפ״ז', 'מסמך ההיערכות, נספח ג׳ ולוח מועדי הוועדה', 'page']]],
+    ['קישורים ואנשי קשר', [
+      ['sachar', 'יחידת השכר · למי פונים', 'עובדי השכר לפי מחוז ותחום', 'img', SITE + 'img/yechidat-hasachar.jpg'],
+      ['vaadat-hishtalmuyot', 'ועדת ההשתלמויות · סרטון הדרכה', 'הגשת בקשה מקוונת דרך פורטל השירות לעובד', 'ext',
+        'https://www.canva.com/design/DAHPhfCKa_o/dRTK3Wn9NtGl9gllFCuGzA/watch'],
+      ['drive', 'דרייב הפיקוח', 'חומרים רגישים ותוכניות אישיות · רק עם הרשאת דרייב', 'ext', 'https://drive.google.com/drive/folders/1UTIbgT-ftevtPIPFkabyb4E2j9BB2CaA'],
+      ['sikumim', 'סיכומי מפגשי הפיקוח', 'פרוטוקולים עם מידע אישי · רק עם הרשאת דרייב', 'ext', 'https://drive.google.com/drive/folders/1NSSMTXrenR2lIJXQBEUfj3R1eUAgOuIn']]]
+  ];
+  function kitItem(id) {
+    var hit = null;
+    KIT.forEach(function (g) { g[1].forEach(function (it) { if (it[0] === id) hit = it; }); });
+    return hit;
+  }
+  function kitPage() {
+    $('main').innerHTML = '<div class="card head"><h1>ערכת המפקח.ת</h1><div class="meta">כל ההנחיות, הטבלאות והקישורים של הפיקוח במקום אחד</div></div>' +
+      KIT.map(function (g) {
+        return '<div class="card"><p class="eyebrow">' + I.book + esc(g[0]) + '</p><div class="tiles">' + g[1].map(function (it) {
+          var inner = '<span><b>' + esc(it[1]) + '</b><small>' + esc(it[2]) + '</small></span>';
+          return it[3] === 'ext'
+            ? '<a class="tile" href="' + esc(it[4]) + '" target="_blank" rel="noopener">' + inner + I.ext + '</a>'
+            : '<button type="button" class="tile" data-go="k:' + esc(it[0]) + '">' + inner + '</button>';
+        }).join('') + '</div></div>';
+      }).join('');
+  }
+  var KITC = {};   /* מטמון: מזהה → HTML מוכן למסגרת */
+  function kitDocPage(id) {
+    var it = kitItem(id);
+    if (!it) { go('K'); return; }
+    /* במסמך מהאתר הכותרת כבר בראש הדף — כאן רק "חזרה" */
+    var head = '<div class="kithead">' + backLink() + '</div>';
+    if (it[3] === 'img') {
+      $('main').innerHTML = '<div class="card head">' + backLink() + '<h1>' + esc(it[1]) + '</h1><div class="meta">' + esc(it[2]) + '</div></div><div class="card"><a href="' + esc(it[4]) + '" target="_blank" rel="noopener"><img class="kitimg" src="' + esc(it[4]) + '" alt="' + esc(it[1]) + '"></a></div>';
+      return;
+    }
+    $('main').innerHTML = head + '<div class="card kitbox"><div class="empty" id="kitWait">טוען…</div><iframe class="kitf" id="kitF" title="' + esc(it[1]) + '" hidden></iframe></div>';
+    if (KITC[id]) { kitShow(id); return; }
+    fetch(SITE + id + '.html', { cache: 'no-cache' }).then(function (r) {
+      if (!r.ok) throw new Error(r.status);
+      return r.text();
+    }).then(function (t) {
+      KITC[id] = kitClean(t, id);
+      if (CUR === 'k:' + id) kitShow(id);
+    }).catch(function () {
+      if (CUR !== 'k:' + id || !$('kitWait')) return;
+      $('kitWait').innerHTML = 'המסמך לא נטען כרגע. <a href="' + SITE + id + '.html" target="_blank" rel="noopener">פתיחה באתר</a>';
+    });
+  }
+  /* מורידים מהדף את מה שכבר יש בתובה: תפריט האתר, התחתית, השער (תובה כבר נעולה), עוגן, חיפוש, משוב ופס הניווט הדביק */
+  function kitClean(t, id) {
+    t = t.replace(/<!-- nav:start[\s\S]*?<!-- nav:end -->/, '')
+         .replace(/<!-- foot:start[\s\S]*?<!-- foot:end -->/, '')
+         .replace(/<script\b[^>]*\bsrc="([^"]*)"[^>]*>\s*<\/script>/g, function (all, src) {
+           return /(analytics|auth|search|feedback|pagenav|ogen-widget)[^\/]*\.js/.test(src) ? '' : all;
+         })
+         .replace(/<script>\s*window\.OGEN_WIDGET_POSITION[^<]*<\/script>/g, '')
+         .replace(/<body([^>]*)>/i, function (all, attrs) { return '<body' + attrs.replace(/\sdata-back="[^"]*"/, '') + ' data-pn="off">'; })
+         .replace(/<head>/i, '<head><base href="' + SITE + '">' +
+           '<style>html,body{min-height:0!important;height:auto!important;background:#fff!important}' +
+           '.skip,.crumb,.govbar,.scrim,.drawer{display:none!important}' +
+           '.hero{padding-top:14px!important}.hero .kicker{display:none!important}</style>');
+    return t;
+  }
+  function kitShow(id) {
+    var f = $('kitF');
+    if (!f) return;
+    f.onload = function () { kitWire(f, id); };
+    f.srcdoc = KITC[id];
+  }
+  function kitWire(f, id) {
+    var d = f.contentDocument;
+    if (!d || !d.body) return;
+    if ($('kitWait')) $('kitWait').remove();
+    f.hidden = false;
+    if (id === 'bikur-mefakeach') kitCkSwap(d);
+    function fit() { f.style.height = Math.max(d.documentElement.scrollHeight, d.body.scrollHeight) + 'px'; }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(d.body);
+    Array.prototype.forEach.call(d.images, function (im) { if (!im.complete) im.addEventListener('load', fit); });
+    setTimeout(fit, 700);
+    /* קישורים: עוגן בתוך הדף = גלילה בתובה; דף אחר מהערכה = נפתח בתובה; כל השאר = לשונית חדשה */
+    d.addEventListener('click', function (e) {
+      if (e.target.closest('[data-tuva-ck]')) { e.preventDefault(); go(''); return; }
+      var a = e.target.closest('a[href]');
+      if (!a || e.defaultPrevented) return;
+      var raw = a.getAttribute('href') || '';
+      if (raw.charAt(0) === '#') {
+        e.preventDefault();
+        var el = raw.length > 1 && d.getElementById(decodeURIComponent(raw.slice(1)));
+        if (el) window.scrollTo({ top: f.getBoundingClientRect().top + window.pageYOffset + el.getBoundingClientRect().top - 70, behavior: 'smooth' });
+        return;
+      }
+      var u;
+      try { u = new URL(a.href); } catch (err) { return; }
+      e.preventDefault();
+      var m = u.origin + '/' === SITE && u.pathname.match(/^\/([\w-]+)\.html$/);
+      if (m && kitItem(m[1]) && kitItem(m[1])[3] === 'page') { go('k:' + m[1]); return; }
+      if (u.protocol === 'mailto:' || u.protocol === 'tel:') { location.href = a.href; return; }
+      window.open(a.href, '_blank', 'noopener');
+    });
+  }
+  /* בדף הביקור: הצ׳ק ליסט של האתר נשמר רק בדפדפן — בתובה עובדים עם הצ׳ק ליסט שנשמר ומגיע לתובי */
+  function kitCkSwap(d) {
+    var hs = d.querySelectorAll('h2.sub-sec'), from = null;
+    Array.prototype.forEach.call(hs, function (h) { if (!from && h.textContent.indexOf('צ׳ק ליסט') > -1) from = h; });
+    if (!from) return;
+    var parent = from.parentNode, n = from, stop = null;
+    while (n && !stop) {
+      var nx = n.nextElementSibling;
+      if (n !== from && n.classList && n.classList.contains('callout')) { stop = n; break; }
+      if (n.tagName !== 'SCRIPT') n.remove();
+      n = nx;
+    }
+    var box = d.createElement('div');
+    box.innerHTML = '<h2 class="sub-sec">צ׳ק ליסט לביקור</h2><div class="callout"><span class="ttl">הצ׳ק ליסט נמצא בתובה</span>' +
+      'הצ׳ק ליסט של הביקור (30 סעיפים, עם צעדי פעולה) נשמר בתובה לכל בית ספר, ותובי משתמש בו בתדריך לביקור הבא. ' +
+      'הוא נמצא בראש הדשבורד, ובעמוד בית הספר בלשונית "ביקורים ומשימות".' +
+      '<p style="margin:12px 0 0"><a class="btn primary" href="#" data-tuva-ck>לצ׳ק ליסט בדשבורד</a></p></div>';
+    parent.insertBefore(box, stop);
   }
 
   /* ----- מה חסר לכל בית ספר (דף הבית) ----- */

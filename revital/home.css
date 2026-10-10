@@ -578,3 +578,11 @@ details.sec[data-k^="olt"]{scroll-margin-top:84px}
 .dck>summary{min-height:64px}
 .dck .st{font-size:17px}
 .dck .dckbody{margin-top:10px}
+/* ערכת המפקח.ת (10.10.26) — מסמך מהאתר במסגרת, תמונה, ואריח שהוא קישור חיצוני */
+.kitbox{padding:0;overflow:hidden}
+.kitbox .empty{padding:18px 20px}
+.kitf{display:block;width:100%;border:0;min-height:300px;background:#fff}
+.kitimg{display:block;max-width:100%;height:auto;margin:0 auto;border-radius:10px}
+a.tile{text-decoration:none}
+a.tile .ext{width:15px;height:15px;margin-inline-start:auto;color:var(--muted);flex:none}
+.kithead{margin:0 0 -4px}
