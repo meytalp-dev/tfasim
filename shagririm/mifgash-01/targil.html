@@ -30,6 +30,10 @@ pre.code{direction:ltr;text-align:left;background:#f1f3f8;border-radius:10px;pad
 details summary{cursor:pointer;font-weight:700}
 table{width:100%;border-collapse:collapse;font-size:15.5px}
 td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:right;vertical-align:top}
+.shot{display:block;width:100%;height:auto;margin:12px 0 6px;border:1px solid var(--line);border-radius:10px;background:#fff}
+ol.marks{margin:4px 0 10px;padding-inline-start:22px;font-size:15.5px}
+ol.marks li::marker{color:#C2620C;font-weight:800}
+.sub-h{font-weight:700;margin:16px 0 0}
 footer{margin-top:40px;color:var(--soft);font-size:13px;text-align:center}
 footer a{color:inherit}
 </style>
@@ -49,7 +53,9 @@ footer a{color:inherit}
 
 <div class="card step"><div class="num">2</div><div>
 <h3>פותחים את Apps Script מתוך הגיליון</h3>
-<p>בתפריט: <b>תוספים ← Apps Script</b>. נפתח עורך עם קובץ <span class="ltr">Code.gs</span> ריק.</p>
+<p>בתפריט של הגיליון: <b>Extensions</b> (בעברית: <b>תוספים</b>) ← <b>Apps Script</b>. נפתח עורך עם קובץ <span class="ltr">Code.gs</span> ריק.</p>
+<img class="shot" src="targil-img/1-tosafim.png" alt="תפריט Extensions בגיליון, מסומן במספר 1" loading="lazy">
+<ol class="marks"><li>לוחצים על <b>Extensions</b> (תוספים), ובתפריט שנפתח: <b>Apps Script</b>.</li></ol>
 </div></div>
 
 <div class="card step"><div class="num">3</div><div>
@@ -75,14 +81,44 @@ footer a{color:inherit}
 
 <div class="card step"><div class="num">4</div><div>
 <h3>מדביקים את שני הקבצים</h3>
-<p>את <span class="ltr">Code.gs</span> מדביקים במקום מה שיש בעורך. לקובץ השני: <b>+ ← HTML</b>, קוראים לו <span class="ltr">Index</span> (בלי <span class="ltr">.html</span>, העורך מוסיף לבד) ומדביקים. שומרים (<span class="ltr">Ctrl+S</span>).</p>
+<img class="shot" src="targil-img/2-orech.png" alt="עורך Apps Script: אזור הקוד מסומן 1, כפתור הפלוס ליד קבצים מסומן 2" loading="lazy">
+<ol class="marks">
+<li>מוחקים את מה שכתוב בעורך (<span class="ltr">function myFunction</span>), ומדביקים במקומו את הקוד של <span class="ltr">Code.gs</span> מ-Gemini.</li>
+<li>לוחצים על <b>+</b> ליד "קבצים" ← <b>HTML</b>. קוראים לקובץ <span class="ltr">Index</span> (בלי <span class="ltr">.html</span>, העורך מוסיף לבד), ומדביקים בו את הקוד השני.</li>
+</ol>
+<p>שומרים: <span class="ltr">Ctrl+S</span>, או אייקון הדיסקט בסרגל.</p>
 </div></div>
 
 <div class="card step"><div class="num">5</div><div>
 <h3>פורסים</h3>
-<p><b>פריסה ← פריסה חדשה ← סוג: אפליקציית אינטרנט</b>.<br>
-הפעלה בתור: <b>אני</b>. למי יש גישה: <b>כל אחד</b>. ← פריסה.</p>
-<p>בפעם הראשונה גוגל מבקש הרשאות. כאן מגיע המסך המפחיד (ראו למטה). בסוף מתקבל קישור שמסתיים ב-<span class="ltr">/exec</span>.</p>
+<p>זה החלק הארוך. הולכים לפי התמונות, לפי הסדר.</p>
+
+<p class="sub-h">א. בוחרים סוג פריסה</p>
+<img class="shot" src="targil-img/3-sug-prisa.png" alt="כפתור לפריסה, גלגל השיניים ואפליקציית אינטרנט, מסומנים 1 עד 3" loading="lazy">
+<ol class="marks">
+<li>לוחצים על הכפתור הכחול <b>לפריסה</b> (באנגלית: Deploy) ← <b>פריסה חדשה</b>.</li>
+<li>בחלון שנפתח לוחצים על <b>גלגל השיניים</b> ליד "בחירת סוג".</li>
+<li>בוחרים <b>אפליקציית אינטרנט</b>.</li>
+</ol>
+
+<p class="sub-h">ב. מי יכול לפתוח: כולם</p>
+<img class="shot" src="targil-img/4-kulam.png" alt="רשימת למי יש גישה, האפשרות כולם מסומנת" loading="lazy">
+<ol class="marks"><li>ב"למי יש גישה" בוחרים <b>כולם</b>. בלי זה, הצוות לא יוכל לפתוח את השאלון. "לבצע בתור" נשאר <b>עצמי</b>.</li></ol>
+<img class="shot" src="targil-img/5-lifrisa.png" alt="כולם נבחר, וכפתור לפריסה מסומן" loading="lazy">
+<ol class="marks"><li>בודקים שכתוב <b>כולם</b>.</li><li>לוחצים <b>לפריסה</b>.</li></ol>
+
+<p class="sub-h">ג. מאשרים גישה (רק בפעם הראשונה)</p>
+<img class="shot" src="targil-img/6-harshaa.png" alt="כפתור הרשאת הגישה מסומן" loading="lazy">
+<ol class="marks"><li>לוחצים <b>הרשאת הגישה</b>, ובוחרים את חשבון הג'ימייל שלכם.</li></ol>
+<p>עכשיו מגיע מסך באנגלית שנראה מפחיד. זה תקין: גוגל מזהיר על כל קוד שלא עבר בדיקה שלו, וזה הקוד שלכם.</p>
+<img class="shot" src="targil-img/7-lo-imta.png" alt="מסך Google hasn't verified this app, עם Advanced ו-Go to unsafe מסומנים" loading="lazy" style="max-width:520px">
+<ol class="marks"><li>לוחצים על הקישור הקטן <b>Advanced</b> (מתקדם). לא על הכפתור הכחול.</li><li>לוחצים על <b>Go to … (unsafe)</b> שמופיע למטה.</li></ol>
+<img class="shot" src="targil-img/8-continue.png" alt="כפתור Continue מסומן" loading="lazy" style="max-width:420px">
+<ol class="marks"><li>גוללים למטה ולוחצים <b>Continue</b> (או Allow).</li></ol>
+
+<p class="sub-h">ד. מעתיקים את הקישור</p>
+<img class="shot" src="targil-img/9-kishur.png" alt="כתובת האפליקציה וכפתור העתקה מסומנים" loading="lazy">
+<ol class="marks"><li>תחת "אפליקציית אינטרנט" יש כתובת שמסתיימת ב-<span class="ltr">/exec</span>. לוחצים <b>העתקה</b>. זה הקישור ששולחים.</li></ol>
 </div></div>
 
 <div class="card step ok"><div class="num">6</div><div>
@@ -94,7 +130,7 @@ footer a{color:inherit}
 <div class="card warn">
 <table>
 <tr><th>מה רואים</th><th>מה עושים</th></tr>
-<tr><td>"Google hasn't verified this app" / "גוגל לא אימתה את האפליקציה"</td><td><b>Advanced / מתקדם ← Go to … (unsafe)</b> ← Allow. זה הקוד שלך, והגישה רק לגיליון שלך.</td></tr>
+<tr><td>"Google hasn't verified this app" / "גוגל לא אימתה את האפליקציה"</td><td><b>Advanced / מתקדם ← Go to … (unsafe)</b> ← Continue. זה הקוד שלך, והגישה רק לגיליון שלך. התמונות בצעד 5, חלק ג.</td></tr>
 <tr><td>אין אפשרות "כל אחד" ב"למי יש גישה", או שההרשאה נחסמת</td><td>חשבון בית ספרי שמנוהל על ידי ארגון. עוברים לג'ימייל פרטי.</td></tr>
 <tr><td>שגיאה בהרצה, או שהשאלון נשלח ושום שורה לא נוספת</td><td>מעתיקים את הודעת השגיאה המלאה ל-Gemini: "קיבלתי את השגיאה הזאת, מה לתקן?". מדביקים את התיקון ושומרים.</td></tr>
 <tr><td>תיקנתי את הקוד, והקישור עדיין מציג את הגרסה הישנה</td><td><b>פריסה ← ניהול פריסות ← עריכה (עיפרון) ← גרסה: חדשה ← פריסה</b>. כך הקישור נשאר אותו קישור. "פריסה חדשה" יוצרת קישור חדש.</td></tr>
