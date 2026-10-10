@@ -262,6 +262,13 @@ a.nw-ses:hover { color: var(--orange); }
 .nw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .nw-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--muted); }
 .nw-meta a { display: inline-flex; align-items: center; gap: 5px; color: var(--orange); font-weight: 700; text-decoration: none; }
+.nw-check { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 10px; border-radius: 12px; padding: 8px 12px; font-size: 13.5px; line-height: 1.55; }
+.nw-check p { margin: 0; flex: 1 1 260px; }
+.nw-check b { display: inline-flex; align-items: center; gap: 4px; }
+.nw-check.ok { background: var(--ok-soft); color: #1E5E40; }
+.nw-check.warn { background: var(--orange-soft); color: #7A3E06; }
+.nw-check.none { background: #EDEFF1; color: var(--muted); }
+.nw-recheck { min-height: 36px; padding: 4px 10px; font-size: 13px; }
 .nw-warn { display: inline-flex; align-items: center; gap: 5px; color: #8A4707; font-weight: 700; }
 .nw-acts { display: flex; flex-wrap: wrap; gap: 8px; }
 .nw-pub { margin-top: 18px; }

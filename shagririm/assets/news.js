@@ -226,6 +226,7 @@
       '<div class="nw-meta"><span class="v2-chip ' + (isPub ? "done" : "soon") + '">' + (isPub ? "פורסם " + esc(shortDate(it.published)) : esc(it.via || "טיוטה")) + "</span>" +
       '<span translate="no">' + esc(shortDate(it.created)) + "</span>" +
       (it.link ? '<a href="' + esc(it.link) + '" target="_blank" rel="noopener">' + ico("ext", "xs") + "לבדוק במקור</a>" : '<span class="nw-warn">' + ico("alert", "xs") + "אין קישור למקור</span>") + "</div>" +
+      checkLine(it, ctx) +
       '<label>כותרת<input class="a-in" name="title" maxlength="140" value="' + esc(it.title) + '"' + ro + "></label>" +
       '<label>מה זה<textarea class="a-in" name="what" rows="3" maxlength="700"' + ro + ">" + esc(it.what) + "</textarea></label>" +
       '<label>איך מנסים <small>(צעד בכל שורה)</small><textarea class="a-in" name="how" rows="3" maxlength="600"' + ro + ">" + esc(it.how) + "</textarea></label>" +
@@ -250,6 +251,15 @@
       "</form>";
   }
 
+  /* שורת הבדיקה האוטומטית (10.10.26): מול מה נבדק, ומה תוקן או לא אומת. רק במסך האישור — הרכזים לא רואים אותה. */
+  function checkLine(it, ctx) {
+    var c = str(it.check);
+    var cls = c === "נבדק" ? "ok" : c ? "warn" : "none";
+    var head = c === "נבדק" ? ico("check", "xs") + "נבדק" : c ? ico("alert", "xs") + esc(c) : "עוד לא נבדק";
+    return '<div class="nw-check ' + cls + '"><p><b>' + head + "</b>" + (it.checkNote ? " · " + esc(it.checkNote) : "") + "</p>" +
+      (ctx.viewer ? "" : '<button type="button" class="v2-btn ghost nw-recheck" data-nwact="verify">' + ico("search", "xs") + "לבדוק שוב</button>") + "</div>";
+  }
+
   /* לחיצות במסך האישור. ctx.save מחזיר Promise של תשובת השרת. */
   function wireQueue(el, ctx) {
     if (el.getAttribute("data-nw-wired")) return;
@@ -259,6 +269,7 @@
       if (!b) return;
       var f = b.closest("form[data-nw]");
       var act = b.getAttribute("data-nwact");
+      if (act === "verify") { recheck(f, b, ctx); return; }
       if (act === "del" && !w.confirm(f.querySelector('[name="title"]').value ? "למחוק את \"" + f.querySelector('[name="title"]').value + "\"?" : "למחוק?")) return;
       var body = {
         id: f.getAttribute("data-nw"),
@@ -285,6 +296,36 @@
         } else {
           for (var m = 0; m < btns.length; m++) btns[m].disabled = false;
         }
+      });
+    });
+  }
+
+  /* "לבדוק שוב": קודם שומרים את מה שמיטל תיקנה בטופס (בלי לשנות סטטוס), ואז הבדיקה רצה על הנוסח השמור.
+     הבדיקה לוקחת עד דקה — longPost, בקשה אחת, בלי ניסיון חוזר. */
+  function recheck(f, b, ctx) {
+    var id = f.getAttribute("data-nw");
+    var cur = null;
+    for (var i = 0; i < N.items.length; i++) if (N.items[i].id === id) cur = N.items[i];
+    var body = { id: id, status: cur && cur.status === ST_OK ? ST_OK : ST_PENDING };
+    ["title", "what", "how", "copy", "why", "price", "tag", "link", "session"].forEach(function (k) { body[k] = f.querySelector('[name="' + k + '"]').value; });
+    var btns = f.querySelectorAll("button");
+    for (var j = 0; j < btns.length; j++) btns[j].disabled = true;
+    var was = b.innerHTML;
+    b.innerHTML = "בודקים… עד דקה";
+    function fail(msg) {
+      for (var k = 0; k < btns.length; k++) btns[k].disabled = false;
+      b.innerHTML = was;
+      ctx.toast(msg, true);
+    }
+    ctx.save(body).then(function (r) {
+      if (!r || !r.ok) { fail("לא נשמר (" + ((r && r.error) || "רשת") + ")"); return; }
+      return longPost({ action: "newsVerify", key: ctx.key(), id: id }).then(function (v) {
+        if (!v || !v.ok) { fail("הבדיקה לא הצליחה (" + ((v && v.error) || "רשת") + ")"); return; }
+        for (var m = 0; m < N.items.length; m++) if (N.items[m].id === id) N.items[m] = v.item;
+        var holder = d.createElement("div");
+        holder.innerHTML = form(v.item, ctx, v.item.status === ST_OK);
+        f.parentNode.replaceChild(holder.firstChild, f);
+        ctx.toast(v.item.check === "נבדק" ? "נבדק" : "הבדיקה הסתיימה: " + (v.item.check || ""));
       });
     });
   }
