@@ -117,6 +117,7 @@
         <button type="button" data-nav="meet" aria-expanded="true"><svg class="sh-ico"><use href="#i-cal"/></svg>מפגשי הדרכה<svg class="sh-ico v2-caret"><use href="#i-caret"/></svg></button>
         <ul class="v2-mlist" id="v2-mlist"></ul>
       </li>
+      <li><button type="button" data-nav="news"><svg class="sh-ico"><use href="#i-spark"/></svg>חדשות וחידושים</button></li>
       <li><button type="button" data-nav="studio"><svg class="sh-ico"><use href="#i-studio"/></svg>הסטודיו שלי</button></li>
       <li><button type="button" data-nav="port"><svg class="sh-ico"><use href="#i-folio"/></svg>תיק העבודות שלי</button></li>
       <!-- מיפוי הצוות (1.10.26): אותו מפתח אישי, נפתח בלשונית חדשה. לא data-nav, כי זה דף נפרד -->
@@ -140,7 +141,10 @@
         <!-- מיפוי הצוותות (1.10.26): נפתח עם מפתח המבט-על שנשמר בדפדפן אחרי הכניסה הראשונה לדף המיפוי -->
         <li><a class="a-navlink" id="a-mipui" href="mipui/" target="_blank" rel="noopener"><svg class="sh-ico"><use href="#i-users"/></svg>מיפוי הצוותות<svg class="sh-ico xs a-ext"><use href="#i-ext"/></svg></a></li>
         <!-- 3.10.26: מעל = מה שגם הרכזים רואים. מתחת = ניהול, רק למיטל ולאלנט -->
+        <li><button type="button" data-av="news"><svg class="sh-ico"><use href="#i-spark"/></svg>חדשות וחידושים</button></li>
         <li class="a-navsec" aria-hidden="true">ניהול</li>
+        <li><button type="button" data-av="newsq"><svg class="sh-ico"><use href="#i-inbox"/></svg>חדשות לאישור<span class="v2-n" id="a-n-news" hidden></span></button></li>
+        <li class="a-admin-only"><button type="button" data-av="newsadd"><svg class="sh-ico"><use href="#i-pen"/></svg>הוספה מהירה</button></li>
         <li><button type="button" data-av="people"><svg class="sh-ico"><use href="#i-users"/></svg>נתוני הבסיס</button></li>
         <li><button type="button" data-av="att"><svg class="sh-ico"><use href="#i-check"/></svg>נוכחות ואישור<span class="v2-n" id="a-n-att" hidden></span></button></li>
         <li><button type="button" data-av="ans"><svg class="sh-ico"><use href="#i-chart"/></svg>בדיקת עבודות</button></li>
@@ -211,6 +215,10 @@
       <section class="a-scr" id="a-ans" hidden></section>
       <section class="a-scr" id="a-subs" hidden></section>
       <section class="a-scr" id="a-set" hidden></section>
+      <!-- 10.10.26: חדשות וחידושים. news.js מצייר -->
+      <section class="a-scr" id="a-news" hidden></section>
+      <section class="a-scr" id="a-newsq" hidden></section>
+      <section class="a-scr" id="a-newsadd" hidden></section>
 
       <!-- משתתפים וזכאות: הטבלה של מיטל (כניסות) ומעליה מסך אלנט כמו שהוא (הכרעה 18) -->
       <section class="a-scr" id="a-people" hidden>
@@ -368,6 +376,7 @@
 <script src="assets/auth.js"></script>
 <script src="assets/attend.js"></script>
 <script src="assets/page.js"></script>
+<script src="assets/news.js"></script>
 <!-- המעטפת של מיטל ואלנט. אצל רכז/ת הקבצים נטענים ולא מופעלים: shell.js
      קורא ל-SH_admin.start רק במפתח adm-/view-. -->
 <script src="assets/zoom-import.js"></script>

@@ -224,3 +224,56 @@
 .vf-err { color: #A33; font-weight: 700; margin: 0 0 10px; }
 .vf-done { background: var(--blue-soft); border-color: transparent; font-size: 15px; }
 @media (max-width: 760px) { .vf-grid { grid-template-columns: 1fr; } }
+
+/* חדשות וחידושים (news.js, 10.10.26) — אותו טאב לרכזים ולמיטל, ומסכי האישור וההוספה של מיטל */
+.nw-head { margin: 0 0 14px; }
+.nw-head h2 { font-size: 23px; line-height: 1.25; margin: 0 0 6px; }
+.nw-head p:not(.v2-eyebrow) { margin: 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; }
+.nw-head .v2-eyebrow { display: flex; align-items: center; gap: 6px; }
+.nw-last { white-space: nowrap; }
+.nw-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.nw-item.fresh { border-color: var(--orange); box-shadow: inset -4px 0 0 var(--orange); }
+.nw-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.v2-chip.tip { background: #EFE7F6; color: #5B3A82; }
+.nw-item { padding: 20px 22px; }
+.nw-item h3 { margin: 0 0 8px; font-size: 18.5px; line-height: 1.4; }
+.nw-what { margin: 0 0 12px; font-size: 15.5px; line-height: 1.7; }
+.nw-lbl { margin: 0 0 6px; font-size: 12.5px; font-weight: 800; color: var(--muted); letter-spacing: .02em; }
+.nw-how { margin: 0 0 12px; }
+.nw-how ol { margin: 0; padding-inline-start: 22px; display: grid; gap: 4px; font-size: 15px; line-height: 1.6; }
+.nw-copy { margin: 0 0 12px; border: 1px solid var(--line); border-radius: 14px; background: #F6F8FA; padding: 10px 12px; }
+.nw-copy-h { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.nw-copy-h .nw-lbl { margin: 0; }
+.nw-copybtn { min-height: 36px; padding: 6px 12px; font-size: 13px; }
+.nw-copytx { margin: 8px 0 0; font: 500 15px/1.6 Assistant, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; unicode-bidi: plaintext; }
+.nw-why { margin: 0 0 12px; background: #FBFAF6; border-radius: 14px; padding: 10px 14px; }
+.nw-why p:not(.nw-lbl) { margin: 0; font-size: 15px; line-height: 1.65; }
+.nw-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-top: 4px; padding-top: 12px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.nw-src { flex: 1 1 auto; }
+.nw-ses { display: inline-flex; align-items: center; gap: 5px; color: var(--ink); font-weight: 700; text-decoration: none; }
+a.nw-ses:hover { color: var(--orange); }
+.nw-go { min-height: 40px; padding: 6px 14px; font-size: 14px; color: var(--orange); border-color: var(--orange); }
+.nw-intro { margin: 0 0 14px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.nw-forms { display: grid; gap: 14px; }
+.nw-form { display: grid; gap: 10px; }
+.nw-form label small { font-weight: 400; color: var(--muted); }
+.nw-form label { display: grid; gap: 5px; font-size: 13px; font-weight: 700; color: var(--ink); }
+.nw-form .a-in, .nw-add .a-in { width: 100%; min-width: 0; box-sizing: border-box; font-weight: 400; resize: vertical; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; font: inherit; background: #fff; }
+.nw-two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.nw-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; font-size: 13px; color: var(--muted); }
+.nw-meta a { display: inline-flex; align-items: center; gap: 5px; color: var(--orange); font-weight: 700; text-decoration: none; }
+.nw-warn { display: inline-flex; align-items: center; gap: 5px; color: #8A4707; font-weight: 700; }
+.nw-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.nw-pub { margin-top: 18px; }
+.nw-pub summary { cursor: pointer; font-weight: 800; padding: 10px 0; display: flex; align-items: center; gap: 6px; }
+.nw-add p { margin: 0 0 12px; line-height: 1.6; }
+.nw-add .v2-row { margin-top: 12px; }
+.nw-ok { color: #23774F; font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.nw-err { color: #A33; font-weight: 700; }
+@media (max-width: 560px) {
+  .nw-two { grid-template-columns: 1fr; }
+  .nw-acts .v2-btn { flex: 1 1 100%; }
+  .nw-head h2 { font-size: 20px; }
+  .nw-item { padding: 16px; }
+  .nw-go { flex: 1 1 100%; }
+}

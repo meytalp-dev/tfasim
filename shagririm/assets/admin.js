@@ -38,7 +38,7 @@
   function extUrl(tr, num, view) { return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : ""; }
   var TRACKS = ["כלים", "הובלה"];
   var DAYS = { "כלים": "ימי שני", "הובלה": "ימי רביעי" };
-  var VIEWS = { home: 1, kit: 1, desk: 1, ans: 1, att: 1, subs: 1, people: 1, set: 1 };
+  var VIEWS = { home: 1, kit: 1, desk: 1, ans: 1, att: 1, subs: 1, people: 1, set: 1, news: 1, newsq: 1, newsadd: 1 };
 
   /* ------------------------------------------------------------------ */
   /* עזרים                                                              */
@@ -388,13 +388,13 @@
     A.ctx.session = Number(n) || 0;
   }
 
-  var SCREENS = ["a-home", "a-kit", "a-ans", "a-subs", "a-set", "a-people", "a-desk", "a-att"];
+  var SCREENS = ["a-home", "a-kit", "a-ans", "a-subs", "a-set", "a-people", "a-desk", "a-att", "a-news", "a-newsq", "a-newsadd"];
 
   function route() {
     var p = hashParams();
     /* 3.10.26: אין "בית" נפרד. נכנסים לעמוד המפגש, כמו הרכזים. */
     var v = VIEWS[p.v] && p.v !== "home" ? p.v : "kit";
-    if (v === "set" && viewer()) v = "kit";
+    if ((v === "set" || v === "newsadd") && viewer()) v = "kit";
     if (v === "kit" && p.s && Number(p.s) !== curNum()) select(track(), Number(p.s));
     /* עשרת המפגשים פתוחים בתפריט רק במסך "מפגשי ההדרכה" — אחרת הם דוחפים
        את שאר הפריטים מתחת לקצה המסך */
@@ -420,6 +420,7 @@
     else if (v === "subs") renderSubs();
     else if (v === "people") renderPeople();
     else if (v === "set") renderSet();
+    else if (v === "news" || v === "newsq" || v === "newsadd") renderNews(v);
     try { w.scrollTo(0, 0); } catch (e) { /* לא קריטי */ }
   }
 
@@ -431,7 +432,7 @@
     if (k !== A.lastKey) {
       A.lastKey = k;
       d.body.classList.toggle("t-viewer", viewer());
-      if (k) { A.content = {}; A.home = null; A.people = null; loadContent(); }
+      if (k) { A.content = {}; A.home = null; A.people = null; loadContent(); loadNews(); }
     }
     var tr = str(st.track) || A.ctx.track, n = Number(st.session) || 0;
     if (tr !== A.ctx.track || n !== A.ctx.session) {
@@ -633,9 +634,11 @@
     h += "</div>";
 
     var res = sessionRes(tr, s.num);
+    /* 10.10.26: חדשות ששויכו למפגש הזה (מאושרות בלבד, כמו אצל הרכזים) */
+    if (w.SH_news) res = res.concat(w.SH_news.sessionLinks(tr, s.num));
     if (res.length || str(s.materials)) {
       h += '<div class="v2-card"><p class="v2-eyebrow">משאבי המפגש</p>' + (res.length ? '<ul class="v2-mats">' + res.map(function (r) {
-        return '<li><a href="' + esc(r[2]) + '" target="_blank" rel="noopener">' + ico("link", "s") +
+        return '<li><a href="' + esc(r[2]) + '"' + (r[2].charAt(0) === "#" ? "" : ' target="_blank" rel="noopener"') + ">" + ico("link", "s") +
           '<span><b style="display:block">' + esc(r[0]) + '</b><small style="color:var(--muted)">' + esc(r[1]) + "</small></span></a></li>";
       }).join("") + "</ul>" : "") +
         (str(s.materials) && w.SH_shell && w.SH_shell.matsHtml ? w.SH_shell.matsHtml(s.materials) : "") + "</div>";
@@ -978,6 +981,47 @@
     var never = t.rows.filter(function (r) { return !str(r.lastLogin); });
     copyText("טרם נכנסו למערכת · מסלול " + tr + " (" + never.length + "):\n" +
       never.map(function (r) { return "· " + r.name + " — " + r.school; }).join("\n"), "הרשימה הועתקה · " + never.length + " שמות");
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* חדשות וחידושים (10.10.26) — news.js מצייר, כאן הטעינה והשמירה       */
+  /* ------------------------------------------------------------------ */
+
+  function loadNews() {
+    if (!w.SH_news) return null;
+    return w.SH_news.load(function () { return get("news", {}); }).then(function () {
+      newsBadge();
+      if (A.view === "news" || A.view === "newsq" || A.view === "newsadd") renderNews(A.view);
+      if (A.view === "kit" && A.loaded) renderKit();
+    });
+  }
+
+  function newsBadge() {
+    var b = el("a-n-news"), n = w.SH_news ? w.SH_news.state().pending : 0;
+    if (b) { b.hidden = !n; b.textContent = n; }
+  }
+
+  function newsCtx() {
+    return {
+      viewer: viewer(),
+      key: key,
+      sessions: { "כלים": sessionsOf("כלים"), "הובלה": sessionsOf("הובלה") },
+      toast: toast,
+      save: function (body) {
+        var o = { action: "newsSave", key: key() };
+        for (var k in body) o[k] = body[k];
+        return w.SH_auth.post(o).catch(function () { return null; });
+      },
+      done: newsBadge
+    };
+  }
+
+  function renderNews(v) {
+    if (!w.SH_news) return;
+    var host = el("a-" + v);
+    if (v === "news") w.SH_news.renderPublic(host, {});
+    else if (v === "newsq") { w.SH_news.renderQueue(host, newsCtx()); w.SH_news.wireQueue(host, newsCtx()); }
+    else w.SH_news.renderAdd(host, newsCtx());
   }
 
   /* ------------------------------------------------------------------ */

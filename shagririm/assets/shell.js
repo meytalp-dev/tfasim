@@ -68,6 +68,8 @@
     att: { icon: "clock", title: "הנוכחות שלי",
       text: "בכל מפגש בזום מקלידים את הקוד שמיטל מציגה, בעמוד המפגש. אחרי המפגש מיטל מצליבה מול דוח הזום ומאשרת, ורק אז הנוכחות נספרת. כאן יופיע הפירוט שלך, מפגש אחרי מפגש.",
       when: "נפתח אחרי מפגש 4" },
+    /* 10.10.26: חדשות וחידושים. news.js מצייר; כאן רק הכניסה לניווט */
+    news: { icon: "spark", title: "חדשות וחידושים", custom: true },
     enrich: { icon: "star", title: "הצעות להעשרה",
       text: "השתלמויות, קורסים וקהילות שמתאימים למה שמעניין אותך, עם הסבר למה כל אחד הוצע.",
       when: "נפתח בהמשך השנה" }
@@ -230,7 +232,7 @@
         ? "יחידה עצמית · עד " + esc(shortDate(s.dueBy || s.date))
         : esc(shortDate(s.date)) + (s.now ? " · היום" : "");
       h += '<li><button type="button" data-s="' + esc(s.num) + '"' +
-        (S.view !== "studio" && S.view !== "port" && S.view !== "tools" && S.view !== "att" && S.view !== "enrich" && s.num === S.sel ? ' aria-current="true"' : "") + ">" +
+        (!OTHER[S.view] && s.num === S.sel ? ' aria-current="true"' : "") + ">" +
         '<span class="' + cls + '" translate="no">' + mark + "</span>" +
         "<span>" + esc(s.topic) + '<small translate="no">' + sub + "</small></span></button></li>";
     }
@@ -573,9 +575,11 @@
 
     /* משאבי המפגש: מיד מתחת למצגת ולדף המלווה (3.10.26) */
     var res = sessionRes(Number(s.num));
+    /* 10.10.26: חדשות ששויכו למפגש הזה */
+    if (w.SH_news) res = res.concat(w.SH_news.sessionLinks(str(S.me.track), Number(s.num)));
     h += '<div class="v2-card"><p class="v2-eyebrow">משאבי המפגש</p>';
     if (res.length) h += '<ul class="v2-mats">' + res.map(function (r) {
-      return '<li><a href="' + esc(r[2]) + '" target="_blank" rel="noopener">' + ico("link", "s") +
+      return '<li><a href="' + esc(r[2]) + '"' + (r[2].charAt(0) === "#" ? "" : ' target="_blank" rel="noopener"') + ">" + ico("link", "s") +
         '<span><b style="display:block">' + esc(r[0]) + '</b><small style="color:var(--muted)">' + esc(r[1]) + "</small></span></a></li>";
     }).join("") + "</ul>";
     if (str(s.materials)) h += matsHtml(s.materials);
@@ -661,6 +665,10 @@
 
   function renderOther(key) {
     var o = OTHER[key];
+    if (o.custom) {
+      if (key === "news" && w.SH_news) w.SH_news.renderPublic(el("v2-other"), { track: str(S.me.track) });
+      return;
+    }
     var h = '<div class="v2-card v2-soon"><div class="ic">' + ico(o.icon) + "</div><h2>" + esc(o.title) + "</h2><p>" + esc(o.text) +
       '</p><span class="v2-chip soon when">' + esc(o.when) + "</span></div>";
 
@@ -699,7 +707,9 @@
     return Promise.all([
       content("list", "&track=" + encodeURIComponent(S.me.track)),
       content("next", "&track=" + encodeURIComponent(S.me.track)),
-      progress()
+      progress(),
+      /* חדשות וחידושים: כישלון כאן לא עוצר את הסביבה, רק משאיר את הטאב ריק */
+      w.SH_news ? w.SH_news.load(function () { return w.SH_auth.get("news"); }) : null
     ]).then(function (res) {
       var list = res[0], nx = res[1];
       if (!list || list.ok !== true) {
