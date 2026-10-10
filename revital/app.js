@@ -465,7 +465,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W' || h === 'K') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W' || h === 'K' || h === 'U') return h;
     var km = h.match(/^k=([\w-]+)$/);
     if (km && kitItem(km[1])) return 'k:' + km[1];
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
@@ -533,6 +533,7 @@
     if (CUR === 'M') return 'M';
     if (CUR === 'W') return 'W';
     if (CUR === 'K' || c === 'k') return 'K';
+    if (CUR === 'U') return 'U';
     if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
@@ -555,6 +556,7 @@
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : item('W', I.doc, 'תוכנית העבודה שלי', '')) +   /* מיטל, 8.10.26 */
       item('K', I.book, 'ערכת המפקח.ת', '') +   /* במקום מרחב הפיקוח באתר (מיטל, 10.10.26) */
+      (adminView() ? item('U', I.chart, 'שימוש · תובה וצוהר', '') : '') +   /* אדמין בלבד (מיטל, 10.10.26) */
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
@@ -644,7 +646,141 @@
     else if (CUR.charAt(0) === 'f') formPage(CUR.slice(2));
     else if (CUR === 'K') kitPage();
     else if (CUR.charAt(0) === 'k') kitDocPage(CUR.slice(2));
+    else if (CUR === 'U') { if (adminView()) usagePage(); else dashboard(); }
     else dashboard();
+    trackSec();
+  }
+
+  /* ===== מדידת שימוש (10.10.26) =====
+     הדף מדווח לשער על פתיחה ועל כל מקטע שנפתח. השער שומר שורה אחת לאדם × מקטע בכל 20 דקות,
+     ומיטל ותצוגת "כמו ש..." לא נספרות. כשל ברשת לא מפריע לשום דבר. */
+  var TRACKED = '';
+  function track(ev, sec) {
+    if (!token()) return;
+    try {
+      fetch(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'track', token: token(), app: 'tuva', ev: ev, sec: sec || '', as: AS ? 1 : 0 }) }).catch(function () {});
+    } catch (e) {}
+  }
+  function pageLabel() {
+    var c = CUR.charAt(0);
+    if (!CUR) return 'דשבורד';
+    if (c === 's' && CUR.length > 1) {
+      var tb = TABS.filter(function (t) { return t[0] === STAB; })[0];
+      return 'בית ספר · ' + (tb ? tb[1] : 'סקירה');
+    }
+    if (c === 'k' && CUR.length > 1) { var it = kitItem(CUR.slice(2)); return 'ערכת המפקח.ת · ' + (it ? it[1] : ''); }
+    if (c === 'm' && CUR.length > 1) return 'מיפוי לפי מצב';
+    if (c === 'f' && CUR.length > 1) return 'טפסים · טופס';
+    if (c === 'r' && CUR.length > 1) return 'בעלי תפקידים · תפקיד';
+    if (c === 'p' && CUR.length > 1) return 'מפקחים · מפקח.ת';
+    return { G: 'מה חסר לכל בית ספר', A: 'דורש תשומת לב', S: 'בתי הספר', R: 'בעלי תפקידים לפי תפקיד', M: 'הודעה למנהלים',
+      F: 'טפסים', N: 'טפסים · טופס חדש', W: 'תוכנית העבודה שלי', P: 'מפקחים · מצב ושליחה', K: 'ערכת המפקח.ת', U: '' }[CUR] || '';
+  }
+  function trackSec() {
+    var l = pageLabel();
+    if (!l || l === TRACKED) return;
+    TRACKED = l;
+    track('sec', l);
+  }
+
+  /* ===== עמוד "שימוש · תובה וצוהר" — אדמין בלבד (מיטל, 10.10.26) =====
+     מי נכנס ומי עוד לא, המקטעים הכי נקראים, הפעילות, ומה שואלים את תובי וקרן ומה הן עונות. הכול מקופל. */
+  var USG = null, USG_ST = '';
+  var UAPP = (function () { try { return localStorage.getItem('revital.uapp') || 'tuva'; } catch (e) { return 'tuva'; } })();
+  var U_NAME = { tuva: 'תובה', tzohar: 'צוהר' }, U_BOT = { tuva: 'תובי', tzohar: 'קרן' };
+  var U_URL = { tuva: 'https://tfasim.pedagogiamh.co.il/revital/', tzohar: 'https://pedagogiamh.co.il/tzohar/' };
+  function loadUsage() {
+    USG_ST = 'load';
+    fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'usage', token: token() }) }, 90000, 2).then(function (d) {
+      if (!d || !d.ok) throw new Error(d && d.error || 'err');
+      USG = d; USG_ST = 'ok';
+    }).catch(function () { USG_ST = 'err'; }).then(function () { if (CUR === 'U') usagePage(); });
+  }
+  function uRole(p) { return p.role === 'pikuah' ? '' : (p.role === 'rakaz' ? 'רכז/ת פדגוגי/ת' : 'מנהל/ת'); }
+  function uWho(p) { return [uRole(p), p.school].filter(Boolean).join(' · '); }
+  function uDate(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}:\d{2}))?/); return m ? (+m[3]) + '.' + (+m[2]) + (m[4] ? ' ' + m[4] : '') : esc(s); }
+  function usagePage() {
+    if (!USG_ST) loadUsage();
+    var h = '<div class="card head"><h1>שימוש · תובה וצוהר</h1><div class="meta">מי נכנס ומי עוד לא, מה הכי נקרא, מה עושים, ומה שואלים את תובי וקרן</div>' +
+      '<div class="seg" style="margin-top:10px">' + ['tuva', 'tzohar'].map(function (a) {
+        return '<button type="button" data-uapp="' + a + '" aria-pressed="' + (UAPP === a) + '">' + U_NAME[a] + '</button>';
+      }).join('') + '</div></div>';
+    if (USG_ST !== 'ok') {
+      $('main').innerHTML = h + '<div class="card">' + (USG_ST === 'err'
+        ? '<div class="empty">הנתונים לא נטענו. <button type="button" class="linkbtn" data-ureload>לנסות שוב</button></div>'
+        : '<div class="empty">טוען את נתוני השימוש…</div>') + '</div>';
+      return;
+    }
+    var A = USG[UAPP], P = A.people, n = P.length, bot = U_BOT[UAPP], app = U_NAME[UAPP];
+    var inn = P.filter(function (p) { return p.last; }).sort(function (a, b) { return a.last < b.last ? 1 : -1; });
+    var not = P.filter(function (p) { return !p.last; }).sort(function (a, b) { return String(a.school + a.name).localeCompare(b.school + b.name, 'he'); });
+    var wk = P.filter(function (p) { return p.week; }).length;
+    var qs = A.bots.filter(function (b) { return !b.error; });
+    function stat(num, of, label, hint, color) {
+      var pc = of ? Math.round(100 * num / of) : 0;
+      return '<div class="pstat" style="cursor:default"><span class="t">' + label + '</span><span class="v">' + num + (of ? ' <em>מתוך ' + of + '</em>' : '') + '</span>' +
+        (of ? '<span class="bar"><i style="width:' + pc + '%;background:' + color + '"></i></span>' : '') + '<span class="hint">' + hint + '</span></div>';
+    }
+    h += '<div class="pstats">' +
+      stat(inn.length, n, 'נכנסו ל' + app, UAPP === 'tuva' ? 'מפקחים ורויטל' : 'מנהלים ורכזים פדגוגיים', 'var(--brand)') +
+      stat(wk, n, 'פעילים ב-7 הימים האחרונים', 'נכנסו או עשו פעולה', 'var(--brand-sky)') +
+      stat(qs.length, 0, 'שאלות ובקשות ל' + bot, qs.length ? 'אחרונה ' + uDate(qs[0].at) : 'עוד לא נשאלה', '') + '</div>';
+
+    /* טרם נכנסו — עם העתקה ומייל תזכורת */
+    var mails = [];
+    not.forEach(function (p) { if (p.emails[0]) mails.push(p.emails[0]); });
+    LISTS.uNot = not.map(function (p) { return p.name + (uWho(p) ? ' · ' + uWho(p) : ''); }).join('\n');
+    var txt = 'שלום,\n\n' + app + ' כבר מחכה לך: ' + U_URL[UAPP] + '\n\nנכנסים עם המייל, וקוד כניסה נשלח למייל.\n' +
+      'אם משהו לא עובד, אפשר לכתוב לי ואעזור.\n\nבחום,\nמיטל';
+    var M = { to: [], bcc: mails, subject: 'מחכה לך ב' + app, text: txt,
+      html: '<div dir="rtl" style="text-align:right">' + txt.split('\n').map(function (l) { return l ? '<p dir="rtl" style="margin:0 0 6px;text-align:right">' + esc(l) + '</p>' : ''; }).join('') + '</div>' };
+    h += sec('u-not', I.users, 'טרם נכנסו', not.length ? tag('bad', not.length + ' מתוך ' + n) : tag('ok', 'כולם נכנסו'),
+      (not.length ? '<ul class="list">' + not.map(function (p) {
+        return '<li><span class="li"><b>' + esc(p.name) + '</b><span>' + esc(uWho(p)) + '</span></span></li>';
+      }).join('') + '</ul><div class="acts row-end" style="margin-top:10px"><button type="button" class="btn" data-copy="uNot">' + I.copy + 'העתקת הרשימה</button>' +
+        mailBtn('uNot', M, 'מייל תזכורת (' + mails.length + ' בעותק מוסתר)') + '</div>' : '<div class="empty">כולם כבר נכנסו.</div>'));
+
+    /* מי נכנס */
+    h += sec('u-in', I.check, 'מי נכנס', tag('ok', inn.length + ' נכנסו'),
+      inn.length ? '<ul class="list">' + inn.map(function (p) {
+        var top = Object.keys(p.secs || {}).sort(function (a, b) { return p.secs[b] - p.secs[a]; }).slice(0, 3);
+        return '<li><span class="li"><b>' + esc(p.name) + '</b>' + (uWho(p) ? '<small>' + esc(uWho(p)) + '</small>' : '') +
+          '<span>אחרון ' + uDate(p.last) + ' · ' + p.days + ' ימים' + (p.acts ? ' · ' + p.acts + ' פעולות' : '') + '</span>' +
+          (top.length ? '<small style="flex-basis:100%">הכי נקרא: ' + top.map(esc).join(' · ') + '</small>' : '') + '</span></li>';
+      }).join('') + '</ul>' : '<div class="empty">עוד אף אחד לא נכנס.</div>');
+
+    /* המקטעים הכי נקראים */
+    var mx = A.secs.length ? A.secs[0].views : 1;
+    h += sec('u-secs', I.chart, 'המקטעים הכי נקראים', A.secs.length ? esc(A.secs[0].sec) : 'אין עדיין נתונים',
+      (A.secs.length ? '<ul class="list">' + A.secs.slice(0, 40).map(function (x) {
+        return '<li><span class="li" style="display:block"><span style="display:flex;justify-content:space-between;gap:10px"><b>' + esc(x.sec) + '</b><span>' + x.views + ' צפיות · ' + x.people + ' אנשים</span></span>' +
+          '<span class="bar" style="display:block;margin-top:6px"><i style="display:block;height:6px;border-radius:3px;width:' + Math.max(3, Math.round(100 * x.views / mx)) + '%;background:var(--brand)"></i></span></span></li>';
+      }).join('') + '</ul>' : '<div class="empty">המדידה של המקטעים מתחילה מהיום. הנתונים יופיעו כאן אחרי הכניסות הבאות.</div>'));
+
+    /* פעילות */
+    h += sec('u-act', I.doc, 'פעילות', A.activity.length ? A.activity.length + ' פעולות' : 'אין עדיין',
+      A.activity.length ? '<ul class="list">' + A.activity.map(function (a) {
+        return '<li><span class="li"><b>' + esc(a.name) + '</b><span>' + uDate(a.at) + '</span><small style="flex-basis:100%">' + esc(a.what) + '</small></span></li>';
+      }).join('') + '</ul>' : '<div class="empty">עוד לא נרשמו פעולות.</div>');
+
+    /* השאלות לבוט והתשובות */
+    var err = A.bots.filter(function (b) { return b.error; })[0];
+    h += sec('u-bot', I.chat, 'מה שואלים את ' + bot, qs.length ? qs.length + ' שאלות ובקשות' : 'עוד לא נשאלה',
+      (err ? '<div class="empty">היומן של ' + bot + ' לא נקרא: ' + esc(err.error) + '</div>' : '') +
+      (qs.length ? qs.map(function (b) {
+        return '<details class="card" style="margin:0 0 8px;padding:10px 12px"><summary style="cursor:pointer"><b>' + esc(b.name) + '</b> · ' + uDate(b.at) +
+          (b.action ? ' · ' + esc(b.action) : '') + (b.school ? ' · ' + esc(b.school.slice(0, 60)) : '') +
+          '<div style="margin-top:4px">' + esc(b.q ? b.q.slice(0, 220) : '(בלי נוסח)') + '</div></summary>' +
+          (b.q && b.q.length > 220 ? '<p class="eyebrow" style="margin-top:10px">השאלה המלאה</p><div class="pre">' + esc(b.q) + '</div>' : '') +
+          '<p class="eyebrow" style="margin-top:10px">התשובה של ' + bot + '</p><div class="pre">' + esc(b.a || (b.err ? 'לא נענתה: ' + b.err : '—')) + '</div>' +
+          '<div class="small">עלות ' + (b.cost ? '$' + b.cost.toFixed(3) : '—') + '</div></details>';
+      }).join('') : (err ? '' : '<div class="empty">עוד לא נשאלה אף שאלה.</div>')));
+
+    h += '<div class="small" style="margin:6px 4px">עודכן ' + uDate(USG.now) + ' · <button type="button" class="linkbtn" data-ureload>רענון</button>' +
+      (UAPP === 'tuva' ? ' · עד 10.10 נספרו רק כניסות ופעולות מהיומן. מעבר בין מקטעים נמדד מהיום.' : '') + '</div>';
+    $('main').innerHTML = h;
   }
 
   /* ===== ערכת המפקח.ת (מיטל, 10.10.26) =====
@@ -3406,7 +3542,12 @@
   /* ===== אירועים ===== */
   document.addEventListener('toggle', function (e) {
     var d = e.target;
-    if (d && d.classList && d.classList.contains('sec')) OPENSEC[d.getAttribute('data-k')] = d.open;
+    if (d && d.classList && d.classList.contains('sec')) {
+      OPENSEC[d.getAttribute('data-k')] = d.open;
+      /* מדידה: מקטע מקופל שנפתח, בתוך העמוד שבו הוא נמצא */
+      var st = d.open && CUR !== 'U' && d.querySelector('summary .st');
+      if (st && st.textContent.trim()) track('sec', pageLabel().split(' · ')[0] + ' › ' + st.textContent.trim().slice(0, 50));
+    }
   }, true);
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target : null;
@@ -3476,6 +3617,9 @@
     if (gk2) { GKIND = gk2.getAttribute('data-gk'); go('G'); return; }
     var ak2 = t.closest('[data-ak]');
     if (ak2) { AKIND = ak2.getAttribute('data-ak'); go('A'); return; }
+    var ua = t.closest('[data-uapp]');
+    if (ua) { UAPP = ua.getAttribute('data-uapp'); try { localStorage.setItem('revital.uapp', UAPP); } catch (err) {} usagePage(); return; }
+    if (t.closest('[data-ureload]')) { USG_ST = ''; usagePage(); return; }
     var g = t.closest('[data-go]');
     if (g) { e.preventDefault(); go(g.getAttribute('data-go')); return; }
     var gv = t.closest('[data-gview]');
@@ -3606,6 +3750,7 @@
     }
     $('out').onclick = function () { PMH_AUTH.logout(); };
 
+    track('open', '');
     start();
   }
   document.addEventListener('pmh:in', boot);
