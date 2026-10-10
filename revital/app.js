@@ -680,7 +680,7 @@
     return hit;
   }
   function kitPage() {
-    $('main').innerHTML = '<div class="card head"><h1>ערכת המפקח.ת</h1><div class="meta">כל ההנחיות, הטבלאות והקישורים של הפיקוח במקום אחד</div></div>' +
+    $('main').innerHTML = '<div class="card head" id="kitBox"><h1>ערכת המפקח.ת</h1><div class="meta">כל ההנחיות, הטבלאות והקישורים של הפיקוח במקום אחד</div></div>' +
       KIT.map(function (g) {
         return '<div class="card"><p class="eyebrow">' + I.book + esc(g[0]) + '</p><div class="tiles">' + g[1].map(function (it) {
           var inner = '<span><b>' + esc(it[1]) + '</b><small>' + esc(it[2]) + '</small></span>';
@@ -1097,6 +1097,13 @@
       '\n\nאשמח שנדבר על זה.\n\nתודה,\n' + me;
     return { to: to, subject: 'דורש תשומת לב · בתי הספר שלך · ' + date, html: html, text: text };
   }
+  /* מונה לסוג חוסר/אות — אותו עיצוב כמו בדשבורד: "כמה מתוך N" עם פס, בצבע התחום (מיטל, 10.10.26: לא כרטיסים עם קו צד) */
+  function kindStat(attr, k, label, num, on) {
+    var n = SCHOOLS.length, pc = typeof num === 'number' && n ? Math.round(100 * num / n) : 0;
+    return '<button type="button" class="pstat kstat k-' + k + (on ? ' on' : '') + '" ' + attr + '="' + k + '" aria-pressed="' + !!on + '">' +
+      '<span class="t">' + esc(label) + '</span><span class="v">' + num + (typeof num === 'number' ? ' <em>מתוך ' + n + '</em>' : '') + '</span>' +
+      '<span class="bar"><i style="width:' + pc + '%;background:var(--kc)"></i></span></button>';
+  }
   function drawAtt() {
     if (!$('attList')) return;
     Array.prototype.forEach.call(document.querySelectorAll('[data-aview]'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-aview') === AVIEW); });
@@ -1105,8 +1112,7 @@
     function stOf(k) { return k === 'visit' ? (ST.pk === 'ok' && ST.mv === 'ok' ? 'ok' : (ST.pk === 'load' || ST.mv === 'load' ? 'load' : 'err')) : ST.pk; }
     $('attKinds').innerHTML = FLAG_KINDS.map(function (k) {
       var st = stOf(k[0]);
-      return '<button type="button" class="kind k-' + k[0] + (AKIND === k[0] ? ' on' : '') + '" data-akind="' + k[0] + '"><b>' +
-        (st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—')) + '</b>' + esc(k[1]) + '</button>';
+      return kindStat('data-akind', k[0], k[1], st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—'), AKIND === k[0]);
     }).join('');
     var rows = attRows();
     var fail = [];
@@ -1143,9 +1149,8 @@
     SCHOOLS.forEach(function (s) { gaps(BY[s.name]).forEach(function (x) { cnt[x.k] = (cnt[x.k] || 0) + 1; }); });
     $('gapKinds').innerHTML = GAP_KINDS.map(function (k) {
       var st = ST[k[0]];
-      return '<button type="button" class="kind k-' + k[0] + (GKIND === k[0] ? ' on' : '') + '" data-gkind="' + k[0] + '"><b>' +
-        (st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—')) + '</b>' + esc(k[1]) + '</button>';
-    }).join('') + '<div class="kind soon"><b>בבנייה</b>הגשת תוכנית עבודה</div>';
+      return kindStat('data-gkind', k[0], k[1], st === 'ok' ? (cnt[k[0]] || 0) : (st === 'load' ? '…' : '—'), GKIND === k[0]);
+    }).join('') + '<div class="pstat kstat soon"><span class="t">הגשת תוכנית עבודה</span><span class="v">בבנייה</span></div>';
     $('gapMeta').innerHTML = rows.length + ' בתי ספר עם חוסרים' + (waiting ? ' · עוד ' + waiting + ' מקורות נטענים…' : '') +
       (failed.length ? ' · <span style="color:var(--bad)">לא נטען: ' + esc(failed.join(', ')) + '</span>' : '') +
       '';
