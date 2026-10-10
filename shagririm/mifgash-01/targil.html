@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>שאלון ב-Apps Script עם Gemini</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1d2433;--soft:#5b6478;--line:#e3e6ee;--bg:#f7f8fb;--card:#fff;--acc:#2f6fdb;--acc2:#e8f0fd;--warn:#fff4e0;--warnb:#f0b44c;--ok:#e9f7ef}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Heebo,system-ui,sans-serif;line-height:1.65;font-size:17px}
+.wrap{max-width:880px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:30px;margin:0 0 4px;font-weight:800}
+.sub{color:var(--soft);margin:0 0 24px}
+h2{font-size:22px;margin:34px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:12px 0}
+.step{display:flex;gap:14px}
+.num{flex:0 0 34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;display:grid;place-items:center;font-weight:700}
+.step h3{margin:2px 0 4px;font-size:18px}
+.step p{margin:4px 0}
+.prompt{position:relative;background:#0f1729;color:#e8ecf5;border-radius:12px;padding:16px 18px 16px;margin:10px 0;white-space:pre-wrap;font-size:15.5px;line-height:1.7}
+.copy{position:absolute;top:10px;left:10px;background:#fff;color:var(--ink);border:0;border-radius:8px;padding:5px 12px;font:inherit;font-size:14px;cursor:pointer}
+.copy.done{background:#c9f0d6}
+.tag{display:inline-block;font-size:13px;font-weight:700;border-radius:20px;padding:2px 10px;background:var(--acc2);color:var(--acc);margin-inline-end:6px}
+.warn{background:var(--warn);border-color:var(--warnb)}
+.ok{background:var(--ok)}
+code,.ltr{direction:ltr;unicode-bidi:isolate;font-family:Consolas,monospace;font-size:.92em}
+pre.code{direction:ltr;text-align:left;background:#f1f3f8;border-radius:10px;padding:14px;overflow:auto;font-size:13.5px;line-height:1.5}
+details summary{cursor:pointer;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:15.5px}
+td,th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:right;vertical-align:top}
+footer{margin-top:40px;color:var(--soft);font-size:13px;text-align:center}
+footer a{color:inherit}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>שאלון קטן ב-Apps Script, עם Gemini</h1>
+<p class="sub">מפגש 1 · מסלול ההובלה · צעד 5. בחשבון ג'ימייל פרטי וב-Gemini החינמי. כ-25 דקות.<br>
+התוצר: קישור לשאלון על האתגר שהבאתם מבית הספר, שבו כל תשובה נכנסת לגיליון שלכם. שולחים אותו כבר מחר.</p>
+
+<h2>הצעדים</h2>
+
+<div class="card step"><div class="num">1</div><div>
+<h3>גיליון חדש</h3>
+<p>נכנסים ל-<span class="ltr">sheets.new</span> ונותנים לו שם, למשל "משוב הדרכה". משאירים את הגיליון ריק.</p>
+</div></div>
+
+<div class="card step"><div class="num">2</div><div>
+<h3>פותחים את Apps Script מתוך הגיליון</h3>
+<p>בתפריט: <b>תוספים ← Apps Script</b>. נפתח עורך עם קובץ <span class="ltr">Code.gs</span> ריק.</p>
+</div></div>
+
+<div class="card step"><div class="num">3</div><div>
+<h3>מבקשים מ-Gemini את הקוד</h3>
+<p>ב-<span class="ltr">gemini.google.com</span> מדביקים את הפרומפט:</p>
+<div class="prompt" id="p1"><button class="copy" data-for="p1">העתקה</button>אני רכז/ת חדשנות בבית ספר. אני רוצה לבנות שאלון משוב קצר אחרי הדרכה שהעברתי לצוות, ב-Google Apps Script שמחובר לגיליון Google (הסקריפט נפתח מתוך הגיליון: תוספים ← Apps Script).
+
+מה השאלון צריך לעשות:
+- דף ווב בעברית, מימין לשמאל, שנראה טוב בטלפון.
+- שלוש שאלות:
+  1. עד כמה ההדרכה הייתה שימושית לך? (דירוג 1 עד 5)
+  2. מה תנסה/י כבר השבוע בעקבות ההדרכה? (טקסט חופשי)
+  3. על מה היית רוצה הדרכה הבאה? (בחירה: כלי AI לכתיבה / בדיקת עבודות / הכנת חומרי למידה / אחר)
+- בלחיצה על "שליחה", התשובה נשמרת כשורה חדשה בגיליון, עם תאריך ושעה, ומופיעה הודעת תודה.
+
+תן לי:
+1. את הקוד המלא של Code.gs
+2. את הקוד המלא של קובץ Index.html
+3. הוראות צעד אחר צעד: איפה להדביק כל קובץ, איך להריץ בפעם הראשונה ולאשר הרשאות, ואיך לפרוס כ"אפליקציית אינטרנט" כדי לקבל קישור שאפשר לשלוח לצוות.
+כתוב קוד פשוט, עם הערות קצרות בעברית.</div>
+<p><span class="tag">האתגר שלכם</span>בפרומפט יש דוגמה: משוב אחרי הדרכה. מחליפים את המשפט הראשון באתגר שהבאתם, ואת שלוש השאלות בשאלות שיעזרו להבין אותו. כותבים גם למי השאלון מיועד: צוות, מנהל/ת, תלמידים או הורים. כל השאר נשאר אותו דבר.</p>
+</div></div>
+
+<div class="card step"><div class="num">4</div><div>
+<h3>מדביקים את שני הקבצים</h3>
+<p>את <span class="ltr">Code.gs</span> מדביקים במקום מה שיש בעורך. לקובץ השני: <b>+ ← HTML</b>, קוראים לו <span class="ltr">Index</span> (בלי <span class="ltr">.html</span>, העורך מוסיף לבד) ומדביקים. שומרים (<span class="ltr">Ctrl+S</span>).</p>
+</div></div>
+
+<div class="card step"><div class="num">5</div><div>
+<h3>פורסים</h3>
+<p><b>פריסה ← פריסה חדשה ← סוג: אפליקציית אינטרנט</b>.<br>
+הפעלה בתור: <b>אני</b>. למי יש גישה: <b>כל אחד</b>. ← פריסה.</p>
+<p>בפעם הראשונה גוגל מבקש הרשאות. כאן מגיע המסך המפחיד (ראו למטה). בסוף מתקבל קישור שמסתיים ב-<span class="ltr">/exec</span>.</p>
+</div></div>
+
+<div class="card step ok"><div class="num">6</div><div>
+<h3>בודקים</h3>
+<p>פותחים את הקישור בטלפון וממלאים. אם בגיליון נוספה שורה, זה עובד. זו גרסה 1.</p>
+</div></div>
+
+<h2>איפה נתקעים, ומה עושים</h2>
+<div class="card warn">
+<table>
+<tr><th>מה רואים</th><th>מה עושים</th></tr>
+<tr><td>"Google hasn't verified this app" / "גוגל לא אימתה את האפליקציה"</td><td><b>Advanced / מתקדם ← Go to … (unsafe)</b> ← Allow. זה הקוד שלך, והגישה רק לגיליון שלך.</td></tr>
+<tr><td>אין אפשרות "כל אחד" ב"למי יש גישה", או שההרשאה נחסמת</td><td>חשבון בית ספרי שמנוהל על ידי ארגון. עוברים לג'ימייל פרטי.</td></tr>
+<tr><td>שגיאה בהרצה, או שהשאלון נשלח ושום שורה לא נוספת</td><td>מעתיקים את הודעת השגיאה המלאה ל-Gemini: "קיבלתי את השגיאה הזאת, מה לתקן?". מדביקים את התיקון ושומרים.</td></tr>
+<tr><td>תיקנתי את הקוד, והקישור עדיין מציג את הגרסה הישנה</td><td><b>פריסה ← ניהול פריסות ← עריכה (עיפרון) ← גרסה: חדשה ← פריסה</b>. כך הקישור נשאר אותו קישור. "פריסה חדשה" יוצרת קישור חדש.</td></tr>
+<tr><td>הדף עולה בלי עיצוב או משמאל לימין</td><td>מבקשים מ-Gemini: "הוסף dir=rtl ו-meta viewport לקובץ Index.html".</td></tr>
+</table>
+</div>
+
+<h2>שלוש רמות לאותה משימה</h2>
+<div class="card">
+<p><span class="tag">עם דוגמה</span>מדביקים את הפרומפט כמו שהוא. המטרה: קישור שעובד.</p>
+<p><span class="tag">לבד</span>כותבים פרומפט משלכם, עם שאלות ונושא משלכם.</p>
+<p><span class="tag">עוד צעד</span>אחרי שזה עובד, ממשיכים עם הפרומפט הבא:</p>
+<div class="prompt" id="p2"><button class="copy" data-for="p2">העתקה</button>השאלון עובד. עכשיו תוסיף לו שני דברים:
+1. כל תשובה חדשה שולחת לי מייל קצר עם התשובה.
+2. תפריט מותאם בגיליון בשם "שאלון", ובו פעולה "סיכום תשובות" שכותבת בלשונית חדשה: כמה ענו, ממוצע הדירוג, וכמה בחרו כל נושא.
+תן לי רק את הקוד שמשתנה, ותגיד איפה להדביק.</div>
+</div>
+
+<details class="card">
+<summary>פתרון לדוגמה (למקרה שמישהו נתקע)</summary>
+<p>קוד שנבדק תחבירית. כך נראה בערך מה ש-Gemini אמור לתת.</p>
+<p><b>Code.gs</b></p>
+<pre class="code">// מציג את השאלון
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+    .setTitle('משוב על ההדרכה')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+// שומר תשובה כשורה חדשה בגיליון
+function saveAnswer(a) {
+  var sh = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  if (sh.getLastRow() === 0) {
+    sh.appendRow(['תאריך', 'שימושיות (1-5)', 'מה אנסה השבוע', 'הדרכה הבאה']);
+  }
+  sh.appendRow([new Date(), Number(a.useful), a.next, a.topic]);
+  return true;
+}</pre>
+<p><b>Index.html</b></p>
+<pre class="code">&lt;!DOCTYPE html&gt;
+&lt;html dir="rtl" lang="he"&gt;
+&lt;head&gt;
+&lt;base target="_top"&gt;
+&lt;style&gt;
+  body{font-family:Arial,sans-serif;max-width:480px;margin:auto;padding:16px}
+  label{display:block;margin-top:16px;font-weight:bold}
+  textarea,select{width:100%;padding:8px;font-size:16px;box-sizing:border-box}
+  .scale button{width:18%;padding:10px 0;font-size:18px}
+  .scale button.on{background:#2f6fdb;color:#fff}
+  #send{margin-top:20px;width:100%;padding:12px;font-size:18px}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;משוב על ההדרכה&lt;/h2&gt;
+&lt;div id="form"&gt;
+  &lt;label&gt;עד כמה ההדרכה הייתה שימושית לך?&lt;/label&gt;
+  &lt;div class="scale" id="scale"&gt;&lt;/div&gt;
+  &lt;label for="next"&gt;מה תנסה/י כבר השבוע?&lt;/label&gt;
+  &lt;textarea id="next" rows="3"&gt;&lt;/textarea&gt;
+  &lt;label for="topic"&gt;על מה היית רוצה הדרכה הבאה?&lt;/label&gt;
+  &lt;select id="topic"&gt;
+    &lt;option&gt;כלי AI לכתיבה&lt;/option&gt;
+    &lt;option&gt;בדיקת עבודות&lt;/option&gt;
+    &lt;option&gt;הכנת חומרי למידה&lt;/option&gt;
+    &lt;option&gt;אחר&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;button id="send"&gt;שליחה&lt;/button&gt;
+&lt;/div&gt;
+&lt;p id="thanks" hidden&gt;תודה! התשובה נשמרה.&lt;/p&gt;
+&lt;script&gt;
+  var useful = 0, box = document.getElementById('scale');
+  for (var i = 1; i &lt;= 5; i++) {
+    var b = document.createElement('button');
+    b.textContent = i;
+    b.onclick = (function (n, el) { return function () {
+      useful = n;
+      box.querySelectorAll('button').forEach(function (x) { x.className = ''; });
+      el.className = 'on';
+    }; })(i, b);
+    box.appendChild(b);
+  }
+  document.getElementById('send').onclick = function () {
+    if (!useful) { alert('נא לבחור דירוג'); return; }
+    this.disabled = true;
+    google.script.run
+      .withSuccessHandler(function () {
+        document.getElementById('form').hidden = true;
+        document.getElementById('thanks').hidden = false;
+      })
+      .withFailureHandler(function (e) { alert('שגיאה: ' + e.message); })
+      .saveAnswer({
+        useful: useful,
+        next: document.getElementById('next').value,
+        topic: document.getElementById('topic').value
+      });
+  };
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</details>
+
+<footer>נבנה עם <a href="https://impactos.co.il">impactos</a></footer>
+</div>
+<script>
+document.querySelectorAll('.copy').forEach(function(b){
+  b.onclick=function(){
+    var el=document.getElementById(b.dataset.for).cloneNode(true);
+    el.querySelector('.copy').remove();
+    var t=el.textContent.trim();
+    var done=function(){b.textContent='הועתק';b.classList.add('done');setTimeout(function(){b.textContent='העתקה';b.classList.remove('done')},1600)};
+    if(navigator.clipboard){navigator.clipboard.writeText(t).then(done,function(){fallback(t);done()})}else{fallback(t);done()}
+  };
+});
+function fallback(t){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy')}catch(e){}a.remove()}
+</script>
+</body>
+</html>
