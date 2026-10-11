@@ -564,7 +564,23 @@
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
+    railTips();
   }
+
+  /* תפריט מצומצם במחשב (11.10.26): שם הפריט בלי המונה, לתווית שקופצת מעל האייקון */
+  function railTips() {
+    [].forEach.call(document.querySelectorAll('#nav button, #nav a'), function (b) {
+      var c = b.cloneNode(true);
+      [].forEach.call(c.querySelectorAll('.n'), function (x) { x.remove(); });
+      b.setAttribute('data-tip', c.textContent.trim());
+    });
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest || !e.target.closest('#railTog')) return;
+    var on = document.body.classList.toggle('rail');
+    try { localStorage.setItem('revital.rail', on ? '1' : '0'); } catch (err) {}
+    $('railTog').querySelector('span').textContent = on ? 'הרחבת התפריט' : 'צמצום התפריט';
+  });
 
   /* ----- עמודי רשימה באמצע ----- */
   var SQ = '', SSUP = '';
