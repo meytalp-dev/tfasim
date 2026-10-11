@@ -596,3 +596,40 @@ a.tile .ext{width:15px;height:15px;margin-inline-start:auto;color:var(--muted);f
 .kstat.soon:hover{border-color:var(--line);background:#fff}
 .kstat.soon .v{font-size:18px;color:var(--muted)}
 @media (max-width:960px){ .kinds{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .kstat{padding:10px 12px} .kstat .v{font-size:20px} }
+
+/* ===== 11.10.26 (מיטל): כלי הביקור כעיגולים קבועים בפס העליון + כרטיסי התפריט בדשבורד ===== */
+.qbtns{margin-inline-start:auto;display:flex;gap:10px;align-items:center}
+.qbtns+.out{margin-inline-start:6px}
+.qbtn{display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:0;font:inherit;cursor:pointer;color:var(--navy)}
+.qbtn .o{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#fff;border:1.5px solid var(--brand);color:var(--blue);transition:background .15s,transform .15s}
+.qbtn .o svg{width:20px;height:20px}
+.qbtn .l{font-size:11.5px;font-weight:700;line-height:1.1;white-space:nowrap}
+.qbtn:hover .o{background:var(--blue-soft);transform:translateY(-1px)}
+.qbtn[aria-current] .o{background:var(--blue);border-color:var(--blue);color:#fff}
+#qV .o{border-color:var(--brand-sky)}
+.dtiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.dtile{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;font:inherit;text-align:right;cursor:pointer;color:inherit;min-height:72px}
+.dtile:hover{border-color:var(--brand);background:var(--paper)}
+.dtile .ic{width:40px;height:40px;flex:none;border-radius:12px;background:var(--blue-soft);color:var(--blue);display:flex;align-items:center;justify-content:center}
+.dtile .ic svg{width:21px;height:21px}
+.dtile .tx{min-width:0}
+.dtile b{display:block;font:600 16px/1.25 Rubik,sans-serif;color:var(--navy)}
+.dtile small{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.dtile.hot .ic{background:var(--blue);color:#fff}
+.dtile.hot small{color:var(--blue);font-weight:700}
+@media (max-width:960px){
+  .dtiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .dtile{gap:9px;padding:10px;min-height:0;border-radius:14px}
+  .dtile .ic{width:34px;height:34px;border-radius:10px}
+  .dtile .ic svg{width:18px;height:18px}
+  .dtile b{font-size:14.5px}
+  .dtile small{font-size:12px;line-height:1.3}
+  /* בנייד הסיכום מצטמצם לשורה אחת של שלושה מונים — בלי הסבר מתחת */
+  #dashStats .pstats{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  #dashStats .pstat{padding:10px;border-radius:13px}
+  #dashStats .pstat .t{font-size:12.5px;line-height:1.25}
+  #dashStats .pstat .v{font-size:21px}
+  #dashStats .pstat .v em{font-size:12px}
+  #dashStats .pstat .hint{display:none}
+}
+@media (max-width:420px){ .qbtns{gap:6px} .qbtn .o{width:36px;height:36px} .qbtn .l{font-size:10.5px} .top .brand small{display:none} }

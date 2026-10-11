@@ -465,7 +465,7 @@
   /* ===== ניתוב ===== */
   function fromHash() {
     var h = decodeURIComponent(String(location.hash || '').slice(1));
-    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W' || h === 'K' || h === 'U') return h;
+    if (h === 'S' || h === 'R' || h === 'P' || h === 'G' || h === 'A' || h === 'F' || h === 'N' || h === 'M' || h === 'W' || h === 'K' || h === 'U' || h === 'C' || h === 'V' || h === 'Q' || h === 'O') return h;
     var km = h.match(/^k=([\w-]+)$/);
     if (km && kitItem(km[1])) return 'k:' + km[1];
     var m = h.match(/^s=(\d+)(?:&t=(\w+))?$/);
@@ -534,11 +534,13 @@
     if (CUR === 'W') return 'W';
     if (CUR === 'K' || c === 'k') return 'K';
     if (CUR === 'U') return 'U';
+    if (CUR === 'C' || CUR === 'V' || CUR === 'Q' || CUR === 'O') return CUR;
     if (CUR === 'F' || CUR === 'N' || c === 'f') return 'F';
     return '';
   }
   function side() {
     var at = section();
+    ['C', 'V'].forEach(function (k) { var b = $('q' + k); if (b) { if (at === k) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); } });
     function item(key, icon, label, n) {
       return '<li><button type="button" class="home" data-go="' + key + '"' + (at === key ? ' aria-current="true"' : '') + '>' +
         icon + label + (n ? '<span class="n">' + n + '</span>' : '') + '</button></li>';
@@ -550,6 +552,8 @@
       item('', I.home, 'דשבורד', '') +
       item('G', I.check, 'מה חסר לכל בית ספר', bad ? String(bad) : '') +
       item('A', I.chart, 'דורש תשומת לב', att ? String(att) : '') +
+      item('Q', I.flag, adminView() ? 'מה מחכה למפקחים' : 'מה מחכה לך', waitN() ? String(waitN()) : '') +
+      item('O', I.chart, 'מצב במיפוי', '') +
       item('S', I.book, 'בתי הספר', String(SCHOOLS.length)) +
       item('R', I.users, 'בעלי תפקידים לפי תפקיד', '') +
       item('M', I.send, 'הודעה למנהלים', '') +
@@ -615,7 +619,7 @@
   /* "חזרה" בראש עמוד פנימי */
   function backLink() {
     var at = FROM !== null ? FROM : section();
-    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים', K: 'לערכת המפקח.ת' }[at];
+    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים', K: 'לערכת המפקח.ת', O: 'למצב במיפוי' }[at];
     return lbl ? '<button type="button" class="back" data-go="' + at + '">→ ' + lbl + '</button>' : '';
   }
 
@@ -647,6 +651,10 @@
     else if (CUR === 'K') kitPage();
     else if (CUR.charAt(0) === 'k') kitDocPage(CUR.slice(2));
     else if (CUR === 'U') { if (adminView()) usagePage(); else dashboard(); }
+    else if (CUR === 'C') ckPage();
+    else if (CUR === 'V') repPage();
+    else if (CUR === 'Q') waitPage();
+    else if (CUR === 'O') mapPage();
     else dashboard();
     trackSec();
   }
@@ -675,7 +683,7 @@
     if (c === 'r' && CUR.length > 1) return 'בעלי תפקידים · תפקיד';
     if (c === 'p' && CUR.length > 1) return 'מפקחים · מפקח.ת';
     return { G: 'מה חסר לכל בית ספר', A: 'דורש תשומת לב', S: 'בתי הספר', R: 'בעלי תפקידים לפי תפקיד', M: 'הודעה למנהלים',
-      F: 'טפסים', N: 'טפסים · טופס חדש', W: 'תוכנית העבודה שלי', P: 'מפקחים · מצב ושליחה', K: 'ערכת המפקח.ת', U: '' }[CUR] || '';
+      F: 'טפסים', N: 'טפסים · טופס חדש', W: 'תוכנית העבודה שלי', P: 'מפקחים · מצב ושליחה', K: 'ערכת המפקח.ת', U: '', C: 'צ׳ק ליסט ביקור', V: 'דוח ביקור בהקלטה', Q: 'מה מחכה לך', O: 'מצב במיפוי' }[CUR] || '';
   }
   function trackSec() {
     var l = pageLabel();
@@ -1122,10 +1130,8 @@
       : '<div class="hello" id="hello">' + (name ? 'שלום ' + esc(name) + ' · ' : '') + 'טוב לראות אותך שוב' +
         '<button type="button" class="linkbtn" data-tour-start>' + I.flag + 'סיור במערכת</button></div>';
 
-    h += dashRep();   /* דוח ביקור בהקלטה — כרטיס משלו (8.10.26) */
-    h += dashCk();
-    h += dashWait();
-
+    /* 11.10.26 (מיטל): בעמוד הראשי רק סיכום + כרטיסי התפריט — "כדי לא ליצור רעש ועומס".
+       הצ׳ק ליסט ודוח הביקור = עיגולים קבועים בפס העליון (#C, #V); מה מחכה, המיפוי — עמודים משלהם */
     /* "כמה מתוך N" עם פס (מיטל, 7.10.26: חלופה ב׳, בצבעי הלוגו) — המספר ביחס לכלל בתי הספר */
     function stat(go, num, label, hint, color, extra) {
       var pc = num === null || !n ? 0 : Math.round(100 * num / n);
@@ -1137,8 +1143,42 @@
       stat('G', gapN, 'עם חוסרים להשלמה', 'נספח, השתלמויות, מנור, סל תוכניות', 'var(--brand)', ' data-gk=""') +
       stat('A', attN, 'דורשים תשומת לב', 'ביקור, מדדים בסיכון, יעדים', 'var(--brand-sky)', ' data-ak=""') +
       stat('A', riskN, 'עם מדד במצב סיכון', 'לפי המיפוי האחרון', 'var(--blue)', ' data-ak="risk"') + '</div></div>';
-    h += '<div data-tovi-insight="focus:all"></div>';   /* תובי: על מה להתמקד השבוע — אותה תוצאה גם ב"דורש תשומת לב" (tovi.js) */
-
+    h += dashTiles();
+    setMainKeepCk(h);
+    var ok = $('welcomeOk');
+    if (ok) ok.onclick = function () { WELCOME_NOW = false; dashboard(); };
+  }
+  /* ===== כרטיסי התפריט בדשבורד (11.10.26) — אותם עמודים כמו בתפריט הצד, עם מספר קטן אחד ===== */
+  function waitN() { return ST.wait === 'ok' ? waitItems().length : 0; }
+  function dashTiles() {
+    var n = SCHOOLS.length, done = allLoaded(), pk = ST.pk === 'ok', adm = adminView();
+    var gapN = done ? SCHOOLS.filter(function (s) { return issues(BY[s.name]).length; }).length : null;
+    var attN = pk ? SCHOOLS.filter(function (s) { return flags(BY[s.name]).length; }).length : null;
+    var cnt = { ok: 0, warn: 0, bad: 0, none: 0 };
+    if (pk) SCHOOLS.forEach(function (s) { cnt[mapState(BY[s.name])]++; });
+    var fo = 0, fopen = adm && ST.forms === 'ok' ? FORMS.filter(function (f) { return f.open; }) : [];
+    fopen.forEach(function (f) { if (!fIsG(f)) fo += fOpenN(f); });
+    var wn = waitN();
+    function t(go, icon, title, sub, hot) {
+      return '<button type="button" class="dtile' + (hot ? ' hot' : '') + '" data-go="' + go + '"><span class="ic">' + icon + '</span>' +
+        '<span class="tx"><b>' + title + '</b><small>' + sub + '</small></span></button>';
+    }
+    return '<div id="dashTiles" class="dtiles">' +
+      t('Q', I.flag, adm ? 'מה מחכה למפקחים' : 'מה מחכה לך', ST.wait !== 'ok' ? '…' : wn ? wn + ' ממתינים לאישור' : 'אין כרגע בקשות', wn) +
+      t('G', I.check, 'מה חסר לכל בית ספר', gapN === null ? '…' : gapN + ' בתי ספר עם חוסרים') +
+      t('A', I.chart, 'דורש תשומת לב', attN === null ? '…' : attN + ' בתי ספר') +
+      t('O', I.chart, 'מצב במיפוי', !pk ? '…' : cnt.bad + ' בסיכון · ' + cnt.warn + ' עם פערים') +
+      t('S', I.book, 'בתי הספר', n + ' בתי ספר') +
+      t('R', I.users, 'בעלי תפקידים', 'לפי תפקיד, מכל בתי הספר') +
+      t('M', I.send, 'הודעה למנהלים', 'הודעה אחת לכמה מנהלים') +
+      t('F', I.doc, adm ? 'טפסים פעילים' : 'טפסים וקישורים', adm ? (ST.forms !== 'ok' ? '…' : fo ? fo + ' פניות פתוחות' : fopen.length + ' טפסים פתוחים') : 'מי מילא ומי עוד לא') +
+      (adm ? t('P', I.mail, 'מפקחים', 'מצב ושליחה') : t('W', I.doc, 'תוכנית העבודה שלי', 'טיוטה מתובי לפי נספח ב')) +
+      t('K', I.book, 'ערכת המפקח.ת', 'הנחיות, ביקור, ועדות מלוות') +
+      (adm ? t('U', I.chart, 'שימוש', 'תובה וצוהר · מי נכנס') : '') +
+      '</div>';
+  }
+  function mapCard() {
+    var n = SCHOOLS.length, pk = ST.pk === 'ok', h = '';
     /* מצב במיפוי — פס אחד לפי הדירוג הכולל, עם מקרא שהוא גם הטבלה */
     var cnt = { ok: 0, warn: 0, bad: 0, none: 0 };
     if (pk) SCHOOLS.forEach(function (s) { cnt[mapState(BY[s.name])]++; });
@@ -1154,28 +1194,13 @@
             (m[2] ? '<small>' + m[2] + '</small>' : '') + '</button></li>';
         }).join('') + '</ul>') + '</div>';
 
-    /* סיכום — כמה בתי ספר בכל סוג, לחיצה פותחת את הרשימה מסוננת */
-    var gc = {}, ac = {};
-    SCHOOLS.forEach(function (s) {
-      gaps(BY[s.name]).forEach(function (x) { gc[x.k] = (gc[x.k] || 0) + 1; });
-      flags(BY[s.name]).forEach(function (x) { ac[x.k] = (ac[x.k] || 0) + 1; });
-    });
-    function chips(kinds, c, attr, ready) {
-      return kinds.map(function (k) {
-        return '<button type="button" class="chip k-' + k[0] + '" ' + attr + '="' + k[0] + '">' + (ready(k[0]) ? (c[k[0]] || 0) : '…') + ' · ' + esc(k[1]) + '</button>';
-      }).join('');
-    }
-    h += '<div class="card" id="dashSum"><h2 class="h2">חוסרים ותשומת לב</h2>' +
-      '<div class="sumrow"><button type="button" class="sumh" data-go="G">מה חסר לכל בית ספר ←</button><div class="gc">' +
-      chips(GAP_KINDS, gc, 'data-gk', function (k) { return ST[k] === 'ok'; }) + '</div></div>' +
-      '<div class="sumrow"><button type="button" class="sumh" data-go="A">דורש תשומת לב ←</button><div class="gc">' +
-      chips(FLAG_KINDS, ac, 'data-ak', function (k) { return k === 'visit' ? (pk && ST.mv === 'ok') : pk; }) + '</div></div></div>';
-
-    h += dashForms();
-    setMainKeepCk(h);
-    var ok = $('welcomeOk');
-    if (ok) ok.onclick = function () { WELCOME_NOW = false; dashboard(); };
+    return h;
   }
+  /* עמודים משלהם — מה שעבר מהדשבורד (11.10.26) */
+  function ckPage() { OPENSEC.dashck = true; setMainKeepCk(dashCk()); }
+  function repPage() { OPENSEC.dashrep = true; setMainKeepCk(dashRep()); }
+  function waitPage() { $('main').innerHTML = dashWait(); }
+  function mapPage() { $('main').innerHTML = mapCard(); }
   /* בתי הספר בצבע אחד של המיפוי */
   function mapList(k) {
     var m = MAP_ST.filter(function (x) { return x[0] === k; })[0] || MAP_ST[3];
@@ -3668,15 +3693,15 @@
   /* בונה הטפסים: שינוי סוג תשובה מציג/מסתיר את שדה האפשרויות */
   document.addEventListener('change', function (e) {
     if (e.target && e.target.classList && e.target.classList.contains('nfType')) { nfSync(); newFormPage(true); }
-    if (e.target && e.target.id === 'dckSup') { DCK.sup = e.target.value; DCK.semel = ''; dckKeep(); dashboard(); return; }
-    if (e.target && e.target.id === 'dckSchool') { DCK.semel = e.target.value; dckKeep(); dashboard(); return; }
+    if (e.target && e.target.id === 'dckSup') { DCK.sup = e.target.value; DCK.semel = ''; dckKeep(); render(); return; }
+    if (e.target && e.target.id === 'dckSchool') { DCK.semel = e.target.value; dckKeep(); render(); return; }
     if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repck')) { repGet(e.target.getAttribute('data-repsemel')).ck[e.target.getAttribute('data-repck')] = e.target.checked; return; }
     if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-repdate')) {
       var rds = e.target.getAttribute('data-repdate');
       if (/^\d{4}-\d{2}-\d{2}$/.test(e.target.value)) { repGet(rds).date = e.target.value; repKeep(rds); }
       return;
     }
-    if (e.target && e.target.id === 'drpSchool') { DRP = e.target.value; try { localStorage.setItem('revital.drp', DRP); } catch (err) {} dashboard(); return; }
+    if (e.target && e.target.id === 'drpSchool') { DRP = e.target.value; try { localStorage.setItem('revital.drp', DRP); } catch (err) {} render(); return; }
     if (e.target && e.target.id === 'ckDate') ckSwitch(e.target.getAttribute('data-cksemel'), e.target.value);
     else if (e.target && e.target.type === 'date' && e.target.hasAttribute('data-ckstep')) ckInput(e.target);
   });
