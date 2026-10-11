@@ -616,11 +616,19 @@
           (done ? ' · ' + bad + ' עם חוסרים' : '') + '</small></span></button>';
       }).join('') + '</div></div>' + planTrack();
   }
-  /* "חזרה" בראש עמוד פנימי */
-  function backLink() {
+  /* חזרה — פס קבוע מעל התוכן בכל עמוד שאינו הדשבורד (מיטל, 11.10.26: "איך אני חוזרת אחורה?").
+     עמוד פנימי: גם חזרה לרשימה שממנה נכנסו. הפס מחוץ ל-#main, כך שציור מחדש של העמוד לא מוחק אותו */
+  function backLink() { return ''; }
+  function crumb() {
+    var el = $('crumb');
+    if (!el) return;
+    if (!CUR) { el.hidden = true; el.innerHTML = ''; return; }
     var at = FROM !== null ? FROM : section();
-    var lbl = { '': 'לדשבורד', G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים', K: 'לערכת המפקח.ת', O: 'למצב במיפוי' }[at];
-    return lbl ? '<button type="button" class="back" data-go="' + at + '">→ ' + lbl + '</button>' : '';
+    var lbl = { G: 'למה חסר לכל בית ספר', A: 'לדורש תשומת לב', S: 'לכל בתי הספר', R: 'לכל התפקידים', P: 'לכל המפקחים', F: 'לכל הטפסים', K: 'לערכת המפקח.ת', O: 'למצב במיפוי', Q: 'למה מחכה' }[at];
+    var inner = CUR.indexOf(':') > -1;
+    el.innerHTML = (inner && at && lbl ? '<button type="button" class="back" data-go="' + at + '">→ ' + lbl + '</button>' : '') +
+      '<button type="button" class="back" data-go="">→ לדשבורד</button>';
+    el.hidden = false;
   }
 
   /* ===== מקטע מקופל ===== */
@@ -634,6 +642,7 @@
 
   /* ===== עמוד ראשי ===== */
   function render() {
+    crumb();
     if (CUR === 'S') schoolsPage();
     else if (CUR === 'R') rolesPage();
     else if (CUR === 'P') supsPage();

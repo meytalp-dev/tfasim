@@ -633,3 +633,8 @@ a.tile .ext{width:15px;height:15px;margin-inline-start:auto;color:var(--muted);f
   #dashStats .pstat .hint{display:none}
 }
 @media (max-width:420px){ .qbtns{gap:6px} .qbtn .o{width:36px;height:36px} .qbtn .l{font-size:10.5px} .top .brand small{display:none} }
+
+/* חזרה לדשבורד — מעל התוכן בכל עמוד (11.10.26) */
+.maincol{min-width:0}
+.crumb{display:flex;flex-wrap:wrap;gap:4px 18px;margin:-4px 0 4px}
+.crumb .back{padding:4px 2px 8px}
