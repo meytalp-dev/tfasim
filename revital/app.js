@@ -560,7 +560,7 @@
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : item('W', I.doc, 'תוכנית העבודה שלי', '')) +   /* מיטל, 8.10.26 */
       item('K', I.book, 'ערכת המפקח.ת', '') +   /* במקום מרחב הפיקוח באתר (מיטל, 10.10.26) */
-      (adminView() ? item('U', I.chart, 'שימוש · תובה, צוהר ונטע', '') : '') +   /* אדמין בלבד (מיטל, 10.10.26) */
+      (adminView() ? item('U', I.chart, 'שימוש · תובה, צוהר, נטע ומחולל', '') : '') +   /* אדמין בלבד (מיטל, 10.10.26) */
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
@@ -722,7 +722,7 @@
   var USG = null, USG_ST = '';
   var UAPP = (function () { try { return localStorage.getItem('revital.uapp') || 'tuva'; } catch (e) { return 'tuva'; } })();
   /* נטע (רכזים פדגוגיים) נפרדה מצוהר ב-11.10.26 — לשונית שלישית, והשאלות לניצה בנפרד מקרן */
-  var U_NAME = { tuva: 'תובה', tzohar: 'צוהר', neta: 'נטע' }, U_BOT = { tuva: 'תובי', tzohar: 'קרן', neta: 'ניצה' };
+  var U_NAME = { tuva: 'תובה', tzohar: 'צוהר', neta: 'נטע', mecholel: 'מחולל' }, U_BOT = { tuva: 'תובי', tzohar: 'קרן', neta: 'ניצה' };
   var U_URL = { tuva: 'https://tfasim.pedagogiamh.co.il/revital/', tzohar: 'https://pedagogiamh.co.il/tzohar/', neta: 'https://pedagogiamh.co.il/neta/' };
   var U_KIND = { ask: 'שאלה', chat: 'שאלה', plan: 'תוכנית', planHelp: 'חומר לתוכנית', help: 'עזרה בהקשר' };
   function loadUsage() {
@@ -737,12 +737,16 @@
   function uWho(p) { return [uRole(p), p.school].filter(Boolean).join(' · '); }
   function uDate(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}:\d{2}))?/); return m ? (+m[3]) + '.' + (+m[2]) + (m[4] ? ' ' + m[4] : '') : esc(s); }
   function usagePage() {
-    if (!USG_ST) loadUsage();
     if (!U_NAME[UAPP]) UAPP = 'tuva';
-    var h = '<div class="card head"><h1>שימוש · תובה, צוהר ונטע</h1><div class="meta">מי נכנס ומי עוד לא, מה הכי נקרא, מה שואלים את תובי, קרן וניצה, וכמה — כדי לקבוע תקרה יומית הגיונית</div>' +
-      '<div class="seg" style="margin-top:10px">' + ['tuva', 'tzohar', 'neta'].map(function (a) {
+    if (UAPP === 'mecholel') { if (!MUSG_ST) loadMecholel(); }
+    else if (!USG_ST) loadUsage();
+    var h = '<div class="card head"><h1>שימוש · תובה, צוהר, נטע ומחולל</h1><div class="meta">' + (UAPP === 'mecholel'
+        ? 'מחולל השיעורים: עלויות, מי משתמש, מה בונים, מה עושים עם השיעור, מה קורה בכיתה, ומה אומרים'
+        : 'מי נכנס ומי עוד לא, מה הכי נקרא, מה שואלים את תובי, קרן וניצה, וכמה — כדי לקבוע תקרה יומית הגיונית') + '</div>' +
+      '<div class="seg" style="margin-top:10px">' + ['tuva', 'tzohar', 'neta', 'mecholel'].map(function (a) {
         return '<button type="button" data-uapp="' + a + '" aria-pressed="' + (UAPP === a) + '">' + U_NAME[a] + '</button>';
       }).join('') + '</div></div>';
+    if (UAPP === 'mecholel') { mecholelPage(h); return; }
     if (USG_ST !== 'ok') {
       $('main').innerHTML = h + '<div class="card">' + (USG_ST === 'err'
         ? '<div class="empty">הנתונים לא נטענו. <button type="button" class="linkbtn" data-ureload>לנסות שוב</button></div>'
@@ -838,6 +842,155 @@
 
     h += '<div class="small" style="margin:6px 4px">עודכן ' + uDate(USG.now) + ' · <button type="button" class="linkbtn" data-ureload>רענון</button>' +
       (UAPP === 'tuva' ? ' · עד 10.10 נספרו רק כניסות ופעולות מהיומן. מעבר בין מקטעים נמדד מהיום.' : '') + '</div>';
+    $('main').innerHTML = h;
+  }
+
+  /* ===== שימוש במחולל השיעורים (מיטל, 11.10.26: "להבין עלויות, הרגלי שימוש, צרכים — נתחיל ונדייק") =====
+     הנתונים מהשער (usageMecholel ← מחולל.js), שקורא את היומן של השרת "מחולל - מוח". הכול מקופל.
+     תלמידים — רק ספירות. מיטל עצמה לא נספרת בהרגלי השימוש; העלות שלה מוצגת בנפרד. */
+  var MUSG = null, MUSG_ST = '', MUSG_ERR = '';
+  function loadMecholel() {
+    MUSG_ST = 'load';
+    fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'usageMecholel', token: token() }) }, 90000, 2).then(function (d) {
+      if (!d || !d.ok) throw new Error((d && (d.detail || d.error)) || 'err');
+      MUSG = d; MUSG_ST = 'ok';
+    }).catch(function (e) { MUSG_ST = 'err'; MUSG_ERR = String(e && e.message || e); })
+      .then(function () { if (CUR === 'U' && UAPP === 'mecholel') usagePage(); });
+  }
+  var M_KIND = { lesson: 'מערך שיעור', opener: 'פעילות פתיחה', deck: 'מצגת', game: 'משחק', sheet: 'דף עבודה', quiz: 'בוחן' };
+  var M_GAME = { millionaire: 'סולם הפרסים', wheel: 'גלגל השאלות', escape: 'חדר בריחה', trivia: 'טריוויה', memory: 'זיכרון', matching: 'התאמה',
+    groups: 'מיון לקבוצות', ordering: 'סדר נכון', truefalse: 'נכון / לא נכון', fillblank: 'השלמת חסר', sentence: 'סדר את המשפט', hangman: 'נחשו את המילה', 'הפתעה': 'תפתיעו אותי' };
+  var M_OPEN = { question: 'שאלה עם טיימר', riddle: 'חידה', dilemma: 'דילמה', twotruths: 'שתי אמיתות ושקר', truefalse: 'נכון / לא נכון', story: 'סיפור',
+    guessnumber: 'נחשו את המספר', vote: 'הצבעה מהטלפונים', wordcloud: 'ענן מילים', 'הפתעה': 'תפתיעו אותי' };
+  var M_EV = [['לשונית', 'פתחו לשונית של תוצר', M_KIND], ['הצגה לכיתה', 'הציגו לכיתה', M_KIND], ['הורדה', 'הורידו', null], ['הדפסה', 'הדפיסו', M_KIND],
+    ['שליחה לכיתה', 'פתחו "שליחה לכיתה"', M_KIND], ['העתקת קישור', 'העתיקו קישור לתלמידים', M_KIND], ['וואטסאפ', 'שלחו בוואטסאפ', M_KIND], ['QR', 'הציגו QR', M_KIND],
+    ['תוצאות', 'פתחו את התוצאות', null], ['לוח חי', 'הפעילו לוח חי', null], ['הצבעה חיה', 'הצבעה או ענן מהטלפונים', null],
+    ['שיעור קודם', 'חזרו לשיעור קודם', null], ['שיעור מהבנק', 'קיבלו שיעור מוכן מהבנק', null], ['שוב', 'בנו תוצר שוב אחרי כישלון', M_KIND]];
+  function mUsd(x) { return '$' + (Number(x) || 0).toFixed(2); }
+  function mBars(obj, names, unit) {
+    var keys = Object.keys(obj || {}).filter(function (k) { return k; }).sort(function (a, b) { return obj[b] - obj[a]; });
+    if (!keys.length) return '<div class="empty">אין עדיין נתונים.</div>';
+    var mx = obj[keys[0]] || 1;
+    return '<ul class="list">' + keys.map(function (k) {
+      return '<li><span class="li" style="display:block"><span style="display:flex;justify-content:space-between;gap:10px"><b>' + esc((names && names[k]) || k) + '</b><span>' + obj[k] + ' ' + (unit || '') + '</span></span>' +
+        '<span class="bar" style="display:block;margin-top:6px"><i style="display:block;height:6px;border-radius:3px;width:' + Math.max(3, Math.round(100 * obj[k] / mx)) + '%;background:var(--brand)"></i></span></span></li>';
+    }).join('') + '</ul>';
+  }
+  function mStat(num, of, label, hint, color) {
+    var pc = of ? Math.round(100 * num / of) : 0;
+    return '<div class="pstat" style="cursor:default"><span class="t">' + label + '</span><span class="v">' + num + (of ? ' <em>מתוך ' + of + '</em>' : '') + '</span>' +
+      (of ? '<span class="bar"><i style="width:' + pc + '%;background:' + color + '"></i></span>' : '') + '<span class="hint">' + hint + '</span></div>';
+  }
+  function mecholelPage(h) {
+    if (MUSG_ST !== 'ok') {
+      $('main').innerHTML = h + '<div class="card">' + (MUSG_ST === 'err'
+        ? '<div class="empty">הנתונים של המחולל לא נטענו' + (MUSG_ERR ? ' (' + esc(MUSG_ERR.slice(0, 160)) + ')' : '') + '. <button type="button" class="linkbtn" data-ureload>לנסות שוב</button></div>'
+        : '<div class="empty">טוען את נתוני המחולל…</div>') + '</div>';
+      return;
+    }
+    var M = MUSG, C = M.cost, B = M.build, F = M.funnel, K = M.cls, FB = M.feedback;
+    var n = M.people.length;
+    h += '<div class="pstats">' +
+      mStat(B.lessons, 0, 'שיעורים שנבנו', B.kit + ' ערכות מלאות · ' + B.pick + ' בחירה · ' + B.material + ' עם חומר של המורה', '') +
+      mStat(n, 0, 'מורים ובעלי תפקידים שבנו', M.teachers + ' מורים · ' + M.staff + ' בעלי תפקידים · ' + M.schools + ' בתי ספר', '') +
+      mStat(mUsd(C.month), 0, 'עלות החודש', 'היום ' + mUsd(C.today) + ' · 7 ימים ' + mUsd(C.week), '') +
+      mStat(mUsd(C.perLesson), 0, 'עלות ממוצעת לשיעור', C.lessonsCosted ? 'לפי ' + C.lessonsCosted + ' שיעורים, כולל הבודק' : 'עוד אין שיעורים עם עלות מלאה', '') + '</div>';
+
+    /* עלויות */
+    var L = M.limits, kinds = Object.keys(C.byKind).filter(function (k) { return k.indexOf('בדיקה:') !== 0; }).sort(function (a, b) { return C.byKind[b].cost - C.byKind[a].cost; });
+    var fixes = Object.keys(C.byKind).filter(function (k) { return k.indexOf('בדיקה:') === 0; });
+    h += sec('m-cost', I.chart, 'עלויות', mUsd(C.month) + ' החודש',
+      '<ul class="list"><li><span class="li"><b>היום</b><span>' + mUsd(C.today) + '</span></span></li><li><span class="li"><b>7 הימים האחרונים</b><span>' + mUsd(C.week) + '</span></span></li>' +
+      '<li><span class="li"><b>החודש</b><span>' + mUsd(C.month) + '</span></span></li><li><span class="li"><b>מתחילת המדידה</b><span>' + mUsd(C.all) +
+      (C.self ? ' · מתוכם הבדיקות שלך ' + mUsd(C.self) : '') + '</span></span></li></ul>' +
+      '<p class="small" style="margin:10px 2px">התקרה היום: ' + L.user + ' שיעורים ביום לאדם · ' + L.day + ' ביום במערכת · ' + L.month.toLocaleString('he-IL') + ' בחודש.' +
+      (C.perLesson ? ' בעלות הממוצעת, יום מלא בתקרה עולה בערך ' + mUsd(C.perLesson * L.day) + '.' : '') + '</p>' +
+      '<p class="eyebrow" style="margin-top:12px">לפי סוג קריאה</p><ul class="list">' + kinds.map(function (k) {
+        var x = C.byKind[k];
+        return '<li><span class="li"><b>' + esc(k) + '</b><span>' + x.n + ' קריאות · ' + mUsd(x.cost) + ' · ממוצע ' + mUsd(x.avg) + '</span></span></li>';
+      }).join('') + '</ul>' +
+      (fixes.length ? '<p class="eyebrow" style="margin-top:12px">כמה הבודק תיקן (ממוצע לתוצר)</p><ul class="list">' + fixes.map(function (k) {
+        var x = C.byKind[k];
+        return '<li><span class="li"><b>' + esc(k.slice(6)) + '</b><span>' + x.fixAvg + ' תיקונים בממוצע · ' + x.checks + ' בדיקות</span></span></li>';
+      }).join('') + '</ul>' : '') +
+      '<p class="eyebrow" style="margin-top:12px">לפי יום</p>' + (M.days.length ? '<ul class="list">' + M.days.map(function (d) {
+        return '<li><span class="li"><b>' + uDate(d.day) + '</b><span>' + d.lessons + ' שיעורים · ' + d.people + ' אנשים · ' + mUsd(d.cost) +
+          (d.blocked ? ' · ' + d.blocked + ' נחסמו בתקרה' : '') + (d.errors ? ' · ' + d.errors + ' שגיאות' : '') + '</span></span></li>';
+      }).join('') + '</ul>' : '<div class="empty">אין עדיין נתונים.</div>'));
+
+    /* מי משתמש */
+    h += sec('m-people', I.users, 'מי משתמש', n ? n + ' אנשים' : 'עוד אף אחד',
+      n ? '<ul class="list">' + M.people.map(function (p) {
+        return '<li><span class="li"><b>' + esc(p.name) + '</b>' + ([p.role, p.school].filter(Boolean).length ? '<small>' + esc([p.role, p.school].filter(Boolean).join(' · ')) + '</small>' : '') +
+          '<span>' + p.lessons + ' שיעורים · ' + p.days + ' ימים · אחרון ' + uDate(p.last) + '</span>' +
+          (p.subjects.length ? '<small style="flex-basis:100%">' + p.subjects.map(esc).join(' · ') + '</small>' : '') + '</span></li>';
+      }).join('') + '</ul>' : '<div class="empty">עוד אף אחד לא בנה שיעור.</div>');
+
+    /* מה בונים */
+    h += sec('m-build', I.book, 'מה בונים', B.lessons + ' שיעורים',
+      '<p class="eyebrow">תחומי דעת</p>' + mBars(B.subjects, null, 'שיעורים') +
+      '<p class="eyebrow" style="margin-top:12px">תוצרים שהוזמנו</p>' + mBars(B.kinds, M_KIND) +
+      '<p class="eyebrow" style="margin-top:12px">ערכה מלאה או בחירה · עם חומר או בלי</p>' + mBars({ 'ערכה מלאה': B.kit, 'בחירה של תוצרים': B.pick, 'עם חומר של המורה': B.material, 'בלי חומר': B.lessons - B.material }) +
+      '<p class="eyebrow" style="margin-top:12px">שכבות</p>' + mBars(B.grades) +
+      '<p class="eyebrow" style="margin-top:12px">נתיבים</p>' + mBars(B.tracks) +
+      '<p class="eyebrow" style="margin-top:12px">סוגי משחק</p>' + mBars(B.games, M_GAME) +
+      '<p class="eyebrow" style="margin-top:12px">סוגי פתיחה</p>' + mBars(B.openers, M_OPEN) +
+      '<p class="eyebrow" style="margin-top:12px">רמת דף העבודה</p>' + mBars(B.levels));
+
+    /* האשף */
+    var base = F.visit || 1;
+    h += sec('m-funnel', I.flag, 'האשף · איפה עוזבים', F.visit ? F.built + ' בנו מתוך ' + F.visit + ' שנכנסו' : 'אין עדיין נתונים',
+      '<div class="pstats">' + mStat(F.visit, 0, 'נכנסו לעמוד', F.anon + ' בלי כניסה דרך מנור', '') +
+      mStat(F.s2, base, 'עברו לצעד 2 (חומר)', '', 'var(--brand-sky)') + mStat(F.s3, base, 'הגיעו לצעד 3 (מה לבנות)', '', 'var(--brand-sky)') +
+      mStat(F.built, base, 'בנו שיעור', 'שלד שנבנה בהצלחה', 'var(--brand)') + '</div>' +
+      '<p class="small" style="margin:8px 2px">אנשים, לא כניסות: כל אחד נספר פעם אחת בכל שלב. מי שנכנס ולא מחובר דרך מנור נספר לפי המכשיר.</p>');
+
+    /* מה עושים עם השיעור */
+    var A = M.after;
+    h += sec('m-after', I.check, 'מה עושים עם השיעור', A['הצגה לכיתה'] ? A['הצגה לכיתה'].people + ' הציגו לכיתה' : 'אין עדיין נתונים',
+      '<ul class="list">' + M_EV.filter(function (e) { return A[e[0]]; }).map(function (e) {
+        var x = A[e[0]], ds = Object.keys(x.d || {}).filter(Boolean).sort(function (a, b) { return x.d[b] - x.d[a]; }).slice(0, 6);
+        return '<li><span class="li"><b>' + esc(e[1]) + '</b><span>' + x.n + ' פעמים · ' + x.people + ' אנשים</span>' +
+          (ds.length ? '<small style="flex-basis:100%">' + ds.map(function (k) { var nm = e[2] ? (e[2][k] || k) : k.replace(/^(\w+)/, function (w) { return M_KIND[w] || w; }); return esc(nm) + ' ' + x.d[k]; }).join(' · ') + '</small>' : '') + '</span></li>';
+      }).join('') + '</ul>' + (Object.keys(A).length ? '' : '<div class="empty">המדידה מתחילה מהיום.</div>'));
+
+    /* בכיתה */
+    var S = K.subs || {};
+    h += sec('m-class', I.users, 'בכיתה · תלמידים', K.lessons ? K.lessons + ' שיעורים עם תלמידים' : 'עוד אין הגשות',
+      '<ul class="list">' +
+      '<li><span class="li"><b>שיעורים שתלמידים ענו בהם</b><span>' + (K.lessons || 0) + '</span></span></li>' +
+      '<li><span class="li"><b>מכשירים של תלמידים</b><span>' + (K.students || 0) + '</span></span></li>' +
+      '<li><span class="li"><b>הגשות</b><span>בוחן ' + (S.quiz || 0) + ' · משחק ' + (S.game || 0) + ' · דף עבודה ' + (S.sheet || 0) + ' · הצבעה ' + (S.vote || 0) + ' · ענן ' + (S.cloud || 0) + '</span></span></li>' +
+      '<li><span class="li"><b>מיילים מסכמים שמורים ביקשו</b><span>' + (K.mails || 0) + '</span></span></li>' +
+      '<li><span class="li"><b>דפי עבודה ש-Claude הציע להם ציון</b><span>' + (K.grades || 0) + (K.gradeCost ? ' · ' + mUsd(K.gradeCost) : '') + '</span></span></li></ul>' +
+      '<p class="small" style="margin:8px 2px">רק ספירות. שמות התלמידים נשמרים ביומן ומוצגים רק למורה שבנה/תה את השיעור.</p>');
+
+    /* משוב */
+    var fbn = FB.yes + FB.partly + FB.no;
+    h += sec('m-fb', I.chat, 'מה אומרים · "השיעור שימושי?"', fbn ? 'כן ' + FB.yes + ' · חלקית ' + FB.partly + ' · לא ' + FB.no : 'עוד אין משוב',
+      (fbn ? mBars({ 'כן': FB.yes, 'חלקית': FB.partly, 'לא': FB.no }) : '') +
+      (FB.items.filter(function (x) { return x.text; }).length ? '<p class="eyebrow" style="margin-top:12px">מה חסר</p><ul class="list">' + FB.items.filter(function (x) { return x.text; }).map(function (x) {
+        return '<li><span class="li"><b>' + esc(x.name) + '</b><span>' + uDate(x.at) + (x.rating ? ' · ' + esc(x.rating) : '') + '</span>' +
+          (x.topic ? '<small>' + esc(x.topic) + '</small>' : '') + '<small style="flex-basis:100%">' + esc(x.text) + '</small></span></li>';
+      }).join('') + '</ul>' : (fbn ? '' : '<div class="empty">אחרי כל בנייה המורה נשאל/ת אם השיעור שימושי ומה חסר. התשובות יופיעו כאן.</div>')));
+
+    /* השיעורים האחרונים */
+    h += sec('m-recent', I.doc, 'השיעורים האחרונים', M.recent.length ? uDate(M.recent[0].at) : 'אין עדיין',
+      M.recent.length ? '<ul class="list">' + M.recent.map(function (x) {
+        return '<li><span class="li"><b>' + esc(x.topic) + '</b><span>' + uDate(x.at) + ' · ' + mUsd(x.cost) + (x.fixes ? ' · ' + x.fixes + ' תיקוני בודק' : '') + (x.errors ? ' · ' + x.errors + ' שגיאות' : '') + '</span>' +
+          '<small style="flex-basis:100%">' + esc(x.name) + (x.self ? ' (בדיקה שלך)' : '') + (x.school ? ' · ' + esc(x.school) : '') + ' · ' + esc(x.subject) + ' · ' + esc(x.grade) + ' · ' +
+          esc(x.kinds.split(',').map(function (k) { return M_KIND[k] || k; }).join(', ')) + '</small></span></li>';
+      }).join('') + '</ul>' : '<div class="empty">עוד לא נבנה שיעור.</div>');
+
+    /* תקלות */
+    h += sec('m-err', I.flag, 'תקלות וחסימות', (M.errors.length ? M.errors.length + ' שגיאות' : 'אין שגיאות') + (M.blocked ? ' · ' + M.blocked + ' נחסמו בתקרה' : ''),
+      M.errors.length ? '<ul class="list">' + M.errors.map(function (x) {
+        return '<li><span class="li"><b>' + esc(x.name) + '</b><span>' + uDate(x.at) + ' · ' + esc(x.action) + '</span><small style="flex-basis:100%">' + esc(x.error) + '</small></span></li>';
+      }).join('') + '</ul>' : '<div class="empty">לא נרשמו שגיאות.</div>');
+
+    h += '<div class="small" style="margin:6px 4px">עודכן ' + uDate(M.now) + ' · <button type="button" class="linkbtn" data-ureload>רענון</button>' +
+      (M.logUrl ? ' · <a href="' + esc(M.logUrl) + '" target="_blank" rel="noopener">היומן המלא בגיליון</a>' : '') + '</div>';
     $('main').innerHTML = h;
   }
 
@@ -1224,7 +1377,7 @@
       t('F', I.doc, adm ? 'טפסים פעילים' : 'טפסים וקישורים', adm ? (ST.forms !== 'ok' ? '…' : fo ? fo + ' פניות פתוחות' : fopen.length + ' טפסים פתוחים') : 'מי מילא ומי עוד לא') +
       (adm ? t('P', I.mail, 'מפקחים', 'מצב ושליחה') : t('W', I.doc, 'תוכנית העבודה שלי', 'טיוטה מתובי לפי נספח ב')) +
       t('K', I.book, 'ערכת המפקח.ת', 'הנחיות, ביקור, ועדות מלוות') +
-      (adm ? t('U', I.chart, 'שימוש', 'תובה, צוהר ונטע · מי נכנס ומה שואלים') : '') +
+      (adm ? t('U', I.chart, 'שימוש', 'תובה, צוהר, נטע ומחולל · מי נכנס, מה שואלים ומה עולה') : '') +
       '</div>';
   }
   function mapCard() {
@@ -3694,7 +3847,7 @@
     if (ak2) { AKIND = ak2.getAttribute('data-ak'); go('A'); return; }
     var ua = t.closest('[data-uapp]');
     if (ua) { UAPP = ua.getAttribute('data-uapp'); try { localStorage.setItem('revital.uapp', UAPP); } catch (err) {} usagePage(); return; }
-    if (t.closest('[data-ureload]')) { USG_ST = ''; usagePage(); return; }
+    if (t.closest('[data-ureload]')) { USG_ST = ''; MUSG_ST = ''; usagePage(); return; }
     var g = t.closest('[data-go]');
     if (g) { e.preventDefault(); go(g.getAttribute('data-go')); return; }
     var gv = t.closest('[data-gview]');
