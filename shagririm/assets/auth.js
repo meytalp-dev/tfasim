@@ -286,7 +286,7 @@
     d.getElementById("shauth-card").innerHTML =
       html +
       '<div class="shauth-foot">שגרירי חדשנות טכנולוגית · משרד העבודה, מינהל הכשרה מקצועית' +
-      '<br>נבנה על ידי <a href="https://impact-os.app" target="_blank" rel="noopener">impactos · impact-os.app</a></div>';
+      '<br>נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>';
   }
 
   function close() {
