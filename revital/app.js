@@ -560,7 +560,7 @@
       item('F', I.doc, adminView() ? 'טפסים פעילים' : 'טפסים וקישורים', adminView() ? fNavCount() : '') +
       (adminView() ? item('P', I.mail, 'מפקחים · מצב ושליחה', '') : item('W', I.doc, 'תוכנית העבודה שלי', '')) +   /* מיטל, 8.10.26 */
       item('K', I.book, 'ערכת המפקח.ת', '') +   /* במקום מרחב הפיקוח באתר (מיטל, 10.10.26) */
-      (adminView() ? item('U', I.chart, 'שימוש · תובה וצוהר', '') : '') +   /* אדמין בלבד (מיטל, 10.10.26) */
+      (adminView() ? item('U', I.chart, 'שימוש · תובה, צוהר ונטע', '') : '') +   /* אדמין בלבד (מיטל, 10.10.26) */
       '<li class="sep"></li>' +
       (myMenorView() ? '<li><a class="home" href="' + myMenorView() + '" target="_blank" rel="noopener">' + I.chart + 'המבט שלי במנור' + I.ext + '</a></li>' : '') +
       '<li><button type="button" class="home" id="tourLink" data-tour-start>' + I.flag + 'סיור במערכת</button></li>';
@@ -721,8 +721,10 @@
      מי נכנס ומי עוד לא, המקטעים הכי נקראים, הפעילות, ומה שואלים את תובי וקרן ומה הן עונות. הכול מקופל. */
   var USG = null, USG_ST = '';
   var UAPP = (function () { try { return localStorage.getItem('revital.uapp') || 'tuva'; } catch (e) { return 'tuva'; } })();
-  var U_NAME = { tuva: 'תובה', tzohar: 'צוהר' }, U_BOT = { tuva: 'תובי', tzohar: 'קרן' };
-  var U_URL = { tuva: 'https://tfasim.pedagogiamh.co.il/revital/', tzohar: 'https://pedagogiamh.co.il/tzohar/' };
+  /* נטע (רכזים פדגוגיים) נפרדה מצוהר ב-11.10.26 — לשונית שלישית, והשאלות לניצה בנפרד מקרן */
+  var U_NAME = { tuva: 'תובה', tzohar: 'צוהר', neta: 'נטע' }, U_BOT = { tuva: 'תובי', tzohar: 'קרן', neta: 'ניצה' };
+  var U_URL = { tuva: 'https://tfasim.pedagogiamh.co.il/revital/', tzohar: 'https://pedagogiamh.co.il/tzohar/', neta: 'https://pedagogiamh.co.il/neta/' };
+  var U_KIND = { ask: 'שאלה', chat: 'שאלה', plan: 'תוכנית', planHelp: 'חומר לתוכנית', help: 'עזרה בהקשר' };
   function loadUsage() {
     USG_ST = 'load';
     fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -736,8 +738,9 @@
   function uDate(s) { var m = String(s || '').match(/^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}:\d{2}))?/); return m ? (+m[3]) + '.' + (+m[2]) + (m[4] ? ' ' + m[4] : '') : esc(s); }
   function usagePage() {
     if (!USG_ST) loadUsage();
-    var h = '<div class="card head"><h1>שימוש · תובה וצוהר</h1><div class="meta">מי נכנס ומי עוד לא, מה הכי נקרא, מה עושים, ומה שואלים את תובי וקרן</div>' +
-      '<div class="seg" style="margin-top:10px">' + ['tuva', 'tzohar'].map(function (a) {
+    if (!U_NAME[UAPP]) UAPP = 'tuva';
+    var h = '<div class="card head"><h1>שימוש · תובה, צוהר ונטע</h1><div class="meta">מי נכנס ומי עוד לא, מה הכי נקרא, מה שואלים את תובי, קרן וניצה, וכמה — כדי לקבוע תקרה יומית הגיונית</div>' +
+      '<div class="seg" style="margin-top:10px">' + ['tuva', 'tzohar', 'neta'].map(function (a) {
         return '<button type="button" data-uapp="' + a + '" aria-pressed="' + (UAPP === a) + '">' + U_NAME[a] + '</button>';
       }).join('') + '</div></div>';
     if (USG_ST !== 'ok') {
@@ -746,7 +749,7 @@
         : '<div class="empty">טוען את נתוני השימוש…</div>') + '</div>';
       return;
     }
-    var A = USG[UAPP], P = A.people, n = P.length, bot = U_BOT[UAPP], app = U_NAME[UAPP];
+    var A = USG[UAPP] || { people: [], secs: [], activity: [], bots: [] }, P = A.people, n = P.length, bot = U_BOT[UAPP], app = U_NAME[UAPP];
     var inn = P.filter(function (p) { return p.last; }).sort(function (a, b) { return a.last < b.last ? 1 : -1; });
     var not = P.filter(function (p) { return !p.last; }).sort(function (a, b) { return String(a.school + a.name).localeCompare(b.school + b.name, 'he'); });
     var wk = P.filter(function (p) { return p.week; }).length;
@@ -757,7 +760,7 @@
         (of ? '<span class="bar"><i style="width:' + pc + '%;background:' + color + '"></i></span>' : '') + '<span class="hint">' + hint + '</span></div>';
     }
     h += '<div class="pstats">' +
-      stat(inn.length, n, 'נכנסו ל' + app, UAPP === 'tuva' ? 'מפקחים ורויטל' : 'מנהלים ורכזים פדגוגיים', 'var(--brand)') +
+      stat(inn.length, n, 'נכנסו ל' + app, UAPP === 'tuva' ? 'מפקחים ורויטל' : UAPP === 'neta' ? 'רכזים פדגוגיים' : 'מנהלי בתי הספר', 'var(--brand)') +
       stat(wk, n, 'פעילים ב-7 הימים האחרונים', 'נכנסו או עשו פעולה', 'var(--brand-sky)') +
       stat(qs.length, 0, 'שאלות ובקשות ל' + bot, qs.length ? 'אחרונה ' + uDate(qs[0].at) : 'עוד לא נשאלה', '') + '</div>';
 
@@ -798,13 +801,35 @@
         return '<li><span class="li"><b>' + esc(a.name) + '</b><span>' + uDate(a.at) + '</span><small style="flex-basis:100%">' + esc(a.what) + '</small></span></li>';
       }).join('') + '</ul>' : '<div class="empty">עוד לא נרשמו פעולות.</div>');
 
+    /* שאלות ותקרה (11.10.26): כמה שואלים ביום, מי נחסם ומה זה עולה — לקביעת תקרה יומית הגיונית */
+    var C = A.caps;
+    if (C) {
+      var L = C.limits || {}, kinds = Object.keys(C.byKind || {});
+      var rec = !C.personDays ? 'עוד אין מספיק נתונים להמלצה.' :
+        (C.p90 <= Math.ceil((L.perUser || 10) / 2) ? 'ב-90% מהימים אדם שאל עד ' + C.p90 + '. התקרה (' + (L.perUser || '—') + ') רחוקה — אפשר להשאיר.' :
+         C.p90 >= (L.perUser || 10) ? 'ב-10% מהימים אנשים מגיעים לתקרה (' + L.perUser + '). כדאי לשקול להגדיל.' :
+         'ב-90% מהימים אדם שאל עד ' + C.p90 + ' — קרוב לתקרה (' + L.perUser + '). לעקוב.') + (C.blocked.length ? ' נחסמו ' + C.blocked.length + ' פעמים.' : ' אף אחד לא נחסם.');
+      h += sec('u-cap', I.chart, 'שאלות ותקרה', C.total ? C.total + ' בקשות · $' + C.cost : 'אין עדיין',
+        '<div class="note" style="margin-bottom:10px"><b>' + esc(rec) + '</b></div>' +
+        '<div class="small" style="margin-bottom:8px">התקרה היום: ' + esc(L.user || '—') + ' · ' + esc(L.total || '') + '</div>' +
+        (C.personDays ? '<div class="small" style="margin-bottom:10px">לאדם ביום (בימים ששאל): חציון ' + C.p50 + ' · 90% עד ' + C.p90 + ' · הכי הרבה ' + C.max + ' · ' + C.personDays + ' ימי־אדם</div>' : '') +
+        (kinds.length ? '<div class="small" style="margin-bottom:10px">' + kinds.map(function (k) { var x = C.byKind[k]; return esc(U_KIND[k] || k) + ': ' + x.n + ' (ממוצע $' + x.avg + ')'; }).join(' · ') + '</div>' : '') +
+        (C.days.length ? '<div style="overflow-x:auto"><table style="border-collapse:collapse;width:100%;min-width:560px"><tr><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">יום</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">שאלות</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">תוכניות</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">חומרים/עזרה</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">אנשים</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">הכי הרבה לאדם</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">נחסמו</th><th style=\"padding:6px 8px;border-bottom:2px solid var(--line);text-align:right;white-space:nowrap;font-size:13px\">עלות</th></tr>' +
+          C.days.map(function (d) {
+            return '<tr><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + uDate(d.day) + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + d.ask + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + d.plan + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + d.help + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + d.people + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + d.max + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">' + (d.blocked ? '<b style="color:var(--bad)">' + d.blocked + '</b>' : 0) + '</td><td style=\"padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-size:13.5px\">$' + d.cost + '</td></tr>';
+          }).join('') + '</table></div>' : '<div class="empty">עוד אין שאלות.</div>') +
+        (C.blocked.length ? '<p class="eyebrow" style="margin-top:12px">מי נחסם</p><ul class="list">' + C.blocked.map(function (b) {
+          return '<li><span class="li"><b>' + esc(b.name) + '</b><span>' + uDate(b.at) + ' · ' + esc(U_KIND[b.kind] || b.kind) + ' · ' + esc(b.reason === 'total' ? 'תקרת המערכת' : 'תקרה אישית') + '</span></span></li>';
+        }).join('') + '</ul>' : ''));
+    }
+
     /* השאלות לבוט והתשובות */
     var err = A.bots.filter(function (b) { return b.error; })[0];
     h += sec('u-bot', I.chat, 'מה שואלים את ' + bot, qs.length ? qs.length + ' שאלות ובקשות' : 'עוד לא נשאלה',
       (err ? '<div class="empty">היומן של ' + bot + ' לא נקרא: ' + esc(err.error) + '</div>' : '') +
       (qs.length ? qs.map(function (b) {
         return '<details class="card" style="margin:0 0 8px;padding:10px 12px"><summary style="cursor:pointer"><b>' + esc(b.name) + '</b> · ' + uDate(b.at) +
-          (b.action ? ' · ' + esc(b.action) : '') + (b.school ? ' · ' + esc(b.school.slice(0, 60)) : '') +
+          (b.action ? ' · ' + esc(U_KIND[b.action] || b.action) : '') + (b.blocked ? ' · <b style="color:var(--bad)">נחסם</b>' : '') + (b.school ? ' · ' + esc(b.school.slice(0, 60)) : '') +
           '<div style="margin-top:4px">' + esc(b.q ? b.q.slice(0, 220) : '(בלי נוסח)') + '</div></summary>' +
           (b.q && b.q.length > 220 ? '<p class="eyebrow" style="margin-top:10px">השאלה המלאה</p><div class="pre">' + esc(b.q) + '</div>' : '') +
           '<p class="eyebrow" style="margin-top:10px">התשובה של ' + bot + '</p><div class="pre">' + esc(b.a || (b.err ? 'לא נענתה: ' + b.err : '—')) + '</div>' +
@@ -1199,7 +1224,7 @@
       t('F', I.doc, adm ? 'טפסים פעילים' : 'טפסים וקישורים', adm ? (ST.forms !== 'ok' ? '…' : fo ? fo + ' פניות פתוחות' : fopen.length + ' טפסים פתוחים') : 'מי מילא ומי עוד לא') +
       (adm ? t('P', I.mail, 'מפקחים', 'מצב ושליחה') : t('W', I.doc, 'תוכנית העבודה שלי', 'טיוטה מתובי לפי נספח ב')) +
       t('K', I.book, 'ערכת המפקח.ת', 'הנחיות, ביקור, ועדות מלוות') +
-      (adm ? t('U', I.chart, 'שימוש', 'תובה וצוהר · מי נכנס') : '') +
+      (adm ? t('U', I.chart, 'שימוש', 'תובה, צוהר ונטע · מי נכנס ומה שואלים') : '') +
       '</div>';
   }
   function mapCard() {
