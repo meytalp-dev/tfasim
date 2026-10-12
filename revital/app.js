@@ -56,9 +56,11 @@
   var GAP_KINDS = [['nispach', 'נספח בעלי תפקידים'], ['bs', 'השתלמות מוסדית'], ['rg', 'רישום להשתלמויות'],
                    ['menor', 'רישום מורים למנור'], ['sal', 'סל תוכניות'], ['vaad', 'ועדה מלווה']];   /* מצבת התלמידים הוסרה (מיטל, 7.10.26) */
   /* "דורש תשומת לב" — אותות לפיקוח, לא חוסרים של בית הספר (מיטל, 7.10.26). לכן בלי מייל למנהל.ת */
-  var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'מדדים במצב סיכון'], ['goals', 'אין יעדים מהוועדה'],
+  var FLAG_KINDS = [['visit', 'לא היה ביקור 3 חודשים'], ['risk', 'במצב סיכון (מדד או פחות מ-100 תלמידים)'], ['goals', 'אין יעדים מהוועדה'],
                     ['aklim', 'אקלים: פער או ירידה']];
   var VISIT_DAYS = 90;
+  /* בית ספר עם פחות מ-100 תלמידים = בסיכון (רויטל; מיטל אישרה 12.10.26). אותו כלל בתובי (SMALL_SCHOOL_) */
+  var SMALL_SCHOOL = 100;
   /* שאלון אקלים תשפ"ו (מיטל, 7.10.26): ממד חריג = 12 נקודות ומעלה מתחת להשוואה, או ירידה של 12 ומעלה
      מתשפ"ה. כרטיס עם פחות מ-10 משיבים מוצג עם הערה, ולא נכנס להתראות */
   var AKL_GAP = 12, AKL_MIN = 10;
@@ -435,8 +437,10 @@
     }
     if (ST.pk === 'ok') {
       var rk = riskOf(r), overall = field(r.mipui[0], 'דירוג כולל');
-      if (rk.length) out.push({ k: 'risk', t: 'במצב סיכון: ' + rk.map(function (x) { return x.name; }).join(', ') });
-      else if (overall.indexOf('סיכון') === 0) out.push({ k: 'risk', t: overall });
+      var stN = parseInt(String(studentsOf(r) || '').replace(/[^\d]/g, ''), 10), small = stN >= 0 && stN < SMALL_SCHOOL;
+      if (rk.length) out.push({ k: 'risk', t: 'במצב סיכון: ' + rk.map(function (x) { return x.name; }).join(', ') + (small ? ' · ' + stN + ' תלמידים' : '') });
+      else if (overall.indexOf('סיכון') === 0) out.push({ k: 'risk', t: overall + (small ? ' · ' + stN + ' תלמידים' : '') });
+      else if (small) out.push({ k: 'risk', t: 'במצב סיכון: פחות מ-' + SMALL_SCHOOL + ' תלמידים (' + stN + ')' });
       if (!r.yaad) out.push({ k: 'goals', t: 'אין יעדים מהוועדה המלווה האחרונה' });
     }
     if (ST.akl === 'ok') {
@@ -4042,6 +4046,8 @@
       roles: ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? 'הנספח לא הוגש' :
         'הוגש ' + x.ts + ' · ' + x.people.length + ' בעלי תפקידים' + (x.missing.length ? ' · חסרים: ' + x.missing.join(', ') : '')),
       mef: mef, lastMef: r.mvLast || '',
+      /* מספר התלמידים (12.10.26) — לשאלות רוחב בתובי ("בתי ספר קטנים") */
+      st: String(studentsOf(r) || ''),
       /* השתלמויות (8.10.26): המוסדית + כמה נרשמו לכל אחת מההשתלמויות המקוונות */
       hisht: [ST.bs !== 'ok' ? '' : (r.bs ? 'השתלמות מוסדית: ' + r.bs.status + (r.bs.name ? ' · ' + r.bs.name : '') : 'השתלמות מוסדית: לא הוגשה'),
         ST.rg !== 'ok' ? '' : 'נרשמו להשתלמויות המקוונות: ' + WS.map(function (w) { return w[1] + ' ' + (Number(r.rg && r.rg[w[0]]) || 0); }).join(', ')
