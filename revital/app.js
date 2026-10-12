@@ -2676,7 +2676,7 @@
           ? '<button type="button" class="btn primary" data-saldoc="' + esc(r.s.semel) + '">' + I.doc + 'פתיחת המסמך</button>'
           : '<span class="small">המסמך עוד לא הועלה לדרייב.</span>') + '</div>' +
         '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח דרך הבית, רק למי שבית הספר משויך אליו/ה.</div></div>' +
-        salSummary(x)
+        salSummary(x) + salSumBox(r, x, fid)
     };
   }
 
@@ -2707,7 +2707,7 @@
         if (!d || !d.ok) throw new Error(d && d.error || 'err');
         r.sal = d.row;
         toast('הסל עלה, והחוסר ירד');
-        render();
+        salSum(semel);
       }).catch(function (err) {
         var m = String(err.message), el = $('salSt-' + semel);
         if (el) el.textContent = m === 'toobig' ? 'הקובץ גדול מ-10MB.' :
@@ -2719,6 +2719,37 @@
       });
     };
     rd.readAsDataURL(f);
+  }
+
+  /* תקציר אוטומטי (12.10.26): אחרי ההעלאה תובי קורא את המסמך וכותב את התקציר לגיליון (salsum ב-tovi-gas).
+     סל בלי תקציר — כפתור "הכנת תקציר" (גם לניסיון חוזר). SALSUM[semel] = { st: 'busy' | 'err', msg } */
+  var SALSUM = {};
+  var SALSUM_ERR = { nodoc: 'לא הצלחתי לפתוח את המסמך מהשער.', notext: 'לא מצאתי טקסט בקובץ. אפשר להעלות אותו כ-PDF.',
+    limited: 'תובי הגיע לתקרה היומית. אפשר לנסות מחר.', noschool: 'בית הספר לא משויך לחשבון הזה.' };
+  function salSumBox(r, x, fid) {
+    if (!fid || String(x['תקציר'] || '').trim()) return '';
+    var z = SALSUM[r.s.semel] || {};
+    if (z.st === 'busy') return '<div class="card"><p class="eyebrow">' + I.book + 'מה בית הספר הגיש · תקציר</p><div class="small">תובי קורא את המסמך ומכין תקציר. זה לוקח עד שתי דקות, ואפשר להמשיך לעבוד בינתיים.</div></div>';
+    if (adminView()) return '';
+    return '<div class="card"><p class="eyebrow">' + I.book + 'מה בית הספר הגיש · תקציר</p>' +
+      (z.st === 'err' ? '<div class="small">' + esc(z.msg) + '</div>' : '<div class="small">עוד אין תקציר למסמך הזה.</div>') +
+      '<div class="acts" style="margin-top:10px"><button type="button" class="btn" data-salsum="' + esc(r.s.semel) + '">' + I.book + 'הכנת תקציר בתובי</button></div></div>';
+  }
+  function salSum(semel) {
+    var r = BYSEMEL[semel];
+    if (!r || !r.sal) return render();
+    if (!window.TOVI_POST) { SALSUM[semel] = { st: 'err', msg: 'תובי לא נטען בדף. רענון הדף ינסה שוב.' }; return render(); }
+    SALSUM[semel] = { st: 'busy' }; render();
+    window.TOVI_POST({ action: 'salsum', semel: String(semel) }).then(function (d) {
+      if (!d || !d.ok || !d.summary) throw new Error(SALSUM_ERR[d && d.error] || (d && d.message) || 'התקציר לא נוצר. אפשר לנסות שוב.');
+      r.sal['תקציר'] = d.summary;
+      delete SALSUM[semel];
+      toast('התקציר מוכן');
+      render();
+    }).catch(function (e) {
+      SALSUM[semel] = { st: 'err', msg: /^[A-Za-z]/.test(String(e.message)) ? 'התקציר לא נוצר. אפשר לנסות שוב.' : String(e.message) };
+      render();
+    });
   }
 
   /* תקציר המסמך (עמודת "תקציר" בגיליון, JSON) — מוכן מראש מכל מסמך, כולל סרוקים. משמש גם את הבוט */
@@ -3836,6 +3867,8 @@
     /* לפני data-go: כפתור שמסנן ואז עובר לרשימה */
     var sd = t.closest('[data-saldoc]');
     if (sd) { e.preventDefault(); openSalDoc(sd.getAttribute('data-saldoc')); return; }
+    var ss = t.closest('[data-salsum]');
+    if (ss) { e.preventDefault(); salSum(ss.getAttribute('data-salsum')); return; }
     var rp = t.closest('[data-reply]');
     if (rp) { e.preventDefault(); replyOpen(rp.getAttribute('data-reply')); return; }
     /* צ׳ק ליסט ביקור */
