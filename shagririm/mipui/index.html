@@ -705,23 +705,64 @@
   }
 
   /* ---------- מבט על (מיטל) ---------- */
+  /* 12.10.26: סינון כלים/הובלה + "טרם שלחו" (בית ספר בלי אף תשובה מהצוות, עם שמות הרכזים) */
+  var admF = 'all', admData = null;
+  var ADM_SPECIAL = { demo00: 1, 'rk-k': 1, 'rk-h': 1 };
   function renderAdmin() {
     document.getElementById('who').innerHTML = '<span class="chip o">מבט על · מיטל</span>';
     main.innerHTML = '<div class="h2">כל בתי הספר</div><p class="sub">כמה מורים ענו בכל בית ספר. לחיצה על שורה פותחת את הדשבורד של בית הספר.</p><div id="adm"><div class="loading">טוען…</div></div>';
     mGet({ action: 'admin', k: K }).then(function (r) {
       if (!r.ok) { renderEntry('המפתח לא תקין.'); return; }
-      var list = r.schools.slice().sort(function (a, b) { return b.n - a.n || a.school.localeCompare(b.school, 'he'); });
-      var tot = list.reduce(function (a, s) { return a + s.n; }, 0);
-      var act = list.filter(function (s) { return s.n > 0; }).length;
-      var h = '<div class="g4" style="margin-bottom:16px"><div class="kpi"><div class="v">' + tot + '</div><div class="l">תשובות בסך הכול</div></div>' +
-        '<div class="kpi"><div class="v">' + act + '<small> /' + list.length + '</small></div><div class="l">בתי ספר שהתחילו</div></div></div>' +
-        '<div class="card"><table class="t"><tr><th>בית ספר</th><th>מסלול</th><th>ענו</th><th>צוות</th><th>היענות</th></tr>';
+      admData = r.schools;
+      drawAdmin();
+    }).catch(function () { document.getElementById('adm').innerHTML = '<div class="empty">השרת לא ענה. רעננו בעוד רגע.</div>'; });
+  }
+  function drawAdmin() {
+      var TN = { tools: 'כלים', lead: 'הובלה' };
+      var inF = function (s) { return admF === 'all' ? true : !ADM_SPECIAL[s.s] && s.tracks.indexOf(admF) > -1; };
+      var list = admData.filter(inF).sort(function (a, b) { return b.n - a.n || a.school.localeCompare(b.school, 'he'); });
+      var real = list.filter(function (s) { return !ADM_SPECIAL[s.s]; });
+      var tot = real.reduce(function (a, s) { return a + s.n; }, 0);
+      var act = real.filter(function (s) { return s.n > 0; }).length;
+      var miss = real.filter(function (s) { return s.n === 0; }).sort(function (a, b) { return a.school.localeCompare(b.school, 'he'); });
+      var who = function (s) { return (s.coords || []).filter(function (c) { return admF === 'all' || c.t === admF; }); };
+      var h = '<div class="row" style="margin-bottom:14px">' + ['all', 'tools', 'lead'].map(function (f) {
+          return '<button class="btn sm' + (admF === f ? ' pri' : '') + '" data-f="' + f + '">' + (f === 'all' ? 'כל המסלולים' : TN[f]) + '</button>';
+        }).join(' ') + '</div>' +
+        '<div class="g4" style="margin-bottom:16px"><div class="kpi"><div class="v">' + tot + '</div><div class="l">תשובות בסך הכול</div></div>' +
+        '<div class="kpi"><div class="v">' + act + '<small> /' + real.length + '</small></div><div class="l">בתי ספר שהתחילו</div></div></div>';
+      if (miss.length) {
+        h += '<div class="card" style="margin-bottom:16px;border-color:var(--orange)"><h3 style="margin-bottom:4px">טרם שלחו · ' + miss.length + ' מתוך ' + real.length + '</h3>' +
+          '<p class="note" style="margin-bottom:10px">אין עדיין אף תשובה מהצוות. אי אפשר לדעת מכאן אם הקישור נשלח ולא ענו, או שלא נשלח.</p><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px">' +
+          miss.map(function (s) {
+            var c = who(s).map(function (x) { return x.n; }).join(', ');
+            return '<span class="chip o">' + mEsc(s.school) + (c ? ' · ' + mEsc(c) : '') + '</span>';
+          }).join('') + '</div><div class="row"><button class="btn pri sm" id="cpMiss"><svg class="i"><use href="#i-copy"/></svg>העתקת הרשימה</button> ' +
+          '<button class="btn sm" id="cpMail"><svg class="i"><use href="#i-copy"/></svg>העתקת המיילים של הרכזים</button></div></div>';
+      }
+      h += '<div class="card"><table class="t"><tr><th>בית ספר</th><th>מסלול</th><th>ענו</th><th>צוות</th><th>היענות</th></tr>';
       list.forEach(function (s) {
         var tr = s.tracks.map(function (t) { return '<span class="chip' + (t === 'lead' ? ' o' : '') + '">' + (t === 'lead' ? 'הובלה' : 'כלים') + '</span>'; }).join(' ');
         h += '<tr class="clk" data-s="' + s.s + '"><td>' + mEsc(s.school) + ' <a class="note" href="?k=' + encodeURIComponent(K) + '&s=' + s.s + '" onclick="event.stopPropagation()">דף הרכז</a></td><td>' + tr + '</td><td><b>' + s.n + '</b></td><td>' + (s.staff || '–') + '</td><td>' + (s.staff ? pct(s.n, s.staff) + '%' : '–') + '</td></tr>';
       });
       h += '</table></div>';
       document.getElementById('adm').innerHTML = h;
+      document.querySelectorAll('#adm [data-f]').forEach(function (b) {
+        b.onclick = function () { admF = b.getAttribute('data-f'); drawAdmin(); };
+      });
+      if (miss.length) {
+        document.getElementById('cpMiss').onclick = function () {
+          copy('טרם שלחו את מיפוי הצוות' + (admF === 'all' ? '' : ' · מסלול ' + TN[admF]) + ' (' + miss.length + '):\n' + miss.map(function (s) {
+            var c = who(s).map(function (x) { return x.n; }).join(', ');
+            return '• ' + s.school + (c ? ' — ' + c : '');
+          }).join('\n'), 'הרשימה הועתקה');
+        };
+        document.getElementById('cpMail').onclick = function () {
+          var m = [];
+          miss.forEach(function (s) { who(s).forEach(function (x) { if (x.m && m.indexOf(x.m) < 0) m.push(x.m); }); });
+          copy(m.join(', '), m.length + ' מיילים הועתקו');
+        };
+      }
       document.querySelectorAll('tr.clk').forEach(function (tr) {
         tr.onclick = function () {
           var s = tr.getAttribute('data-s');
@@ -732,7 +773,6 @@
           window.scrollTo(0, 0);
         };
       });
-    }).catch(function () { document.getElementById('adm').innerHTML = '<div class="empty">השרת לא ענה. רעננו בעוד רגע.</div>'; });
   }
 
   if (!K) { renderEntry(); return; }
