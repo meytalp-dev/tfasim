@@ -424,7 +424,8 @@
   function riskOf(r) { return r.mipui && r.mipui[0] ? levels(r.mipui[0]).filter(function (x) { return x.cls === 'bad'; }) : []; }
   function lastVisit(r) {
     var a = r.bik && r.bik[0] ? String(r.bik[0]['תאריך']).slice(0, 10) : '', b = r.mvLast || '';
-    return a > b ? a : b;
+    var c = r.ck && r.ck[0] ? String(r.ck[0].date || '').slice(0, 10) : '';   /* 12.10.26: צ׳ק ליסט ביקור = ביקור (כרמיאל: "28.6" למרות צ׳ק ליסט מ-11.10) */
+    return [a, b, c].sort().pop();
   }
   function daysSince(iso) { return Math.floor((Date.now() - new Date(iso + 'T00:00:00').getTime()) / 864e5); }
   function flags(r) {
