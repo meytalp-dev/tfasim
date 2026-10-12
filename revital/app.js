@@ -975,6 +975,16 @@
           (x.topic ? '<small>' + esc(x.topic) + '</small>' : '') + '<small style="flex-basis:100%">' + esc(x.text) + '</small></span></li>';
       }).join('') + '</ul>' : (fbn ? '' : '<div class="empty">אחרי כל בנייה המורה נשאל/ת אם השיעור שימושי ומה חסר. התשובות יופיעו כאן.</div>')));
 
+    /* השאלון הקצר למשתמשים (12.10.26) — mecholel.html?seker=<קוד אישי> */
+    var SV = FB.survey || [];
+    h += sec('m-seker', I.chat, 'שאלון משתמשים', SV.length ? SV.length + ' ענו' : 'עוד אף אחד',
+      SV.length ? '<ul class="list">' + SV.map(function (x) {
+        var bits = [x.used && 'בכיתה: ' + x.used, x.best && 'הכי עזר: ' + x.best, x.saved && 'חסך זמן: ' + x.saved, x.ease && 'קלות: ' + x.ease + '/5'].filter(Boolean);
+        return '<li><span class="li"><b>' + esc(x.name) + '</b><span>' + uDate(x.at) + (x.school ? ' · ' + esc(x.school) : '') + '</span>' +
+          (bits.length ? '<small style="flex-basis:100%">' + esc(bits.join(' · ')) + '</small>' : '') +
+          (x.text ? '<small style="flex-basis:100%">' + esc(x.text) + '</small>' : '') + '</span></li>';
+      }).join('') + '</ul>' : '<div class="empty">התשובות לשאלון שנשלח במייל יופיעו כאן.</div>');
+
     /* השיעורים האחרונים */
     h += sec('m-recent', I.doc, 'השיעורים האחרונים', M.recent.length ? uDate(M.recent[0].at) : 'אין עדיין',
       M.recent.length ? '<ul class="list">' + M.recent.map(function (x) {
@@ -2655,7 +2665,7 @@
     var x = r.sal;
     if (!x) return { sum: tag('k-sal', 'לא הוגש'),
       body: '<div class="card"><p class="eyebrow">' + I.doc + 'סל תוכניות להעשרה וטיפוח הלומד · תשפ״ז</p><div class="gc"><span class="chip k-sal">סל התוכניות לא הוגש</span></div>' +
-        '<div class="small">אין מסמך הגשה של בית הספר בקובץ שהתקבל.</div></div>' };
+        '<div class="small">אין מסמך הגשה של בית הספר בקובץ שהתקבל.</div>' + salUpBox(r) + '</div>' };
     var note = String(x['הערה'] || '').trim(), fid = String(x['מזהה קובץ בדרייב'] || '').trim();
     return {
       sum: tag('ok', 'הוגש') + (note ? ' ' + tag('warn', note) : ''),
@@ -2668,6 +2678,47 @@
         '<div class="small">' + esc(x['שם הקובץ'] || '') + ' · המסמך נפתח דרך הבית, רק למי שבית הספר משויך אליו/ה.</div></div>' +
         salSummary(x)
     };
+  }
+
+  /* העלאת הסל בידי המפקח.ת (מיטל, 12.10.26): הקובץ עולה דרך השער (salUpload) לתיקיית הסלים,
+     נכנסת שורה ללשונית "סל תוכניות" והחוסר יורד. למפקחים (וגם באדמין בתצוגת ?as=), כמו "תגובה" */
+  var SAL_MAX = 10 * 1024 * 1024;
+  function salUpBox(r) {
+    if (adminView()) return '';
+    return '<div class="acts" style="margin-top:10px"><label class="btn primary">' + I.doc + 'העלאת הסל של בית הספר' +
+      '<input type="file" hidden accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png" data-salup="' + esc(r.s.semel) + '"></label></div>' +
+      '<div class="small" id="salSt-' + esc(r.s.semel) + '">PDF, Word, Excel או צילום, עד 10MB. אחרי ההעלאה החוסר יורד, והמסמך נפתח כאן לכל מי שבית הספר משויך אליו/ה.</div>';
+  }
+  function salUpload(inp) {
+    var semel = inp.getAttribute('data-salup'), r = BYSEMEL[semel], f = inp.files && inp.files[0];
+    var st = $('salSt-' + semel);
+    if (!r || !f) return;
+    inp.value = '';
+    if (f.size > SAL_MAX) { st.textContent = 'הקובץ גדול מ-10MB. אפשר לשמור אותו כ-PDF קטן יותר ולנסות שוב.'; return; }
+    if (!confirm('להעלות את "' + f.name + '" כסל התוכניות של ' + r.s.name + '?')) return;
+    st.textContent = 'מעלה את ' + f.name + '…';
+    var rd = new FileReader();
+    rd.onerror = function () { st.textContent = 'לא הצלחתי לקרוא את הקובץ.'; };
+    rd.onload = function () {
+      var data = String(rd.result).split(',')[1] || '';
+      fetchJson(GATE_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'salUpload', token: token(), semel: String(semel), school: r.s.name, network: r.s.network || '',
+          name: f.name, mime: f.type, data: data }) }, 120000, 1).then(function (d) {
+        if (!d || !d.ok) throw new Error(d && d.error || 'err');
+        r.sal = d.row;
+        toast('הסל עלה, והחוסר ירד');
+        render();
+      }).catch(function (err) {
+        var m = String(err.message), el = $('salSt-' + semel);
+        if (el) el.textContent = m === 'toobig' ? 'הקובץ גדול מ-10MB.' :
+          m === 'badtype' ? 'סוג הקובץ לא נתמך. אפשר PDF, Word, Excel, PowerPoint או צילום.' :
+          m === 'exists' ? 'לבית הספר כבר יש סל בגיליון. כדי להחליף אותו כתבו למיטל.' :
+          m === 'notyours' ? 'בית הספר לא משויך לחשבון הזה.' :
+          m === 'quota' ? 'הגעת למספר ההעלאות היומי.' : m === 'badsession' ? 'החיבור פג. צריך להיכנס מחדש.' :
+          'ההעלאה לא הצליחה. נסו שוב בעוד רגע.';
+      });
+    };
+    rd.readAsDataURL(f);
   }
 
   /* תקציר המסמך (עמודת "תקציר" בגיליון, JSON) — מוכן מראש מכל מסמך, כולל סרוקים. משמש גם את הבוט */
@@ -3895,6 +3946,7 @@
   });
   /* בונה הטפסים: שינוי סוג תשובה מציג/מסתיר את שדה האפשרויות */
   document.addEventListener('change', function (e) {
+    if (e.target && e.target.hasAttribute && e.target.hasAttribute('data-salup')) { salUpload(e.target); return; }
     if (e.target && e.target.classList && e.target.classList.contains('nfType')) { nfSync(); newFormPage(true); }
     if (e.target && e.target.id === 'dckSup') { DCK.sup = e.target.value; DCK.semel = ''; dckKeep(); render(); return; }
     if (e.target && e.target.id === 'dckSchool') { DCK.semel = e.target.value; dckKeep(); render(); return; }
