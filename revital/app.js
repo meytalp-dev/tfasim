@@ -391,9 +391,11 @@
     }
     salGap(r, out);
     /* ועדה מלווה (מיטל, 8.10.26): נוסח שנכון גם אם הוועדה התקיימה ורק המסמך לא הגיע */
-    if (ST.vaad === 'ok' && !(r.vaad && r.vaad.length)) out.push({ k: 'vaad', t: 'חסר מסמך ועדה מלווה תשפ״ו' });
+    if (ST.vaad === 'ok' && !(r.vaad && r.vaad.length) && !VAAD_NEW[String(r.s.semel)]) out.push({ k: 'vaad', t: 'חסר מסמך ועדה מלווה תשפ״ו' });
     return out;
   }
+  /* בתי ספר שלא היו קיימים בתשפ״ו — אין להם ועדה מלווה, ולכן אין חוסר (מיטל, 12.10.26) */
+  var VAAD_NEW = { '42925': 'אור דניאל' };
   function issues(r) { return gaps(r).map(function (g) { return g.t; }); }
   /* סל תוכניות תשפ"ז (7.10.26) — חוסר רק כשלא הוגש. הערת האישור מוצגת בלשונית */
   function salGap(r, out) { if (ST.sal === 'ok' && !r.sal) out.push({ k: 'sal', t: 'סל תוכניות לא הוגש' }); }
@@ -2783,6 +2785,8 @@
     var head = '<p class="eyebrow">' + I.doc + 'ועדה מלווה · תשפ״ו</p>';
     if (ST.vaad !== 'ok') return { sum: ST.vaad === 'load' ? 'טוען…' : 'לא נטען', body: '<div class="card">' + pending('vaad') + '</div>' };
     var rows = r.vaad || [];
+    if (!rows.length && VAAD_NEW[String(r.s.semel)]) return { sum: 'בית ספר חדש',
+      body: '<div class="card">' + head + '<div class="small">בית ספר חדש — לא היה קיים בתשפ״ו, ולכן אין לו ועדה מלווה מתשפ״ו.</div></div>' };
     if (!rows.length) return { sum: tag('k-vaad', 'חסר מסמך'),
       body: '<div class="card">' + head + '<div class="gc"><span class="chip k-vaad">חסר מסמך ועדה מלווה תשפ״ו</span></div>' +
         '<div class="small">לא התקבל מסמך של ועדה מלווה מתשפ״ו. ייתכן שהוועדה התקיימה והמסמך לא הועבר.</div></div>' };
