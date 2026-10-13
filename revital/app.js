@@ -134,7 +134,7 @@
 
   /* ===== מצב ===== */
   var SCHOOLS = [], BY = {}, BYSEMEL = {}, CONTACTS = [];
-  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load', tg: 'load', ck: 'load', plan: 'load' };
+  var ST = { contacts: 'load', nispach: 'load', menor: 'load', matz: 'load', bs: 'load', rg: 'load', sherut: 'load', pk: 'load', mv: 'load', sal: 'load', vaad: 'load', wait: 'load', tg: 'load', ck: 'load', plan: 'load', ishit: 'load' };
   /* בנות שירות — מהמפתח המוגן admin-sherut בשער (גיליון "בנות שירות — אדמין המוסדות", בלי ת"ז) */
   var SHERUT_ROLE = 'בנות שירות';
   var CUR = '';     /* '' = סקירה · 's:<סמל>' = בית ספר · 'r:<תפקיד>' = לפי תפקיד */
@@ -312,7 +312,10 @@
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
       if (!d || d.error) { ST.sal = ST.akl = ST.vaad = ST.tg = ST.ck = ST.plan = 'err'; return loaded('pk', false); }
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; r.ck = []; });
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; r.ck = []; r.ishit = []; });
+      /* תוכנית אישית לבית ספר (קובץ המפקחים, קיץ 2026) — 13.10.26. בשער שלפני כן אין את המפתח */
+      ST.ishit = Array.isArray(d.ishit) ? 'ok' : 'err';
+      (d.ishit || []).forEach(function (row) { var r = at(row); if (r) r.ishit.push(row); });
       /* צ׳ק ליסט ביקור (8.10.26) — שורה לכל ביקור, החדש ראשון. בשער שלפני כן אין את המפתח */
       ST.ck = Array.isArray(d.checklist) ? 'ok' : 'err';
       /* תוכניות עבודה של מפקחים (8.10.26) — מפקח.ת מקבל.ת רק את שלו/ה */
@@ -1770,7 +1773,7 @@
               return '<li><button type="button" data-tab="' + z[0] + '"><span class="st">' + z[1] + esc(lbl) + '</span><span class="sum">' + (z[2] || '') + '</span><span class="go">←</span></button></li>';
             }).join('') + '</ul></div>' + schoolForms(s),
       ppl: P.contacts + P.roles + P.sherut,
-      map: K.yaad + K.mipui,
+      map: K.yaad + (K.ishit || '') + K.mipui,
       vaad: VD.body,
       akl: AK.body,
       vis: ckSec(r) + repSec(r) + '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
@@ -2415,18 +2418,66 @@
   function planSchoolsOf(name) {
     return SCHOOLS.filter(function (s) { return supsOf(s).indexOf(name) > -1; }).sort(function (a, b) { return a.name.localeCompare(b.name, 'he'); });
   }
+  /* ===== תוכנית אישית לבית ספר (מיטל, 13.10.26) =====
+     המבנה של "תוכנית עבודה אישית למפקח לליווי בתי הספר": תובנה, חסם, שאלות מנחות, איך אני מקדם/ת, פעולות.
+     הקובץ שמולא בקיץ 2026 יושב בלשונית "תוכנית אישית" (ishit בשער, לפי בית ספר). בתוכנית העבודה כל בית ספר
+     מקבל את אותם שדות, ומולאים מהקובץ כשהם עדיין ריקים. שדה = [מפתח, כותרת כמו בקובץ, עמודה בלשונית] */
+  var PL_SF = [
+    ['insight', 'תובנה ניהולית שלי ביחס לבית הספר והמנהל.ת', 'תובנה ניהולית'],
+    ['challenge', 'חסם/אתגר מרכזי שעל בית הספר לפתור עד תחילת שנת הלימודים הבאה', 'חסם/אתגר מרכזי'],
+    ['questions', 'שאלות מנחות שהייתי שואל.ת את עצמי או את המנהל.ת כדי לחדד את התובנות', 'שאלות מנחות'],
+    ['promote', 'כיצד אני כמפקח.ת יכול.ה לקדם', 'איך אני מקדם/ת'],
+    ['actions', 'הפעולות שלי לפי חודשים', '']
+  ];
+  var ISHIT_M = [['פעולות ביוני', 'יוני'], ['פעולות ביולי', 'יולי'], ['פעולות באוגוסט', 'אוגוסט'], ['פעולות בספטמבר', 'ספטמבר']];
+  function ishitV(row, k) { return String(row[k] || '').replace(/\n[ \t]*(\n[ \t]*)+/g, '\n').trim(); }
+  function ishitHas(row) { return PL_SF.some(function (f) { return f[2] && ishitV(row, f[2]); }) || ISHIT_M.some(function (m) { return ishitV(row, m[0]); }); }
+  function ishitRows(r) { return (r && r.ishit || []).filter(ishitHas); }
+  function ishitSec(r) {
+    if (ST.ishit !== 'ok') return '';
+    var rows = ishitRows(r), cur = supsOf(r.s);
+    var prev = rows.filter(function (x) { return cur.indexOf(ishitV(x, 'נכתב ע"י')) < 0; });
+    var sum = rows.length ? 'קיץ 2026' + (prev.length ? ' · ' + esc(prev.map(function (x) { return ishitV(x, 'נכתב ע"י'); }).join(', ')) : '') : 'לא נכתבה';
+    var body = rows.length ? rows.map(function (x) {
+      var by = ishitV(x, 'נכתב ע"י'), h = '<p class="small">נכתבה ע"י ' + esc(by) + (cur.indexOf(by) < 0 ? ' (המפקח.ת של בית הספר אז)' : '') +
+        ' · מתוך "תוכנית עבודה אישית למפקח לליווי בתי הספר", קיץ 2026</p>';
+      PL_SF.forEach(function (f) { var v = f[2] && ishitV(x, f[2]); if (v) h += '<h4 class="subh">' + esc(f[1]) + '</h4>' + para(v); });
+      var ms = ISHIT_M.filter(function (m) { return ishitV(x, m[0]); });
+      if (ms.length) h += '<h4 class="subh">הפעולות שתוכננו</h4>' + ms.map(function (m) {
+        return '<div class="plm"><span>' + m[1] + '</span>' + para(ishitV(x, m[0])) + '</div>';
+      }).join('');
+      return '<div class="ishit">' + h + '</div>';
+    }).join('') : '<div class="empty">לבית הספר הזה אין שורה בקובץ התוכנית האישית מקיץ 2026.</div>';
+    return sec('ishit', I.doc, 'תוכנית אישית לבית הספר', sum, body);
+  }
+  /* שורת הקובץ שממנה ממלאים: של המפקח.ת עצמו/ה אם יש, אחרת הראשונה */
+  function ishitFor(schoolName, sup) {
+    var rows = ishitRows(BY[schoolName]);
+    return rows.filter(function (x) { return ishitV(x, 'נכתב ע"י') === sup; })[0] || rows[0] || null;
+  }
+  /* שדות התוכנית האישית לבית ספר בתוכנית העבודה. undefined = עוד לא נפתח — ממלאים מהקובץ פעם אחת */
+  function planFill(sup, sc) {
+    if (sc.insight !== undefined) return sc;
+    var row = ST.ishit === 'ok' ? ishitFor(sc.name, sup) : null;
+    PL_SF.forEach(function (f) { if (f[0] !== 'actions') sc[f[0]] = row && f[2] ? ishitV(row, f[2]) : ''; });
+    sc.actions = sc.actions || [];
+    sc.from = row ? ishitV(row, 'נכתב ע"י') : '';
+    return sc;
+  }
+  function planSHas(sc) { return PL_SF.some(function (f) { return f[0] === 'actions' ? (sc.actions || []).length : sc[f[0]]; }); }
   function planEmpty(name) {
-    return { focus: [], schools: planSchoolsOf(name).map(function (s) { return { name: s.name, freq: '', focus: [] }; }),
+    return { focus: [], schools: planSchoolsOf(name).map(function (s) { return planFill(name, { name: s.name, freq: '', focus: [] }); }),
              months: PLAN_PERIODS.map(function (p) { return { period: p, items: [] }; }), roles: [], mate: '', missing: '' };
   }
   function planDraft(name) {
     if (!PD[name]) {
       var p = PLANS[name];
       PD[name] = p && p.content && p.content.months ? JSON.parse(JSON.stringify(p.content)) : planEmpty(name);
+      (PD[name].schools || []).forEach(function (sc) { planFill(name, sc); });   /* תוכנית שנשמרה לפני 13.10.26 */
     }
     return PD[name];
   }
-  function planHas(c) { return !!(c && ((c.focus || []).length || (c.months || []).some(function (m) { return (m.items || []).length; }) || c.mate)); }
+  function planHas(c) { return !!(c && ((c.focus || []).length || (c.months || []).some(function (m) { return (m.items || []).length; }) || c.mate || (c.schools || []).some(planSHas))); }
   function planState(name) {
     var p = PLANS[name];
     if (!p || !planHas(p.content)) return ['none', 'לא התחיל.ה'];
@@ -2460,7 +2511,7 @@
     h += '<h4 class="subh">שלושה מוקדים לשנה</h4>' + planTa(name, 'focus', planLines(d.focus), 3);
     h += '<h4 class="subh">בתי הספר שלי</h4><div class="plschools">' + (d.schools || []).map(function (s, i) {
       return '<div class="pls"><b>' + esc(s.name) + '</b><label>תדירות ביקור<input type="text" maxlength="80" data-pl="sfreq:' + i + '" data-plsup="' + nm + '" data-ckf="pl-sf' + i + '" value="' + esc(s.freq) + '" placeholder="למשל: אחת לחודש וחצי"></label>' +
-        planTa(name, 'sfocus:' + i, planLines(s.focus), 2, 'דגשים לשנה — שורה לכל דגש') + '</div>';
+        planTa(name, 'sfocus:' + i, planLines(s.focus), 2, 'דגשים לשנה — שורה לכל דגש') + planSForm(name, s, i) + '</div>';
     }).join('') + '</div>';
     h += '<h4 class="subh">גאנט חודשי</h4>' + (d.months || []).map(function (m, i) {
       return '<label class="plm"><span>' + esc(m.period) + '</span>' + planTa(name, 'month:' + i, planLines(m.items), 3) + '</label>';
@@ -2470,11 +2521,28 @@
     if (d.missing) h += '<p class="small"><b>תובי:</b> ' + esc(d.missing) + '</p>';
     return h;
   }
+  /* התוכנית האישית לבית הספר בתוך כרטיס בית הספר — מקופלת; פותחים כשרוצים לעבוד עליה */
+  function planSForm(name, s, i) {
+    var n = PL_SF.filter(function (f) { return f[0] === 'actions' ? (s.actions || []).length : s[f[0]]; }).length;
+    return '<details class="plx"><summary>תוכנית אישית לבית הספר<span class="small"> · ' + n + ' מתוך ' + PL_SF.length + '</span></summary>' +
+      (s.from ? '<p class="small">מולא מהתוכנית האישית מקיץ 2026 (' + esc(s.from) + '). כדאי לעדכן לתשפ״ז.</p>' : '') +
+      PL_SF.map(function (f) {
+        var act = f[0] === 'actions';
+        return '<label>' + esc(f[1]) + planTa(name, 's' + f[0] + ':' + i, act ? planLines(s.actions) : (s[f[0]] || ''), act ? 3 : 2,
+          act ? 'שורה לכל פעולה, עם החודש. למשל: אוקטובר — פגישה עם המנהל.ת והצוות המוביל' : ' ') + '</label>';
+      }).join('') + '</details>';
+  }
+  function planSView(s) {
+    return PL_SF.map(function (f) {
+      if (f[0] === 'actions') return (s.actions || []).length ? '<h4 class="subh">' + esc(f[1]) + '</h4><ul class="plv">' + s.actions.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '';
+      return s[f[0]] ? '<h4 class="subh">' + esc(f[1]) + '</h4>' + para(s[f[0]]) : '';
+    }).join('');
+  }
   function planView(d) {
     function ul(a) { return (a || []).length ? '<ul class="plv">' + a.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '<div class="empty">—</div>'; }
     return '<h4 class="subh">שלושה מוקדים לשנה</h4>' + ul(d.focus) +
       '<h4 class="subh">בתי הספר שלי</h4>' + (d.schools || []).map(function (s) {
-        return '<div class="pls"><b>' + esc(s.name) + '</b>' + (s.freq ? '<span class="small"> · ' + esc(s.freq) + '</span>' : '') + ul(s.focus) + '</div>';
+        return '<div class="pls"><b>' + esc(s.name) + '</b>' + (s.freq ? '<span class="small"> · ' + esc(s.freq) + '</span>' : '') + ul(s.focus) + planSView(s) + '</div>';
       }).join('') +
       '<h4 class="subh">גאנט חודשי</h4>' + (d.months || []).map(function (m) { return '<div class="plm"><span>' + esc(m.period) + '</span>' + ul(m.items) + '</div>'; }).join('') +
       '<h4 class="subh">ליווי בעלי תפקידים ומדריכים</h4>' + ul(d.roles) +
@@ -2506,6 +2574,8 @@
     else if (k === 'mate') d.mate = v.trim();
     else if (m[0] === 'sfreq' && d.schools[i]) d.schools[i].freq = v.trim();
     else if (m[0] === 'sfocus' && d.schools[i]) d.schools[i].focus = planArr(v);
+    else if (m[0] === 'sactions' && d.schools[i]) d.schools[i].actions = planArr(v);
+    else if (/^s(insight|challenge|questions|promote)$/.test(m[0]) && d.schools[i]) d.schools[i][m[0].slice(1)] = v.trim();
     else if (m[0] === 'month' && d.months[i]) d.months[i].items = planArr(v);
     planLater(name);
   }
@@ -2538,7 +2608,7 @@
   }
   function planGen(name) {
     var d = planDraft(name);
-    if (planHas(d) && !confirm('הטיוטה של תובי תחליף את מה שכתוב עכשיו בתוכנית (חוץ מעבודת המטה). להמשיך?')) return;
+    if (planHas(d) && !confirm('הטיוטה של תובי תחליף את מה שכתוב עכשיו בתוכנית (חוץ מעבודת המטה והתוכנית האישית לכל בית ספר). להמשיך?')) return;
     PL_GEN[name] = true; planRedraw();
     var list = planSchoolsOf(name), snap = {};
     list.forEach(function (s) { snap[s.semel] = snapOf(BY[s.name]); });
@@ -2553,7 +2623,14 @@
       (j.schools || []).forEach(function (s) { bySchool[SN.canon ? SN.canon(s.name) : s.name] = s; });
       PD[name] = {
         focus: (j.focus || []).slice(0, 5),
-        schools: list.map(function (s) { var t = bySchool[SN.canon ? SN.canon(s.name) : s.name] || {}; return { name: s.name, freq: t.freq || '', focus: t.focus || [] }; }),
+        schools: list.map(function (s) {
+          var t = bySchool[SN.canon ? SN.canon(s.name) : s.name] || {};
+          /* התוכנית האישית לבית הספר נשארת כמו שהיא — תובי לא כותב אותה (13.10.26) */
+          var old = (d.schools || []).filter(function (x) { return x.name === s.name; })[0] || {}, sc = { name: s.name, freq: t.freq || '', focus: t.focus || [] };
+          PL_SF.forEach(function (f) { if (old[f[0]] !== undefined) sc[f[0]] = old[f[0]]; });
+          if (old.from !== undefined) sc.from = old.from;
+          return planFill(name, sc);
+        }),
         months: PLAN_PERIODS.map(function (p, i) {
           var t = (j.months || []).filter(function (m) { return m.period === p; })[0] || (j.months || [])[i] || {};
           return { period: p, items: t.items || [] };
@@ -2573,7 +2650,13 @@
     function list(t, a) { out.push(t + ':'); (a || []).forEach(function (x) { out.push('• ' + x); }); out.push(''); }
     list('שלושה מוקדים לשנה', d.focus);
     out.push('בתי הספר שלי:');
-    (d.schools || []).forEach(function (s) { out.push('◦ ' + s.name + (s.freq ? ' — ' + s.freq : '')); (s.focus || []).forEach(function (x) { out.push('   • ' + x); }); });
+    (d.schools || []).forEach(function (s) {
+      out.push('◦ ' + s.name + (s.freq ? ' — ' + s.freq : '')); (s.focus || []).forEach(function (x) { out.push('   • ' + x); });
+      PL_SF.forEach(function (f) {
+        if (f[0] === 'actions') { if ((s.actions || []).length) { out.push('   ' + f[1] + ':'); s.actions.forEach(function (x) { out.push('     - ' + x); }); } }
+        else if (s[f[0]]) out.push('   ' + f[1] + ': ' + s[f[0]]);
+      });
+    });
     out.push('');
     out.push('גאנט חודשי:');
     (d.months || []).forEach(function (m) { out.push('◦ ' + m.period); (m.items || []).forEach(function (x) { out.push('   • ' + x); }); });
@@ -2590,7 +2673,11 @@
       '<h1>תוכנית עבודה תשפ״ז · ' + esc(name) + '</h1><div class="n">לפי נספח ב בהנחיות תפקיד המפקח.ת</div>';
     function ul(a) { return '<ul>' + (a || []).map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; }
     h += '<h2>שלושה מוקדים לשנה</h2>' + ul(d.focus) + '<h2>בתי הספר שלי</h2>' + (d.schools || []).map(function (s) {
-      return '<h3>' + esc(s.name) + (s.freq ? ' <span class="n">· ' + esc(s.freq) + '</span>' : '') + '</h3>' + ul(s.focus);
+      return '<h3>' + esc(s.name) + (s.freq ? ' <span class="n">· ' + esc(s.freq) + '</span>' : '') + '</h3>' + ul(s.focus) +
+        PL_SF.map(function (f) {
+          if (f[0] === 'actions') return (s.actions || []).length ? '<p class="n">' + esc(f[1]) + '</p>' + ul(s.actions) : '';
+          return s[f[0]] ? '<p><b>' + esc(f[1]) + ':</b> ' + esc(s[f[0]]) + '</p>' : '';
+        }).join('');
     }).join('') + '<h2>גאנט חודשי</h2>' + (d.months || []).map(function (m) { return '<h3>' + esc(m.period) + '</h3>' + ul(m.items); }).join('') +
       '<h2>ליווי בעלי תפקידים ומדריכים</h2>' + ul(d.roles) + '<h2>עבודת מטה</h2><p>' + esc(d.mate || '—') + '</p></body></html>';
     var w = window.open('', '_blank');
@@ -2885,6 +2972,9 @@
     K.yaad = sec('yaad', I.check, 'יעדים מהוועדה המלווה', r.yaad ? 'יש יעדים' : tag('k-goals', 'אין יעדים'),
       r.yaad ? para(r.yaad) + '<div data-tovi-insight="goals:' + esc(r.s.semel) + '"></div>'   /* תובי: תובנות להשגת היעדים (tovi.js) */
         : '<div class="empty">אין יעדים מהוועדה המלווה האחרונה בקובץ.</div>');
+
+    /* תוכנית אישית לבית הספר — קובץ המפקחים מקיץ 2026 (13.10.26). קריאה בלבד; העבודה השוטפת בתוכנית העבודה */
+    K.ishit = ishitSec(r);
 
     /* מיפוי — לפעמים שני מיפויים (שני מפקחים). החדש למעלה */
     var mp = r.mipui || [];
