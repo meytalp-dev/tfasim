@@ -312,7 +312,10 @@
     PMH_AUTH.load('pikuah-data').then(function (res) {
       var d = res && res.ok && res.data;
       if (!d || d.error) { ST.sal = ST.akl = ST.vaad = ST.tg = ST.ck = ST.plan = 'err'; return loaded('pk', false); }
-      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; r.ck = []; r.ishit = []; });
+      SCHOOLS.forEach(function (s) { var r = BY[s.name]; r.mipui = []; r.bik = []; r.yaad = ''; r.sal = null; r.akl = []; r.aklWeak = []; r.vaad = []; r.tg = []; r.ck = []; r.ishit = []; r.tich = []; });
+      /* ביקורים וועדות מתוכננים מהלו"ז של המפקח.ת (יששכר, 13.10.26) — הקרוב ראשון. לא נספרים כביקורים */
+      (d.tichnun || []).forEach(function (row) { var r = at(row); if (r) r.tich.push(row); });
+      SCHOOLS.forEach(function (s) { BY[s.name].tich.sort(function (a, b) { return String(a['תאריך']).localeCompare(String(b['תאריך'])); }); });
       /* תוכנית אישית לבית ספר (קובץ המפקחים, קיץ 2026) — 13.10.26. בשער שלפני כן אין את המפתח */
       ST.ishit = Array.isArray(d.ishit) ? 'ok' : 'err';
       (d.ishit || []).forEach(function (row) { var r = at(row); if (r) r.ishit.push(row); });
@@ -1767,7 +1770,7 @@
                 : '<span class="chip k-' + z.k + '">' + esc(z.t) + '</span>';
             }).join('') + '</div></div>' : '') +
           '<div class="card"><ul class="tabsum">' +
-          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vaad', I.doc, VD.sum], ['akl', I.chart, AK.sum], ['vis', I.doc, [ckSum(r), K.sumVis, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
+          [['ppl', I.users, ppl], ['map', I.chart, K.sumMap], ['vaad', I.doc, VD.sum], ['akl', I.chart, AK.sum], ['vis', I.doc, [ckSum(r), K.sumVis, K.sumTich, vSum].filter(Boolean).join(' · ')], ['sal', I.doc, SL.sum], ['lrn', I.book, lrn]]
             .map(function (z) {
               var lbl = TABS.filter(function (t) { return t[0] === z[0]; })[0][1];
               return '<li><button type="button" data-tab="' + z[0] + '"><span class="st">' + z[1] + esc(lbl) + '</span><span class="sum">' + (z[2] || '') + '</span><span class="go">←</span></button></li>';
@@ -1776,7 +1779,7 @@
       map: K.yaad + (K.ishit || '') + K.mipui,
       vaad: VD.body,
       akl: AK.body,
-      vis: ckSec(r) + repSec(r) + '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
+      vis: (K.tich || '') + ckSec(r) + repSec(r) + '<div data-tovi-insight="visits:' + esc(s.semel) + '"></div>' + K.bik + P.visits + P.tasks,   /* תובי: תובנות מהביקורים (tovi.js) */
       sal: SL.body + (r.sal ? '<div data-tovi-insight="sal:' + esc(s.semel) + '"></div>' : ''),   /* תובי: הסל מול הצרכים (tovi.js) */
       lrn: P.megamot + P.hisht + P.menor
     };
@@ -3011,6 +3014,16 @@
           }).join('') + '</ul>';
         }).join('');
     }
+
+    /* ביקורים וועדות מתוכננים (לו"ז המפקח.ת, 13.10.26) — רק מהיום והלאה */
+    var today = new Date(Date.now() + 3 * 36e5).toISOString().slice(0, 10);
+    var tc = (r.tich || []).filter(function (v) { return String(v['תאריך']).slice(0, 10) >= today; });
+    K.sumTich = tc.length ? 'הבא: ' + fmtDate(tc[0]['תאריך']) + ' · ' + esc(tc[0]['סוג']) : '';
+    K.tich = tc.length ? sec('tich', I.doc, 'ביקורים מתוכננים (לו"ז המפקח.ת)', (tc.length === 1 ? 'אחד' : tc.length) + ' · ' + K.sumTich,
+      '<ul class="tich">' + tc.map(function (v) {
+        return '<li><b>' + fmtDate(v['תאריך']) + '</b>' + (v['שעה'] ? ' · ' + esc(v['שעה']) : '') + ' · ' + esc(v['סוג']) +
+          (v['פירוט'] ? '<span class="small"> — ' + esc(v['פירוט']) + '</span>' : '') + '</li>';
+      }).join('') + '</ul><div class="small">' + esc(tc[0]['מקור'] || '') + '</div>') : '';
 
     /* ביקורי פיקוח מהייצוא של מונדיי (תשפ״ו וגם תחילת תשפ״ז). כל ביקור מקופל בפני עצמו */
     var bk = r.bik || [];
