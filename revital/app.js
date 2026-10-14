@@ -2161,19 +2161,23 @@
       (x.st === 'err' ? '<span class="small repbad" aria-live="polite">' + esc(x.msg) + '</span>' : '') + '</div>';
     if (!x.r) return b;
     var R = x.r;
-    b += '<div class="repout"><h4 class="subh">הדוח לטופס במונדיי</h4>' +
+    /* 14.10.26 (מיטל: "שהדוח ביקור יהיה כמו של הגמיני") — הדוח מוצג כמסמך מסודר (prot.css), עורכים ישירות בתוכו.
+       שדות הבחירה של המונדיי — מקופלים מתחת, רק בשביל ה-Excel והשמירה */
+    b += '<div class="repout">' +
       ((R.unclear || []).length ? '<div class="repwarn"><b>כדאי להשלים:</b><ul>' + R.unclear.map(function (u) { return '<li>' + esc(u) + '</li>'; }).join('') + '</ul></div>' : '') +
+      '<p class="small">אפשר לתקן כל שורה ישירות בדוח. לחיצה על תגית המצב מחליפה אותה.</p>' +
+      repDoc(r, true) +
+      '<div class="acts"><button type="button" class="btn primary sm" data-repsave="' + sm + '"' + (x.st === 'saving' ? ' disabled' : '') + '>' + I.check + (x.st === 'saving' ? 'שומר…' : 'שמירה בתובה') + '</button>' +
+      '<button type="button" class="btn sm" data-repprint="' + sm + '">' + I.doc + 'הדפסה / PDF</button>' +
+      '<button type="button" class="btn sm" data-repxl="' + sm + '">' + I.doc + 'הורדה למונדיי (Excel)</button>' +
+      '<button type="button" class="btn sm" data-repcopy="' + sm + '">' + I.doc + 'העתקה</button>' +
+      (x.saved ? '<span class="small">נשמר בתובה ' + esc(x.saved) + ' · מופיע ב"ביקורי פיקוח"</span>' : '') + '</div>' +
+      '<details class="reptype"><summary>שדות הטופס במונדיי (נוכחים, מטרות, נושאים)</summary>' +
       '<label class="repl">שם מנהל.ת בית הספר<input type="text" maxlength="120" data-ckf="rep-pr" data-repf="principal" data-repsemel="' + sm + '" value="' + esc(R.principal || '') + '"></label>' +
       '<span class="ckpl">נוכחים בביקור</span>' + repChips(sm, 'present', REP_PRESENT, R.present || []) +
       '<input type="text" class="cknote repother" maxlength="300" placeholder="נוכחים נוספים (שמות או תפקידים)" data-ckf="rep-po" data-repf="presentOther" data-repsemel="' + sm + '" value="' + esc(R.presentOther || '') + '">' +
       '<span class="ckpl">מטרות הביקור</span>' + repChips(sm, 'goals', REP_GOALS, R.goals || []) +
-      '<span class="ckpl">נושאים שעלו בביקור</span>' + repChips(sm, 'topics', REP_TOPICS, R.topics || []) +
-      '<label class="repl">סיכום הביקור<textarea rows="9" data-ckf="rep-sum" data-repf="summary" data-repsemel="' + sm + '">' + esc(R.summary || '') + '</textarea></label>' +
-      '<label class="repl">פעולות נדרשות ונושאים למעקב<textarea rows="4" data-ckf="rep-fu" data-repf="followup" data-repsemel="' + sm + '">' + esc(R.followup || '') + '</textarea></label>' +
-      '<div class="acts"><button type="button" class="btn primary sm" data-repsave="' + sm + '"' + (x.st === 'saving' ? ' disabled' : '') + '>' + I.check + (x.st === 'saving' ? 'שומר…' : 'שמירה בתובה') + '</button>' +
-      '<button type="button" class="btn sm" data-repxl="' + sm + '">' + I.doc + 'הורדה למונדיי (Excel)</button>' +
-      '<button type="button" class="btn sm" data-repcopy="' + sm + '">' + I.doc + 'העתקה</button>' +
-      (x.saved ? '<span class="small">נשמר בתובה ' + esc(x.saved) + ' · מופיע ב"ביקורי פיקוח"</span>' : '') + '</div>';
+      '<span class="ckpl">נושאים שעלו בביקור</span>' + repChips(sm, 'topics', REP_TOPICS, R.topics || []) + '</details>';
     var cks = (R.checklist || []).filter(function (c) { return ckItemText(c.id); });
     var steps = (R.steps || []).filter(function (s) { return s && s.t; });
     if (cks.length || steps.length) {
@@ -2183,20 +2187,109 @@
           return '<li><label><input type="checkbox" data-repck="' + esc(c.id) + '" data-repsemel="' + sm + '"' + (x.ck[c.id] === false ? '' : ' checked') + '> ' +
             tag(CK_ST[c.s][1], CK_ST[c.s][0]) + ' ' + esc(ckItemText(c.id)) + (c.n ? '<small>' + esc(c.n) + '</small>' : '') + '</label></li>';
         }).join('') + '</ul>' +
-        (steps.length ? '<p class="small"><b>צעדי פעולה</b> (נכנסים רק אם בצ׳ק ליסט עוד אין):</p>' + ckStepsHtml(steps) : '') +
+        (steps.length ? '<p class="small"><b>צעדי פעולה</b> (נכנסים רק אם בצ׳ק ליסט עוד אין' + (steps.length > 3 ? '; בצ׳ק ליסט יש מקום ל-3 הראשונים' : '') + '):</p>' + ckStepsHtml(steps.slice(0, 3)) : '') +
         '<div class="acts"><button type="button" class="btn sm" data-repckapply="' + sm + '">' + I.check + 'העברה לצ׳ק ליסט</button></div></details>';
     }
     return b + '</div>';
   }
   function repSec(r) {
     var x = repGet(r.s.semel);
-    return sec('rep', I_MIC, 'דוח ביקור בהקלטה', REC.semel === String(r.s.semel) && REC.st === 'rec' ? tag('bad', 'מקליט') : x.saved ? 'נשמר ' + esc(x.saved) : x.r ? tag('warn', 'טיוטה, עוד לא נשמרה') : 'מקליטים, ותובי כותב דוח בפורמט של המונדיי', repBody(r));
+    return sec('rep', I_MIC, 'דוח ביקור בהקלטה', REC.semel === String(r.s.semel) && REC.st === 'rec' ? tag('bad', 'מקליט') : x.saved ? 'נשמר ' + esc(x.saved) : x.r ? tag('warn', 'טיוטה, עוד לא נשמרה') : 'מקליטים, ותובי כותב דוח ביקור מסודר', repBody(r));
+  }
+  /* ----- הדוח כמסמך (prot.css). ed = עריכה בדף; בלי ed — להדפסה ----- */
+  var REP_ST = { ok: 'מתנהל באופן תקין', part: 'חלקי / דורש הסדרה', bad: 'חסר / דורש טיפול מיידי', info: 'לידיעה' };
+  var REP_ST_NEXT = { ok: 'part', part: 'bad', bad: 'info', info: 'ok' };
+  function repPresent(R) {
+    return (R.present || []).filter(function (p) { return p !== 'אחר'; }).concat(String(R.presentOther || '').trim() ? [String(R.presentOther).trim()] : []).join(', ');
+  }
+  function repDoc(r, ed) {
+    var x = repGet(r.s.semel), R = x.r || {}, sm = esc(r.s.semel), sup = SUPNAME || (ME && ME.name) || '';
+    function E(path, val, tg, ph, at) {
+      return '<' + tg + (at ? ' ' + at : '') + (ed ? ' contenteditable="true" data-rp="' + path + '" data-repsemel="' + sm + '"' + (ph ? ' data-ph="' + esc(ph) + '"' : '') : '') + '>' + esc(val || '') + '</' + tg + '>';
+    }
+    var areas = (R.areas || []).filter(function (a) { return a; }), steps = (R.steps || []).filter(function (s) { return s && (s.t || ed); });
+    var h = '<article class="pd" id="repDoc-' + sm + '"><div class="pd-top"><div><h1>פרוטוקול ביקור פיקוח</h1>' +
+      '<p class="pd-sub">' + esc((R.goals || []).filter(function (g) { return g !== 'אחר'; }).join(' · ') || 'ביקור פיקוח פדגוגי') + '</p></div><span class="pd-badge">דוח ביקור</span></div>' +
+      '<div class="pd-meta"><div><small>מוסד חינוכי</small><b>' + esc(r.s.name) + '</b></div><div><small>תאריך הביקור</small><b>' + esc(fmtDate(repDate(r))) + '</b></div>' +
+      '<div><small>מפקח.ת מלווה</small><b>' + esc(sup) + '</b></div><div><small>נוכחים בפגישה</small><b id="repPres-' + sm + '">' + esc(repPresent(R) || '—') + '</b></div></div>';
+    var n = 0;
+    if (R.purpose || ed) h += '<h2 class="pd-h"><span class="n">' + (++n) + '</span>מטרת הביקור ותחומי המיקוד</h2>' + E('purpose', R.purpose, 'p', 'מטרת הביקור') ;
+    if (areas.length) {
+      h += '<h2 class="pd-h"><span class="n">' + (++n) + '</span>תמונת מצב וממצאים</h2>' + areas.map(function (a, i) {
+        var st = REP_ST[a.st] ? a.st : 'info', lb = a.label || REP_ST[st];
+        return '<section class="pd-card"><div class="pd-ch">' + E('areas.' + i + '.h', a.h, 'h3', 'שם התחום') +
+          (ed ? '<button type="button" class="pd-pill ' + st + '" data-rpst="' + i + '" data-repsemel="' + sm + '" title="לחיצה מחליפה את המצב">' + esc(lb) + '</button>' : '<span class="pd-pill ' + st + '">' + esc(lb) + '</span>') +
+          '</div><ul>' + (a.points || []).map(function (p, k) {
+            return '<li>' + E('areas.' + i + '.points.' + k + '.b', p.b, 'b') + (ed || p.b ? ': ' : '') + E('areas.' + i + '.points.' + k + '.t', p.t, 'span') + '</li>';
+          }).join('') + '</ul></section>';
+      }).join('');
+    } else if (R.summary) {
+      /* טיוטה ישנה (לפני 14.10.26): סיכום בטקסט אחד */
+      h += '<h2 class="pd-h"><span class="n">' + (++n) + '</span>סיכום הביקור</h2><div class="pd-card">' +
+        (ed ? '<div contenteditable="true" data-rp="summary" data-repsemel="' + sm + '" style="white-space:pre-wrap">' + esc(R.summary) + '</div>' : '<div style="white-space:pre-wrap">' + esc(R.summary) + '</div>') + '</div>' +
+        (R.followup ? '<h2 class="pd-h"><span class="n">' + (++n) + '</span>פעולות נדרשות ונושאים למעקב</h2><div class="pd-card" style="white-space:pre-wrap">' + esc(R.followup) + '</div>' : '');
+    }
+    if (steps.length) {
+      var due = steps.some(function (s) { return s.due; });
+      h += '<h2 class="pd-h"><span class="n">' + (++n) + '</span>צעדי פעולה מחייבים עד לביקור הבא</h2><div class="pd-tw"><table class="pd-tbl"><thead><tr><th>#</th><th>תחום היעד</th><th>פירוט המשימה והמדד להצלחה</th><th>גורם אחראי</th>' +
+        (due ? '<th>עד מתי</th>' : '') + '</tr></thead><tbody>' + steps.map(function (s, i) {
+          return '<tr><td class="c-n">' + (i + 1) + '</td>' + E('steps.' + i + '.area', s.area, 'td', '', 'class="c-a" data-l="תחום"') +
+            E('steps.' + i + '.t', s.t, 'td', '', 'data-l="משימה"') + E('steps.' + i + '.who', s.who, 'td', '', 'class="c-w" data-l="אחראי"') +
+            (due ? '<td class="c-d' + (s.due ? '' : ' none') + '" data-l="עד">' + esc(s.due ? fmtDate(s.due) : '—') + '</td>' : '') + '</tr>';
+        }).join('') + '</tbody></table></div>';
+    }
+    return h + '<div class="pd-sign"><div><b>' + esc(sup) + '</b><small>מפקח.ת מלווה</small></div><div><b>הנהלת בית הספר</b><small>' + esc(r.s.name) + '</small></div></div></article>';
+  }
+  function repDocInput(el) {
+    var semel = el.getAttribute('data-repsemel'), x = repGet(semel); if (!x.r) return;
+    var p = el.getAttribute('data-rp').split('.'), o = x.r;
+    for (var i = 0; i < p.length - 1; i++) { if (o[p[i]] == null) return; o = o[p[i]]; }
+    o[p[p.length - 1]] = p[0] === 'summary' ? el.innerText.trim() : el.textContent.replace(/\s+/g, ' ').trim();
+    repKeep(semel);
+  }
+  function repStCycle(btn) {
+    var semel = btn.getAttribute('data-repsemel'), x = repGet(semel), a = x.r && (x.r.areas || [])[+btn.getAttribute('data-rpst')]; if (!a) return;
+    a.st = REP_ST_NEXT[a.st] || 'ok'; a.label = REP_ST[a.st];
+    btn.className = 'pd-pill ' + a.st; btn.textContent = a.label;
+    repKeep(semel);
+  }
+  /* prot.css כטקסט — מוטבע בחלון ההדפסה (קישור לקובץ מחלון ריק לא תמיד נטען) */
+  function protCss() {
+    var out = '';
+    [].forEach.call(document.styleSheets, function (s) {
+      if (!/prot\.css/.test(s.href || '')) return;
+      try { [].forEach.call(s.cssRules, function (r) { out += r.cssText + '\n'; }); } catch (e) {}
+    });
+    return out;
+  }
+  /* הדפסה / PDF — אותו מסמך בחלון נקי, עם prot.css ועם הצבעים של תובה */
+  function repPrint(semel) {
+    var r = BYSEMEL[semel]; if (!r || !repGet(semel).r) return;
+    var cs = getComputedStyle(document.documentElement), vars = ['--navy', '--line', '--muted', '--paper', '--ink', '--ok', '--ok-soft', '--bad', '--bad-soft', '--warn', '--warn-soft'].map(function (v) {
+      return v + ':' + cs.getPropertyValue(v).trim();
+    }).filter(function (s) { return !/:$/.test(s); }).join(';');
+    var w = window.open('', '_blank');
+    if (!w) { toast('הדפדפן חסם חלון חדש'); return; }
+    w.document.open();
+    w.document.write('<!doctype html><html lang="he" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' +
+      '<title>' + esc('פרוטוקול ביקור - ' + r.s.name + ' - ' + fmtDate(repDate(r))) + '</title>' +
+      '<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@600;700&display=swap" rel="stylesheet">' +
+      '<style>' + protCss() + '</style>' +
+      '<style>:root{' + vars + '}body{margin:0;background:#fff;font-family:Assistant,Arial,sans-serif}.wrapp{max-width:860px;margin:24px auto;padding:0 16px}@page{margin:14mm}</style></head><body><div class="wrapp">' +
+      repDoc(r, false) + '</div><script>window.onload=function(){setTimeout(function(){window.focus();window.print()},250)}<\/script></body></html>');
+    w.document.close();
   }
   function repInput(el) {
     var semel = el.getAttribute('data-reptext') || el.getAttribute('data-repsemel'), x = repGet(semel);
     if (el.hasAttribute('data-reptext')) x.text = el.value;
     else if (x.r) x.r[el.getAttribute('data-repf')] = el.value;
     repKeep(semel);
+    if (x.r && el.getAttribute('data-repf') === 'presentOther') repPresSync(semel);
+  }
+  /* הנוכחים בראש המסמך מתעדכנים בלי לבנות את הדף מחדש */
+  function repPresSync(semel) {
+    var x = repGet(semel), el = $('repPres-' + semel);
+    if (el && x.r) el.textContent = repPresent(x.r) || '—';
   }
   function repChip(btn) {
     var semel = btn.getAttribute('data-repsemel'), x = repGet(semel); if (!x.r) return;
@@ -2204,6 +2297,7 @@
     if (i > -1) a.splice(i, 1); else a.push(v);
     btn.setAttribute('aria-pressed', i < 0);
     repKeep(semel);
+    if (f === 'present') repPresSync(semel);
   }
   function repGo(semel) {
     var r = BYSEMEL[semel], x = repGet(semel);
@@ -2228,8 +2322,20 @@
     var other = String(R.presentOther || '').trim();
     var present = (R.present || []).slice();
     if (other && present.indexOf('אחר') < 0) present.push('אחר');
+    /* מ-14.10.26 הדוח בנוי ממטרה + תחומים + צעדים; לטופס במונדיי הם נכתבים כטקסט. טיוטה ישנה — summary/followup כמו שהם */
+    var summary = String(R.summary || '').trim(), followup = String(R.followup || '').trim();
+    if (R.areas) {
+      summary = [String(R.purpose || '').trim() ? 'מטרת הביקור: ' + String(R.purpose).trim() : ''].concat((R.areas || []).map(function (a) {
+        var pts = (a.points || []).filter(function (p) { return p && (p.b || p.t); }).map(function (p) { return '• ' + (p.b ? p.b + ': ' : '') + (p.t || ''); });
+        return (a.h || '') + (a.label ? ' (' + a.label + ')' : '') + ':\n' + pts.join('\n');
+      })).filter(Boolean).join('\n\n');
+      followup = (R.steps || []).filter(function (s) { return s && s.t; }).map(function (s) {
+        var tail = [s.who ? 'אחראי: ' + s.who : '', /^\d{4}-\d{2}-\d{2}$/.test(s.due || '') ? 'עד ' + fmtDate(s.due) : ''].filter(Boolean).join(', ');
+        return '- ' + (s.area ? s.area + ': ' : '') + s.t + (tail ? ' (' + tail + ')' : '');
+      }).join('\n');
+    }
     return { principal: String(R.principal || '').trim(), present: present.join(', '), goals: (R.goals || []).join(', '), topics: (R.topics || []).join(', '),
-             summary: (other ? 'נוכחים נוספים: ' + other + '\n\n' : '') + String(R.summary || '').trim(), followup: String(R.followup || '').trim() };
+             summary: (other ? 'נוכחים נוספים: ' + other + '\n\n' : '') + summary, followup: followup };
   }
   function repSave(semel, replace) {
     var r = BYSEMEL[semel], x = repGet(semel); if (!r || !x.r) return;
@@ -2420,9 +2526,9 @@
     var r = DRP ? BYSEMEL[DRP] : null, x = r ? repGet(r.s.semel) : null, live = REC.st === 'rec' || REC.st === 'send' || REC.st === 'done';
     if (live) OPENSEC.dashrep = true;   /* הקלטה פעילה — הכרטיס לא נסגר */
     var sum = REC.st === 'rec' ? tag('bad', 'מקליט') : REC.st === 'done' ? tag('warn', 'הקלטה ממתינה לשליחה') :
-      !r ? 'אחרי הביקור: מקליטים, ותובי כותב דוח בפורמט של המונדיי' : esc(r.s.name) + (x.saved ? ' · נשמר ' + esc(x.saved) : x.r ? ' · ' + tag('warn', 'טיוטה') : '');
+      !r ? 'אחרי הביקור: מקליטים, ותובי כותב דוח ביקור מסודר' : esc(r.s.name) + (x.saved ? ' · נשמר ' + esc(x.saved) : x.r ? ' · ' + tag('warn', 'טיוטה') : '');
     return sec('dashrep', I_MIC, 'דוח ביקור בהקלטה', sum,
-      '<div class="meta">אחרי הביקור: מקליטים מה היה, ותובי כותב דוח בפורמט של טופס הביקור במונדיי.</div><div class="dckpick">' +
+      '<div class="meta">אחרי הביקור: מקליטים מה היה, ותובי כותב דוח ביקור מסודר: מטרה, ממצאים לפי תחום וצעדי פעולה. אפשר להדפיס, לשמור כ-PDF ולהוריד למונדיי.</div><div class="dckpick">' +
       '<label>בית ספר<select id="drpSchool"><option value="">בחירת בית ספר…</option>' + list.map(function (s) {
         return '<option value="' + esc(s.semel) + '"' + (String(s.semel) === DRP ? ' selected' : '') + '>' + esc(s.name) + '</option>';
       }).join('') + '</select></label>' +
@@ -4058,6 +4164,10 @@
     if (t.closest('[data-recdrop]')) { if (confirm('למחוק את ההקלטה?')) { recClear(); render(); } return; }
     var rpc = t.closest('[data-repchip]');
     if (rpc) { repChip(rpc); return; }
+    var rpt = t.closest('[data-rpst]');
+    if (rpt) { repStCycle(rpt); return; }
+    var rpp = t.closest('[data-repprint]');
+    if (rpp) { repPrint(rpp.getAttribute('data-repprint')); return; }
     var rpg = t.closest('[data-repgo]');
     if (rpg) { repGo(rpg.getAttribute('data-repgo')); return; }
     var rps = t.closest('[data-repsave]');
@@ -4150,6 +4260,7 @@
     if (el && el.hasAttribute && el.hasAttribute('data-pl')) { planInput(el); return; }
     if (el && el.type !== 'date' && (el.hasAttribute && (el.hasAttribute('data-ckn') || el.hasAttribute('data-ckstep') || el.hasAttribute('data-ckpres')))) ckInput(el);
     if (el && el.hasAttribute && (el.hasAttribute('data-reptext') || el.hasAttribute('data-repf'))) repInput(el);
+    if (el && el.hasAttribute && el.hasAttribute('data-rp')) repDocInput(el);
   });
   window.addEventListener('hashchange', function () { CUR = fromHash(); side(); render(); });
 
