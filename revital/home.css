@@ -676,3 +676,11 @@ a.tile .ext{width:15px;height:15px;margin-inline-start:auto;color:var(--muted);f
 /* ביקורים מתוכננים — לו"ז המפקח.ת (13.10.26) */
 ul.tich { margin: 0 0 8px; padding: 0 18px 0 0; }
 ul.tich li { padding: 4px 0; line-height: 1.5; }
+/* סנכרון המשימות ליומן (14.10.26) */
+.calsync{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.calsync .small{margin-top:6px}
+.calsync-t{display:flex;align-items:center;gap:8px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.calsync-t svg{width:17px;height:17px}
+.calsync .acts{display:flex;flex-wrap:wrap;gap:8px}
+.calsync-how{margin:10px 0 0;padding-inline-start:18px;line-height:1.6}
+.calsync-reset{background:none;border:0;padding:0;font:inherit;color:var(--navy);text-decoration:underline;cursor:pointer}

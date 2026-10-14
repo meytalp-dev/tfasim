@@ -71,6 +71,7 @@
 
   var I = {
     home:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>',
+    cal:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
     car:   '<svg class="car" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
     phone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>',
     users: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.9.4 5 2.8 5 5.8"/></svg>',
@@ -661,6 +662,32 @@
   }
 
   /* ===== מקטע מקופל ===== */
+  /* ===== סנכרון המשימות ליומן (14.10.26, מיטל) — קישור מנוי אישי מהבית של המפקח (cal.link).
+     כל המשימות הפתוחות שלי עם תאריך, מכל בתי הספר. חד-כיווני: מתובה ליומן. גוגל מרענן כמה פעמים ביום. */
+  var CALT = '', CALBUSY = false;
+  function calSyncHtml() {
+    if (!CALT) return '<button type="button" class="btn sm" data-cal="get"' + (CALBUSY ? ' disabled' : '') + '>' + I.cal + 'סנכרון המשימות שלי ליומן</button>' +
+      '<div class="small">כל המשימות הפתוחות שלך שיש להן תאריך, מכל בתי הספר, יופיעו ביומן ויתעדכנו לבד. מחברים פעם אחת.</div>';
+    var web = CALT.replace(/^https:\/\//, 'webcal://');
+    return '<div class="calsync-t">' + I.cal + 'סנכרון המשימות שלי ליומן</div>' +
+      '<div class="acts"><a class="btn primary sm" target="_blank" rel="noopener" href="' + esc('https://calendar.google.com/calendar/render?cid=' + encodeURIComponent(web)) + '">' + I.cal + 'ליומן גוגל</a>' +
+      '<a class="btn sm" href="' + esc(web) + '">לאייפון / למק</a>' +
+      '<button type="button" class="btn sm" data-cal="copy">' + I.copy + 'העתקת הקישור (לאאוטלוק)</button></div>' +
+      '<ul class="small calsync-how"><li><b>יומן גוגל:</b> מהמחשב. נפתח חלון "להוסיף יומן?" ולוחצים "הוספה". אחרי זה היומן מופיע גם באפליקציה בטלפון.</li>' +
+      '<li><b>אייפון:</b> לוחצים מהטלפון ומאשרים "הרשמה".</li>' +
+      '<li><b>אאוטלוק:</b> מעתיקים את הקישור, ובאאוטלוק: הוספת יומן ← מהאינטרנט ← מדביקים.</li></ul>' +
+      '<div class="small">ביומן: משימה שבוצעה יורדת ותאריך שזז זז. גוגל מרענן כמה פעמים ביום, ולכן שינוי יכול להופיע אחרי כמה שעות. שינוי ביומן עצמו לא משנה את המשימה. ' +
+      'הקישור אישי: מי שמחזיק בו רואה את המשימות שלך. <button type="button" class="calsync-reset" data-cal="reset">החלפת הקישור</button></div>';
+  }
+  function calLink(reset) {
+    CALBUSY = true;
+    return fetchJson(MEF_EXEC, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'cal.link', token: token(), reset: !!reset }) }, 30000, 1).then(function (d) {
+      CALBUSY = false;
+      if (!d || !d.ok || !d.url) throw new Error(d && d.error || 'x');
+      CALT = d.url; render();
+    }).catch(function (e) { CALBUSY = false; render(); toast(String(e && e.message) === 'notregistered' ? 'החשבון לא רשום בבית של המפקח. פנו למיטל.' : 'לא הצלחנו ליצור את הקישור. נסו שוב.'); });
+  }
   function sec(key, icon, title, summary, body) {
     return '<details class="card sec" data-k="' + key + '"' + (OPENSEC[key] ? ' open' : '') + '><summary>' +
       '<span class="st">' + icon + esc(title) + '</span><span class="sum">' + summary + '</span>' + I.car + '</summary>' +
@@ -1752,6 +1779,7 @@
         return '<li><span class="li"><b>' + esc(t.title) + '</b>' + (t.owner_role ? ' · ' + esc(t.owner_role) : '') +
           '<span>' + (t.due ? tag(t.late ? '' : 'warn', 'עד ' + fmtDate(t.due)) : '') + '</span></span></li>';
       }).join('') + '</ul>' : '<div class="empty">אין משימות פתוחות לבית הספר הזה.</div>';
+      tBody += '<div class="calsync">' + calSyncHtml() + '</div>';
     }
     P.visits = sec('visits', I.doc, 'ביקורי פיקוח ודוחות', vSum, vBody);
     P.tasks = sec('tasks', I.check, 'משימות', tSum, tBody);
@@ -3974,6 +4002,17 @@
   document.addEventListener('click', function (e) {
     var t = e.target && e.target.closest ? e.target : null;
     if (!t) return;
+    var cb = t.closest('[data-cal]');
+    if (cb) {
+      var ck = cb.getAttribute('data-cal');
+      if (ck === 'get') { cb.disabled = true; calLink(false); }
+      else if (ck === 'reset') { if (confirm('להחליף את הקישור? היומן שכבר מחובר יתרוקן, וצריך לחבר מחדש.')) calLink(true).then(function () { if (CALT) toast('נוצר קישור חדש'); }); }
+      else if (ck === 'copy') {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(CALT).then(function () { toast('הקישור הועתק'); }, function () { prompt('להעתקה:', CALT); });
+        else prompt('להעתקה:', CALT);
+      }
+      return;
+    }
     var mp = t.closest('[data-mefpick]');
     if (mp) { try { localStorage.setItem('mefakeach.school', mp.getAttribute('data-mefpick')); } catch (err) {} return; }
     /* לפני data-go: כפתור שמסנן ואז עובר לרשימה */
