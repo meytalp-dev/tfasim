@@ -1874,6 +1874,24 @@
   var CK_ST = { y: ['קיים', 'ok'], p: ['חלקי', 'warn'], n: ['לא קיים', 'bad'] };
   /* נוכחים בביקור (מיטל, 8.10.26) — בעלי התפקידים מנספח א בהנחיות התפקיד + שדה חופשי. נשמר כטקסט אחד מופרד בפסיקים */
   var CK_ROLES = ['מנהל.ת', 'רכז.ת פדגוגי.ת', 'רכז.ת חניכות', 'רכז.ת חברתי.ת', 'מת״לית', 'יועצת'];
+  /* צ׳ק ליסט לפי בעל.ת תפקיד (מיטל + יששכר, 14.10.26: "כשיששכר יושב עם רכז חברתי הוא יפתח את הצ׳ק ליסט שלו").
+     אותם 30 סעיפים, כל סעיף אצל בעל.ת התפקיד שאחראי.ת עליו. רק תצוגה — הסימונים נשמרים בביקור אחד לכל תאריך.
+     מת״לית — בינתיים בלי צ׳ק ליסט משלה (מיטל) */
+  var CK_OWN = [
+    ['מנהל.ת', ['c1', 'c2', 'c3', 'c4', 'm1', 'm2', 'p2']],
+    ['רכז.ת פדגוגי.ת', ['s1', 's2', 's3', 's4', 'd1', 'd2']],
+    ['רכז.ת חניכות', ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p1']],
+    ['רכז.ת חברתי.ת', ['f1', 'f2', 'f3', 'f4', 'a1']],
+    ['יועצת', ['n1', 'n2', 'n3', 'n4', 'a2']]
+  ];
+  var CKR = '';   /* התפקיד שהצ׳ק ליסט שלו פתוח; '' = הכול */
+  try { CKR = String(localStorage.getItem('revital.ckr') || ''); } catch (e) {}
+  function ckRoleIds(role) { var x = CK_OWN.filter(function (o) { return o[0] === role; })[0]; return x ? x[1] : null; }
+  function ckProg(d) {
+    var ids = ckRoleIds(CKR);
+    if (!ids) return 'נבדקו ' + ckCount(d.marks) + ' מתוך ' + CK_N;
+    return 'נבדקו ' + ids.filter(function (k) { return d.marks[k] && d.marks[k].s; }).length + ' מתוך ' + ids.length + ' · ' + CKR;
+  }
   function ckPres(str) {
     var parts = String(str || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
     return { roles: CK_ROLES.filter(function (x) { return parts.indexOf(x) > -1; }),
@@ -1931,19 +1949,28 @@
   function ckSec(r) { return sec('ck', I.check, 'צ׳ק ליסט ביקור', ckSum(r), ckBody(r)); }
   function ckBody(r) {
     if (ST.ck !== 'ok') return pending('ck');
-    var d = ckDraft(r), sm = esc(r.s.semel), n = ckCount(d.marks);
+    var d = ckDraft(r), sm = esc(r.s.semel), own = ckRoleIds(CKR);
+    if (!own) CKR = '';
     var b = '<p class="small ckintro">לפי "צ׳ק ליסט מומלץ למפקח בביקור בית ספר מקצועי". מסמנים תוך כדי הביקור, והכול נשמר לבד. לחיצה חוזרת על סימון מבטלת אותו.</p>' +
       '<div class="ckbar"><label>תאריך הביקור<input type="date" id="ckDate" data-cksemel="' + sm + '" value="' + esc(d.date) + '" max="' + ckToday() + '"></label>' +
-      '<span class="ckprog" id="ckCount">נבדקו ' + n + ' מתוך ' + CK_N + '</span><span class="small" id="ckSaved" aria-live="polite">' +
-      (ckRowOf(r, d.date) ? 'שמור' : '') + '</span></div>';
+      '<span class="ckprog" id="ckCount">' + esc(ckProg(d)) + '</span><span class="small" id="ckSaved" aria-live="polite">' +
+      (ckRowOf(r, d.date) ? 'שמור' : '') + '</span></div>' +
+      '<div class="ckpres ckown"><span class="ckpl">עם מי יושבים? פותחים את הצ׳ק ליסט של בעל.ת התפקיד</span><div class="ckb" role="group" aria-label="הצ׳ק ליסט של">' +
+      CK_OWN.concat([['', null]]).map(function (o) {
+        var ids = o[1], done = ids ? ids.filter(function (k) { return d.marks[k] && d.marks[k].s; }).length : 0;
+        return '<button type="button" class="ckv ck-r" data-ckrt="' + esc(o[0]) + '" data-cksemel="' + sm + '" aria-pressed="' + (CKR === o[0]) + '">' +
+          (o[0] ? esc(o[0]) + ' <small>' + done + '/' + ids.length + '</small>' : 'הכול') + '</button>';
+      }).join('') + '</div></div>';
     var pr = ckPres(d.present);
     b += '<div class="ckpres"><span class="ckpl">נוכחים בביקור</span><div class="ckb">' + CK_ROLES.map(function (x) {
       return '<button type="button" class="ckv ck-r" data-ckrole="' + esc(x) + '" data-cksemel="' + sm + '" aria-pressed="' + (pr.roles.indexOf(x) > -1) + '">' + esc(x) + '</button>';
     }).join('') + '</div><input type="text" class="cknote" maxlength="300" placeholder="עוד נוכחים (שמות או תפקידים)" data-ckf="pres" data-ckpres="1" data-cksemel="' + sm + '" value="' + esc(pr.other) + '"></div>';
     CK.forEach(function (g) {
-      if (g[0] === 'd') b += '<p class="eyebrow ckmore">עוד בדיקות מומלצות לפי עקרונות החינוך היוצר</p>';
-      b += '<h4 class="subh">' + esc(g[1]) + '</h4><ul class="ckl">' + g[2].map(function (t, i) {
-        var id = g[0] + (i + 1), m = d.marks[id] || {}, showNote = m.n || d.open[id];
+      var items = g[2].map(function (t, i) { return [t, g[0] + (i + 1)]; }).filter(function (x) { return !own || own.indexOf(x[1]) > -1; });
+      if (!items.length) return;
+      if (g[0] === 'd' && !own) b += '<p class="eyebrow ckmore">עוד בדיקות מומלצות לפי עקרונות החינוך היוצר</p>';
+      b += '<h4 class="subh">' + esc(g[1]) + '</h4><ul class="ckl">' + items.map(function (x) {
+        var t = x[0], id = x[1], m = d.marks[id] || {}, showNote = m.n || d.open[id];
         return '<li data-ckli="' + id + '"><div class="ckq">' + esc(t) + '</div><div class="ckb" role="group" aria-label="סימון">' +
           ['y', 'p', 'n'].map(function (v) {
             return '<button type="button" class="ckv ck-' + v + '" data-ck="' + id + '" data-v="' + v + '" data-cksemel="' + sm + '" aria-pressed="' + (m.s === v) + '">' + CK_ST[v][0] + '</button>';
@@ -1959,8 +1986,11 @@
         '<input type="text" maxlength="80" placeholder="אחראי.ת" data-ckf="w' + i + '" data-ckstep="' + i + '" data-ckk="who" data-cksemel="' + sm + '" value="' + esc(x.who) + '">' +
         '<input type="date" aria-label="עד תאריך" data-ckf="d' + i + '" data-ckstep="' + i + '" data-ckk="due" data-cksemel="' + sm + '" value="' + esc(x.due) + '"></li>';
     }).join('') + '</ol>';
-    b += '<div class="acts"><button type="button" class="btn sm" data-ckcopy="' + sm + '">' + I.doc + 'העתקה</button>' +
-      '<button type="button" class="btn sm" data-ckprint="' + sm + '">' + I.doc + 'הדפסה</button></div>';
+    b += '<div class="acts"><button type="button" class="btn primary sm" data-ckrep="' + sm + '"' + (CKREP[r.s.semel] ? ' disabled' : '') + '>' + I.doc +
+      (CKREP[r.s.semel] ? 'תובי כותב את הדוח… (עד דקה)' : 'דוח ביקור מהצ׳ק ליסט') + '</button>' +
+      '<button type="button" class="btn sm" data-ckcopy="' + sm + '">' + I.doc + 'העתקה</button>' +
+      '<button type="button" class="btn sm" data-ckprint="' + sm + '">' + I.doc + 'הדפסה</button></div>' +
+      '<p class="small">"דוח ביקור מהצ׳ק ליסט" — תובי כותב מהסימונים, מההערות ומצעדי הפעולה (של כל בעלי התפקידים באותו ביקור) דוח ביקור מסודר. אם הביקור הוקלט באותו תאריך, גם ההקלטה נכנסת.</p>';
     /* ביקורים קודמים — כל השורות של בית הספר חוץ מזו שבעריכה, החדש ראשון */
     var past = (r.ck || []).filter(function (x) { return !(x.date === d.date && x.email === ckMe()); });
     if (past.length) {
@@ -2037,7 +2067,9 @@
     if (m.s || m.n) d.marks[id] = m; else delete d.marks[id];
     var li = btn.closest('[data-ckli]');
     Array.prototype.forEach.call(li.querySelectorAll('[data-v]'), function (x) { x.setAttribute('aria-pressed', x.getAttribute('data-v') === m.s); });
-    var c = $('ckCount'); if (c) c.textContent = 'נבדקו ' + ckCount(d.marks) + ' מתוך ' + CK_N;
+    var c = $('ckCount'); if (c) c.textContent = ckProg(d);
+    var rt = document.querySelector('[data-ckrt="' + CKR + '"] small'), ids = ckRoleIds(CKR);
+    if (rt && ids) rt.textContent = ids.filter(function (k) { return d.marks[k] && d.marks[k].s; }).length + '/' + ids.length;
     ckLater(semel);
   }
   function ckRole(btn) {
@@ -2047,6 +2079,64 @@
     ckPresSet(d, pr.roles, pr.other);
     btn.setAttribute('aria-pressed', i < 0);
     ckLater(semel);
+  }
+  /* פתיחת הצ׳ק ליסט של בעל.ת תפקיד — ובעל.ת התפקיד נכנס.ת לנוכחים בביקור */
+  function ckRt(btn) {
+    var semel = btn.getAttribute('data-cksemel'), d = CKD[semel], role = btn.getAttribute('data-ckrt');
+    CKR = role;
+    try { localStorage.setItem('revital.ckr', CKR); } catch (e) {}
+    if (d && role) {
+      var pr = ckPres(d.present);
+      if (pr.roles.indexOf(role) < 0) { pr.roles.push(role); ckPresSet(d, pr.roles, pr.other); ckLater(semel); }
+    }
+    render();
+  }
+  /* ----- דוח ביקור מהצ׳ק ליסט (14.10.26): הסימונים, ההערות והצעדים → תובי → אותו מסמך מסודר של "דוח ביקור בהקלטה".
+     הקלטה של אותו תאריך (אם יש) נכנסת יחד. הדוח נכנס לטיוטת הדוח של בית הספר, ומשם שמירה / הדפסה / מונדיי כרגיל ----- */
+  var CKREP = {};
+  function ckRepText(d) {
+    var out = ['סיכום צ׳ק ליסט הביקור (סימוני המפקח.ת: קיים / חלקי / לא קיים, והערות)'];
+    if (d.present) out.push('נוכחים: ' + d.present);
+    CK.forEach(function (g) {
+      var L = [];
+      g[2].forEach(function (t, i) {
+        var m = d.marks[g[0] + (i + 1)];
+        if (m && (m.s || m.n)) L.push('• [' + (m.s ? CK_ST[m.s][0] : 'הערה') + '] ' + t + (m.n ? ' — ' + m.n : ''));
+      });
+      if (L.length) out.push('', g[1] + ':', L.join('\n'));
+    });
+    var st = (d.steps || []).filter(function (x) { return x && x.t; });
+    if (st.length) out.push('', 'צעדי פעולה שנקבעו:', st.map(function (x) { return '- ' + x.t + (x.who ? ' (אחראי: ' + x.who + ')' : '') + (x.due ? ' עד ' + x.due : ''); }).join('\n'));
+    return out.join('\n');
+  }
+  function ckRep(semel) {
+    var r = BYSEMEL[semel], d = CKD[semel], x = repGet(semel);
+    if (!r || !d || CKREP[semel]) return;
+    if (!Object.keys(d.marks).length && !(d.steps || []).some(function (s) { return s && s.t; })) { toast('עוד לא סומן כלום בצ׳ק ליסט של הביקור הזה'); return; }
+    if (!window.TOVI_POST) { toast('תובי לא נטען בדף. רענון הדף ינסה שוב.'); return; }
+    if (x.r && !confirm('כבר יש טיוטת דוח ביקור לבית הספר הזה. להחליף אותה בדוח מהצ׳ק ליסט של ' + fmtDate(d.date) + '?')) return;
+    var text = ckRepText(d), rec = String(x.text || '').trim();
+    if (rec && (x.date || ckToday()) === d.date) text += '\n\nמה שהמפקח.ת הקליט.ה אחרי הביקור:\n' + rec;
+    CKREP[semel] = true; render();
+    var p = CK_T[semel] ? ckSave(semel) : Promise.resolve();
+    p.then(function () {
+      return window.TOVI_POST({ action: 'report', semel: String(semel), date: d.date, sup: SUPNAME || (ME && ME.name) || '', text: text.slice(0, 12000) });
+    }).then(function (res) {
+      if (res && res.ok && res.limited) throw new Error(res.message);
+      if (!res || !res.ok || !res.report) throw new Error(REP_ERR[res && res.error] || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.');
+      x.r = res.report; x.r.principal = repPrincipal(r); x.ck = {}; x.saved = ''; x.st = ''; x.date = d.date; x.fromCk = true;
+      repKeep(semel);
+      CKREP[semel] = false;
+      toast('דוח הביקור מוכן');
+      OPENSEC.rep = true;
+      if (CUR === 's:' + semel) { render(); var el = document.querySelector('details[data-k="rep"]'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      else { DRP = String(semel); try { localStorage.setItem('revital.drp', DRP); } catch (e) {} go('V'); }
+    }).catch(function (err) {
+      CKREP[semel] = false;
+      var m = String(err && err.message || '');
+      toast(/fetch|network|json/i.test(m) || !m ? 'אין חיבור לתובי כרגע. אפשר לנסות שוב.' : m);
+      render();
+    });
   }
   function ckInput(el) {
     var semel = el.getAttribute('data-cksemel'), d = CKD[semel]; if (!d) return;
@@ -2128,14 +2218,14 @@
     if (REP[semel]) return REP[semel];
     var x = null;
     try { x = JSON.parse(localStorage.getItem(repKey(semel)) || 'null'); } catch (e) {}
-    REP[semel] = x && typeof x === 'object' ? { date: x.date || '', text: String(x.text || ''), r: x.r || null, saved: x.saved || '', ck: {}, st: '' } : { date: '', text: '', r: null, saved: '', ck: {}, st: '' };
+    REP[semel] = x && typeof x === 'object' ? { date: x.date || '', text: String(x.text || ''), r: x.r || null, saved: x.saved || '', fromCk: !!x.fromCk, ck: {}, st: '' } : { date: '', text: '', r: null, saved: '', ck: {}, st: '' };
     return REP[semel];
   }
   function repKeep(semel) {
     var x = REP[semel]; if (!x) return;
     try {
       if (!x.text && !x.r && !x.date) localStorage.removeItem(repKey(semel));
-      else localStorage.setItem(repKey(semel), JSON.stringify({ date: x.date, text: x.text, r: x.r, saved: x.saved }));
+      else localStorage.setItem(repKey(semel), JSON.stringify({ date: x.date, text: x.text, r: x.r, saved: x.saved, fromCk: !!x.fromCk }));
     } catch (e) {}
   }
   /* לדוח תאריך משלו (ברירת מחדל: היום) — לא תלוי בצ׳ק ליסט */
@@ -2180,7 +2270,8 @@
       '<span class="ckpl">נושאים שעלו בביקור</span>' + repChips(sm, 'topics', REP_TOPICS, R.topics || []) + '</details>';
     var cks = (R.checklist || []).filter(function (c) { return ckItemText(c.id); });
     var steps = (R.steps || []).filter(function (s) { return s && s.t; });
-    if (cks.length || steps.length) {
+    if (x.fromCk) b += '<p class="small">הדוח נכתב מהצ׳ק ליסט של ' + esc(fmtDate(date)) + '.</p>';
+    else if (cks.length || steps.length) {
       b += '<details class="reptype repckbox"><summary>רשות: להעביר לצ׳ק ליסט של אותו ביקור (' + (cks.length + (steps.length ? 1 : 0)) + ')</summary>' +
         '<p class="small">תובי זיהה בהקלטה סעיפים מהצ׳ק ליסט. מסמנים מה להעביר; סימון שכבר קיים בצ׳ק ליסט של ' + esc(fmtDate(date)) + ' יוחלף.</p><ul class="repck">' +
         cks.map(function (c) {
@@ -2309,7 +2400,7 @@
     window.TOVI_POST({ action: 'report', semel: String(semel), date: repDate(r), sup: SUPNAME || (ME && ME.name) || '', text: x.text }).then(function (d) {
       if (d && d.ok && d.limited) throw new Error(d.message);
       if (!d || !d.ok || !d.report) throw new Error(REP_ERR[d && d.error] || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.');
-      x.r = d.report; x.r.principal = repPrincipal(r); x.ck = {}; x.saved = ''; x.st = '';
+      x.r = d.report; x.r.principal = repPrincipal(r); x.ck = {}; x.saved = ''; x.st = ''; x.fromCk = false;
       repKeep(semel);
     }).catch(function (err) {
       x.st = 'err'; x.msg = String(err && err.message || '') || 'תובי לא הצליח לכתוב את הדוח. אפשר לנסות שוב.';
@@ -4140,6 +4231,10 @@
     if (plc) { copy(planText(plc.getAttribute('data-plcopy'))); return; }
     var plp = t.closest('[data-plprint]');
     if (plp) { planPrint(plp.getAttribute('data-plprint')); return; }
+    var ckt = t.closest('[data-ckrt]');
+    if (ckt) { ckRt(ckt); return; }
+    var ckq = t.closest('[data-ckrep]');
+    if (ckq) { ckRep(ckq.getAttribute('data-ckrep')); return; }
     var ckr = t.closest('[data-ckrole]');
     if (ckr) { ckRole(ckr); return; }
     var ckb = t.closest('[data-ck]');
