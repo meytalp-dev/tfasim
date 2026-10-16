@@ -68,6 +68,15 @@
 .tovi-m{max-width:90%;border-radius:14px;padding:9px 13px;font-size:14.5px;line-height:1.5}
 .tovi-m p{margin:0 0 6px}.tovi-m p:last-child{margin:0}
 .tovi-m ul{margin:4px 0;padding-inline-start:18px}
+.tovi-m li{margin-bottom:5px;line-height:1.55}
+.tovi-m .tovi-lead,.tovi-m .tovi-chk{margin:4px 0 8px}
+.tovi-m .tovi-chk{margin-top:12px}
+/* דוח בתשובה: כותרות מודגשות עם קישור ללשונית, שורה ראשונה = השורה התחתונה (15.10.26) */
+.tovi-m.bot>p:first-child{font-weight:600}
+.tovi-m .tovi-h{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin:12px 0 2px;padding-bottom:2px;border-bottom:1px solid var(--line);color:var(--navy)}
+.tovi-m .tovi-h:first-child{margin-top:0}
+.tovi-m .tovi-go{font-size:12.5px;white-space:nowrap;text-decoration:none}
+.tovi-m .tovi-go:hover{text-decoration:underline}
 .tovi-m.me{align-self:flex-start;background:var(--navy);color:#fff;white-space:pre-wrap}
 .tovi-m.bot{align-self:flex-end;background:#fff;border:1px solid var(--line)}
 .tovi-m.err{border-color:var(--warn);background:var(--warn-soft)}

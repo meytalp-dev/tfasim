@@ -375,6 +375,8 @@
       paint();
     });
     fab.onclick = function () { open(true); };
+    /* "לפירוט ←" בנייד: סוגרים את החלונית כדי לראות את הלשונית (השיחה נשמרת) */
+    log.addEventListener('click', function (e) { if (e.target.closest('.tovi-go') && window.innerWidth < 760) open(false); });
     panel.querySelector('.tovi-x').onclick = function () { open(false); };
     resetBtn.onclick = function () { if (busy) return; H = []; OUT = filterOut(OUT); paint(); inp.focus(); };
     panel.querySelector('form').onsubmit = function (e) { e.preventDefault(); ask(inp.value); };
@@ -388,20 +390,58 @@
     document.body.classList.toggle('tovi-on', on);
     if (on) { paint(); setTimeout(function () { inp.focus(); }, 30); }
   }
-  function fmt(t) {
-    var out = '', inList = false;
+  /* כותרת בתשובה ("מיפוי:") → הלשונית שלה בעמוד בית הספר (15.10.26, מיטל: "אולי לשים קישור") */
+  var HEAD_TAB = [['מיפוי', 'map'], ['חניכות', 'map'], ['יעדים', 'map'], ['אקלים', 'akl'], ['ועדה מלווה', 'vaad'], ['מצב עדכני', 'vis'], ['ביקורים', 'vis'], ['סל', 'sal'], ['בעלי תפקידים', 'ppl'], ['השתלמויות', 'lrn']];
+  /* מקור בסוגריים בסוף שורה — אפור וקטן, כדי שהתוכן יבלוט */
+  function srcTail(s) {
+    var m = s.match(/^(.*\S)\s*(\((?:מיפוי|ביקור|ועדה|שאלון|מצב הבית|מצבת|נספח|יעדי|ספר|השתלמויות|הבית של|מנור|סל|צ׳ק|תוכנית)[^()]*\))$/);
+    return m ? esc(m[1]) + ' <span class="tovi-s" style="color:#66728f;font-size:.85em">' + esc(m[2]) + '</span>' : esc(s);
+  }
+  /* תווית בתחילת נקודה ("סיכון ·", "הוחלט:") → תג צבעוני; מה שלפני הנקודתיים → מודגש (15.10.26, מיטל: "יותר יפה וקריא").
+     סגנון inline — כדי שיישאר גם בהעתקה ובמייל */
+  var CHIP = { 'סיכון': ['#fde8e8', '#a61b1b'], 'דורש חיזוק': ['#fdf1dc', '#8a5300'], 'הוחלט': ['#e3f4ea', '#1d6b3c'], 'עלה': ['#eeeaf4', '#4a3f5c'] };
+  function item(s) {
+    var c = s.match(/^(סיכון|דורש חיזוק|הוחלט|עלה)\s*[·:]\s*(.*)$/), chip = '';
+    if (c) {
+      chip = '<span class="tovi-chip" style="display:inline-block;padding:0 7px;margin-inline-end:5px;border-radius:9px;font-size:.82em;font-weight:600;background:' +
+        CHIP[c[1]][0] + ';color:' + CHIP[c[1]][1] + '">' + esc(c[1]) + '</span>';
+      s = c[2];
+    }
+    var b = s.match(/^([^:()]{2,45}):\s+(.+)$/);
+    return chip + (b ? '<b>' + esc(b[1]) + ':</b> ' + srcTail(b[2]) : srcTail(s));
+  }
+  function fmt(t, semel) {
+    var out = '', inList = false, first = true;
     String(t || '').split('\n').forEach(function (line) {
       var m = line.match(/^\s*[-•]\s+(.*)$/);
-      if (m) { if (!inList) { out += '<ul>'; inList = true; } out += '<li>' + esc(m[1]) + '</li>'; return; }
+      if (m) { if (!inList) { out += '<ul>'; inList = true; } out += '<li>' + item(m[1]) + '</li>'; first = false; return; }
       if (inList) { out += '</ul>'; inList = false; }
-      if (line.trim()) out += '<p>' + esc(line) + '</p>';
+      if (!line.trim()) return;
+      /* השורה התחתונה (שורה ראשונה כשאחריה יש כותרות) ו"לבדיקה:" — בתיבה */
+      if (first && /\n[^\n\-•][^\n:]{1,29}:[ \t]*\n/.test('\n' + t)) {
+        first = false;
+        out += '<p class="tovi-lead" style="background:#f2ebfd;border-radius:10px;padding:8px 11px;font-weight:600">' + srcTail(line) + '</p>';
+        return;
+      }
+      first = false;
+      var chk = line.match(/^לבדיקה:\s*(.+)$/);
+      if (chk) { out += '<p class="tovi-chk" style="background:#f7f4fb;border:1px dashed #d9cfe8;border-radius:10px;padding:7px 11px"><b>לבדיקה:</b> ' + srcTail(chk[1]) + '</p>'; return; }
+      var h = line.trim().match(/^([^:]{2,30}):$/);
+      if (h) {
+        var tab = HEAD_TAB.filter(function (x) { return h[1].indexOf(x[0]) === 0; })[0];
+        out += '<p class="tovi-h"><b>' + esc(h[1]) + '</b>' +
+          (semel && tab ? '<a class="tovi-go" href="#s=' + esc(semel) + '&t=' + tab[1] + '">לפירוט ←</a>' : '') + '</p>';
+        return;
+      }
+      out += '<p>' + srcTail(line) + '</p>';
     });
     return out + (inList ? '</ul>' : '');
   }
   function answerOut(q, m) {
     var src = (m.sources || []).map(srcShort), title = 'תובי: ' + (q.length > 70 ? q.slice(0, 70) + '…' : q);
     var inner = '<p style="margin:0 0 8px;color:#66728f">השאלה: ' + esc(q) + '</p>' +
-      fmt(m.content).replace(/<ul>/g, '<ul style="margin:0;padding-right:20px">').replace(/<p>/g, '<p style="margin:0 0 6px">') +
+      fmt(m.content).replace(/<ul>/g, '<ul style="margin:0;padding-right:20px">').replace(/<p>/g, '<p style="margin:0 0 6px">')
+        .replace(/<p class="tovi-h">/g, '<p style="margin:12px 0 2px;color:#1d2b4f">') +
       (src.length ? '<p style="color:#66728f;font-size:12px;margin:8px 0 0">מקורות: ' + esc(src.join(' · ')) + '</p>' : '');
     return { subject: title, html: mailWrap(title, inner),
              text: 'השאלה: ' + q + '\n\n' + m.content + (src.length ? '\n\nמקורות: ' + src.join(' · ') : '') + '\n\nנוצר על ידי תובי · תובה' };
@@ -424,7 +464,7 @@
     if (!H.length) h += examples();
     H.forEach(function (m, i) {
       if (m.role === 'user') { lastQ = m.content; h += '<div class="tovi-m me">' + esc(m.content) + '</div>'; return; }
-      h += '<div class="tovi-m bot' + (m.err ? ' err' : '') + '">' + fmt(m.content) +
+      h += '<div class="tovi-m bot' + (m.err ? ' err' : '') + '">' + fmt(m.content, m.schools && m.schools.length === 1 ? m.schools[0] : '') +
         (m.sources && m.sources.length ? '<div class="tovi-srcs">' + m.sources.map(srcHtml).join('') + '</div>' : '') +
         (m.err ? '' : actions('m:' + i, answerOut(lastQ, m), false)) + '</div>';
     });
@@ -441,7 +481,7 @@
     var history = H.filter(function (m) { return !m.err; }).slice(-6).map(function (m) { return { role: m.role, content: m.content }; });
     H.push({ role: 'user', content: q }); inp.value = ''; busy = true; paint();
     post({ action: 'ask', question: q, history: history, semel: sc ? sc.semel : '' }).then(function (d) {
-      if (d && d.ok) H.push({ role: 'assistant', content: d.answer, sources: d.sources || [], err: !!d.limited });
+      if (d && d.ok) H.push({ role: 'assistant', content: d.answer, sources: d.sources || [], schools: d.schools || [], err: !!d.limited });
       else H.push({ role: 'assistant', content: errText(d), err: true });
     }).catch(function () {
       H.push({ role: 'assistant', content: 'אין חיבור לתובי כרגע. אפשר לנסות שוב.', err: true });
