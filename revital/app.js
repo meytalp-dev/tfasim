@@ -4393,7 +4393,9 @@
       flags: flags(r).map(function (f) { return f.t; }),
       menor: r.menor && r.menor.t ? 'נרשמו ' + r.menor.r + ' מתוך ' + r.menor.t + ' מורים' : '',
       roles: ST.nispach !== 'ok' ? '' : (!x || !x.submitted ? 'הנספח לא הוגש' :
-        'הוגש ' + x.ts + ' · ' + x.people.length + ' בעלי תפקידים' + (x.missing.length ? ' · חסרים: ' + x.missing.join(', ') : '')),
+        'הוגש ' + x.ts + ' · ' + x.people.length + ' בעלי תפקידים' + (x.missing.length ? ' · חסרים: ' + x.missing.join(', ') : '') +
+        /* שמות לפי תפקיד (16.10.26: "מי בעלי התפקידים?" → תובי ענה "אין לי נתון על שמות"). בלי טלפון ומייל */
+        (x.people.length ? '\nבעלי התפקידים: ' + x.people.map(function (q) { return shortRole(q.role) + (q.detail ? ' (' + q.detail + ')' : '') + ': ' + (q.name || 'לא צוין שם'); }).join('; ') : '')),
       mef: mef, lastMef: r.mvLast || '',
       /* מספר התלמידים (12.10.26) — לשאלות רוחב בתובי ("בתי ספר קטנים") */
       st: String(studentsOf(r) || ''),
