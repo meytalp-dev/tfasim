@@ -29,6 +29,10 @@
      דף מלווה אחד במקום אחד). נבנה ב-build_comp01.py (תיקיית _build של מפגשי השגרירים).
      שדות הדף המלווה שבגיליון למפגש הזה הועברו לארכיון ולא מוצגים. */
   var EXT_PAGE = { 1: "mifgash-01/" };
+  /* 17.10.26: מפגש 2 — רק במסלול הכלים. במסלול ההובלה נשאר הדף המלווה הקיים */
+  Object.defineProperty(EXT_PAGE, 2, { enumerable: true, get: function () {
+    return (S && S.me && str(S.me.track) === "הובלה") ? undefined : "mifgash-02/";
+  } });
   /* משאבי המפגש שמובנים במערכת (3.10.26: "הכול במקום אחד"). נוספים לחומרים שבגיליון.
      [כותרת, שורת הסבר, כתובת]. אותה רשימה ב-admin.js (שם הקישורים במצב בדיקה). */
   function sessionRes(num) {
@@ -42,7 +46,9 @@
   }
   function extPageUrl(num, view) {
     var u = EXT_PAGE[num];
-    return u ? u + "?v=" + (view || "comp") + "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k") : "";
+    /* 17.10.26: המפתח האישי עובר אחרי # (לא נשלח לשרת), כדי שהדשבורד ייפתח בתוך הדף המלווה בלי כניסה נוספת */
+    var tk = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
+    return u ? u + "?v=" + (view || "comp") + "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k") + (tk ? "#k=" + encodeURIComponent(tk) : "") : "";
   }
 
   /* חמש הפעימות של תבנית המפגש (סעיף 3 באפיון). במפגש 1 הראשונה היא "פתיחה". */
