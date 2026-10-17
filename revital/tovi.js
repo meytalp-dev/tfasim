@@ -8,7 +8,7 @@
    הנתונים לא נשמרים בדף ולא בדפדפן — השרת של תובי מאמת את הטוקן מול השער ומסנן לפי בתי הספר של המחובר.ת.
    השיחה נשמרת רק בזיכרון של הלשונית; "שיחה חדשה" מנקה אותה. */
 (function () {
-  var TOVI_EXEC = 'https://script.google.com/macros/s/AKfycbxGnq5H1y9ubpgUCXRSE5T8aSNVPtEf-15RitWu2UofCvLszICoEUEzAFXpXEaOJzQg/exec';
+  var TOVI_EXEC = 'https://script.google.com/macros/s/AKfycbyPIgTKy0onNXTOSkd-kr4vyGAzWeVlFHe8oWMS9K7pMTIJPNofFcbKAqcX91lamk-xrA/exec';
   /* TOVI_OPEN = תובי מוצג לכל מי שנכנס.ה לתובה (מיטל, 7.10.26: "הקישור לא יישלח למפקחים עד שאבדוק").
      false = רק מי שנכנס.ה פעם אחת עם ?tovi=1 — מתג חירום אם צריך להסתיר מהר */
   var TOVI_OPEN = true;
