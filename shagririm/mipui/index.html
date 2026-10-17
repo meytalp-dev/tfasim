@@ -664,6 +664,11 @@
 
     h += whoTable(rows);
 
+    // 17.10.26: קובץ בלי שמות ובלי תשובות פתוחות, שורה לכל מורה, לשאלות הצלבה ב-Gemini (מפגש 2)
+    h += '<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0"><svg class="i"><use href="#i-spark"/></svg>לשאול את הנתונים</h3>' +
+      '<button class="btn pri sm" id="csvB"><svg class="i"><use href="#i-copy"/></svg>הורדת התשובות בלי שמות</button></div>' +
+      '<p class="note">קובץ עם שורה לכל מורה, בלי שמות ובלי התשובות הפתוחות. מעלים אותו ל-Gemini, עדיף בחשבון של בית הספר, ושואלים שאלות שהדשבורד לא עונה עליהן. למשל: מי משתמש/ת כל יום אבל לא הביא/ה AI לכיתה, ובאיזה תחום?</p></div>';
+
     var help = rows.map(function (x) { return x.help; }).filter(Boolean);
     var story = rows.map(function (x) { return x.story; }).filter(Boolean);
     var words = topWords(help.concat(story));
@@ -683,6 +688,23 @@
     box.querySelectorAll('.more-b').forEach(function (btn) {
       btn.onclick = function () { btn.parentNode.querySelectorAll('[data-more]').forEach(function (e) { e.hidden = false; }); btn.remove(); };
     });
+    var csvB = document.getElementById('csvB');
+    if (csvB) csvB.onclick = function () {
+      var cols = [];
+      SV.questions.forEach(function (q) {
+        if (q.id === 'name' || q.type === 'text') return;
+        if (q.type === 'grid') { q.items.forEach(function (it) { cols.push({ h: it.he + ' (1-5)', v: function (x) { return x[it.id] == null ? '' : x[it.id]; } }); }); return; }
+        cols.push({ h: q.q.he, v: function (x) { var a = x[q.id]; if (Array.isArray(a)) return a.map(function (o) { return label(q.id, o); }).join(' | '); return a == null || a === '' ? '' : (q.opts ? label(q.id, a) : a); } });
+        if (q.id === 'subj') cols.push({ h: 'מגמה', v: function (x) { return x.megama || ''; } });
+      });
+      var esc = function (s) { s = String(s); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+      var lines = [['מס׳', 'תאריך'].concat(cols.map(function (c) { return c.h; })).map(esc).join(',')];
+      rows.forEach(function (x, i) { lines.push([i + 1, x.date || ''].concat(cols.map(function (c) { return c.v(x); })).map(esc).join(',')); });
+      var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+      var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'מיפוי-צוות-בלי-שמות.csv';
+      document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+      toast('הקובץ ירד. עכשיו מעלים אותו ל-Gemini');
+    };
     var aiB = document.getElementById('aiB');
     if (aiB) aiB.onclick = function () {
       var c = counts(rows, 'block');
