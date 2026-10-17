@@ -42,6 +42,14 @@
       ["השאלון שלי כרכז/ת", "ממלאים בעצמכם במפגש. אותו שאלון שיוצא לצוות", "mipui/q.html?s=rk-" + tr],
       ["מיפוי הצוות שלי", "הקישור לשאלון של הצוות, ההודעה לשליחה והדשבורד של בית הספר", "mipui/" + (tk ? "?k=" + encodeURIComponent(tk) : "")]
     ];
+    /* 17.10.26: כלי מפגש 2, מסלול הכלים בלבד */
+    if (num === 2 && tr === "k") return [
+      ["הדשבורד של בית הספר", "מיפוי הצוות: הורדת התשובות בלי שמות, והכנה לניתוח AI", "mipui/" + (tk ? "?k=" + encodeURIComponent(tk) : "")],
+      ["קובץ הדוגמה", "תשובות בדויות של בית ספר לדוגמה, בלי שמות. למי שבלי מספיק תשובות", "mipui/dugma-bli-shmot.csv"],
+      ["Gemini", "שואלים את הנתונים: מעלים את הקובץ ומדביקים פרומפט", "https://gemini.google.com/app"],
+      ["NotebookLM (היום: Gemini Notebook)", "מה המורים כתבו: נושאים, פרסונות ורעיונות, עם מקור לכל משפט", "https://notebooklm.google.com/"],
+      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
+    ];
     return [];
   }
   function extPageUrl(num, view) {

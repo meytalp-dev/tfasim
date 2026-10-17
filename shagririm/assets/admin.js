@@ -32,6 +32,14 @@
       ["השאלון של הרכזים · מסלול " + tr, "הרכזים ממלאים במפגש. אצלך נפתח במצב בדיקה ולא נספר", "mipui/q.html?s=rk-" + t + "&test=1"],
       ["מיפוי הצוות", "אצל הרכזים: הדף של בית הספר שלהם. אצלך: מבט-על על כל בתי הספר", "mipui/"]
     ];
+    /* 17.10.26: כלי מפגש 2, מסלול הכלים בלבד (אותה רשימה כמו ב-shell.js) */
+    if (Number(num) === 2 && t === "k") return [
+      ["הדשבורד של בית הספר", "אצל הרכזים: הדף של בית הספר שלהם. אצלך: מבט-על", "mipui/"],
+      ["קובץ הדוגמה", "תשובות בדויות של בית ספר לדוגמה, בלי שמות", "mipui/dugma-bli-shmot.csv"],
+      ["Gemini", "שואלים את הנתונים: מעלים את הקובץ ומדביקים פרומפט", "https://gemini.google.com/app"],
+      ["NotebookLM (היום: Gemini Notebook)", "מה המורים כתבו: נושאים, פרסונות ורעיונות", "https://notebooklm.google.com/"],
+      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
+    ];
     return [];
   }
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
