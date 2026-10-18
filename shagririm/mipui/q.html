@@ -26,7 +26,7 @@
 
 <div class="qwrap">
   <div class="qtop">
-    <img src="../assets/logo-kehila.png" alt="שגרירי חדשנות טכנולוגית">
+    <img id="topLogo" src="../assets/logo-kehila.png" alt="שגרירי חדשנות טכנולוגית">
     <div class="sch"><b id="schName"></b><span id="schSub"></span></div>
     <button class="lang" id="langBtn" type="button"><svg class="i" style="width:16px;height:16px"><use href="#i-globe"/></svg><span></span></button>
   </div>
@@ -34,8 +34,8 @@
 </div>
 
 <footer class="mf">
-  <img src="../assets/logo-minhal.png" alt="משרד העבודה · המנהל להכשרה מקצועית">
-  <div>שגרירי חדשנות טכנולוגית · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <img id="footLogo" src="../assets/logo-minhal.png" alt="משרד העבודה · המנהל להכשרה מקצועית">
+  <div id="footText">שגרירי חדשנות טכנולוגית · המנהל להכשרה מקצועית · משרד העבודה</div>
   <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
 </footer>
 
@@ -48,7 +48,16 @@
   var S = P.get('s') || '';
   var TEST = P.get('test') === '1';
   var SV = MIPUI_SURVEY;
-  var lang = P.get('lang') === 'ar' ? 'ar' : (mStore('mipui_lang') || 'he');
+  var BR = (typeof MIPUI_BRAND !== 'undefined' && MIPUI_BRAND[S]) || null;
+  var lang = BR ? 'he' : (P.get('lang') === 'ar' ? 'ar' : (mStore('mipui_lang') || 'he'));
+  if (BR) { // השתלמות של לרני: בלי מיתוג המשרד והקהילה, בלי ערבית
+    var tl = document.getElementById('topLogo');
+    if (BR.logo) { tl.src = BR.logo; tl.alt = MIPUI_SCHOOLS[S] || ''; } else tl.remove();
+    document.getElementById('langBtn').style.display = 'none';
+    var fl = document.getElementById('footLogo');
+    fl.src = 'learni-logo.png'; fl.alt = 'לרני'; fl.style.height = '48px';
+    document.getElementById('footText').textContent = 'השתלמות צוות: הטמעה ושינוי בעידן ה-AI · לרני';
+  }
   var DONE_KEY = 'mipui_done_' + S + '_' + SV.id;
   var QKEY = 'mipui_queue';
   var app = document.getElementById('app');
@@ -132,7 +141,7 @@
       document.getElementById('againB').onclick = function () { mStore(DONE_KEY, null); render(); };
       return;
     }
-    app.innerHTML = '<div class="qstart"><h1>' + mEsc(L(SV.title)) + '</h1><p>' + mEsc(L(SV.intro)) + '</p>' +
+    app.innerHTML = '<div class="qstart"><h1>' + mEsc(L(SV.title)) + '</h1><p>' + mEsc(BR && BR.intro ? L({ he: BR.intro }) : L(SV.intro)) + '</p>' +
       '<div class="meta"><span><svg class="i"><use href="#i-clock"/></svg>' + t('min') + '</span></div>' +
       (TEST ? '<div class="testbar">' + t('test') + '</div>' : '') +
       '<div><button class="btn pri" id="go" style="min-width:180px">' + t('start') + '</button></div></div>';
