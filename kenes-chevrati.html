@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>מעקב הרשמה · כנס רכזים חברתיים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M9 11l3 3 8-8'/><path d='M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Rubik:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#16203c;--blue:#224292;--blue2:#2f6bff;--soft:#eef3ff;--line:#e3e8f2;--muted:#5d6782;--bg:#f6f8fc;--ok:#1f7a4d;--ok-soft:#e8f6ee;--warn:#a5520c;--warn-soft:#fff3e4}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--navy);font-family:Assistant,Arial,sans-serif;font-size:16px;line-height:1.6}
+.strip{height:5px;background:linear-gradient(90deg,var(--blue),#5fb4ff,var(--blue))}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 40px}
+h1{font-family:Rubik,Assistant,sans-serif;font-size:26px;line-height:1.3;margin:0 0 6px;color:var(--blue)}
+.meta{color:var(--muted);font-size:15px;margin:0 0 14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(22,32,60,.05)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid #c9d6ff;background:var(--soft);color:var(--blue);border-radius:10px;padding:7px 14px;font:600 15px Assistant,sans-serif;cursor:pointer;text-decoration:none}
+.btn.main{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn svg{width:17px;height:17px;flex:none}
+.big{font-family:Rubik,sans-serif;font-size:34px;font-weight:700;color:var(--blue);line-height:1}
+.big small{font-size:17px;color:var(--muted);font-weight:600}
+.bar{height:9px;background:#eef1f7;border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--blue2));border-radius:99px}
+.sub{color:var(--muted);font-size:14.5px}
+details.fold{background:#fff;border:1px solid var(--line);border-radius:16px;margin-bottom:12px;overflow:hidden}
+details.fold>summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:10px;font:700 17px Rubik,Assistant,sans-serif;flex-wrap:wrap}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary .chev{margin-inline-start:auto;transition:transform .2s;color:var(--muted)}
+details.fold[open]>summary .chev{transform:rotate(180deg)}
+.tag{font:600 13.5px Assistant,sans-serif;border-radius:99px;padding:2px 10px}
+.tag.ok{background:var(--ok-soft);color:var(--ok)}.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.body{border-top:1px solid var(--line);padding:14px 18px}
+ul.list{list-style:none;margin:12px 0 0;padding:0;columns:2;column-gap:24px}
+ul.list li{break-inside:avoid;padding:6px 0;border-bottom:1px solid #f0f2f7}
+ul.list li span{display:block;color:var(--muted);font-size:13.5px}
+.person{border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin-top:10px}
+.person b{font-size:16.5px}
+.person .row{color:var(--muted);font-size:14.5px}
+.person .note{margin-top:6px;background:#fffbea;border-radius:8px;padding:6px 10px;font-size:15px;white-space:pre-wrap}
+.empty,.loading{color:var(--muted);text-align:center;padding:26px 10px}
+.err{color:#b42318}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;border-radius:10px;padding:9px 18px;font-size:15px;z-index:9}
+.credit{text-align:center;color:var(--muted);font-size:13.5px;padding:0 16px 24px}
+.credit a{color:var(--blue);text-decoration:none}
+@media (max-width:620px){h1{font-size:22px}ul.list{columns:1}}
+</style>
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+</head>
+<body>
+<div class="strip"></div>
+<div class="wrap">
+  <h1>מעקב הרשמה · כנס פתיחת שנה לרכזים חברתיים</h1>
+  <p class="meta">יום רביעי <bdi dir="ltr">21.10</bdi> · <bdi dir="ltr">9:00–15:00</bdi> · מיי קמפוס, רחוב הלח"י 21, בני ברק</p>
+  <div class="card acts">
+    <a class="btn main" id="formLink" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3h7v7"/><path d="M10 14L21 3"/><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/></svg>לטופס ההרשמה</a>
+    <button type="button" class="btn" data-copy="link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>העתקת הקישור לטופס</button>
+    <button type="button" class="btn" id="refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>רענון</button>
+  </div>
+  <div id="main"><div class="loading">טוען…</div></div>
+</div>
+<div id="toast" hidden></div>
+<div class="credit">המנהל להכשרה מקצועית · משרד העבודה · נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></div>
+
+<script src="https://pedagogiamh.co.il/school-names.js"></script>
+<script>
+(function () {
+  "use strict";
+  var FORM_ID = "kenes-chevrati";
+  var EXEC = "https://script.google.com/macros/s/AKfycbylxc_Y8ozHXD7a2qQH1ICT-68ctUpvyARL2jNazaSOj1GxygU3zI8flb2xNndvGLMe/exec";
+  var MOSDOT = "https://pedagogiamh.co.il/data/mosdot.json";
+  var FORM_URL = "https://tfasim.pedagogiamh.co.il/f.html?id=" + FORM_ID;
+  var SN = window.SchoolNames || { canon: function (n) { return n; } };
+  var LISTS = { link: FORM_URL };
+  var CHEV = '<svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>';
+  var COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  $("formLink").href = FORM_URL;
+
+  function token() {
+    var keys = ["localStorage", "sessionStorage"];
+    for (var i = 0; i < keys.length; i++) {
+      try { var s = JSON.parse(window[keys[i]].getItem("pmh_auth") || "null"); if (s && s.token && s.exp > Date.now()) return s.token; } catch (e) {}
+    }
+    return "";
+  }
+  /* הגיליון מוריד אפס מוביל מטלפון */
+  function phoneOf(v) {
+    var s = String(v || "").replace(/[^\d+]/g, "");
+    if (s.indexOf("+972") === 0) s = "0" + s.slice(4);
+    if (/^5\d{8}$/.test(s)) s = "0" + s;
+    if (/^05\d{8}$/.test(s)) return s.slice(0, 3) + "-" + s.slice(3);
+    return String(v || "");
+  }
+  function fdate(v) {
+    var d = new Date(v); if (isNaN(d)) return "";
+    return d.toLocaleDateString("he-IL", { day: "numeric", month: "numeric" }) + " " + d.toLocaleTimeString("he-IL", { hour: "2-digit", minute: "2-digit" });
+  }
+  function sups(s) { return (s.sups && s.sups.length ? s.sups : [s.sup]).filter(Boolean).join(", "); }
+  function toast(t) { var el = $("toast"); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(function () { el.hidden = true; }, 2200); }
+  function copy(text) {
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { toast("הועתק"); }, fb); else fb();
+    function fb() {
+      var ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); toast("הועתק"); } catch (e) {} document.body.removeChild(ta);
+    }
+  }
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-copy]"); if (b) copy(LISTS[b.getAttribute("data-copy")] || "");
+  });
+  $("refresh").onclick = load;
+
+  function fold(title, tagHtml, inner, open) {
+    return '<details class="fold"' + (open ? " open" : "") + '><summary>' + title + " " + tagHtml + CHEV + '</summary><div class="body">' + inner + "</div></details>";
+  }
+  function nSchools(n) { return n === 1 ? 'בית ספר אחד' : n + ' בתי ספר'; }
+  function copyBtn(key, label) { return '<button type="button" class="btn" data-copy="' + key + '">' + COPY + label + "</button>"; }
+
+  function render(schools, rows) {
+    var col = function (r, k) { return r[k] == null ? "" : String(r[k]).trim(); };
+    var by = {};
+    rows.forEach(function (r) { var n = SN.canon(col(r, "בית ספר")); (by[n] = by[n] || []).push(r); });
+    var done = schools.filter(function (s) { return by[s.name]; });
+    var miss = schools.filter(function (s) { return !by[s.name]; });
+    var pct = schools.length ? Math.round(done.length / schools.length * 100) : 0;
+
+    var h = '<div class="card"><div class="big">' + done.length + ' <small>מתוך ' + schools.length + ' בתי ספר נרשמו</small></div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+      '<div class="sub">' + rows.length + ' נרשמים בסך הכול</div></div>';
+
+    LISTS.miss = ["בית ספר\tמפקח.ת"].concat(miss.map(function (s) { return s.name + "\t" + sups(s); })).join("\n");
+    h += fold("טרם נרשמו", '<span class="tag warn">' + nSchools(miss.length) + '</span>',
+      miss.length ? '<div class="acts">' + copyBtn("miss", "העתקת הרשימה") + '</div><ul class="list">' +
+        miss.map(function (s) { return "<li>" + esc(s.name) + "<span>" + esc(sups(s)) + "</span></li>"; }).join("") + "</ul>"
+        : '<div class="empty">כל בתי הספר נרשמו.</div>');
+
+    LISTS.done = ["בית ספר\tנרשמים"].concat(done.map(function (s) { return s.name + "\t" + by[s.name].length; })).join("\n");
+    h += fold("נרשמו", '<span class="tag ok">' + nSchools(done.length) + '</span>',
+      done.length ? '<div class="acts">' + copyBtn("done", "העתקת הרשימה") + '</div><ul class="list">' +
+        done.map(function (s) { return "<li>" + esc(s.name) + "<span>" + by[s.name].length + " נרשמים · " + esc(sups(s)) + "</span></li>"; }).join("") + "</ul>"
+        : '<div class="empty">עדיין אין נרשמים.</div>');
+
+    var sorted = rows.slice().sort(function (a, b) { return String(b["חותמת זמן"]).localeCompare(String(a["חותמת זמן"])); });
+    var head = ["נרשם/ה", "בית ספר", "שם מלא", "טלפון נייד", "מייל", "תפקיד", "בקשות / הערות"];
+    LISTS.people = [head.join("\t")].concat(sorted.map(function (r) {
+      return [fdate(r["חותמת זמן"]), SN.canon(col(r, "בית ספר")), col(r, "שם מלא"), phoneOf(r["טלפון נייד"]), col(r, "מייל"), col(r, "תפקיד"), col(r, "בקשות / הערות").replace(/\s+/g, " ")].join("\t");
+    })).join("\n");
+    var notes = rows.filter(function (r) { return col(r, "בקשות / הערות"); }).length;
+    h += fold("פירוט הנרשמים", '<span class="tag ok">' + rows.length + "</span>" + (notes ? ' <span class="tag warn">' + notes + " עם בקשות</span>" : ""),
+      rows.length ? '<div class="acts">' + copyBtn("people", "העתקה לאקסל") + "</div>" + sorted.map(function (r) {
+        var ph = phoneOf(r["טלפון נייד"]), note = col(r, "בקשות / הערות");
+        return '<div class="person"><b>' + esc(col(r, "שם מלא")) + "</b> · " + esc(SN.canon(col(r, "בית ספר"))) +
+          '<div class="row">' + esc(col(r, "תפקיד")) + (ph ? ' · <a href="tel:' + esc(ph.replace(/-/g, "")) + '" dir="ltr">' + esc(ph) + "</a>" : "") +
+          (col(r, "מייל") ? ' · <bdi dir="ltr">' + esc(col(r, "מייל")) + "</bdi>" : "") + " · נרשם/ה " + esc(fdate(r["חותמת זמן"])) + "</div>" +
+          (note ? '<div class="note">' + esc(note) + "</div>" : "") + "</div>";
+      }).join("") : '<div class="empty">עדיין אין נרשמים.</div>');
+
+    $("main").innerHTML = h;
+  }
+
+  function load() {
+    $("main").innerHTML = '<div class="loading">טוען את הנרשמים…</div>';
+    Promise.all([
+      fetch(MOSDOT).then(function (r) { return r.json(); }),
+      fetch(EXEC, { method: "POST", body: JSON.stringify({ action: "admin", token: token() }) }).then(function (r) { return r.json(); })
+    ]).then(function (res) {
+      var schools = res[0].schools || [], d = res[1];
+      if (!d || !d.ok) {
+        if (d && d.error === "noauth") { $("main").innerHTML = '<div class="card empty err">אין הרשאת צפייה בנרשמים. הדף פתוח לאדמין בלבד.</div>'; return; }
+        throw new Error((d && d.error) || "fail");
+      }
+      var f = (d.forms || []).filter(function (x) { return x.id === FORM_ID; })[0];
+      if (!f) throw new Error("noform");
+      render(schools, f.rows || []);
+    }).catch(function (err) {
+      $("main").innerHTML = '<div class="card empty err">לא הצלחתי לטעון את הנתונים (' + esc(err.message) + '). נסו "רענון".</div>';
+    });
+  }
+  if (token()) load(); else document.addEventListener("pmh:in", load);
+})();
+</script>
+</body>
+</html>
