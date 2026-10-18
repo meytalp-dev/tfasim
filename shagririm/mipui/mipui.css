@@ -128,3 +128,55 @@ table.t tr.clk:hover td { background: #F6F9FC; }
   .bar { grid-template-columns: 110px 1fr 44px; }
   .ctop .who { margin-inline-start: 0; width: 100%; }
 }
+
+/* ---------- מראה השאלון (18.10.26): "סטורי צבעוני" + אריחים לבחירה מרובה ----------
+   כל שאלה בבלוק צבע משלה (מתחלף לפי #app[data-i]), תשובות עם אותיות א-ב-ג.
+   חל רק על דפי השאלון (q.html, f.html) — כל הכללים תחת .qwrap או body:has(.qwrap). */
+.qwrap { --k0: #1D6FA5; --k1: #C2620C; --k2: #243F93; --k3: #2E7D7B; --k4: #A23E6B; --ink: #111C27; --k: var(--k0); }
+body.br-learni .qwrap { --k0: #D9518F; --k1: #1689A5; --k2: #E0763F; --k3: #8A4FB0; --k4: #2A9A8F; }
+.qwrap #app[data-i="1"] { --k: var(--k1); } .qwrap #app[data-i="2"] { --k: var(--k2); }
+.qwrap #app[data-i="3"] { --k: var(--k3); } .qwrap #app[data-i="4"] { --k: var(--k4); }
+body:has(.qwrap) { background: #fff; color: #111C27; }
+.qwrap, body:has(.qwrap) footer.mf { font-family: Heebo, Assistant, Arial, sans-serif; }
+.qwrap .qtop .sch b { font-weight: 800; color: var(--ink); }
+.qwrap .stories { gap: 5px; }
+.qwrap .stories i { height: 6px; background: #ECEEF1; }
+.qwrap .stories i.f { background: var(--k); }
+.qwrap .qcount { font-weight: 700; color: var(--k); }
+.qwrap .qbody { gap: 9px; }
+.qwrap .qq { font-family: 'Suez One', Rubik, serif; font-weight: 400; font-size: 1.6rem; line-height: 1.25; color: #fff; background: var(--k);
+  border-radius: 22px; padding: 26px 22px 30px; margin-bottom: 8px; position: relative; overflow: hidden; }
+.qwrap .qq::after { content: ""; position: absolute; width: 150px; height: 150px; border-radius: 50%; inset-inline-end: -50px; bottom: -70px; background: rgba(255,255,255,.14); }
+.qwrap .qq::before { content: ""; position: absolute; width: 60px; height: 60px; border-radius: 50%; inset-inline-end: 60px; top: -30px; background: rgba(255,255,255,.1); }
+.qwrap .qhint { color: var(--k); font-weight: 700; margin-top: 0; }
+.qwrap .qbody [role="radiogroup"], .qwrap .qbody [role="group"] { counter-reset: o; gap: 7px !important; }
+.qwrap .opt { counter-increment: o; border: 0; background: #F3F4F6; border-radius: 16px; padding: 11px 12px; min-height: 54px; font-weight: 500; transition: background .15s; }
+.qwrap .opt:hover { background: color-mix(in srgb, var(--k) 10%, #fff); }
+.qwrap .opt .mk { width: 32px; height: 32px; border-radius: 10px !important; border: 0; background: #fff; color: var(--k); font-weight: 800; font-size: .95rem; }
+.qwrap .opt .mk::before { content: counter(o, hebrew); }
+html[lang="ar"] .qwrap .opt .mk::before { content: counter(o, arabic-indic); }
+.qwrap .opt.on { background: color-mix(in srgb, var(--k) 14%, #fff); font-weight: 700; }
+.qwrap .opt.on .mk { background: var(--k); color: #fff; }
+.qwrap .opt.on .mk::after { display: none; }
+/* בחירה מרובה עם 5 אפשרויות ומעלה: אריחים בשתי עמודות, פחות גלילה */
+.qwrap .qbody [role="group"]:has(> .opt:nth-child(5)) { display: grid !important; grid-template-columns: 1fr 1fr; }
+.qwrap [role="group"]:has(> .opt:nth-child(5)) .opt { flex-direction: column; justify-content: center; text-align: center; gap: 7px; min-height: 88px; padding: 12px 8px; }
+.qwrap .scale button { border: 0; background: #F3F4F6; border-radius: 16px; font-family: 'Suez One', Rubik, serif; font-weight: 400; color: var(--ink); }
+.qwrap .scale button.on { background: var(--k); color: #fff; }
+.qwrap .gitem { border-bottom: 0; background: #F8F9FA; border-radius: 16px; padding: 12px; margin-bottom: 4px; }
+.qwrap textarea.qt, .qwrap input.qt { border: 0; background: #F3F4F6; border-radius: 16px; }
+.qwrap textarea.qt:focus, .qwrap input.qt:focus { outline: 3px solid color-mix(in srgb, var(--k) 40%, #fff); }
+.qwrap .btn { border-radius: 16px; border: 0; background: #F3F4F6; }
+.qwrap .btn.pri { background: var(--k); }
+.qwrap .btn.pri:disabled { opacity: .3; }
+.qwrap .qnav { background: linear-gradient(to top, #fff 75%, transparent); }
+.qwrap .qstart h1 { font-family: 'Suez One', Rubik, serif; font-weight: 400; font-size: 2.3rem; color: #fff; background: var(--k0); border-radius: 26px; padding: 34px 24px 40px; position: relative; overflow: hidden; }
+.qwrap .qstart h1::after { content: ""; position: absolute; width: 180px; height: 180px; border-radius: 50%; inset-inline-end: -60px; bottom: -90px; background: var(--k1); opacity: .9; }
+.qwrap .qstart h1::before { content: ""; position: absolute; width: 70px; height: 70px; border-radius: 50%; inset-inline-end: 90px; top: -34px; background: var(--k2); opacity: .8; }
+.qwrap #app[data-i="d"] .qstart h1 { background: none; color: var(--ink); padding: 0; }
+.qwrap #app[data-i="d"] .qstart h1::before, .qwrap #app[data-i="d"] .qstart h1::after { display: none; }
+.qwrap .qstart .btn.pri { background: var(--k0); }
+.qwrap .done-ic { background: var(--k0); color: #fff; }
+/* העיגולים מאחורי הטקסט, גם כשהכותרת ארוכה */
+.qwrap .qq, .qwrap .qstart h1 { isolation: isolate; }
+.qwrap .qq::before, .qwrap .qq::after, .qwrap .qstart h1::before, .qwrap .qstart h1::after { z-index: -1; }

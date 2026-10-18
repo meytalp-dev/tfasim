@@ -12,7 +12,7 @@
 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Rubik:wght@700;800;900&family=Heebo:wght@400;500;700;800&family=Suez+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="mipui.css">
 </head>
 <body>
@@ -51,6 +51,7 @@
   var BR = (typeof MIPUI_BRAND !== 'undefined' && MIPUI_BRAND[S]) || null;
   var lang = BR ? 'he' : (P.get('lang') === 'ar' ? 'ar' : (mStore('mipui_lang') || 'he'));
   if (BR) { // השתלמות של לרני: בלי מיתוג המשרד והקהילה, בלי ערבית
+    document.body.classList.add('br-learni');
     var tl = document.getElementById('topLogo');
     if (BR.logo) { tl.src = BR.logo; tl.alt = MIPUI_SCHOOLS[S] || ''; } else tl.remove();
     document.getElementById('langBtn').style.display = 'none';
@@ -128,8 +129,9 @@
   function render() {
     header();
     if (!MIPUI_SCHOOLS[S]) { app.innerHTML = '<div class="qstart"><p class="err">' + t('bad') + '</p></div>'; return; }
-    if (idx === -1) return renderStart();
     var qs = visible();
+    app.setAttribute('data-i', idx === -1 ? 's' : (idx >= qs.length ? 'd' : idx % 5)); // לעיצוב: מסך פתיחה/תודה וצבע מתחלף
+    if (idx === -1) return renderStart();
     if (idx >= qs.length) return renderDone();
     renderQ(qs[idx], qs);
   }
@@ -150,7 +152,7 @@
 
   function stories(qs) {
     return '<div class="stories">' + qs.map(function (_, i) { return '<i class="' + (i <= idx ? 'f' : '') + '"></i>'; }).join('') + '</div>' +
-      '<div class="qcount">' + t('q') + ' ' + (idx + 1) + ' ' + t('of') + ' ' + qs.length + '</div>';
+      '<div class="qcount">' + t('q') + ' <b class="qn">' + (idx + 1) + '</b> ' + t('of') + ' ' + qs.length + '</div>';
   }
 
   function canNext(q) {
