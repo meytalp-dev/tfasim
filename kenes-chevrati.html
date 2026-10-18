@@ -49,7 +49,7 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
 .credit a{color:var(--blue);text-decoration:none}
 @media (max-width:620px){h1{font-size:22px}ul.list{columns:1}}
 </style>
-<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah"></script>
+<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah" data-optional data-label="פירוט הנרשמים"></script>
 </head>
 <body>
 <div class="strip"></div>
@@ -121,17 +121,17 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
   function nSchools(n) { return n === 1 ? 'בית ספר אחד' : n + ' בתי ספר'; }
   function copyBtn(key, label) { return '<button type="button" class="btn" data-copy="' + key + '">' + COPY + label + "</button>"; }
 
-  function render(schools, rows) {
-    var col = function (r, k) { return r[k] == null ? "" : String(r[k]).trim(); };
-    var by = {};
-    rows.forEach(function (r) { var n = SN.canon(col(r, "בית ספר")); (by[n] = by[n] || []).push(r); });
+  /* החלק הפתוח: ספירה לפי בית ספר בלבד (mode=counts), בלי פרטים אישיים */
+  function render(schools, counts) {
+    var by = {}, total = 0;
+    Object.keys(counts || {}).forEach(function (k) { var n = SN.canon(k); by[n] = (by[n] || 0) + counts[k]; total += counts[k]; });
     var done = schools.filter(function (s) { return by[s.name]; });
     var miss = schools.filter(function (s) { return !by[s.name]; });
     var pct = schools.length ? Math.round(done.length / schools.length * 100) : 0;
 
     var h = '<div class="card"><div class="big">' + done.length + ' <small>מתוך ' + schools.length + ' בתי ספר נרשמו</small></div>' +
       '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
-      '<div class="sub">' + rows.length + ' נרשמים בסך הכול</div></div>';
+      '<div class="sub">' + total + ' נרשמים בסך הכול</div></div>';
 
     LISTS.miss = ["בית ספר\tמפקח.ת"].concat(miss.map(function (s) { return s.name + "\t" + sups(s); })).join("\n");
     h += fold("טרם נרשמו", '<span class="tag warn">' + nSchools(miss.length) + '</span>',
@@ -139,49 +139,73 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
         miss.map(function (s) { return "<li>" + esc(s.name) + "<span>" + esc(sups(s)) + "</span></li>"; }).join("") + "</ul>"
         : '<div class="empty">כל בתי הספר נרשמו.</div>');
 
-    LISTS.done = ["בית ספר\tנרשמים"].concat(done.map(function (s) { return s.name + "\t" + by[s.name].length; })).join("\n");
+    LISTS.done = ["בית ספר\tנרשמים"].concat(done.map(function (s) { return s.name + "\t" + by[s.name]; })).join("\n");
     h += fold("נרשמו", '<span class="tag ok">' + nSchools(done.length) + '</span>',
       done.length ? '<div class="acts">' + copyBtn("done", "העתקת הרשימה") + '</div><ul class="list">' +
-        done.map(function (s) { return "<li>" + esc(s.name) + "<span>" + by[s.name].length + " נרשמים · " + esc(sups(s)) + "</span></li>"; }).join("") + "</ul>"
+        done.map(function (s) { return "<li>" + esc(s.name) + "<span>" + (by[s.name] === 1 ? "נרשם/ה אחד/ת" : by[s.name] + " נרשמים") + " · " + esc(sups(s)) + "</span></li>"; }).join("") + "</ul>"
         : '<div class="empty">עדיין אין נרשמים.</div>');
 
+    h += '<div id="people"></div>';
+    $("main").innerHTML = h;
+    people();
+  }
+
+  /* הפירוט השמי: רק אחרי כניסה מורשית (auth.js במצב data-optional) */
+  function people() {
+    var box = $("people"); if (!box) return;
+    var A = window.PMH_AUTH;
+    if (!token() || !(A && A.allowed && A.allowed())) {
+      box.innerHTML = fold("פירוט הנרשמים", '<span class="tag warn">בכניסה</span>',
+        '<p class="sub" style="margin:0 0 10px">שמות, טלפונים ובקשות — רק לצוות, אחרי כניסה.</p><button type="button" class="btn main" id="loginBtn">כניסה לצפייה בפירוט</button>');
+      $("loginBtn").onclick = function () { if (A && A.login) A.login(); };
+      return;
+    }
+    box.innerHTML = fold("פירוט הנרשמים", '<span class="tag ok">טוען…</span>', '<div class="loading">טוען…</div>');
+    fetch(EXEC, { method: "POST", body: JSON.stringify({ action: "admin", token: token() }) }).then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ok) {
+        if (d && d.error === "noauth") { box.innerHTML = fold("פירוט הנרשמים", "", '<div class="empty err">אין לך הרשאת צפייה בפירוט הנרשמים.</div>'); return; }
+        throw new Error((d && d.error) || "fail");
+      }
+      var f = (d.forms || []).filter(function (x) { return x.id === FORM_ID; })[0];
+      if (!f) throw new Error("noform");
+      box.innerHTML = peopleHtml(f.rows || []);
+    }).catch(function (err) {
+      box.innerHTML = fold("פירוט הנרשמים", "", '<div class="empty err">לא הצלחתי לטעון את הפירוט (' + esc(err.message) + ').</div>');
+    });
+  }
+  function peopleHtml(rows) {
+    var col = function (r, k) { return r[k] == null ? "" : String(r[k]).trim(); };
     var sorted = rows.slice().sort(function (a, b) { return String(b["חותמת זמן"]).localeCompare(String(a["חותמת זמן"])); });
     var head = ["נרשם/ה", "בית ספר", "שם מלא", "טלפון נייד", "מייל", "תפקיד", "בקשות / הערות"];
     LISTS.people = [head.join("\t")].concat(sorted.map(function (r) {
       return [fdate(r["חותמת זמן"]), SN.canon(col(r, "בית ספר")), col(r, "שם מלא"), phoneOf(r["טלפון נייד"]), col(r, "מייל"), col(r, "תפקיד"), col(r, "בקשות / הערות").replace(/\s+/g, " ")].join("\t");
     })).join("\n");
     var notes = rows.filter(function (r) { return col(r, "בקשות / הערות"); }).length;
-    h += fold("פירוט הנרשמים", '<span class="tag ok">' + rows.length + "</span>" + (notes ? ' <span class="tag warn">' + notes + " עם בקשות</span>" : ""),
+    return fold("פירוט הנרשמים", '<span class="tag ok">' + rows.length + "</span>" + (notes ? ' <span class="tag warn">' + notes + " עם בקשות</span>" : ""),
       rows.length ? '<div class="acts">' + copyBtn("people", "העתקה לאקסל") + "</div>" + sorted.map(function (r) {
         var ph = phoneOf(r["טלפון נייד"]), note = col(r, "בקשות / הערות");
         return '<div class="person"><b>' + esc(col(r, "שם מלא")) + "</b> · " + esc(SN.canon(col(r, "בית ספר"))) +
           '<div class="row">' + esc(col(r, "תפקיד")) + (ph ? ' · <a href="tel:' + esc(ph.replace(/-/g, "")) + '" dir="ltr">' + esc(ph) + "</a>" : "") +
           (col(r, "מייל") ? ' · <bdi dir="ltr">' + esc(col(r, "מייל")) + "</bdi>" : "") + " · נרשם/ה " + esc(fdate(r["חותמת זמן"])) + "</div>" +
           (note ? '<div class="note">' + esc(note) + "</div>" : "") + "</div>";
-      }).join("") : '<div class="empty">עדיין אין נרשמים.</div>');
-
-    $("main").innerHTML = h;
+      }).join("") : '<div class="empty">עדיין אין נרשמים.</div>', true);
   }
 
   function load() {
-    $("main").innerHTML = '<div class="loading">טוען את הנרשמים…</div>';
+    $("main").innerHTML = '<div class="loading">טוען…</div>';
     Promise.all([
       fetch(MOSDOT).then(function (r) { return r.json(); }),
-      fetch(EXEC, { method: "POST", body: JSON.stringify({ action: "admin", token: token() }) }).then(function (r) { return r.json(); })
+      fetch(EXEC + "?mode=counts&id=" + FORM_ID).then(function (r) { return r.json(); })
     ]).then(function (res) {
-      var schools = res[0].schools || [], d = res[1];
-      if (!d || !d.ok) {
-        if (d && d.error === "noauth") { $("main").innerHTML = '<div class="card empty err">אין הרשאת צפייה בנרשמים. הדף פתוח לאדמין בלבד.</div>'; return; }
-        throw new Error((d && d.error) || "fail");
-      }
-      var f = (d.forms || []).filter(function (x) { return x.id === FORM_ID; })[0];
-      if (!f) throw new Error("noform");
-      render(schools, f.rows || []);
+      var d = res[1];
+      if (!d || !d.ok) throw new Error((d && d.error) || "fail");
+      render(res[0].schools || [], d.schools || {});
     }).catch(function (err) {
       $("main").innerHTML = '<div class="card empty err">לא הצלחתי לטעון את הנתונים (' + esc(err.message) + '). נסו "רענון".</div>';
     });
   }
-  if (token()) load(); else document.addEventListener("pmh:in", load);
+  load();
+  document.addEventListener("pmh:in", people);
 })();
 </script>
 </body>
