@@ -40,6 +40,12 @@
       ["NotebookLM (היום: Gemini Notebook)", "מה המורים כתבו: נושאים, פרסונות ורעיונות", "https://notebooklm.google.com/"],
       ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
     ];
+    /* 18.10.26: כלי מפגש 2, מסלול ההובלה (אותה רשימה כמו ב-shell.js) */
+    if (Number(num) === 2 && t === "h") return [
+      ["Google AI Studio", "הכלי של היום: שיחה קולית עם אבי, תרגום, טבלאות ואפליקציה ממשפט", "https://aistudio.google.com/"],
+      ["NotebookLM (היום: Gemini Notebook)", "להכרה: עונה רק מהמקורות, ומוציא פודקאסט, בוחן ומפת חשיבה", "https://notebooklm.google.com/"],
+      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
+    ];
     return [];
   }
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
