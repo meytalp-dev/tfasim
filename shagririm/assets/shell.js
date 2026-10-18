@@ -48,7 +48,9 @@
       ["קובץ הדוגמה", "תשובות בדויות של בית ספר לדוגמה, בלי שמות. למי שבלי מספיק תשובות", "mipui/dugma-bli-shmot.csv"],
       ["Gemini", "שואלים את הנתונים: מעלים את הקובץ ומדביקים פרומפט", "https://gemini.google.com/app"],
       ["NotebookLM (היום: Gemini Notebook)", "מה המורים כתבו: נושאים, פרסונות ורעיונות, עם מקור לכל משפט", "https://notebooklm.google.com/"],
-      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
+      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"],
+      /* 18.10.26: הטופס הוא שלב 16 בדף המלווה. extPageUrl כבר מוסיף #k=, ולכן p16 נכנס אחרי & */
+      ["טופס משימת השטח · עד 2.11", "בודקים עם מורים, בוחרים שותף/ה, ומריצים יחד את הפרומפט", extPageUrl(2) + (extPageUrl(2).indexOf("#") > -1 ? "&p16" : "#p16")]
     ];
     return [];
   }
