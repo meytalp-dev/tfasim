@@ -81,7 +81,7 @@
   /* הודעות שגיאה בעברית, לשני הצדדים */
   var ERR = {
     badcode: "הקוד לא נכון. אם הוא התחלף בדיוק עכשיו, הקוד שמוצג בזום תקף.",
-    closed: "הרישום למפגש עוד לא נפתח, או שנסגר. מיטל פותחת אותו בזום.",
+    closed: "הרישום נפתח רבע שעה לפני המפגש ונסגר בסופו. אם המפגש כבר התחיל — לרענן את הדף ולנסות שוב.",
     wrongsession: "הרישום פתוח למפגש אחר.",
     locked: "יותר מדי ניסיונות. אפשר לנסות שוב בעוד עשר דקות, או לכתוב למיטל.",
     nosession: "הכניסה פגה. לרענן את הדף ולהיכנס שוב בקישור האישי.",
@@ -360,7 +360,25 @@
     if (first) first.focus();
   }
 
+  /* SH_attend.here(n) — "אני כאן" (19.10.26, כמו במנור): בלי קוד. השרת מזהה
+     לפי המפתח האישי והסשן, ומיטל מאשרת אחרי הצלבה מול הזום. בהצלחה נפתח
+     מסך "נרשמת"; בכישלון ה-promise מחזיר את קוד השגיאה, והעמוד מציג אותו. */
+  function aHere(num, opts) {
+    var n = Number(digits(num));
+    if (!w.SH_auth || !w.SH_auth.api) return Promise.resolve({ ok: false, error: "server" });
+    if (!n) return Promise.resolve({ ok: false, error: "nonum" });
+    aBuild();
+    aState = { num: n, typed: "", busy: false, prev: d.activeElement, onDone: opts && opts.onDone };
+    return w.SH_auth.api("checkin", { n: n })
+      .then(function (r) {
+        if (r && r.ok === true) aDone(r);
+        return r || { ok: false, error: "server" };
+      })
+      .catch(function () { return { ok: false, error: "network" }; });
+  }
+
   w.SH_attend = {
+    here: aHere,
     open: aOpen,
     close: aClose,
     isOpen: function () { return !!(aBox && (!aBox.hidden || (aOk && !aOk.hidden))); },
@@ -445,17 +463,11 @@
     el("t-closeBtn").hidden = false;
     el("t-copyCode").hidden = false;
     ttl.textContent = "רישום נוכחות · מפגש " + c.session;
-    bigEl.textContent = c.code || "";
-
-    var full = (Number(c.codeMinutes) || 5) * 60;
-    var left = Math.max(0, Math.round((T.endsAt - Date.now()) / 1000));
-    drawRing(left, full);
-
-    var txt = left > 0
-      ? "מתחלף בעוד " + mmss(left)
-      : "מתחלף עכשיו";
-    if (c.grace) txt += " · הקוד הקודם עוד מתקבל";
-    noteEl.textContent = txt;
+    /* 19.10.26: אין קוד להקרין. הרכזים לוחצים "אני כאן" בעמוד המפגש. */
+    bigEl.textContent = "פתוח";
+    drawRing(1, 1);
+    noteEl.textContent = "הרכזים לוחצים \"אני כאן\" בעמוד המפגש" +
+      (c.auto ? " · נפתח לבד לפי השעה, ונסגר בסוף המפגש" : "");
   }
 
   /* השעון מתרוקן בדפדפן, והשרת נשאל רק כשהחלון נגמר. התצוגה נשארת על
@@ -667,8 +679,7 @@
         (m.risk ? "  (בסיכון: " + m.absences + " היעדרויות)" : ""));
     }
     lines.push("");
-    lines.push("הרישום נעשה במודול, בקוד שמוצג בזום. הקוד מתחלף כל חמש דקות,");
-    lines.push("והקוד הקודם ממשיך להתקבל, כך שאין לחץ אם הוא התחלף בדיוק עכשיו.");
+    lines.push("הרישום: נכנסים לאדווה בקישור האישי, ובעמוד המפגש לוחצים \"אני כאן\".");
     return lines.join("\n");
   }
 
@@ -677,11 +688,10 @@
      הקוד מתחלף כל חמש דקות, ולכן ההודעה נבנית מהקוד שמוצג ברגע ההעתקה. */
   function zoomChatText() {
     var c = T.code || {};
-    if (!c.open || !c.code) return "";
+    if (!c.open) return "";
     return "רישום נוכחות למפגש " + c.session + ":\n" +
-      "פתחו את הקישור האישי שקיבלתם בוואטסאפ או במייל,\n" +
-      "ובראש המסך הקלידו את הקוד: " + c.code + "\n" +
-      "הקוד מתחלף כל " + (Number(c.codeMinutes) || 5) + " דקות.";
+      "פתחו את הקישור האישי לאדווה שקיבלתם במייל,\n" +
+      "ובעמוד המפגש לחצו \"אני כאן\".";
   }
 
   function copyText_(text, okMsg) {
@@ -708,7 +718,7 @@
 
   function copyZoomChat() {
     var t = zoomChatText();
-    if (!t) { toast("אין קוד פעיל. לפתוח רישום קודם.", true); return; }
+    if (!t) { toast("הרישום סגור. לפתוח רישום קודם.", true); return; }
     copyText_(t, "ההודעה הועתקה · אפשר להדביק בצ׳אט הזום");
   }
 

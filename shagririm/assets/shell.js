@@ -518,7 +518,7 @@
       var st = attState(s.num), text;
       if (s.isUnit) text = "ביחידה עצמית הנוכחות היא התוצר: היא נספרת אחרי שהגשת בחלון הזמן ומיטל אישרה.";
       else if (st === "present") text = "נכחת במפגש הזה.";
-      else if (s.locked) text = "שדה הקוד נפתח כאן ביום המפגש. מקלידים את ארבע הספרות שמיטל מציגה בזום.";
+      else if (s.locked) text = "ביום המפגש יופיע כאן כפתור \"אני כאן\". לוחצים עליו כשנכנסים לזום.";
       else text = "הרישום למפגש הזה נסגר. מיטל מאשרת נוכחות אחרי הצלבה מול דוח הזום.";
       att.innerHTML = quietItem("check", "רישום נוכחות", text);
     }
@@ -541,38 +541,31 @@
     host.innerHTML =
       '<div class="sh-live-h"><span class="sh-rec" aria-hidden="true"></span>המפגש מתקיים היום</div>' +
       '<h2 id="sh-attend-h">מפגש ' + esc(s.num) + " · רישום נוכחות</h2>" +
-      "<p>הקלידו את הקוד שמיטל מציגה בזום. הקוד מתחלף כל 5 דקות, והקודם עוד מתקבל.</p>" +
-      '<label class="sh-sr" for="sh-attend-code">קוד הנוכחות</label>' +
+      "<p>כשנכנסים למפגש בזום, לוחצים כאן. הרישום פתוח מרבע שעה לפני המפגש ועד סופו.</p>" +
       '<div class="sh-live-row">' +
-        '<input id="sh-attend-code" class="sh-code" type="text" inputmode="numeric" ' +
-          'autocomplete="off" maxlength="6" translate="no" dir="ltr" placeholder="0000" ' +
-          'aria-describedby="sh-attend-msg">' +
-        (ready ? '<button type="button" class="sh-live-btn" id="sh-attend-go">' + ico("check") + " שליחה</button>" : "") +
+        '<button type="button" class="sh-live-btn sh-here-btn" id="sh-attend-go"' + (ready ? "" : " disabled") +
+          ' aria-describedby="sh-attend-msg">' + ico("check") + " אני כאן</button>" +
       "</div>" +
-      '<p class="sh-live-msg" id="sh-attend-msg">' +
+      '<p class="sh-live-msg" id="sh-attend-msg" role="status" aria-live="polite">' +
         (ready ? "" : "רישום הנוכחות ייפתח כאן") +
       "</p>";
 
-    if (!ready) {
-      el("sh-attend-code").disabled = true;
-      return;
-    }
+    if (!ready || typeof w.SH_attend.here !== "function") return;
 
-    /* מעבירים הלאה את מה שכבר הוקלד כאן. בלי זה נפתח חלון קוד שני ריק
-       והמשתתף התבקש להקליד שוב — נמצא בחזרה היבשה 21.9.26. */
-    function hand() {
-      var typed = "";
-      try { typed = el("sh-attend-code").value || ""; } catch (e0) { typed = ""; }
-      try {
-        w.SH_attend.open(s.num, { code: typed });
-        try { el("sh-attend-code").value = ""; } catch (e1) { /* לא קריטי */ }
-      } catch (e) {
-        el("sh-attend-msg").textContent = "רישום הנוכחות ייפתח כאן";
-      }
-    }
-    el("sh-attend-go").addEventListener("click", hand);
-    el("sh-attend-code").addEventListener("keydown", function (ev) {
-      if (ev.key === "Enter") { ev.preventDefault(); hand(); }
+    /* 19.10.26 ("כמו במנור"): בלי קוד. לחיצה אחת, והשרת מזהה לפי הקישור האישי. */
+    var btn = el("sh-attend-go"), msg = el("sh-attend-msg");
+    btn.addEventListener("click", function () {
+      if (btn.disabled) return;
+      btn.disabled = true;
+      msg.textContent = "נרשם/ת…";
+      w.SH_attend.here(s.num).then(function (r) {
+        btn.disabled = false;
+        if (r && r.ok === true) {
+          msg.textContent = "נרשמת למפגש " + esc(s.num) + ". הנוכחות תאושר אחרי המפגש.";
+          return;
+        }
+        msg.textContent = w.SH_attend.errText(r && r.error);
+      });
     });
   }
 
