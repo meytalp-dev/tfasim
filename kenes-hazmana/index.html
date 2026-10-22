@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>מנהיגות אנושית מחברת</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0f2f52; --navy2:#2b5a7a; --teal:#3a8f86; --teal2:#5fb3a6;
+  --gold:#c8955a; --gold2:#e2b886; --paper:#fbfaf7; --ink:#1d2b3a; --muted:#5a6b7c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden}
+body{
+  font-family:'Heebo',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  min-height:100vh;display:flex;justify-content:center;
+  background-image:radial-gradient(ellipse at 50% 55%,rgba(226,184,134,.18),transparent 60%),
+                   radial-gradient(ellipse at 80% 10%,rgba(95,179,166,.10),transparent 50%);
+}
+.card{width:100%;max-width:720px;padding:40px 16px 28px;text-align:center;position:relative}
+
+/* ---------- כותרת עליונה ---------- */
+.logo{display:block;width:min(300px,70%);height:auto;margin:0 auto 18px;opacity:0;animation:fadeDown .9s .1s forwards}
+.rule{height:1.5px;background:var(--gold);margin:0 auto;width:0;animation:grow 1s .5s forwards}
+.rule.short{max-width:110px}
+.kicker{font-size:clamp(18px,4.4vw,26px);font-weight:500;line-height:1.35;text-align:center;color:var(--navy);margin:16px auto 4px;opacity:0;animation:fadeUp .8s .8s forwards}
+.year{display:flex;align-items:center;justify-content:center;gap:16px;font-size:clamp(17px,4vw,22px);letter-spacing:.25em;color:var(--navy);opacity:0;animation:fadeUp .8s 1s forwards}
+.year i{display:block;height:1.5px;background:var(--gold);width:0;animation:growTo 1s 1.2s forwards}
+
+/* ---------- כותרת ראשית ---------- */
+h1{margin:30px 0 10px;line-height:1.02;font-weight:800}
+h1 .l1{display:block;font-size:clamp(44px,11vw,84px);color:var(--navy)}
+h1 .l2{display:block;font-size:clamp(50px,12.5vw,96px);position:relative}
+h1 .l3{display:block;font-size:clamp(36px,9vw,66px);font-weight:500;color:var(--navy);margin-top:4px}
+.ch{display:inline-block;opacity:0;transform:translateY(.4em);filter:blur(8px);animation:letterIn .7s cubic-bezier(.2,.8,.2,1) forwards}
+.l2 .ch{background:linear-gradient(100deg,var(--teal) 0%,var(--teal) 40%,#bff0e6 50%,var(--teal) 60%,var(--teal) 100%);
+  background-size:300% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;color:transparent}
+.l2.shine .ch{animation:letterIn .7s cubic-bezier(.2,.8,.2,1) forwards, shine 4.5s 0s infinite}
+
+/* ---------- איור ---------- */
+.art{position:relative;margin:6px -16px 0;height:clamp(180px,42vw,300px);transition:transform .25s ease-out}
+.art svg{width:100%;height:100%;overflow:visible}
+.wave{fill:none;stroke-width:1.3;opacity:.55}
+.person{fill:none;stroke-width:2.4;stroke-linecap:round;stroke-dasharray:200;stroke-dashoffset:200;animation:draw 2s forwards}
+.ring{fill:none;stroke:var(--gold);stroke-width:1;opacity:.35;transform-origin:500px 150px;animation:ringPulse 4s infinite}
+.compass{transform-origin:500px 150px;animation:spinIn 2.6s 1.4s cubic-bezier(.15,.85,.25,1) both, wobble 7s 4s ease-in-out infinite}
+.node{transform-box:fill-box;transform-origin:center;opacity:0;animation:nodeIn .5s forwards, blink 3.2s infinite}
+.link{fill:none;stroke-width:1;opacity:.45;stroke-dasharray:120;stroke-dashoffset:120;animation:draw 1.4s forwards}
+
+/* ---------- פרטים ---------- */
+.details{display:grid;grid-template-columns:1fr 1px 1fr;align-items:start;gap:14px;margin:26px 0 8px}
+.details .sep{background:var(--gold);height:0;align-self:stretch;animation:growH 1s 2.6s forwards}
+.det{opacity:0;animation:fadeUp .8s forwards}
+.det svg{width:52px;height:52px;fill:none;stroke:var(--gold);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:8px}
+.det svg *{stroke-dasharray:160;stroke-dashoffset:160;animation:draw 1.6s forwards;animation-delay:inherit}
+.det p{font-size:clamp(17px,4.2vw,22px);color:var(--navy);line-height:1.45}
+.det .ltr{direction:ltr;display:block}
+
+/* ---------- ספירה לאחור ---------- */
+.count{display:flex;justify-content:center;gap:10px;margin:22px 0 6px;direction:rtl;opacity:0;animation:fadeUp .8s 3.2s forwards}
+.cbox{min-width:66px;padding:10px 6px 8px;border:1px solid rgba(200,149,90,.45);border-radius:12px;background:rgba(255,255,255,.7);
+  box-shadow:0 6px 18px -10px rgba(15,47,82,.25)}
+.cbox b{display:block;font-size:26px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums;direction:ltr}
+.cbox b.tick{animation:tick .45s}
+.cbox span{font-size:13px;color:var(--muted)}
+.count-cap{font-size:14px;color:var(--muted);opacity:0;animation:fadeUp .8s 3.3s forwards}
+
+/* ---------- כפתורים ---------- */
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:22px 0 4px;opacity:0;animation:fadeUp .8s 3.5s forwards}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:999px;font:inherit;font-size:16px;font-weight:500;
+  text-decoration:none;cursor:pointer;transition:transform .2s, box-shadow .2s, background .2s;position:relative;overflow:hidden}
+.btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.btn.pri{background:var(--navy);color:#fff;box-shadow:0 8px 20px -10px rgba(15,47,82,.6)}
+.btn.reg{flex-basis:100%;max-width:280px;justify-content:center;margin:0 auto 4px;padding:15px 28px;font-size:19px;font-weight:700;
+  background:var(--navy);color:#fff;box-shadow:0 10px 24px -10px rgba(15,47,82,.7)}
+.btn.reg svg{width:20px;height:20px}
+.btn.sec{background:#fff;color:var(--navy);border:1px solid rgba(15,47,82,.2)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 12px 26px -12px rgba(15,47,82,.55)}
+.btn::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 50%,transparent 70%);transform:translateX(120%);transition:transform .7s}
+.btn:hover::after{transform:translateX(-120%)}
+.cal-menu{display:none;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.cal-menu.open{display:flex;animation:fadeUp .35s forwards}
+.cal-menu a{font-size:14px;color:var(--navy);padding:8px 14px;border-radius:999px;background:rgba(58,143,134,.1);text-decoration:none}
+
+/* ---------- לו"ז ---------- */
+.luz{margin:34px auto 0;max-width:520px;text-align:right}
+.luz h2{text-align:center;font-size:clamp(20px,5vw,26px);font-weight:700;color:var(--navy);margin-bottom:12px}
+.luz ol{list-style:none;border-top:1px solid rgba(200,149,90,.45)}
+.luz li{display:flex;gap:14px;align-items:baseline;padding:11px 4px;border-bottom:1px solid rgba(200,149,90,.3);font-size:clamp(15px,3.9vw,18px);color:var(--ink);line-height:1.4}
+.luz time{flex:0 0 auto;min-width:96px;direction:ltr;text-align:right;font-weight:700;color:var(--teal);font-variant-numeric:tabular-nums}
+
+/* ---------- מילים ---------- */
+.words{margin:30px auto 0;font-size:clamp(17px,4.4vw,24px);color:var(--navy);letter-spacing:.02em}
+.words .rule{max-width:90px;margin:0 auto 14px}
+.words .rule.b{margin:14px auto 0}
+.w{display:inline-block;transition:color .4s,text-shadow .4s}
+.w.on{color:var(--teal);text-shadow:0 0 18px rgba(95,179,166,.55)}
+footer{margin-top:34px;font-size:12px;color:#9aa6b2}
+footer a{color:inherit}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes grow{to{width:100%}}
+@keyframes growTo{to{width:clamp(60px,18vw,150px)}}
+@keyframes growH{to{height:100%}}
+@keyframes letterIn{to{opacity:1;transform:none;filter:blur(0)}}
+@keyframes shine{0%,55%{background-position:100% 0}100%{background-position:0% 0}}
+@keyframes draw{to{stroke-dashoffset:0}}
+@keyframes ringPulse{0%{transform:scale(.6);opacity:0}30%{opacity:.4}100%{transform:scale(1.6);opacity:0}}
+@keyframes spinIn{from{transform:rotate(-720deg) scale(.2);opacity:0}to{transform:rotate(0) scale(1);opacity:1}}
+@keyframes wobble{0%,100%{transform:rotate(0)}20%{transform:rotate(9deg)}35%{transform:rotate(-6deg)}50%{transform:rotate(3deg)}62%{transform:rotate(0)}}
+@keyframes nodeIn{from{opacity:0;transform:scale(0)}to{opacity:1;transform:scale(1)}}
+@keyframes blink{0%,100%{filter:none}50%{filter:brightness(1.6) drop-shadow(0 0 4px currentColor)}}
+@keyframes tick{0%{transform:translateY(-6px);opacity:.3}100%{transform:none;opacity:1}}
+
+@media (max-width:420px){.cbox{min-width:58px}.cbox b{font-size:22px}}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main class="card">
+  <img class="logo" src="logo.png" alt="משרד העבודה · מינהל הכשרה מקצועית">
+  <div class="rule short"></div>
+  <p class="kicker">כנס מנהלים ורשתות<br>לבתי הספר המקצועיים</p>
+  <p class="year"><i></i>תשפ״ז<i></i></p>
+
+  <h1>
+    <span class="l1" data-split data-delay="1.3">מנהיגות אנושית</span>
+    <span class="l2" data-split data-delay="2.0">מחברת</span>
+    <span class="l3" data-split data-delay="2.5">בעידן הבינה</span>
+  </h1>
+
+  <div class="art" id="art">
+    <svg viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <radialGradient id="glow"><stop offset="0" stop-color="#e2b886" stop-opacity=".35"/><stop offset="1" stop-color="#e2b886" stop-opacity="0"/></radialGradient>
+      </defs>
+      <circle cx="500" cy="150" r="140" fill="url(#glow)"/>
+      <g id="waves"></g>
+      <circle class="ring" cx="500" cy="150" r="60"/>
+      <circle class="ring" cx="500" cy="150" r="60" style="animation-delay:1.3s"/>
+      <circle class="ring" cx="500" cy="150" r="60" style="animation-delay:2.6s"/>
+      <circle cx="500" cy="150" r="52" fill="none" stroke="#c8955a" stroke-width="1" opacity=".5"/>
+      <line x1="500" y1="20" x2="500" y2="280" stroke="#c8955a" stroke-width=".8" opacity=".5"/>
+      <line x1="380" y1="150" x2="620" y2="150" stroke="#c8955a" stroke-width=".8" opacity=".5"/>
+      <g class="compass">
+        <polygon points="500,82 511,150 500,150" fill="#0f2f52"/><polygon points="500,82 489,150 500,150" fill="#2b5a7a"/>
+        <polygon points="500,218 489,150 500,150" fill="#c8955a"/><polygon points="500,218 511,150 500,150" fill="#e2b886"/>
+        <polygon points="568,150 500,139 500,150" fill="#2b5a7a"/><polygon points="568,150 500,161 500,150" fill="#0f2f52"/>
+        <polygon points="432,150 500,161 500,150" fill="#2b5a7a"/><polygon points="432,150 500,139 500,150" fill="#0f2f52"/>
+        <g opacity=".75">
+          <polygon points="536,114 504,146 500,150" fill="#c8955a"/><polygon points="464,186 496,154 500,150" fill="#c8955a"/>
+          <polygon points="464,114 496,146 500,150" fill="#c8955a"/><polygon points="536,186 504,154 500,150" fill="#c8955a"/>
+        </g>
+        <circle cx="500" cy="150" r="4" fill="#fff" stroke="#0f2f52" stroke-width="1.5"/>
+      </g>
+      <g id="people"></g>
+      <g id="net"></g>
+    </svg>
+  </div>
+
+  <section class="details">
+    <div class="det" style="animation-delay:2.8s">
+      <svg viewBox="0 0 48 48" style="animation-delay:2.9s"><rect x="7" y="10" width="34" height="31" rx="4"/><path d="M7 19h34M16 6v8M32 6v8"/></svg>
+      <p>יום שני, י״ג בכסלו<span class="ltr">23/11/26</span><span class="ltr">9:00–15:00</span></p>
+    </div>
+    <div class="sep"></div>
+    <div class="det" style="animation-delay:3s">
+      <svg viewBox="0 0 48 48" style="animation-delay:3.1s"><path d="M24 44s14-13.5 14-24a14 14 0 0 0-28 0c0 10.5 14 24 14 24z"/><circle cx="24" cy="20" r="5"/></svg>
+      <p>ג׳ייקובס חדרה</p>
+    </div>
+  </section>
+
+  <div class="count" id="count">
+    <div class="cbox"><b data-u="d">--</b><span>ימים</span></div>
+    <div class="cbox"><b data-u="h">--</b><span>שעות</span></div>
+    <div class="cbox"><b data-u="m">--</b><span>דקות</span></div>
+    <div class="cbox"><b data-u="s">--</b><span>שניות</span></div>
+  </div>
+  <p class="count-cap">עד שנפגשים</p>
+
+  <div class="actions">
+    <a class="btn reg" href="https://tfasim.pedagogiamh.co.il/kenes-muzeon.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>להרשמה</a>
+    <button class="btn sec" id="calBtn" type="button">
+      <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>הוספה ליומן</button>
+    <a class="btn sec" id="wazeBtn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M3 11l18-8-8 18-2-8z"/></svg>ניווט ב-Waze</a>
+    <a class="btn sec" id="mapsBtn" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 0 0-14 0c0 5.5 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Google Maps</a>
+  </div>
+  <div class="cal-menu" id="calMenu">
+    <a id="gcal" target="_blank" rel="noopener">יומן Google</a>
+    <a id="ics" download="kenes-23-11-26.ics">אייפון / אאוטלוק</a>
+  </div>
+
+  <section class="luz">
+    <h2>לוח הזמנים</h2>
+    <ol>
+      <li><time>9:00–9:30</time><span>התכנסות</span></li>
+      <li><time>9:30–10:30</time><span>ברכות והצגת ספר ההפעלה</span></li>
+      <li><time>10:30–11:30</time><span>הרצאה: פרופ׳ עוז גוטרמן<br>"מפתחות ההצלחה בעידן טכנולוגי סוער"</span></li>
+      <li><time>11:30–11:45</time><span>הפסקה</span></li>
+      <li><time>11:45–13:00</time><span>סדנה בשולחנות עגולים</span></li>
+      <li><time>13:00–13:40</time><span>ארוחת צהריים</span></li>
+      <li><time>13:40–14:40</time><span>טדים של מנהלים</span></li>
+      <li><time>14:40–15:00</time><span>סיכום היום</span></li>
+    </ol>
+  </section>
+
+  <div class="words">
+    <div class="rule"></div>
+    <span class="w">מנהיגות.</span> <span class="w">חיבור.</span> <span class="w">חדשנות.</span> <span class="w">אדם.</span> <span class="w">תבונה.</span>
+    <div class="rule b"></div>
+  </div>
+
+  <footer>נבנה ב-<a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>
+</main>
+
+<script>
+(function(){
+  const NS='http://www.w3.org/2000/svg';
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* פיצול כותרת לאותיות */
+  document.querySelectorAll('[data-split]').forEach(el=>{
+    const base=parseFloat(el.dataset.delay)||0, txt=el.textContent; el.textContent='';
+    [...txt].forEach((c,i)=>{
+      if(c===' '){el.append(' ');return;}
+      const s=document.createElement('span'); s.className='ch'; s.textContent=c;
+      s.style.animationDelay=(base+i*0.05)+'s'; el.append(s);
+    });
+  });
+  setTimeout(()=>document.querySelector('.l2').classList.add('shine'),3200);
+
+  /* אנשים — צד שמאל של האיור */
+  const people=document.getElementById('people');
+  [[95,170,.8,'#c8955a'],[150,160,.95,'#c8955a'],[215,150,1.2,'#2b5a7a'],[285,162,.95,'#c8955a'],[335,172,.75,'#2b5a7a']].forEach((p,i)=>{
+    const [x,y,s,c]=p, g=document.createElementNS(NS,'g');
+    g.setAttribute('transform',`translate(${x},${y}) scale(${s})`);
+    g.innerHTML=`<circle class="person" cx="0" cy="-30" r="15" stroke="${c}" style="animation-delay:${1.6+i*.15}s"/>
+      <path class="person" d="M-28 18 C-28 -6 28 -6 28 18" stroke="${c}" style="animation-delay:${1.8+i*.15}s"/>`;
+    people.append(g);
+  });
+
+  /* רשת נקודות — צד ימין */
+  const net=document.getElementById('net'), cols=['#0f2f52','#2b5a7a','#5fb3a6','#c8955a','#9fb6c8'];
+  let seed=7; const rnd=()=>{seed=(seed*9301+49297)%233280;return seed/233280;};
+  for(let i=0;i<34;i++){
+    const x=650+rnd()*330, y=40+rnd()*230, r=2.5+rnd()*5, c=cols[Math.floor(rnd()*cols.length)];
+    const d=1.8+(x-650)/330*1.4;
+    if(rnd()>.35){
+      const l=document.createElementNS(NS,'path'), len=Math.min(30+rnd()*70,985-x);
+      l.setAttribute('d',`M${x} ${y} L${x+len} ${y-len*.6*(rnd()>.5?1:0)}`);
+      l.setAttribute('class','link'); l.setAttribute('stroke',c); l.style.animationDelay=d+'s'; net.append(l);
+    }
+    const n=document.createElementNS(NS,'circle');
+    n.setAttribute('cx',x); n.setAttribute('cy',y); n.setAttribute('r',r); n.setAttribute('fill',c);
+    n.setAttribute('class','node'); n.style.color=c;
+    n.style.animationDelay=`${d}s, ${d+rnd()*3}s`; net.append(n);
+  }
+
+  /* גלים חיים */
+  const wg=document.getElementById('waves'), W=[];
+  for(let i=0;i<9;i++){
+    const p=document.createElementNS(NS,'path'); p.setAttribute('class','wave');
+    p.setAttribute('stroke',i%2?'#2b5a7a':'#c8955a'); wg.append(p);
+    W.push({p,a:30+i*9,k:.006+i*.0009,s:.5+i*.07,ph:i*.8});
+  }
+  function frame(t){
+    t/=1000;
+    W.forEach(w=>{
+      let d='';
+      for(let x=0;x<=1000;x+=16){
+        const env=.18+.82*Math.abs(x-500)/500;
+        const y=150+w.a*env*Math.sin(x*w.k+t*w.s+w.ph);
+        d+=(x?'L':'M')+x+' '+y.toFixed(1);
+      }
+      w.p.setAttribute('d',d);
+    });
+    if(!reduce) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+
+  /* תזוזה קלה עם העכבר */
+  const art=document.getElementById('art');
+  addEventListener('pointermove',e=>{
+    if(reduce||e.pointerType!=='mouse')return;
+    const dx=(e.clientX/innerWidth-.5), dy=(e.clientY/innerHeight-.5);
+    art.style.transform=`perspective(900px) rotateY(${dx*8}deg) rotateX(${-dy*6}deg)`;
+  });
+
+  /* ספירה לאחור */
+  const T=new Date('2026-11-23T09:00:00+02:00').getTime(), prev={};
+  function tickCount(){
+    let ms=Math.max(0,T-Date.now());
+    const v={d:Math.floor(ms/864e5),h:Math.floor(ms/36e5)%24,m:Math.floor(ms/6e4)%60,s:Math.floor(ms/1e3)%60};
+    for(const k in v){
+      const el=document.querySelector(`[data-u="${k}"]`), val=String(v[k]).padStart(2,'0');
+      if(prev[k]!==val){el.textContent=val;el.classList.remove('tick');void el.offsetWidth;el.classList.add('tick');prev[k]=val;}
+    }
+  }
+  tickCount(); setInterval(tickCount,1000);
+
+  /* מילים נדלקות בתורן */
+  const ws=[...document.querySelectorAll('.w')]; let wi=0;
+  setTimeout(()=>setInterval(()=>{ws.forEach(w=>w.classList.remove('on'));ws[wi%ws.length].classList.add('on');wi++;},1400),3600);
+
+  /* יומן וניווט */
+  const TITLE='כנס מנהלים ורשתות לבתי הספר המקצועיים — מנהיגות אנושית מחברת בעידן הבינה', LOC='ג׳ייקובס חדרה';
+  document.getElementById('gcal').href='https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent(TITLE)+
+    '&dates=20261123T070000Z/20261123T130000Z&location='+encodeURIComponent(LOC)+'&details='+encodeURIComponent('המנהל להכשרה מקצועית · משרד העבודה');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//merhav//kenes//HE','BEGIN:VEVENT','UID:kenes-tashpaz-20261123@pedagogiamh.co.il',
+    'DTSTAMP:20261022T000000Z','DTSTART:20261123T070000Z','DTEND:20261123T130000Z','SUMMARY:'+TITLE,'LOCATION:'+LOC,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  document.getElementById('ics').href='data:text/calendar;charset=utf-8,'+encodeURIComponent(ics);
+  document.getElementById('calBtn').onclick=()=>document.getElementById('calMenu').classList.toggle('open');
+  document.getElementById('wazeBtn').href='https://waze.com/ul?q='+encodeURIComponent('ג\'ייקובס חדרה')+'&navigate=yes';
+  document.getElementById('mapsBtn').href='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent('ג\'ייקובס חדרה');
+})();
+</script>
+</body>
+</html>
