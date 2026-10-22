@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>רשימת המוזמנים · כנס מנהלים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F6F5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2'/><circle cx='9' cy='7' r='4'/><path d='M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap" rel="stylesheet">
+<!-- רשימת המוזמנים לכנס המנהלים 23.11.26 — עריכה של רויטל (22.10.26).
+     השרת: רויטל\kenes-muzmanim-gas (merhav). כל שינוי נשמר מיד בגיליון ובלשונית "יומן".
+     הגישה רק עם הקישור האישי (?k=...). אין בדף הזה נתונים — הכול נטען מהשרת. -->
+<style>
+:root{
+  --paper:#F3EDE2; --paper-2:#EBE3D5; --card:#FBF8F2; --ink:#1D1B18; --ink-2:#5E574D; --muted:#8A8276;
+  --line:#D9CFBE; --teal:#1F6F5C; --teal-soft:#E1ECE6; --amber:#C2620C; --amber-soft:#F6E3CF; --danger:#A8322A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:860px;margin:0 auto;padding:0 16px}
+.serif{font-family:'Frank Ruhl Libre',Georgia,serif}
+.ltr{direction:ltr;unicode-bidi:isolate}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+svg.i{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ---- head ---- */
+header{padding:34px 0 8px;border-bottom:2px solid var(--ink)}
+.eyebrow{color:var(--amber);font-weight:700;font-size:13.5px;letter-spacing:.14em}
+h1{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:clamp(34px,8vw,52px);line-height:1.05;margin:6px 0 10px}
+.lede{color:var(--ink-2);margin:0 0 18px;max-width:58ch}
+.lede mark{background:linear-gradient(transparent 55%,var(--amber-soft) 55%);color:inherit;padding:0 2px}
+.stats{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap;padding:6px 0 18px}
+.stat b{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:44px;line-height:1;color:var(--teal)}
+.stat span{display:block;color:var(--ink-2);font-size:14.5px}
+.who{margin-inline-start:auto;font-size:14px;color:var(--muted)}
+
+/* ---- toolbar ---- */
+.bar{position:sticky;top:0;z-index:5;background:var(--paper);padding:14px 0 10px;border-bottom:1px solid var(--line)}
+.bar-row{display:flex;gap:10px}
+.search{flex:1;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);padding:0 12px;min-height:46px}
+.search input{border:0;background:none;outline:none;flex:1;min-width:0;font-size:16.5px;padding:10px 0}
+.search:focus-within{border-color:var(--teal)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:46px;padding:0 18px;border:1px solid var(--ink);background:var(--ink);color:var(--paper);font-weight:700;white-space:nowrap}
+.btn:hover{background:var(--teal);border-color:var(--teal)}
+.btn.ghost{background:none;color:var(--ink)}
+.btn.ghost:hover{background:var(--paper-2);color:var(--ink);border-color:var(--ink)}
+.btn.amber{background:var(--amber);border-color:var(--amber);color:#fff}
+.btn.amber:hover{background:#a8540a;border-color:#a8540a}
+.btn[disabled]{opacity:.55;cursor:default}
+@media (max-width:520px){.btn .lbl-long{display:none}}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+@media (max-width:560px){.chips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-16px;padding-inline:16px}.chips::-webkit-scrollbar{display:none}.chip{flex:none}}
+.chip{border:1px solid var(--line);background:none;padding:4px 12px;font-size:14.5px;color:var(--ink-2)}
+.chip b{font-weight:700;color:var(--ink)}
+.chip.on{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip.on b{color:var(--paper)}
+
+/* ---- list ---- */
+.grp{margin-top:30px}
+.grp h2{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:26px;margin:0 0 4px;display:flex;align-items:baseline;gap:10px}
+.grp h2 small{font-family:'Assistant',sans-serif;font-weight:600;font-size:14px;color:var(--amber);letter-spacing:.06em}
+.row{display:flex;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line)}
+.row .txt{flex:1;min-width:0}
+.row .nm{font-weight:700;font-size:17.5px}
+.row .nm.missing{color:var(--muted);font-weight:600;font-style:italic}
+.row .sub{color:var(--ink-2);font-size:15px;overflow-wrap:anywhere}
+.row .sub .ltr{color:var(--teal)}
+.row .sub .nomail{color:var(--muted)}
+.row.flash{animation:flash 1.6s ease}
+@keyframes flash{0%{background:var(--teal-soft)}100%{background:transparent}}
+.acts{display:flex;gap:4px;flex:none}
+.ib{width:42px;height:42px;display:inline-flex;align-items:center;justify-content:center;border:1px solid transparent;background:none;color:var(--ink-2)}
+.ib:hover{border-color:var(--line);background:var(--card);color:var(--ink)}
+.ib.del:hover{color:var(--danger)}
+.empty{padding:40px 0;color:var(--ink-2);text-align:center}
+
+/* ---- edit form ---- */
+.form{border-top:1px solid var(--line);border-right:4px solid var(--amber);background:var(--card);padding:16px;margin:0}
+.form.top{margin-top:16px;border-top:1px solid var(--line)}
+.form h3{margin:0 0 10px;font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:21px}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg .full{grid-column:1/-1}
+@media (max-width:560px){.fg{grid-template-columns:1fr}}
+.fg label{display:block;font-size:14px;font-weight:700;color:var(--ink-2);margin-bottom:4px}
+.fg input{width:100%;min-height:46px;border:1px solid var(--line);background:#fff;padding:8px 12px;font-size:16.5px;outline:none}
+.fg input:focus{border-color:var(--teal)}
+.fg input.ltr{text-align:left}
+.facts{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.ferr{color:var(--danger);font-size:14.5px;margin-top:8px;min-height:1em}
+
+/* ---- deleted ---- */
+details.gone{margin-top:40px;border-top:2px solid var(--ink);padding-top:12px}
+details.gone summary{cursor:pointer;font-weight:700;color:var(--ink-2);list-style:none;display:flex;align-items:center;gap:8px;min-height:40px}
+details.gone summary::-webkit-details-marker{display:none}
+details.gone .row .nm{text-decoration:line-through;text-decoration-color:var(--muted);color:var(--ink-2)}
+
+/* ---- status ---- */
+.state{padding:60px 0;text-align:center;color:var(--ink-2)}
+.state h2{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;color:var(--ink);font-size:28px;margin:0 0 8px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(120px);z-index:20;background:var(--ink);color:var(--paper);padding:12px 18px;display:flex;align-items:center;gap:14px;max-width:calc(100% - 32px);transition:transform .25s ease;font-size:15.5px}
+.toast.on{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--danger)}
+.toast button{background:none;border:0;color:var(--amber-soft);font-weight:700;text-decoration:underline;padding:4px}
+
+footer{text-align:center;padding:44px 16px 40px;color:var(--muted);font-size:14px}
+.helpbtn{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--ink-2);border:1px solid var(--line);padding:6px 14px;text-decoration:none;margin-bottom:16px}
+.helpbtn:hover{color:var(--teal);border-color:var(--teal)}
+.credit{font-size:.72rem;color:#8A97A6;margin-top:6px}
+.credit a{color:inherit}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">כנס מנהלים · 23.11.26</div>
+    <h1>רשימת המוזמנים</h1>
+    <p class="lede">אפשר להוסיף, לערוך ולמחוק. <mark>כל שינוי נשמר מיד</mark> אצלנו בגיליון, ונרשם ביומן השינויים.</p>
+    <div class="stats" id="stats" hidden>
+      <div class="stat"><b id="sTotal">0</b><span>מוזמנים</span></div>
+      <div class="stat"><b id="sMail">0</b><span>עם מייל</span></div>
+      <div class="who" id="who"></div>
+    </div>
+  </header>
+</div>
+
+<div class="bar" id="bar" hidden>
+  <div class="wrap">
+    <div class="bar-row">
+      <label class="search"><svg class="i" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="חיפוש שם, בית ספר, רשת, מייל" autocomplete="off"></label>
+      <button class="btn amber" id="addBtn" type="button"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>הוספה<span class="lbl-long"> של מוזמן.ת</span></span></button>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="addSlot"></div>
+  <div id="list"><div class="state">טוען את הרשימה…</div></div>
+  <details class="gone" id="gone" hidden>
+    <summary><svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg><span id="goneT"></span></summary>
+    <div id="goneList"></div>
+  </details>
+</main>
+
+<footer>
+  <a class="helpbtn" href="https://wa.me/972536256653?text=%D7%A8%D7%A9%D7%99%D7%9E%D7%AA%20%D7%94%D7%9E%D7%95%D7%96%D7%9E%D7%A0%D7%99%D7%9D%20%D7%9C%D7%9B%D7%A0%D7%A1%20%E2%80%94%20%D7%AA%D7%99%D7%90%D7%95%D7%A8%20%D7%94%D7%91%D7%A2%D7%99%D7%94%3A%20" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg>נתקלת בבעיה? שלחי הודעה</a>
+  <div>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"><span id="toastT"></span><button type="button" id="toastB" hidden>ביטול</button></div>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbydQlis0xff23vy7aZZ0XCpzGUqiuBqvGkGsx-pi9WmbkQF2aMV7WEqRvzKUvzaUQNaAw/exec';
+  var KEY = new URLSearchParams(location.search).get('k') || '';
+  var FIELDS = [
+    ['first', 'שם פרטי', ''],
+    ['last', 'שם משפחה', ''],
+    ['g', 'מאיפה', 'מטה / מחוז / רשת / מנהל.ת…'],
+    ['email', 'מייל', ''],
+    ['role', 'תפקיד / בית ספר', '']
+  ];
+  var rows = [], deleted = [], filter = '', q = '', openId = null, busy = false;
+  var $ = function (id) { return document.getElementById(id); };
+
+  var IC = {
+    edit: '<svg class="i" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></svg>',
+    del: '<svg class="i" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6"/></svg>',
+    undo: '<svg class="i" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg>'
+  };
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function grp(r) { return r.g || 'ללא שיוך'; }
+  function name(r) { return [r.first, r.last].filter(Boolean).join(' '); }
+
+  function call(d) {
+    d.k = KEY;
+    return fetch(API, { method: 'POST', body: JSON.stringify(d), credentials: 'omit', redirect: 'follow' })
+      .then(function (r) { return r.json(); })
+      .then(function (j) { if (!j.ok) throw new Error(j.error || 'error'); return j; });
+  }
+
+  var toastTimer;
+  function toast(msg, err, undo) {
+    var t = $('toast'), b = $('toastB');
+    $('toastT').textContent = msg;
+    t.classList.toggle('err', !!err);
+    b.hidden = !undo;
+    b.onclick = undo ? function () { t.classList.remove('on'); undo(); } : null;
+    t.classList.add('on');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { t.classList.remove('on'); }, undo ? 7000 : 2600);
+  }
+  function failMsg(e) {
+    return String(e && e.message) === 'no_access' ? 'אין הרשאה — הקישור לא תקין' : 'לא נשמר — בדקי חיבור לאינטרנט ונסי שוב';
+  }
+
+  /* ---------------- load ---------------- */
+  if (!KEY) {
+    $('list').innerHTML = '<div class="state"><h2>חסר הקישור האישי</h2>הדף נפתח רק מהקישור ששלחנו לך. אפשר לבקש אותו מחדש מהמרחב הפדגוגי.</div>';
+    return;
+  }
+  call({ action: 'list' }).then(function (j) {
+    rows = j.rows; deleted = j.deleted;
+    $('who').textContent = 'עורכת: ' + j.who;
+    $('stats').hidden = false; $('bar').hidden = false;
+    render();
+  }).catch(function (e) {
+    $('list').innerHTML = '<div class="state"><h2>' + (String(e.message) === 'no_access' ? 'הקישור לא תקין' : 'לא הצלחנו לטעון') + '</h2>' +
+      (String(e.message) === 'no_access' ? 'בקשי את הקישור מחדש מהמרחב הפדגוגי.' : 'בדקי חיבור לאינטרנט ורענני את הדף.') + '</div>';
+  });
+
+  /* ---------------- render ---------------- */
+  function groups() {
+    var order = [], seen = {};
+    rows.forEach(function (r) { var g = grp(r); if (!seen[g]) { seen[g] = 0; order.push(g); } seen[g]++; });
+    return { order: order, count: seen };
+  }
+
+  function match(r) {
+    if (filter && grp(r) !== filter) return false;
+    if (!q) return true;
+    return (r.first + ' ' + r.last + ' ' + r.last + ' ' + r.first + ' ' + r.role + ' ' + r.g + ' ' + r.email).toLowerCase().indexOf(q) > -1;
+  }
+
+  function rowHtml(r, gone) {
+    var nm = name(r);
+    var sub = [];
+    if (r.role) sub.push(esc(r.role));
+    sub.push(r.email ? (r.email.indexOf('@') > -1 ? '<span class="ltr">' + esc(r.email) + '</span>' : '<span class="nomail">' + esc(r.email) + '</span>') : '<span class="nomail">אין מייל</span>');
+    var acts = gone
+      ? '<button class="btn ghost" type="button" data-restore="' + r.id + '">' + IC.undo + 'שחזור</button>'
+      : '<button class="ib" type="button" data-edit="' + r.id + '" aria-label="עריכה" title="עריכה">' + IC.edit + '</button>' +
+        '<button class="ib del" type="button" data-del="' + r.id + '" aria-label="מחיקה" title="מחיקה">' + IC.del + '</button>';
+    return '<div class="row" id="r-' + r.id + '"><div class="txt"><div class="nm' + (nm ? '' : ' missing') + '">' + (nm ? esc(nm) : 'שם לא ידוע') + '</div>' +
+      '<div class="sub">' + sub.join(' · ') + '</div></div><div class="acts">' + acts + '</div></div>';
+  }
+
+  function render() {
+    var G = groups();
+    $('sTotal').textContent = rows.length;
+    $('sMail').textContent = rows.filter(function (r) { return r.email.indexOf('@') > -1; }).length;
+    if (filter && !G.count[filter]) filter = '';
+    $('chips').innerHTML = '<button class="chip' + (filter ? '' : ' on') + '" data-f="">הכול <b>' + rows.length + '</b></button>' +
+      G.order.map(function (g) { return '<button class="chip' + (filter === g ? ' on' : '') + '" data-f="' + esc(g) + '">' + esc(g) + ' <b>' + G.count[g] + '</b></button>'; }).join('');
+
+    var html = '';
+    G.order.forEach(function (g) {
+      var list = rows.filter(function (r) { return grp(r) === g && match(r); });
+      if (!list.length) return;
+      html += '<section class="grp"><h2>' + esc(g) + ' <small>' + list.length + '</small></h2>' +
+        list.map(function (r) { return openId === r.id ? formHtml(r) : rowHtml(r); }).join('') + '</section>';
+    });
+    $('list').innerHTML = html || '<div class="empty">' + (rows.length ? 'לא נמצא — נסי מילה אחרת' : 'הרשימה ריקה') + '</div>';
+
+    $('gone').hidden = !deleted.length;
+    $('goneT').textContent = 'נמחקו (' + deleted.length + ') — אפשר לשחזר';
+    $('goneList').innerHTML = deleted.map(function (r) { return rowHtml(r, true); }).join('');
+    if (openId) focusForm();
+  }
+
+  /* ---------------- form ---------------- */
+  function groupOptions() {
+    return '<datalist id="glist">' + groups().order.filter(function (g) { return g !== 'ללא שיוך'; })
+      .map(function (g) { return '<option value="' + esc(g) + '">'; }).join('') + '</datalist>';
+  }
+  function formHtml(r) {
+    var isNew = !r.id;
+    return '<form class="form' + (isNew ? ' top' : '') + '" id="frm" data-id="' + (r.id || '') + '" novalidate>' +
+      '<h3>' + (isNew ? 'מוזמן.ת חדש.ה' : 'עריכה') + '</h3><div class="fg">' +
+      FIELDS.map(function (f) {
+        var t = f[0] === 'email' ? 'email' : 'text';
+        return '<div class="' + (f[0] === 'role' ? 'full' : '') + '"><label for="f-' + f[0] + '">' + f[1] + '</label>' +
+          '<input id="f-' + f[0] + '" name="' + f[0] + '" type="' + t + '"' + (t === 'email' ? ' class="ltr" dir="ltr" inputmode="email" autocapitalize="off"' : '') +
+          (f[0] === 'g' ? ' list="glist"' : '') + ' placeholder="' + esc(f[2]) + '" value="' + esc(r[f[0]] || '') + '"></div>';
+      }).join('') + '</div>' + groupOptions() +
+      '<div class="ferr" id="ferr"></div><div class="facts"><button class="btn" type="submit">שמירה</button>' +
+      '<button class="btn ghost" type="button" data-cancel="1">ביטול</button></div></form>';
+  }
+  function focusForm() {
+    var f = $('frm'); if (!f) return;
+    f.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    var first = f.querySelector('input');
+    if (first && !f.dataset.id) first.focus();
+  }
+  function closeForm() { openId = null; $('addSlot').innerHTML = ''; render(); }
+
+  function openAdd() {
+    openId = null; render();
+    var g = filter && filter !== 'ללא שיוך' ? filter : '';
+    $('addSlot').innerHTML = formHtml({ g: g });
+    focusForm();
+  }
+
+  function submit(f) {
+    if (busy) return;
+    var r = {};
+    FIELDS.forEach(function (x) { r[x[0]] = f.elements[x[0]].value.replace(/\s+/g, ' ').trim(); });
+    if (!r.first && !r.last && !r.role) { $('ferr').textContent = 'צריך לפחות שם או תפקיד'; return; }
+    if (r.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r.email)) { $('ferr').textContent = 'המייל לא נראה תקין'; return; }
+    var id = f.dataset.id, btn = f.querySelector('[type=submit]');
+    busy = true; btn.disabled = true; btn.textContent = 'שומרת…';
+    call(id ? { action: 'edit', id: id, r: r } : { action: 'add', r: r }).then(function (j) {
+      busy = false;
+      if (id) { rows = rows.map(function (x) { return x.id === id ? j.row : x; }); }
+      else { rows.push(j.row); }
+      $('addSlot').innerHTML = ''; openId = null; q = ''; $('q').value = '';
+      render();
+      var el = $('r-' + j.row.id);
+      if (el) { el.classList.add('flash'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      toast(id ? 'נשמר' : 'נוסף לרשימה ונשמר');
+    }).catch(function (e) {
+      busy = false; btn.disabled = false; btn.textContent = 'שמירה';
+      $('ferr').textContent = failMsg(e);
+    });
+  }
+
+  function del(id) {
+    var r = rows.filter(function (x) { return x.id === id; })[0];
+    if (!r || busy) return;
+    if (!confirm('למחוק את ' + (name(r) || r.role || 'השורה') + ' מהרשימה?')) return;
+    busy = true;
+    call({ action: 'del', id: id }).then(function () {
+      busy = false;
+      rows = rows.filter(function (x) { return x.id !== id; });
+      deleted.unshift(r); render();
+      toast('נמחק: ' + (name(r) || r.role), false, function () { restore(id); });
+    }).catch(function (e) { busy = false; toast(failMsg(e), true); });
+  }
+
+  function restore(id) {
+    var r = deleted.filter(function (x) { return x.id === id; })[0];
+    if (!r || busy) return;
+    busy = true;
+    call({ action: 'restore', id: id }).then(function () {
+      busy = false;
+      deleted = deleted.filter(function (x) { return x.id !== id; });
+      rows.push(r); render();
+      var el = $('r-' + id); if (el) { el.classList.add('flash'); el.scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+      toast('שוחזר לרשימה');
+    }).catch(function (e) { busy = false; toast(failMsg(e), true); });
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button'); if (!t) return;
+    if (t.dataset.f != null) { filter = t.dataset.f; render(); return; }
+    if (t.dataset.edit) { $('addSlot').innerHTML = ''; openId = t.dataset.edit; render(); return; }
+    if (t.dataset.del) { del(t.dataset.del); return; }
+    if (t.dataset.restore) { restore(t.dataset.restore); return; }
+    if (t.dataset.cancel) { closeForm(); return; }
+    if (t.id === 'addBtn') { openAdd(); }
+  });
+  document.addEventListener('submit', function (e) { if (e.target.id === 'frm') { e.preventDefault(); submit(e.target); } });
+  $('q').addEventListener('input', function () { q = this.value.trim().toLowerCase(); if (!openId) render(); });
+})();
+</script>
+</body>
+</html>
