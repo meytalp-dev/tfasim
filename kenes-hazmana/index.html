@@ -4,7 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>מנהיגות אנושית מחברת</title>
+<title>הזמנה לכנס המנהל להכשרה מקצועית</title>
+<meta property="og:type" content="website">
+<meta property="og:locale" content="he_IL">
+<meta property="og:url" content="https://tfasim.pedagogiamh.co.il/kenes-hazmana/">
+<meta property="og:title" content="הזמנה לכנס המנהל להכשרה מקצועית">
+<meta property="og:description" content="מנהיגות אנושית מחברת בעידן הבינה · יום שני 23.11.26 · ג׳ייקובס חדרה">
+<meta property="og:image" content="https://tfasim.pedagogiamh.co.il/kenes-hazmana/logo.png">
+<meta name="description" content="מנהיגות אנושית מחברת בעידן הבינה · יום שני 23.11.26 · ג׳ייקובס חדרה">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
 <style>
@@ -23,7 +30,9 @@ body{
 .card{width:100%;max-width:720px;padding:40px 16px 28px;text-align:center;position:relative}
 
 /* ---------- כותרת עליונה ---------- */
-.logo{display:block;width:min(300px,70%);height:auto;margin:0 auto 18px;opacity:0;animation:fadeDown .9s .1s forwards}
+.logo{display:block;width:min(300px,70%);height:auto;margin:0 auto 18px;opacity:0;animation:fadeDown .9s .1s forwards;
+  translate:2.5% 0; /* מרכוז אופטי לפי העין של מיטל */
+  mix-blend-mode:multiply} /* מעלים את הרקע הלבן של ה-PNG על הנייר */
 .rule{height:1.5px;background:var(--gold);margin:0 auto;width:0;animation:grow 1s .5s forwards}
 .rule.short{max-width:110px}
 .kicker{font-size:clamp(18px,4.4vw,26px);font-weight:500;line-height:1.35;text-align:center;color:var(--navy);margin:16px auto 4px;opacity:0;animation:fadeUp .8s .8s forwards}
@@ -74,7 +83,8 @@ h1 .l3{display:block;font-size:clamp(36px,9vw,66px);font-weight:500;color:var(--
   text-decoration:none;cursor:pointer;transition:transform .2s, box-shadow .2s, background .2s;position:relative;overflow:hidden}
 .btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .btn.pri{background:var(--navy);color:#fff;box-shadow:0 8px 20px -10px rgba(15,47,82,.6)}
-.btn.reg{flex-basis:100%;max-width:280px;justify-content:center;margin:0 auto 4px;padding:15px 28px;font-size:19px;font-weight:700;
+.reg-wrap{margin:4px 0 0;opacity:0;animation:fadeUp .8s 2.4s forwards}
+.btn.reg{min-width:220px;justify-content:center;padding:15px 28px;font-size:19px;font-weight:700;
   background:var(--navy);color:#fff;box-shadow:0 10px 24px -10px rgba(15,47,82,.7)}
 .btn.reg svg{width:20px;height:20px}
 .btn.sec{background:#fff;color:var(--navy);border:1px solid rgba(15,47,82,.2)}
@@ -162,6 +172,11 @@ footer a{color:inherit}
     </svg>
   </div>
 
+  <div class="reg-wrap">
+    <a class="btn reg" href="https://tfasim.pedagogiamh.co.il/kenes-muzeon.html" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>להרשמה</a>
+  </div>
+
   <section class="details">
     <div class="det" style="animation-delay:2.8s">
       <svg viewBox="0 0 48 48" style="animation-delay:2.9s"><rect x="7" y="10" width="34" height="31" rx="4"/><path d="M7 19h34M16 6v8M32 6v8"/></svg>
@@ -183,8 +198,6 @@ footer a{color:inherit}
   <p class="count-cap">עד שנפגשים</p>
 
   <div class="actions">
-    <a class="btn reg" href="https://tfasim.pedagogiamh.co.il/kenes-muzeon.html" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/></svg>להרשמה</a>
     <button class="btn sec" id="calBtn" type="button">
       <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M12 13v5M9.5 15.5h5"/></svg>הוספה ליומן</button>
     <a class="btn sec" id="wazeBtn" target="_blank" rel="noopener">
