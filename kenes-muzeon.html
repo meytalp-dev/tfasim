@@ -57,6 +57,15 @@ select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end
 textarea{min-height:84px;resize:vertical;line-height:1.55}
 input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
 .bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+/* school search (25.10) */
+.sresults{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.sresults button{all:unset;box-sizing:border-box;display:block;width:100%;padding:11px 14px;border:2px solid var(--line);border-radius:12px;background:#fff;cursor:pointer;font-weight:600;font-size:16px;color:#25325a;text-align:right}
+.sresults button:hover,.sresults button:focus-visible{border-color:var(--blue);background:var(--blue-soft)}
+.sresults button mark{background:#fff1c2;color:inherit;border-radius:3px}
+.sresults .none{color:var(--muted);font-size:15px;padding:4px 2px}
+.schosen{display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border:2px solid var(--blue);border-radius:14px;background:var(--blue-soft);font-weight:700;color:var(--navy)}
+.schosen.on{display:flex}
+.schosen button{all:unset;cursor:pointer;color:var(--blue);font-weight:600;font-size:15px;text-decoration:underline}
 .err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:7px}
 .err.on{display:block}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -157,7 +166,12 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <div class="cond" id="schoolWrap">
     <div class="q">
       <label class="qtext" for="school">בית הספר <span class="req">*</span></label>
-      <select id="school"><option value="">בחירה מתוך 64 בתי הספר</option></select>
+      <div id="schoolPick">
+        <input type="text" id="schoolSearch" autocomplete="off" placeholder="הקלידו חלק משם בית הספר או מהעיר">
+        <div class="sresults" id="schoolResults"></div>
+        <div class="schosen" id="schoolChosen"><span id="schoolChosenName"></span><button type="button" id="schoolChange">שינוי</button></div>
+      </div>
+      <select id="school" hidden><option value="">בחירה מתוך 64 בתי הספר</option></select>
       <div class="err" id="e_school">נא לבחור בית ספר מהרשימה.</div>
     </div>
     </div>
@@ -262,6 +276,39 @@ $("school").insertAdjacentHTML("beforeend", SCHOOLS.map(function(s){ return '<op
 var NETWORKS = ["אורט","עמל","עתיד","דרור","סכנין","רימונים","בית שלומית","חנוך לנער","ימינו כקדם","טל חרמון","נחלים","אחרת"];
 $("network").insertAdjacentHTML("beforeend", NETWORKS.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join(""));
 /* בחירת בית ספר ששמו מתחיל ברשת ממלאת את הרשת (אפשר לשנות) */
+/* ---------- school search: type part of the name or city, pick from the 64 ---------- */
+function normS(s){ return String(s).replace(/["'״׳`]/g, "").replace(/[\-–\/.,()]/g, " ").replace(/\s+/g, " ").trim().toLowerCase(); }
+function pickSchool(s){
+  $("school").value = s; $("schoolSearch").value = ""; $("schoolResults").innerHTML = "";
+  $("school").dispatchEvent(new Event("change", { bubbles: true }));
+  renderSchoolPick();
+}
+function renderSchoolPick(){
+  var v = $("school").value;
+  $("schoolChosen").classList.toggle("on", !!v);
+  $("schoolChosenName").textContent = v;
+  $("schoolSearch").style.display = v ? "none" : "";
+  if (v) $("schoolResults").innerHTML = "";
+}
+function searchSchools(){
+  var q = normS($("schoolSearch").value), box = $("schoolResults");
+  if (!q){ box.innerHTML = ""; return; }
+  var words = q.split(" ");
+  var hits = SCHOOLS.filter(function(s){ var n = normS(s); return words.every(function(w){ return n.indexOf(w) >= 0; }); });
+  hits.sort(function(a, b){ return (normS(a).indexOf(q) === 0 ? 0 : 1) - (normS(b).indexOf(q) === 0 ? 0 : 1); });
+  box.innerHTML = hits.length ? hits.slice(0, 8).map(function(s){
+    return '<button type="button" data-s="' + esc(s) + '">' + esc(s) + '</button>';
+  }).join("") + (hits.length > 8 ? '<div class="none">ועוד ' + (hits.length - 8) + '. כדאי להקליד עוד כמה אותיות.</div>' : "")
+    : '<div class="none">לא נמצא. נסו מילה אחרת מהשם או את שם העיר.</div>';
+}
+$("schoolSearch").addEventListener("input", searchSchools);
+$("schoolSearch").addEventListener("keydown", function(e){
+  if (e.key !== "Enter") return; e.preventDefault();
+  var first = $("schoolResults").querySelector("button"); if (first) pickSchool(first.getAttribute("data-s"));
+});
+$("schoolResults").addEventListener("click", function(e){ var b = e.target.closest("button[data-s]"); if (b) pickSchool(b.getAttribute("data-s")); });
+$("schoolChange").addEventListener("click", function(){ $("school").value = ""; renderSchoolPick(); $("schoolSearch").focus(); saveDraft(); });
+
 $("school").addEventListener("change", function(){
   if ($("network").value) return;
   var s = this.value;
@@ -298,6 +345,7 @@ function refresh(){
   var r = val("role");
   $("schoolWrap").classList.toggle("on", atSchool(r));
   $("netWrap").classList.toggle("on", hasNet(r));
+  renderSchoolPick();
   $("orgWrap").classList.toggle("on", !!r && !atSchool(r));
   $("muzeonWrap").classList.toggle("on", r === PRINCIPAL);
   $("laterNote").classList.toggle("on", val("muzeon") === "כן");
@@ -315,7 +363,7 @@ function validate(d){
   var sch = atSchool(d.roleKind);
   bad("role", !d.roleKind);
   bad("org", !!d.roleKind && !sch && !d.org, "org");
-  bad("school", sch && SCHOOLS.indexOf(d.p.school) < 0, "school");
+  bad("school", sch && SCHOOLS.indexOf(d.p.school) < 0, "schoolSearch");
   bad("network", hasNet(d.roleKind) && NETWORKS.indexOf(d.p.network) < 0, "network");
   bad("kosher", !d.p.kosher);
   bad("phone", d.p.phone.replace(/\D/g,"").length < 9, "phone");
