@@ -135,15 +135,39 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
 
     <div class="q">
+      <span class="qtext">תפקיד <span class="req">*</span></span>
+      <div class="opts" id="roleBox">
+        <input type="radio" name="role" id="r1" value="מנהל.ת"><label for="r1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מנהל.ת בית ספר</label>
+        <input type="radio" name="role" id="r2" value="רכז.ת פדגוגי.ת"><label for="r2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>רכז.ת פדגוגי.ת</label>
+        <input type="radio" name="role" id="r3" value="מטה"><label for="r3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מטה</label>
+        <input type="radio" name="role" id="r4" value="רשת"><label for="r4"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>רשת</label>
+        <input type="radio" name="role" id="r5" value="אחר"><label for="r5"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אחר</label>
+      </div>
+      <div class="err" id="e_role">נא לבחור תפקיד.</div>
+    </div>
+
+    <div class="cond" id="orgWrap">
+      <div class="q">
+        <label class="qtext" for="org">התפקיד <span class="req">*</span></label>
+        <input type="text" id="org" placeholder="למשל: מפקחת, רכזת פדגוגית ברשת, יועצת">
+        <div class="err" id="e_org">נא לכתוב את התפקיד.</div>
+      </div>
+    </div>
+
+    <div class="cond" id="schoolWrap">
+    <div class="q">
       <label class="qtext" for="school">בית הספר <span class="req">*</span></label>
       <select id="school"><option value="">בחירה מתוך 64 בתי הספר</option></select>
       <div class="err" id="e_school">נא לבחור בית ספר מהרשימה.</div>
     </div>
+    </div>
 
+    <div class="cond" id="netWrap">
     <div class="q">
       <label class="qtext" for="network">רשת <span class="req">*</span></label>
       <select id="network"><option value="">בחירת רשת</option></select>
       <div class="err" id="e_network">נא לבחור רשת.</div>
+    </div>
     </div>
 
     <div class="q">
@@ -173,7 +197,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <div class="cond" id="foodNoteWrap"><input type="text" id="foodNote" placeholder="למשל: רגישות לגלוטן"></div>
     </div>
 
-    <!-- ============ המוזיאון ============ -->
+    <!-- ============ המוזיאון (מנהלים בלבד) ============ -->
+    <div class="cond" id="muzeonWrap">
     <div class="part" style="margin-top:34px">מוזיאון החדשנות של משרד העבודה</div>
     <div class="muzeon">
       <h3><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-7 10 7"/></svg>מוזיאון החדשנות</h3>
@@ -188,6 +213,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       </div>
       <div class="err" id="e_muzeon">נא לבחור כן או לא.</div>
       <p class="hint cond" id="laterNote" style="margin:12px 0 0">תודה! פרטים נוספים יישלחו אליכם בנפרד.</p>
+    </div>
     </div>
 
     <div class="actions">
@@ -233,7 +259,7 @@ var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {
 var token = "";
 
 $("school").insertAdjacentHTML("beforeend", SCHOOLS.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join(""));
-var NETWORKS = ["אורט","עמל","עתיד","דרור","סכנין","אחרת"];
+var NETWORKS = ["אורט","עמל","עתיד","דרור","סכנין","רימונים","בית שלומית","חנוך לנער","ימינו כקדם","טל חרמון","נחלים","אחרת"];
 $("network").insertAdjacentHTML("beforeend", NETWORKS.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join(""));
 /* בחירת בית ספר ששמו מתחיל ברשת ממלאת את הרשת (אפשר לשנות) */
 $("school").addEventListener("change", function(){
@@ -244,14 +270,21 @@ $("school").addEventListener("change", function(){
 /* ---------- read / write fields ---------- */
 function val(name){ var b = document.querySelector('input[name="'+name+'"]:checked'); return b ? b.value : ""; }
 function setRadio(name, v){ [].forEach.call(document.querySelectorAll('input[name="'+name+'"]'), function(b){ b.checked = (b.value === v); }); }
+/* 25.10: not only principals — coordinators (with a school), staff and others (no school, no exhibit) */
+function atSchool(r){ return r === PRINCIPAL || r === "רכז.ת פדגוגי.ת"; }
+function hasNet(r){ return atSchool(r) || r === "רשת"; }
 function collect(){
-  return { p:{ name:$("name").value.trim(), role:PRINCIPAL, school:$("school").value, network:$("network").value,
+  var r = val("role"), sch = atSchool(r), org = $("org").value.trim();
+  return { p:{ name:$("name").value.trim(), role: sch || !r ? r : r + (org ? " · " + org : ""),
+               school: sch ? $("school").value : "", network: hasNet(r) ? $("network").value : "",
                phone:$("phone").value.trim(), email:$("email").value.trim(), kosher:val("kosher"), food:val("food"), foodNote:$("foodNote").value.trim(),
-               muzeon:val("muzeon") }, ex:null };
+               muzeon: r === PRINCIPAL ? val("muzeon") : "" }, ex:null, roleKind:r, org:org };
 }
 function fillP(p){
   if (!p) return;
   ["name","phone","email","foodNote"].forEach(function(k){ if (p[k]) $(k).value = p[k]; });
+  var role = String(p.role || ""), m = role.match(/^(מטה|רשת|אחר)( · (.*))?$/);
+  if (m){ setRadio("role", m[1]); if (m[3]) $("org").value = m[3]; } else if (role) setRadio("role", role);
   if (p.food) setRadio("food", p.food);
   if (p.kosher) setRadio("kosher", p.kosher);
   if (p.network) $("network").value = p.network;
@@ -262,6 +295,11 @@ function fillP(p){
 
 /* ---------- conditional parts ---------- */
 function refresh(){
+  var r = val("role");
+  $("schoolWrap").classList.toggle("on", atSchool(r));
+  $("netWrap").classList.toggle("on", hasNet(r));
+  $("orgWrap").classList.toggle("on", !!r && !atSchool(r));
+  $("muzeonWrap").classList.toggle("on", r === PRINCIPAL);
   $("laterNote").classList.toggle("on", val("muzeon") === "כן");
   $("foodNoteWrap").classList.toggle("on", val("food") === "אחר");
   updateHelp();
@@ -274,12 +312,15 @@ function validate(d){
   var ok = true, first = null;
   function bad(id, cond, field){ $("e_"+id).classList.toggle("on", cond); if (field) $(field).classList.toggle("bad", cond); if (cond){ ok = false; first = first || $("e_"+id); } }
   bad("name", d.p.name.split(/\s+/).length < 2, "name");
-  bad("school", SCHOOLS.indexOf(d.p.school) < 0, "school");
-  bad("network", NETWORKS.indexOf(d.p.network) < 0, "network");
+  var sch = atSchool(d.roleKind);
+  bad("role", !d.roleKind);
+  bad("org", !!d.roleKind && !sch && !d.org, "org");
+  bad("school", sch && SCHOOLS.indexOf(d.p.school) < 0, "school");
+  bad("network", hasNet(d.roleKind) && NETWORKS.indexOf(d.p.network) < 0, "network");
   bad("kosher", !d.p.kosher);
   bad("phone", d.p.phone.replace(/\D/g,"").length < 9, "phone");
   bad("email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.p.email), "email");
-  bad("muzeon", !d.p.muzeon);
+  bad("muzeon", d.roleKind === PRINCIPAL && !d.p.muzeon);
   if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
   return ok;
 }
