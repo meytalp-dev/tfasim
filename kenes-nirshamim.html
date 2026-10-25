@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>מי נרשם · כנס מנהלים</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231F6F5C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M9 11l3 3 8-8'/><path d='M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Frank+Ruhl+Libre:wght@500;700;900&display=swap" rel="stylesheet">
+<!-- מעקב הרשמה לכנס המנהלים 23.11.26 (25.10.26) — מי נרשם ומי טרם, מול רשימת המוזמנים של רויטל.
+     נתונים: kenes-muzmanim-gas (המוזמנים) + kenes-muzeon-gas ?mode=track (הנרשמים, משני הטפסים).
+     הגישה רק עם הקישור האישי (?k=...), אותו מפתח כמו רשימת המוזמנים. אין בדף נתונים — הכול נטען מהשרת. -->
+<style>
+:root{
+  --paper:#F3EDE2; --paper-2:#EBE3D5; --card:#FBF8F2; --ink:#1D1B18; --ink-2:#5E574D; --muted:#8A8276;
+  --line:#D9CFBE; --teal:#1F6F5C; --teal-soft:#E1ECE6; --amber:#C2620C; --amber-soft:#F6E3CF; --danger:#A8322A;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:900px;margin:0 auto;padding:0 16px 40px}
+.ltr{direction:ltr;unicode-bidi:isolate}
+button{font:inherit;color:inherit;cursor:pointer}
+input{font:inherit;color:inherit}
+svg.i{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+header{padding:34px 0 8px;border-bottom:2px solid var(--ink)}
+.eyebrow{color:var(--amber);font-weight:700;font-size:13.5px;letter-spacing:.14em}
+h1{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:clamp(34px,8vw,52px);line-height:1.05;margin:6px 0 10px}
+.lede{color:var(--ink-2);margin:0 0 16px;max-width:60ch}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding:4px 0 6px}
+.big b{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:64px;line-height:1;color:var(--teal)}
+.big span{color:var(--ink-2);font-size:18px}
+.bar{height:8px;background:var(--paper-2);border-radius:99px;overflow:hidden;margin:6px 0 16px}
+.bar i{display:block;height:100%;background:var(--teal);border-radius:99px}
+.meta{font-size:14px;color:var(--muted);padding-bottom:14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.meta button{background:none;border:0;color:var(--teal);text-decoration:underline;padding:0}
+
+section{padding:26px 0 6px;border-bottom:1px solid var(--line)}
+h2{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:28px;margin:0 0 4px;line-height:1.15}
+.kick{color:var(--amber);font-weight:700;font-size:13px;letter-spacing:.12em;margin-bottom:2px}
+.sub{color:var(--ink-2);margin:0 0 14px;font-size:15.5px}
+
+/* groups */
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 18px;margin:6px 0 10px}
+.g{padding:10px 0;border-top:1px solid var(--line)}
+.g b{font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:26px;color:var(--teal)}
+.g small{color:var(--ink-2);font-size:14px}
+.g .gb{height:4px;background:var(--paper-2);border-radius:99px;margin-top:6px;overflow:hidden}
+.g .gb i{display:block;height:100%;background:var(--teal)}
+
+/* missing */
+details.miss{border-top:1px solid var(--line);padding:12px 0}
+details.miss summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+details.miss summary::-webkit-details-marker{display:none}
+details.miss summary .n{margin-inline-start:auto;color:var(--amber);font-family:'Frank Ruhl Libre',Georgia,serif;font-weight:900;font-size:22px}
+details.miss summary .chev{transition:transform .2s;color:var(--muted)}
+details.miss[open] summary .chev{transform:rotate(-90deg)}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 10px}
+.chip{background:var(--amber-soft);color:#7A3D06;border-radius:8px;padding:4px 10px;font-size:15px;font-weight:600}
+.chip small{font-weight:500;color:#9a5a20}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-weight:600;font-size:15px}
+.btn:hover{border-color:var(--teal);color:var(--teal)}
+.btn.done{border-color:var(--teal);color:var(--teal);background:var(--teal-soft)}
+
+/* registered */
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 12px}
+.search{flex:1 1 220px;padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:var(--card)}
+.list{border-top:2px solid var(--ink)}
+.row{display:grid;grid-template-columns:1.3fr 1.5fr 1fr .7fr;gap:4px 14px;padding:11px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.row .nm{font-weight:700}
+.row .nm small{display:block;font-weight:500;color:var(--muted);font-size:13px}
+.row .rl{color:var(--ink-2);font-size:15px}
+.row .fd{font-size:14.5px;color:var(--ink-2)}
+.row .tg{font-size:13px;color:var(--muted);text-align:left}
+.tag{display:inline-block;font-size:12.5px;font-weight:700;border-radius:6px;padding:1px 7px;margin-inline-start:4px}
+.tag.mz{background:var(--teal-soft);color:var(--teal)}
+.tag.out{background:var(--amber-soft);color:#7A3D06}
+.head.row{font-size:13px;color:var(--muted);font-weight:700;letter-spacing:.04em}
+@media (max-width:640px){
+  .row{grid-template-columns:1fr;gap:2px}
+  .head.row{display:none}
+  .row .tg{text-align:right}
+}
+.empty{color:var(--muted);padding:14px 0}
+
+.note{background:var(--card);border-right:4px solid var(--amber);padding:12px 14px;margin:14px 0;color:var(--ink-2);font-size:15.5px}
+.gate{padding:60px 0;text-align:center;color:var(--ink-2)}
+.gate h1{font-size:34px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:10px;font-size:15px;transition:transform .25s;z-index:9;visibility:hidden}
+.toast.on{transform:translateX(-50%) translateY(0);visibility:visible}
+footer{padding:26px 0 0;font-size:13.5px;color:var(--muted);text-align:center}
+footer a{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <div class="gate"><h1>טוען…</h1></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var MUZ_API = "https://script.google.com/macros/s/AKfycbydQlis0xff23vy7aZZ0XCpzGUqiuBqvGkGsx-pi9WmbkQF2aMV7WEqRvzKUvzaUQNaAw/exec";
+var REG_API = "https://script.google.com/macros/s/AKfycbzwzbcv2BPft8rNmK1U-ADYlcQ3sxt1_khT7YyZzXYsmIB8LzKqZXNMAzewli0TsWQU/exec";
+var KEY = new URLSearchParams(location.search).get("k") || "";
+var GROUP_ORDER = ["מנהל.ת", "רכז.ת פדגוגי.ת", "מטה", "רשת", "יועץ.ת תוכן", "שותף.ה"];
+var GROUP_NAME = { "מנהל.ת": "מנהלים", "רכז.ת פדגוגי.ת": "רכזים פדגוגיים", "מטה": "מטה", "רשת": "רשתות", "יועץ.ת תוכן": "יועצי תוכן", "שותף.ה": "שותפים" };
+var ICON = {
+  copy: '<svg class="i" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>',
+  mail: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>',
+  down: '<svg class="i" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>',
+  chev: '<svg class="i chev" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>'
+};
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
+var DATA = null, Q = "";
+
+function toast(t) { var el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(function () { el.classList.remove("on"); }, 2200); }
+function copyText(t, done) {
+  function ok() { toast(done || "הועתק"); }
+  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(t).then(ok, fallback); } else fallback();
+  function fallback() { var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) {} document.body.removeChild(ta); }
+}
+function normName(s) { return String(s || "").replace(/["'״׳.]/g, "").replace(/^(ד"?ר|הרב|גב'?|מר)\s+/, "").replace(/\s+/g, " ").trim(); }
+
+/* ---------- match registrations to invitees: e-mail first, then both names ---------- */
+function build(invitees, people) {
+  var byMail = {};
+  invitees.forEach(function (r) { var m = String(r.email || "").trim().toLowerCase(); if (m) byMail[m] = r; });
+  var regOf = {}, outside = [];
+  people.forEach(function (p) {
+    var m = String(p.email || "").trim().toLowerCase(), inv = byMail[m];
+    if (!inv) {
+      var pn = normName(p.name);
+      inv = invitees.filter(function (r) {
+        if (regOf[r.id]) return false;
+        var f = normName(r.first), l = normName(r.last);
+        return f && l && pn.indexOf(f) >= 0 && pn.indexOf(l) >= 0;
+      })[0];
+    }
+    if (inv && !regOf[inv.id]) { regOf[inv.id] = p; p._inv = inv; } else outside.push(p);
+  });
+  return { regOf: regOf, outside: outside };
+}
+
+function invName(r) { return [r.first, r.last].filter(String).join(" ") || r.role || ""; }
+function where(p) {
+  if (p.school) return p.school + (p.network ? " · " + p.network : "");
+  return p.network || "";
+}
+function roleLabel(p) { return String(p.role || "").replace(/^נציג\.ת רשת/, "נציג.ת רשת"); }
+
+function render() {
+  var inv = DATA.inv, people = DATA.people, m = build(inv, people);
+  var reg = inv.filter(function (r) { return m.regOf[r.id]; }), miss = inv.filter(function (r) { return !m.regOf[r.id]; });
+  var total = inv.length, pct = total ? Math.round(reg.length / total * 100) : 0;
+  var groups = GROUP_ORDER.filter(function (g) { return inv.some(function (r) { return r.g === g; }); })
+    .concat(inv.map(function (r) { return r.g; }).filter(function (g, i, a) { return GROUP_ORDER.indexOf(g) < 0 && a.indexOf(g) === i; }));
+
+  var h = '<header><div class="eyebrow">כנס מנהלים ורשתות · 23.11.26 · ג׳ייקובס חדרה</div>' +
+    '<h1>מי נרשם לכנס</h1>' +
+    '<p class="lede">מול רשימת המוזמנים. ההצלבה לפי המייל, ואם אין התאמה, לפי השם. כולל את טופס הרשתות.</p>' +
+    '<div class="big"><b>' + people.length + '</b><span>נרשמו · מהם <b style="font-size:inherit;color:var(--teal)">' + reg.length + '</b> מתוך ' + total + ' מוזמנים (' + pct + '%)</span></div>' +
+    '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
+    '<div class="meta"><span>עודכן ' + new Date(DATA.fetched).toLocaleString("he-IL", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "numeric" }) + '</span>' +
+    '<button type="button" id="reload">רענון</button><span>' + esc(DATA.who) + '</span></div></header>';
+
+  /* by group */
+  h += '<section><div class="kick">לפי קבוצה</div><div class="groups">' + groups.map(function (g) {
+    var all = inv.filter(function (r) { return r.g === g; }), n = all.filter(function (r) { return m.regOf[r.id]; }).length;
+    return '<div class="g"><b>' + n + '</b> <small>מתוך ' + all.length + '</small><div>' + esc(GROUP_NAME[g] || g) + '</div><div class="gb"><i style="width:' + (all.length ? n / all.length * 100 : 0) + '%"></i></div></div>';
+  }).join("") + '</div></section>';
+
+  /* who has not registered */
+  h += '<section><div class="kick">לרדוף אחרי</div><h2>טרם נרשמו · ' + miss.length + ' מתוך ' + total + '</h2>' +
+    '<p class="sub">לפי קבוצה. "העתקת מיילים" מעתיקה את כל הכתובות של הקבוצה, להדבקה בשורת הנמענים (בעותק מוסתר).</p>';
+  groups.forEach(function (g) {
+    var list = miss.filter(function (r) { return r.g === g; });
+    if (!list.length) return;
+    h += '<details class="miss"><summary>' + ICON.chev + esc(GROUP_NAME[g] || g) + '<span class="n">' + list.length + '</span></summary>' +
+      '<div class="chips">' + list.map(function (r) {
+        return '<span class="chip">' + esc(invName(r)) + (r.role && g !== "מטה" ? ' <small>· ' + esc(r.role) + '</small>' : '') + '</span>';
+      }).join("") + '</div><div class="acts">' +
+      '<button type="button" class="btn" data-copy-mails="' + esc(g) + '">' + ICON.mail + 'העתקת מיילים (' + list.filter(function (r) { return r.email; }).length + ')</button>' +
+      '<button type="button" class="btn" data-copy-names="' + esc(g) + '">' + ICON.copy + 'העתקת שמות</button></div></details>';
+  });
+  if (!miss.length) h += '<p class="empty">כל המוזמנים נרשמו.</p>';
+  h += '</section>';
+
+  /* registered */
+  var shown = people.filter(function (p) {
+    if (!Q) return true;
+    return [p.name, p.role, p.school, p.network, p.email].join(" ").indexOf(Q) >= 0;
+  }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
+  var muz = people.filter(function (p) { return p.muzeon === "כן" && !/^נציג\.ת רשת/.test(p.role); }).length;
+  h += '<section><div class="kick">נרשמו</div><h2>' + people.length + ' נרשמו</h2>' +
+    '<p class="sub">מוזיאון החדשנות: ' + muz + ' מנהלים אמרו "כן" · דוכנים בתערוכת הרשתות: ' + DATA.booths.length +
+    (DATA.booths.length ? ' (' + DATA.booths.map(function (b) { return esc(b.network); }).join(", ") + ')' : '') + '</p>' +
+    '<div class="tools"><input type="search" class="search" id="q" placeholder="חיפוש לפי שם, בית ספר, רשת" value="' + esc(Q) + '">' +
+    '<button type="button" class="btn" id="csv">' + ICON.down + 'ייצוא לאקסל</button></div>' +
+    '<div class="list"><div class="row head"><span>שם</span><span>תפקיד · בית ספר / רשת</span><span>אוכל</span><span>נרשם.ה</span></div>' +
+    (shown.length ? shown.map(function (p) {
+      var food = [p.kosher, p.food === "אחר" ? (p.foodNote || "רגישות") : p.food].filter(String).join(" · ");
+      return '<div class="row"><span class="nm">' + esc(p.name) + (p._inv ? '' : '<span class="tag out">לא ברשימה</span>') +
+        (p.muzeon === "כן" ? '<span class="tag mz">' + (/^נציג\.ת רשת/.test(p.role) ? 'דוכן' : 'מוזיאון') + '</span>' : '') +
+        '<small class="ltr">' + esc(p.phone) + '</small></span>' +
+        '<span class="rl">' + esc(roleLabel(p)) + (where(p) ? '<br>' + esc(where(p)) : '') + '</span>' +
+        '<span class="fd">' + esc(food) + '</span><span class="tg">' + esc(String(p.at).split(" ")[0]) + '</span></div>';
+    }).join("") : '<p class="empty">' + (Q ? 'לא נמצא.' : 'עוד אין נרשמים.') + '</p>') + '</div>';
+  h += '</section>';
+
+  /* outside the list */
+  if (m.outside.length) {
+    h += '<section><div class="kick">לבדיקה</div><h2>נרשמו ולא ברשימת המוזמנים · ' + m.outside.length + '</h2>' +
+      '<p class="sub">לא נמצאה התאמה לפי מייל או שם. אולי נרשמו עם כתובת אחרת, או שהגיעו מהפצה של מישהו אחר. הם לא נחשבים כאן כ"טרם נרשמו".</p>' +
+      '<div class="chips">' + m.outside.map(function (p) { return '<span class="chip" style="background:var(--teal-soft);color:var(--teal)">' + esc(p.name) + ' <small style="color:var(--teal)">· ' + esc(where(p) || roleLabel(p)) + '</small></span>'; }).join("") + '</div></section>';
+  }
+
+  h += '<footer>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br>נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>';
+  $("app").innerHTML = h;
+  DATA._miss = miss; DATA._shown = shown;
+  var q = $("q"); if (Q) { q.focus(); q.setSelectionRange(Q.length, Q.length); }
+}
+
+function csv() {
+  var cols = [["at", "נרשם.ה"], ["name", "שם"], ["role", "תפקיד"], ["school", "בית ספר"], ["network", "רשת"], ["phone", "נייד"], ["email", "מייל"],
+              ["kosher", "כשרות"], ["food", "אוכל"], ["foodNote", "רגישות / הערה"], ["muzeon", "מוזיאון / דוכן"]];
+  var cell = function (v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  var lines = [cols.map(function (c) { return c[1]; }).concat(["ברשימת המוזמנים"]).join(",")].concat(DATA.people.map(function (p) {
+    return cols.map(function (c) { return cell(p[c[0]]); }).concat([p._inv ? "כן" : "לא"]).join(",");
+  }));
+  var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+  var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "nirshamim-kenes-23-11.csv";
+  document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+
+document.addEventListener("click", function (e) {
+  var b = e.target.closest("button"); if (!b) return;
+  if (b.id === "reload") return load();
+  if (b.id === "csv") return csv();
+  var g = b.getAttribute("data-copy-mails"), n = b.getAttribute("data-copy-names");
+  if (g != null) { var ms = DATA._miss.filter(function (r) { return r.g === g && r.email; }).map(function (r) { return r.email.trim(); }); copyText(ms.join(", "), ms.length + " כתובות הועתקו"); b.classList.add("done"); }
+  if (n != null) { var ns = DATA._miss.filter(function (r) { return r.g === n; }).map(function (r) { return invName(r) + (r.role && n !== "מטה" ? " · " + r.role : ""); }); copyText(ns.join("\n"), ns.length + " שמות הועתקו"); b.classList.add("done"); }
+});
+document.addEventListener("input", function (e) { if (e.target.id === "q") { Q = e.target.value.trim(); clearTimeout(render.t); render.t = setTimeout(render, 200); } });
+
+function load() {
+  if (!KEY) { $("app").innerHTML = '<div class="gate"><h1>הדף נפתח רק מהקישור האישי</h1><p>אם קיבלת קישור במייל, פתחו אותו משם.</p></div>'; return; }
+  var a = fetch(MUZ_API, { method: "POST", body: JSON.stringify({ k: KEY, action: "list" }), credentials: "omit", redirect: "follow" }).then(function (r) { return r.json(); });
+  var b = fetch(REG_API + "?mode=track&k=" + encodeURIComponent(KEY), { credentials: "omit" }).then(function (r) { return r.json(); });
+  Promise.all([a, b]).then(function (res) {
+    if (!res[0].ok || !res[1].ok) { $("app").innerHTML = '<div class="gate"><h1>אין גישה</h1><p>הקישור לא תקין. נסו לפתוח שוב מהמייל.</p></div>'; return; }
+    DATA = { inv: res[0].rows, people: res[1].people, booths: res[1].booths || [], fetched: res[1].fetched, who: res[1].who };
+    render();
+  }).catch(function () { $("app").innerHTML = '<div class="gate"><h1>לא הצלחנו לטעון</h1><p>בדקו את החיבור ונסו לרענן.</p></div>'; });
+}
+load();
+</script>
+</body>
+</html>
