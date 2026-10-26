@@ -390,6 +390,8 @@ function submit(){
       btn.disabled = false; btn.textContent = "עדכון";
       if (r && r.ok){
         token = r.token || token;
+        /* confirmation mail: the merhav relay pulls it from the server and sends it (26.10) */
+        if (r.mail) fetch("https://script.google.com/macros/s/AKfycbxbudrzz-JSNpEeHwayjq6u8Xmz4dAsmV8FQGwHjZDeC3g028_I2uk2wX2Pi762ULZD1w/exec?src=kenesreg&id=" + encodeURIComponent(r.mail), { mode:"no-cors", credentials:"omit" }).catch(function(){});
         try{ localStorage.setItem(TOKEN_KEY, token); localStorage.removeItem(DRAFT_KEY); }catch(e){}
         $("okTitle").textContent = r.updated ? "העדכון נשמר" : "נרשמת לכנס";
         $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. פרטים נוספים יישלחו בנפרד." : "נתראה ב-23.11.");
