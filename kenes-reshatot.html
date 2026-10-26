@@ -187,6 +187,13 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <p>הכנס נפתח בתערוכת רשתות. זו הזדמנות להציג <b>פרויקטים, יוזמות חינוכיות וסיפורי הצלחה מבתי הספר שלכם</b>, ולתת במה לאנשים שמאחורי העשייה. יחד ניצור מוזיאון חי של רעיונות שאפשר ללמוד מהם ולקחת לבתי ספר נוספים.</p>
     </div>
 
+    <div class="q" style="margin-top:0;padding-top:0;border-top:0">
+      <div class="opts one" id="boothModeBox">
+        <input type="radio" name="boothMode" id="bm1" value="fill" checked><label for="bm1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אני ממלא.ת את פרטי הדוכן של הרשת</label>
+        <input type="radio" name="boothMode" id="bm2" value="only"><label for="bm2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>רישום לכנס בלבד. את פרטי הדוכן ימלא נציג אחר מהרשת</label>
+      </div>
+    </div>
+
     <div class="cond on" id="boothWrap">
       <p class="hint" id="boothBy" style="display:none;margin:18px 0 0"></p>
       <p class="hint" style="margin:18px 0 0">דוכן אחד לכל רשת. נציג נוסף מאותה רשת יראה כאן את מה שכבר נכתב ויוכל להשלים. אפשר לחזור לעדכן בהמשך.</p>
@@ -335,13 +342,14 @@ function collect(){
   B_KEYS.forEach(function(k){ b[k] = $("b_"+k).value.trim(); });
   return { p:{ name:$("name").value.trim(), role: REP + (title ? " · " + title : ""), school:"", network:netName(),
                phone:$("phone").value.trim(), email:$("email").value.trim(), kosher:val("kosher"), food:val("food"), foodNote:$("foodNote").value.trim(),
-               muzeon:"כן" }, title:title, booth:b };   /* every network sets up a booth — no yes/no question */
+               muzeon: val("boothMode") === "only" ? "" : "כן" }, title:title, booth:b };   /* 26.10: registering without the booth is allowed (a colleague fills it) */
 }
 function fillP(p, title){
   if (!p) return;
   ["name","phone","email","foodNote"].forEach(function(k){ if (p[k]) $(k).value = p[k]; });
   var t = title != null ? title : String(p.role || "").replace(/^נציג\.ת רשת( · )?/, "");
   if (t) $("title").value = t;
+  if (p.muzeon != null) setRadio("boothMode", p.muzeon === "כן" ? "fill" : "only");
   if (p.food) setRadio("food", p.food);
   if (p.kosher) setRadio("kosher", p.kosher);
   if (p.network){
@@ -360,6 +368,7 @@ function fillBooth(b){
 
 /* ---------- conditional parts ---------- */
 function refresh(){
+  $("boothWrap").classList.toggle("on", val("boothMode") !== "only");
   $("foodNoteWrap").classList.toggle("on", val("food") === "אחר");
   $("netOtherWrap").classList.toggle("on", $("network").value === "אחרת");
 }
@@ -391,8 +400,9 @@ function validate(d){
   bad("phone", d.p.phone.replace(/\D/g,"").length < 9, "phone");
   bad("email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.p.email), "email");
   bad("kosher", !d.p.kosher);
-  ["title","initiative","problem","did","changed"].forEach(function(k){ bad("b_"+k, !d.booth[k], "b_"+k); });
-  bad("b_quiz", !(d.booth.quiz && d.booth.quizA && d.booth.quizB && d.booth.quizC));
+  var fill = d.p.muzeon === "כן";
+  ["title","initiative","problem","did","changed"].forEach(function(k){ bad("b_"+k, fill && !d.booth[k], "b_"+k); });
+  bad("b_quiz", fill && !(d.booth.quiz && d.booth.quizA && d.booth.quizB && d.booth.quizC));
   if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
   return ok;
 }
