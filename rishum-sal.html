@@ -101,13 +101,13 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 <main class="wrap">
   <section class="hero">
     <h1>רישום לטופס סל תוכניות</h1>
-    <p>מלאו את הפרטים שלכם. מי שממלא.ת יותר מתפקיד אחד מסמן.ת את כולם.</p>
+    <p>לטובת הפעלת האפליקציה המשרדית לניהול התקציבים התוספתיים אנו נדרשים לקבל את הפרטים הבאים להפעלת המשתמשים באפליקציה.</p>
+    <p>במידה ואת/ה נושא/ת יותר מתפקיד אחד, אנא מלא את הטופס מחדש לתפקיד נוסף.</p>
   </section>
 
   <form class="card" id="form" novalidate>
     <div class="q">
       <div class="ql" id="l_roles">תפקיד <span class="req">*</span></div>
-      <div class="hint">אפשר לסמן יותר מתפקיד אחד</div>
       <div class="roles" id="roles" role="group" aria-labelledby="l_roles">
         <label class="chk"><input type="checkbox" name="role" value="מנהל.ת בית ספר">מנהל.ת בית ספר</label>
         <label class="chk"><input type="checkbox" name="role" value="נציג.ת רשת">נציג.ת רשת</label>
@@ -136,10 +136,12 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
 
     <div class="cond" id="c_megama">
-      <label class="ql" for="f_megama">שם המגמה <span class="req">*</span></label>
-      <select id="f_megama"><option value="" disabled selected>בחרו מגמה</option></select>
-      <input type="text" class="other" id="f_megama_o" maxlength="80" placeholder="שם המגמה">
-      <div class="err" id="e_megama">נא לבחור מגמה</div>
+      <div class="ql">תחומי הפיקוח <span class="req">*</span></div>
+      <div class="hint">במידה והינך משמש/ת בתפקיד מפקח/ת מקצועי/ת יש לבחור את תחומי הפיקוח הרלוונטיים. אפשר לבחור יותר מתחום אחד.</div>
+      <div class="slist" id="mlist"></div>
+      <div class="scount" id="mcount">לא נבחרו תחומי פיקוח</div>
+      <input type="text" class="other" id="f_megama_o" maxlength="80" placeholder="שם התחום">
+      <div class="err" id="e_megama">נא לבחור לפחות תחום פיקוח אחד</div>
     </div>
 
     <div class="cond" id="c_sup">
@@ -225,8 +227,13 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   (window.MEGAMOT_LIST || []).map(function (m) { return m.name.trim(); })
     .filter(function (n) { return n && !seen[n] && (seen[n] = 1); })
     .sort(function (a, b) { return a.localeCompare(b, 'he'); })
-    .forEach(function (n) { var o = document.createElement('option'); o.textContent = n; $('f_megama').appendChild(o); });
-  var mo = document.createElement('option'); mo.value = '__other'; mo.textContent = 'מגמה אחרת'; $('f_megama').appendChild(mo);
+    .concat(['__other'])
+    .forEach(function (n) {
+      var l = document.createElement('label');
+      var c = document.createElement('input'); c.type = 'checkbox'; c.value = n;
+      l.appendChild(c); l.appendChild(document.createTextNode(n === '__other' ? 'תחום אחר' : n));
+      $('mlist').appendChild(l);
+    });
 
   function roles() {
     return [].slice.call(document.querySelectorAll('input[name=role]:checked')).map(function (c) { return c.value; });
@@ -244,12 +251,29 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     c.addEventListener('change', function () { sync(); clearErr('roles'); $('roles').classList.remove('bad'); });
   });
 
-  [['f_network', 'f_network_o'], ['f_megama', 'f_megama_o']].forEach(function (p) {
+  [['f_network', 'f_network_o']].forEach(function (p) {
     $(p[0]).addEventListener('change', function () {
       var on = this.value === '__other';
       $(p[1]).classList.toggle('on', on);
       if (on) $(p[1]).focus();
     });
+  });
+
+  function megamaVals() {
+    var out = [];
+    [].slice.call($('mlist').querySelectorAll('input:checked')).forEach(function (c) {
+      if (c.value === '__other') { var o = $('f_megama_o').value.trim(); if (o) out.push(o); }
+      else out.push(c.value);
+    });
+    return out;
+  }
+  $('mlist').addEventListener('change', function () {
+    var n = $('mlist').querySelectorAll('input:checked').length;
+    $('mcount').textContent = n === 0 ? 'לא נבחרו תחומי פיקוח' : (n === 1 ? 'נבחר תחום פיקוח אחד' : 'נבחרו ' + n + ' תחומי פיקוח');
+    var other = $('mlist').querySelector('input[value="__other"]').checked;
+    $('f_megama_o').classList.toggle('on', other);
+    if (other) $('f_megama_o').focus();
+    $('mlist').classList.remove('bad'); clearErr('megama');
   });
 
   function supChecked() {
@@ -298,7 +322,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       roles: roles(),
       school: has('מנהל.ת בית ספר') ? $('f_school').value : '',
       network: has('נציג.ת רשת') ? pick('f_network', 'f_network_o') : '',
-      megama: has('מפקח.ת מקצועי.ת') ? pick('f_megama', 'f_megama_o') : '',
+      megama: has('מפקח.ת מקצועי.ת') ? megamaVals().join('; ') : '',
+      megamot: has('מפקח.ת מקצועי.ת') ? megamaVals() : [],
       supSchools: isSup() ? supChecked() : [],
       first: $('f_first').value.trim(),
       last: $('f_last').value.trim(),
@@ -311,7 +336,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     if (!d.roles.length) { $('roles').classList.add('bad'); fail('roles', $('roles')); }
     if (has('מנהל.ת בית ספר') && !d.school) fail('school', $('f_school'));
     if (has('נציג.ת רשת') && !d.network) fail('network', $('f_network').value === '__other' ? $('f_network_o') : $('f_network'));
-    if (has('מפקח.ת מקצועי.ת') && !d.megama) fail('megama', $('f_megama').value === '__other' ? $('f_megama_o') : $('f_megama'));
+    if (has('מפקח.ת מקצועי.ת') && !d.megamot.length) fail('megama', $('mlist'));
     if (isSup() && !d.supSchools.length) fail('sup', $('slist'));
     if (!d.first) fail('first', $('f_first'));
     if (!d.last) fail('last', $('f_last'));
