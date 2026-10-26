@@ -135,13 +135,54 @@ function copyText(t, done) {
 function normName(s) { return String(s || "").replace(/^\s*(ד"?ר|הרב|גב'?|מר)\s+/, "").replace(/["'״׳.]/g, "").replace(/[\-–־]/g, " ").replace(/\s+/g, " ").trim(); }
 function nameWords(s) { return normName(s).split(" ").filter(String); }
 
-/* ---------- match registrations to invitees: e-mail first, then both names ---------- */
+/* invisible RTL marks sneak into pasted e-mails ("‏higazi_s@...") */
+function normMail(s) { return String(s || "").replace(/[\s‎‏‪-‮﻿]/g, "").toLowerCase(); }
+function mailUser(s) { return normMail(s).split("@")[0].replace(/[^a-z0-9]/g, ""); }
+
+/* ---------- loose spelling: יוסי=יוסף, מגי=מרגלית, סלימאן=סולימאן, שחאדה=חשאדה, בדארנה=באדרנה ---------- */
+var NICK = [["יוסי", "יוסף", "יוסלה"], ["מגי", "מגי", "מרגלית", "מרגי"], ["אבי", "אברהם", "אבשלום", "אביטל"], ["מוטי", "מרדכי"], ["שוש", "שושנה", "שושי"],
+            ["רותי", "רות"], ["דודו", "דוד"], ["ציפי", "ציפורה"], ["איציק", "יצחק", "צחי"], ["בני", "בנימין", "בנצי"], ["קובי", "יעקב"], ["שוקי", "יהושע"],
+            ["אלי", "אליהו", "אליעזר"], ["מושיקו", "משה", "מושי"], ["אתי", "אסתר", "אסתי", "אתל"], ["ריקי", "רבקה"], ["חני", "חנה"], ["שמוליק", "שמואל"],
+            ["רפי", "רפאל"], ["גבי", "גבריאל", "גבריאלה"], ["דני", "דניאל"], ["מיכי", "מיכאל"], ["נתי", "נתנאל", "נתן"]];
+function skel(w) {
+  w = w.replace(/ם/g, "מ").replace(/ן/g, "נ").replace(/ץ/g, "צ").replace(/ף/g, "פ").replace(/ך/g, "כ");
+  w = w.charAt(0) + w.slice(1).replace(/[ויא]/g, "");
+  return w.length > 2 ? w.replace(/ה$/, "") : w;
+}
+function near(a, b) {                                  /* one letter added / missing / changed / swapped */
+  if (Math.abs(a.length - b.length) > 1) return false;
+  var d = [], i, j;
+  for (i = 0; i <= a.length; i++) { d[i] = [i]; }
+  for (j = 0; j <= b.length; j++) d[0][j] = j;
+  for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[a.length][b.length] <= 1;
+}
+function alike(a, b, first) {
+  if (a === b) return true;
+  var sa = skel(a), sb = skel(b);
+  if (sa === sb) return true;
+  if (Math.min(sa.length, sb.length) >= 4 && near(sa, sb)) return true;
+  if (!first) return false;
+  if (NICK.some(function (g) { return g.indexOf(a) >= 0 && g.indexOf(b) >= 0; })) return true;
+  return Math.min(sa.length, sb.length) >= 2 && (sa.indexOf(sb) === 0 || sb.indexOf(sa) === 0);
+}
+function hasAll(words, pw, first) { return words.length && words.every(function (w) { return pw.some(function (x) { return alike(w, x, first); }); }); }
+function sameOrg(p, r) {
+  var a = normName(p.school || p.network), b = normName(r.role);
+  return !!(a && b && (a.indexOf(b) >= 0 || b.indexOf(a) >= 0));
+}
+
+/* ---------- match registrations to invitees: e-mail, then both names, then loose spelling ---------- */
 function build(invitees, people) {
   var byMail = {};
-  invitees.forEach(function (r) { var m = String(r.email || "").trim().toLowerCase(); if (m) byMail[m] = r; });
-  var regOf = {}, outside = [];
+  invitees.forEach(function (r) { var m = normMail(r.email); if (m) byMail[m] = r; });
+  var regOf = {}, left = [];
+  function take(inv, p) { regOf[inv.id] = p; p._inv = inv; }
   people.forEach(function (p) {
-    var m = String(p.email || "").trim().toLowerCase(), inv = byMail[m];
+    var inv = byMail[normMail(p.email)];
     if (!inv) {
       var pw = nameWords(p.name);
       inv = invitees.filter(function (r) {
@@ -151,7 +192,22 @@ function build(invitees, people) {
                want.every(function (w) { return pw.indexOf(w) >= 0; });
       })[0];
     }
-    if (inv && !regOf[inv.id]) { regOf[inv.id] = p; p._inv = inv; } else outside.push(p);
+    if (inv && !regOf[inv.id]) take(inv, p); else left.push(p);
+  });
+  /* last name alike + (first name alike / same school / same e-mail user); one clear candidate only */
+  var outside = [];
+  left.forEach(function (p) {
+    var pw = nameWords(p.name), mu = mailUser(p.email);
+    var cands = invitees.filter(function (r) { return !regOf[r.id]; }).map(function (r) {
+      var fw = nameWords(r.first), lw = nameWords(r.last);
+      if (!fw.length || !lw.length) return null;
+      /* in some rows first/last are swapped, so either can be the "last" */
+      var f = hasAll(fw, pw, true), l = hasAll(lw, pw, false), f2 = hasAll(lw, pw, true), l2 = hasAll(fw, pw, false);
+      var org = sameOrg(p, r), um = mu && mu.length >= 4 && mu === mailUser(r.email);
+      if (!((l && (f || org || um)) || (l2 && (f2 || org || um)))) return null;
+      return { r: r, s: ((l && f) || (l2 && f2) ? 2 : 0) + (org ? 1 : 0) + (um ? 1 : 0) };
+    }).filter(Boolean).sort(function (a, b) { return b.s - a.s; });
+    if (cands.length && (cands.length === 1 || cands[0].s > cands[1].s)) take(cands[0].r, p); else outside.push(p);
   });
   return { regOf: regOf, outside: outside };
 }
