@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>העלאת סל תוכניות</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 16V4M7 9l5-5 5 5'/><path d='M4 16v4h16v-4'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- העלאת סל תוכניות — מפקחים (26.10.26). השרת: רויטל\sal-mefakchim-gas (merhav), גיליון "העלאת סל תוכניות — מפקחים (merhav)" -->
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5; --bg:#f6f8fd; --mint:#12b39f; --mint-soft:#eafaf6; --danger:#d64550;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px;position:relative}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+.site{padding:24px 0 4px}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;display:block}
+@media (max-width:480px){.logo{height:46px}}
+.hero{text-align:center;padding:18px 0 0}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,6vw,36px);line-height:1.2;margin:8px 0 10px;font-weight:700;color:var(--navy)}
+.hero p{font-size:17.5px;color:#3d4a70;max-width:52ch;margin:0 auto}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:24px 28px;margin-top:22px}
+@media (max-width:560px){.card{padding:20px 16px}}
+.ql{display:block;font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;margin-bottom:8px}
+select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
+select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.hint{color:var(--muted);font-size:15px;margin:10px 0 0;line-height:1.5}
+
+#list{display:none;margin-top:22px}
+#list.on{display:block}
+.count{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);margin:0 4px 10px;font-size:16.5px}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin:0 4px 16px}
+.bar i{display:block;height:100%;background:var(--mint);border-radius:99px;transition:width .4s var(--ease)}
+.school{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s);padding:16px 18px;margin-bottom:12px;
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.school.done{border-color:#b9ebe1}
+.school .info{flex:1 1 220px;min-width:0}
+.school h3{font-family:'Rubik',sans-serif;font-size:18px;margin:0;color:var(--ink);font-weight:600}
+.school .net{color:var(--muted);font-size:14.5px}
+.files{list-style:none;margin:8px 0 0;padding:0;font-size:14.5px;color:#2f6f63}
+.files li{display:flex;align-items:flex-start;gap:6px;overflow-wrap:anywhere}
+.files svg{width:16px;height:16px;flex:none;margin-top:3px;fill:none;stroke:var(--mint);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.files .when{color:var(--muted)}
+.up{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 18px;border:0;border-radius:14px;cursor:pointer;
+  font-family:'Rubik',sans-serif;font-size:16px;font-weight:600;color:#fff;background:linear-gradient(100deg,var(--navy),var(--blue) 70%);
+  box-shadow:0 6px 16px rgba(24,92,255,.22);transition:transform .16s var(--ease);white-space:nowrap}
+.up:hover:not(:disabled){transform:translateY(-2px)}
+.up:disabled{opacity:.6;cursor:default}
+.up.more{background:#fff;color:var(--navy);border:1.5px solid #c9d5ee;box-shadow:none}
+.up svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.school input[type=file]{display:none}
+.st{flex-basis:100%;font-size:14.5px;font-weight:600;display:none}
+.st.on{display:block}
+.st.ok{color:var(--mint)} .st.bad{color:var(--danger)} .st.wait{color:var(--muted)}
+@media (max-width:560px){.up{width:100%}}
+
+.helpwrap{text-align:center;margin-top:18px}
+.helpbtn{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;background:#fff}
+.helpbtn:hover{color:var(--navy);border-color:#c9d5ee}
+.helpbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.loadfail{display:none;color:var(--danger);font-size:15px;margin:0 4px 12px}
+.loadfail.on{display:block}
+footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.credit{margin-top:10px;font-size:.72rem;color:#8A97A6}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header class="site"><div class="wrap">
+  <img class="logo" src="https://pedagogiamh.co.il/logo.png" alt="משרד העבודה — המנהל להכשרה מקצועית" onerror="this.style.display='none'">
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>העלאת סל תוכניות</h1>
+    <p>בחרו את שמכם, ולכל בית ספר שבאחריותכם העלו את קובץ סל התוכניות.</p>
+  </section>
+
+  <div class="card">
+    <label class="ql" for="f_sup">שם המפקח.ת</label>
+    <select id="f_sup"><option value="" disabled selected>בחרו שם</option></select>
+    <p class="hint">קבצים מותרים: PDF, Word, Excel, PowerPoint או תמונה, עד 10MB. אפשר להעלות יותר מקובץ אחד לבית ספר.</p>
+  </div>
+
+  <section id="list">
+    <div class="count" id="count"></div>
+    <div class="bar"><i id="barFill" style="width:0"></i></div>
+    <div class="loadfail" id="loadFail">לא הצלחנו לטעון את מה שכבר הועלה. אפשר להעלות בכל זאת.</div>
+    <div id="schools"></div>
+  </section>
+
+  <div class="helpwrap">
+    <a class="helpbtn" id="help" href="https://wa.me/972536256653" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17h.01"/></svg>נתקלתם בבעיה? שלחו הודעה</a>
+  </div>
+</main>
+
+<footer>
+  <div>המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var API = 'https://script.google.com/macros/s/AKfycbzOYyHQfueEkFLm7AYjy_Dno7B5_U8jgaIA_2Nv-P_uHaU5otGsutwBkGE1ydKy6QM19g/exec';
+  var MAX = 10 * 1024 * 1024;
+  var EXT_OK = /\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|heic)$/i;
+  var $ = function (id) { return document.getElementById(id); };
+
+  // סמל · שם · רשת · מפקחים — מתוך "סל תוכניות מאושרים.xlsx"
+  var SCHOOLS = [
+    ["45001", "אורט תעשייה אווירית", "אורט", ["סיגלית דאי"]],
+    ["45002", "אורט תל נוף", "אורט", ["סיגלית דאי"]],
+    ["45005", "אורט אורמת", "אורט", ["סיגלית דאי"]],
+    ["45007", "דן גורמה", "אורט", ["סיגלית דאי"]],
+    ["55003", "אורט כרמל", "אורט", ["יסמין אמון"]],
+    ["65007", "אורט בית הערבה", "אורט", ["רויטל אמיר"]],
+    ["65079", "צור ברק", "אורט", ["סיגלית דאי"]],
+    ["43403", "תיכון חברתי ת\"א", "דרור", ["ליאת צבר"]],
+    ["53403", "התיכון החברתי חיפה", "דרור", ["ליאת צבר"]],
+    ["53405", "דרור גליל", "דרור", ["ליאת צבר"]],
+    ["63401", "חוש\"ן", "דרור", ["רויטל אמיר"]],
+    ["83424", "מצפה רמון", "דרור", ["רביב שורץ"]],
+    ["83425", "דרור נווה מדבר", "דרור", ["שרונה בלוך"]],
+    ["54100", "אל אמאני סכנין", "סכנין", ["יסמין אמון"]],
+    ["54101", "ערערה", "סכנין", ["יסמין אמון"]],
+    ["54102", "כפר יסיף", "סכנין", ["יסמין אמון"]],
+    ["54105", "אום אל פחם בנות", "סכנין", ["ליאת צבר"]],
+    ["54106", "שפרעם", "סכנין", ["רביב שורץ"]],
+    ["54107", "אבו סנאן", "סכנין", ["ליאת צבר"]],
+    ["54108", "אלחכמה כסרא-סמיע", "סכנין", ["יסמין אמון"]],
+    ["54109", "טורען", "סכנין", ["יסמין אמון"]],
+    ["54112", "אום אל פחם בנים", "סכנין", ["רביב שורץ"]],
+    ["54113", "אכסאל", "סכנין", ["יסמין אמון"]],
+    ["64100", "בית חנינה בנות", "סכנין", ["ויסאם סואלחה"]],
+    ["64102", "בית חנינה בנים", "סכנין", ["ויסאם סואלחה"]],
+    ["64103", "כפר עקב", "סכנין", ["ויסאם סואלחה"]],
+    ["84101", "לקייה", "סכנין", ["שרונה בלוך"]],
+    ["84102", "שגב שלום", "סכנין", ["שרונה בלוך"]],
+    ["84104", "סכנין תל שבע", "סכנין", ["שרונה בלוך"]],
+    ["44008", "תיכון החממה", "עמל", ["סיגלית דאי", "רויטל אמיר"]],
+    ["44011", "עמל טייבה ב'", "עמל", ["ויסאם סואלחה"]],
+    ["44050", "עמל טק אין", "עמל", ["סיגלית דאי"]],
+    ["54008", "נצרת", "עמל", ["יסמין אמון"]],
+    ["54009", "מרחביה/מעיינות", "עמל", ["יששכר חפץ"]],
+    ["54017", "רמת דוד", "עמל", ["ליאת צבר"]],
+    ["54021", "אנרג'י טק", "עמל", ["ליאת צבר"]],
+    ["54040", "תיכון שיח", "עמל", ["ליאת צבר"]],
+    ["64001", "עמל אשדוד", "עמל", ["סיגלית דאי"]],
+    ["84003", "עמל רהט", "עמל", ["יסמין אמון", "סיגלית דאי"]],
+    ["42919", "עתיד פלמחים", "עתיד", ["סיגלית דאי"]],
+    ["42924", "עתיד כפר חב\"ד", "עתיד", ["יששכר חפץ"]],
+    ["42925", "אור דניאל", "עתיד", ["יששכר חפץ"]],
+    ["52901", "עתיד כרמיאל", "עתיד", ["רביב שורץ"]],
+    ["52909", "תיכון טכנולוגי אי טק סקול (מסעדה)", "עתיד", ["יסמין אמון"]],
+    ["52916", "עתיד גליל מערבי ירכא בנים", "עתיד", ["יסמין אמון"]],
+    ["52918", "ג'וליס בנות", "עתיד", ["יסמין אמון"]],
+    ["52919", "תיכון עוצמ\"ה עתיד זוקו", "עתיד", ["ליאת צבר"]],
+    ["52920", "תפן ליזמות", "עתיד", ["יסמין אמון"]],
+    ["52921", "צור ים", "עתיד", ["ליאת צבר"]],
+    ["52922", "עתיד טק ביר אל מכסור", "עתיד", ["יסמין אמון"]],
+    ["52923", "עתיד בת עמי", "עתיד", ["יששכר חפץ"]],
+    ["62903", "אור העתיד תורני מקצועי", "עתיד", ["יששכר חפץ"]],
+    ["82918", "עתיד באר שבע", "עתיד", ["סיגלית דאי"]],
+    ["82921", "קמ\"ג דימונה", "עתיד", ["סיגלית דאי"]],
+    ["82922", "ישיבת עתיד אור מנחם", "עתיד", ["יששכר חפץ"]],
+    ["82923", "בית דוד", "עתיד", ["יששכר חפץ"]],
+    ["51511", "רימונים", "רימונים", ["ליאת צבר"]],
+    ["58801", "טל חרמון", "טל חרמון", ["יששכר חפץ"]],
+    ["55400", "ישיבת חנוך לנער", "ישיבת חנוך לנער", ["יששכר חפץ"]],
+    ["55501", "כפר זיתים", "כפר זיתים", ["יששכר חפץ"]],
+    ["46101", "נחלים", "נחלים", ["יששכר חפץ"]],
+    ["55621", "בית אל", "בית אל", ["ליאת צבר"]],
+    ["61902", "הדר", "בית שולמית", ["יששכר חפץ"]],
+    ["64101", "סור באהר", "סכנין", ["רביב שורץ"]]
+  ];
+
+  var ICON_UP = '<svg viewBox="0 0 24 24"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v4h16v-4"/></svg>';
+  var ICON_OK = '<svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>';
+  var uploads = {}; // סמל → [{f, at, by}]
+  var loaded = false;
+
+  var names = {};
+  SCHOOLS.forEach(function (s) { s[3].forEach(function (n) { names[n] = 1; }); });
+  Object.keys(names).sort(function (a, b) { return a.localeCompare(b, 'he'); }).forEach(function (n) {
+    var o = document.createElement('option'); o.textContent = n; $('f_sup').appendChild(o);
+  });
+
+  function esc(t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  function mine() {
+    var sup = $('f_sup').value;
+    return SCHOOLS.filter(function (s) { return s[3].indexOf(sup) > -1; })
+      .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
+  }
+
+  function render() {
+    var list = mine();
+    if (!list.length) { $('list').classList.remove('on'); return; }
+    var done = list.filter(function (s) { return (uploads[s[0]] || []).length; }).length;
+    $('count').textContent = 'הועלו ' + done + ' מתוך ' + list.length + ' בתי ספר';
+    $('barFill').style.width = Math.round(done / list.length * 100) + '%';
+    $('schools').innerHTML = list.map(function (s) {
+      var u = uploads[s[0]] || [];
+      var files = u.length ? '<ul class="files">' + u.map(function (x) {
+        return '<li>' + ICON_OK + '<span><bdi>' + esc(x.f) + '</bdi> <span class="when">· ' + esc(x.at) + '</span></span></li>';
+      }).join('') + '</ul>' : '';
+      return '<div class="school' + (u.length ? ' done' : '') + '" data-code="' + s[0] + '">' +
+        '<div class="info"><h3>' + esc(s[1]) + '</h3><div class="net">' + esc(s[2]) + '</div>' + files + '</div>' +
+        '<label class="up' + (u.length ? ' more' : '') + '">' + ICON_UP + (u.length ? 'העלאת קובץ נוסף' : 'העלאת הסל') +
+        '<input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.heic,image/*"></label>' +
+        '<div class="st" role="status"></div></div>';
+    }).join('');
+    $('list').classList.add('on');
+  }
+
+  function loadUploads() {
+    return fetch(API + '?mode=list', { credentials: 'omit' })
+      .then(function (r) { return r.json(); })
+      .then(function (res) { if (res.ok) { uploads = res.uploads || {}; loaded = true; $('loadFail').classList.remove('on'); } })
+      .catch(function () { if (!loaded) $('loadFail').classList.add('on'); });
+  }
+
+  $('f_sup').addEventListener('change', function () {
+    try { localStorage.setItem('salSup', this.value); } catch (e) {}
+    render();
+  });
+
+  function setSt(card, cls, text) {
+    var st = card.querySelector('.st');
+    st.className = 'st on ' + cls; st.textContent = text;
+  }
+
+  $('schools').addEventListener('change', function (ev) {
+    var input = ev.target;
+    if (input.type !== 'file' || !input.files.length) return;
+    var file = input.files[0];
+    var card = input.closest('.school');
+    var code = card.getAttribute('data-code');
+    var btn = card.querySelector('.up');
+    if (!EXT_OK.test(file.name)) { setSt(card, 'bad', 'סוג הקובץ לא נתמך. אפשר PDF, Word, Excel, PowerPoint או תמונה.'); input.value = ''; return; }
+    if (file.size > MAX) { setSt(card, 'bad', 'הקובץ גדול מ-10MB. נסו לשמור אותו כ-PDF.'); input.value = ''; return; }
+
+    var before = (uploads[code] || []).length;
+    btn.style.pointerEvents = 'none'; btn.style.opacity = '.6';
+    setSt(card, 'wait', 'מעלה את ' + file.name + '…');
+
+    var reader = new FileReader();
+    reader.onload = function () {
+      var data = String(reader.result).split(',')[1] || '';
+      var body = JSON.stringify({ sup: $('f_sup').value, code: code, fileName: file.name, mime: file.type, data: data, website: '' });
+      var ctrl = window.AbortController ? new AbortController() : null;
+      var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 120000);
+      fetch(API, { method: 'POST', body: body, credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
+        .then(function (r) { return r.json(); })
+        .then(function (res) {
+          clearTimeout(t);
+          if (!res.ok) throw new Error(res.error || 'error');
+          (uploads[code] = uploads[code] || []).push({ f: file.name, at: res.at });
+          render();
+          setSt(document.querySelector('.school[data-code="' + code + '"]'), 'ok', 'הקובץ הועלה');
+        })
+        .catch(function (err) {
+          clearTimeout(t);
+          // ייתכן שהקובץ נשמר והתשובה לא הגיעה — בודקים מול השרת לפני שמודיעים על כישלון
+          loadUploads().then(function () {
+            render();
+            var c = document.querySelector('.school[data-code="' + code + '"]');
+            if ((uploads[code] || []).length > before) { setSt(c, 'ok', 'הקובץ הועלה'); return; }
+            var msg = { size: 'הקובץ גדול מ-10MB.', type: 'סוג הקובץ לא נתמך.', busy: 'השרת עמוס. נסו שוב בעוד דקה.', limit: 'הגעתם למכסת ההעלאות להיום. נסו שוב מחר.' }[err && err.message];
+            setSt(c, 'bad', msg || 'ההעלאה לא הצליחה. בדקו את החיבור ונסו שוב.');
+          });
+        });
+    };
+    reader.onerror = function () {
+      btn.style.pointerEvents = ''; btn.style.opacity = '';
+      setSt(card, 'bad', 'לא הצלחנו לקרוא את הקובץ. נסו שוב.');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  var saved = '';
+  try { saved = localStorage.getItem('salSup') || ''; } catch (e) {}
+  if (saved && names[saved]) { $('f_sup').value = saved; render(); }
+  loadUploads().then(render);
+})();
+</script>
+</body>
+</html>
