@@ -74,6 +74,33 @@ select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-sha
 .helpbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .loadfail{display:none;color:var(--danger);font-size:15px;margin:0 4px 12px}
 .loadfail.on{display:block}
+/* מבט־על */
+#mabat{display:none}
+body.mabat #mabat{display:block}
+body.mabat #supCard,body.mabat #list{display:none}
+#mabat .card .bar{margin:0 0 4px}
+#mabat .card .count{margin:0 0 10px}
+.sec{font-family:'Rubik',sans-serif;font-size:21px;color:var(--navy);margin:30px 4px 12px;font-weight:700}
+.sup{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s);padding:16px 18px;margin-bottom:12px}
+.sup-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sup-h h3{font-family:'Rubik',sans-serif;font-size:18px;margin:0;font-weight:600;flex:1 1 auto}
+.sup-h .n{color:var(--muted);font-size:15px}
+.sup.full .n{color:var(--mint);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:#fff4e5;color:#8a4b00;border:1px solid #f6d9ae;border-radius:999px;padding:3px 12px;font-size:15px}
+.copy{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #c9d5ee;background:#fff;color:var(--navy);border-radius:12px;
+  padding:6px 12px;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer}
+.copy svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.copy.done{color:var(--mint);border-color:#b9ebe1}
+.up-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 0;border-top:1px solid var(--line)}
+.up-row:first-child{border-top:0;padding-top:0}
+.up-row:last-child{padding-bottom:0}
+.up-row .info{flex:1 1 240px;min-width:0}
+.up-row b{font-family:'Rubik',sans-serif;font-weight:600}
+.up-row .meta{color:var(--muted);font-size:14.5px;overflow-wrap:anywhere}
+.open{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-weight:600;text-decoration:none;font-size:15px;white-space:nowrap}
+.open svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.empty{color:var(--muted);text-align:center;margin:0}
 footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px}
 footer a{color:var(--navy);font-weight:600;text-decoration:none}
 .credit{margin-top:10px;font-size:.72rem;color:#8A97A6}
@@ -91,7 +118,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <p>בחרו את שמכם, ולכל בית ספר שבאחריותכם העלו את קובץ סל התוכניות.</p>
   </section>
 
-  <div class="card">
+  <div class="card" id="supCard">
     <label class="ql" for="f_sup">שם המפקח.ת</label>
     <select id="f_sup"><option value="" disabled selected>בחרו שם</option></select>
     <p class="hint">קבצים מותרים: PDF, Word, Excel, PowerPoint או תמונה, עד 10MB. אפשר להעלות יותר מקובץ אחד לבית ספר.</p>
@@ -102,6 +129,19 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <div class="bar"><i id="barFill" style="width:0"></i></div>
     <div class="loadfail" id="loadFail">לא הצלחנו לטעון את מה שכבר הועלה. אפשר להעלות בכל זאת.</div>
     <div id="schools"></div>
+  </section>
+
+  <!-- מבט־על לרויטל: sal-mefakchim.html#mabat -->
+  <section id="mabat">
+    <div class="card">
+      <div class="count" id="mCount">טוען…</div>
+      <div class="bar"><i id="mBar" style="width:0"></i></div>
+      <div class="loadfail" id="mFail">לא הצלחנו לטעון את ההעלאות. נסו לרענן את הדף.</div>
+    </div>
+    <h2 class="sec">טרם העלו — לפי מפקח.ת</h2>
+    <div id="mMissing"></div>
+    <h2 class="sec">מה הועלה</h2>
+    <div class="card" id="mUploads"></div>
   </section>
 
   <div class="helpwrap">
@@ -293,6 +333,60 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     };
     reader.readAsDataURL(file);
   });
+
+  // מבט־על (#mabat): מי העלה, מי חסר לפי מפקח.ת, וכל הקבצים
+  var ICON_COPY = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
+  var ICON_OPEN = '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
+
+  function renderMabat() {
+    var has = function (s) { return (uploads[s[0]] || []).length > 0; };
+    var done = SCHOOLS.filter(has).length;
+    $('mCount').textContent = 'הועלו ' + done + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
+    $('mBar').style.width = Math.round(done / SCHOOLS.length * 100) + '%';
+
+    var groups = Object.keys(names).map(function (n) {
+      var all = SCHOOLS.filter(function (s) { return s[3].indexOf(n) > -1; });
+      var miss = all.filter(function (s) { return !has(s); }).map(function (s) { return s[1]; })
+        .sort(function (a, b) { return a.localeCompare(b, 'he'); });
+      return { name: n, total: all.length, miss: miss };
+    }).sort(function (a, b) { return b.miss.length - a.miss.length || a.name.localeCompare(b.name, 'he'); });
+
+    $('mMissing').innerHTML = groups.map(function (g, i) {
+      if (!g.miss.length) return '<div class="sup full"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">הכול הועלה · ' + g.total + ' בתי ספר</span></div></div>';
+      return '<div class="sup"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">חסרים ' + g.miss.length + ' מתוך ' + g.total + '</span>' +
+        '<button type="button" class="copy" data-i="' + i + '">' + ICON_COPY + 'העתקה</button></div>' +
+        '<div class="chips">' + g.miss.map(function (m) { return '<span class="chip">' + esc(m) + '</span>'; }).join('') + '</div></div>';
+    }).join('');
+    $('mMissing').onclick = function (ev) {
+      var b = ev.target.closest('.copy'); if (!b) return;
+      var g = groups[+b.getAttribute('data-i')];
+      var text = 'סל תוכניות — טרם הועלה (' + g.name + '):\n' + g.miss.map(function (m) { return '• ' + m; }).join('\n') +
+        '\n\nלהעלאה: https://tfasim.pedagogiamh.co.il/sal-mefakchim.html';
+      var ok = function () { b.classList.add('done'); b.lastChild.textContent = 'הועתק'; setTimeout(function () { b.classList.remove('done'); b.lastChild.textContent = 'העתקה'; }, 2000); };
+      if (navigator.clipboard) navigator.clipboard.writeText(text).then(ok, function () { window.prompt('העתיקו:', text); });
+      else window.prompt('העתיקו:', text);
+    };
+
+    var rows = [];
+    SCHOOLS.forEach(function (s) { (uploads[s[0]] || []).forEach(function (x) { rows.push({ s: s, x: x }); }); });
+    rows.sort(function (a, b) { return (b.x.t || 0) - (a.x.t || 0); });
+    $('mUploads').innerHTML = rows.length ? rows.map(function (r) {
+      var link = /^https:\/\/drive\.google\.com\//.test(r.x.u || '') ? '<a class="open" href="' + esc(r.x.u) + '" target="_blank" rel="noopener">' + ICON_OPEN + 'פתיחת הקובץ</a>' : '';
+      return '<div class="up-row"><div class="info"><b>' + esc(r.s[1]) + '</b><div class="meta">' + esc(r.x.by || '') + ' · <bdi>' + esc(r.x.f) + '</bdi> · ' + esc(r.x.at) + '</div></div>' + link + '</div>';
+    }).join('') : '<p class="empty">עוד לא הועלו קבצים</p>';
+  }
+
+  if (location.hash === '#mabat') {
+    document.body.classList.add('mabat');
+    document.title = 'סל תוכניות — מבט־על';
+    document.querySelector('.hero h1').textContent = 'סל תוכניות — מבט־על';
+    document.querySelector('.hero p').textContent = 'מה המפקחים העלו, ובאילו בתי ספר עוד חסר.';
+    loadUploads().then(function () {
+      if (!loaded) { $('mFail').classList.add('on'); $('mCount').textContent = ''; return; }
+      renderMabat();
+    });
+    return;
+  }
 
   var saved = '';
   try { saved = localStorage.getItem('salSup') || ''; } catch (e) {}
