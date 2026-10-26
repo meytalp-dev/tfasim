@@ -118,6 +118,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 .helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-s);border-radius:999px;padding:10px 20px;font-size:15px;font-weight:600;color:var(--muted)!important;margin-bottom:18px}
 .helpbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .credit{margin-top:12px;font-size:13.5px;opacity:.85}
+#okBox.nolink .linkrow,#okBox.nolink .linkhint{display:none}
 </style>
 </head>
 <body>
@@ -239,7 +240,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.6-4.9"/></svg>
       <h3 id="okTitle">נרשמת לכנס</h3>
       <p id="okText"></p>
-      <p style="font-size:15px;color:var(--muted)">הקישור האישי שלך, כדי לחזור ולעדכן מכל מכשיר:</p>
+      <p style="font-size:15px;color:var(--muted)" class="linkhint">הקישור האישי שלך, כדי לחזור ולעדכן מכל מכשיר:</p>
       <div class="linkrow"><input type="text" id="myLink" readonly><button type="button" id="copyBtn">העתקה</button></div>
     </div>
     <div class="msg fail" id="badBox">
@@ -383,29 +384,42 @@ function submit(){
   var d = collect(); if (!validate(d)) return;
   saveDraft();
   var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שומר…"; show("");
-  var body = { action:"save", token:token, p:d.p, ex:null, website:$("website").value };
+  var cid = newCid();
+  var body = { action:"save", cid:cid, token:token, p:d.p, ex:null, website:$("website").value };
   /* 26.10: no Google cookies — a browser signed in to Google got an error page instead of the reply (the save itself went through).
      If the reply still does not arrive, ask the server whether it was saved (e-mail + phone). */
   fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
     .then(function(r){ return r.json(); })
     .catch(function(){
       return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
-        .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; });
+        .then(function(r){ return r.json(); }).catch(function(){ return {ok:false, unreadable:true}; });
     })
     .then(function(r){
       btn.disabled = false; btn.textContent = "עדכון";
       if (r && r.ok){
         token = r.token || token;
         /* confirmation mail: the merhav relay pulls it from the server and sends it (26.10) */
-        if (r.mail) fetch("https://script.google.com/macros/s/AKfycbxbudrzz-JSNpEeHwayjq6u8Xmz4dAsmV8FQGwHjZDeC3g028_I2uk2wX2Pi762ULZD1w/exec?src=kenesreg&id=" + encodeURIComponent(r.mail), { mode:"no-cors", credentials:"omit" }).catch(function(){});
+        if (r.mail) relayMail(r.mail);
+        $("okBox").classList.remove("nolink");
         try{ localStorage.setItem(TOKEN_KEY, token); localStorage.removeItem(DRAFT_KEY); }catch(e){}
         $("okTitle").textContent = r.updated ? "העדכון נשמר" : "נרשמת לכנס";
         $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. פרטים נוספים יישלחו בנפרד." : "נתראה ב-23.11.");
         $("myLink").value = linkFor(token);
         show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
+      } else if (r && r.unreadable){
+        /* 26.10: the ministry network blocks the domain Google replies from. The save reached the server,
+           so the relay sends the confirmation (by our own cid) and the page says so honestly. */
+        setTimeout(function(){ relayMail(cid); }, 1200);
+        try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+        $("okTitle").textContent = "ההרשמה נשלחה";
+        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". בדקות הקרובות יגיע אלייך מייל אישור. אם לא יגיע תוך רבע שעה, כתבו לנו בכפתור שבתחתית הדף.";
+        $("okBox").classList.add("nolink");
+        show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
       } else { show("bad"); $("badBox").scrollIntoView({behavior:"smooth", block:"center"}); }
     });
 }
+function newCid(){ var a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); return "c" + Array.prototype.map.call(a, function(x){ return ("0" + x.toString(16)).slice(-2); }).join(""); }
+function relayMail(id){ fetch("https://script.google.com/macros/s/AKfycbxbudrzz-JSNpEeHwayjq6u8Xmz4dAsmV8FQGwHjZDeC3g028_I2uk2wX2Pi762ULZD1w/exec?src=kenesreg&id=" + encodeURIComponent(id), { mode:"no-cors", credentials:"omit" }).catch(function(){}); }
 $("form").addEventListener("submit", function(ev){ ev.preventDefault(); submit(); });
 $("retryBtn").addEventListener("click", submit);
 $("copyBtn").addEventListener("click", function(){
