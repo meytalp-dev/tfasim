@@ -380,7 +380,7 @@ function loadBooth(){
   var n = netName();
   if (!n || n === boothLoadedFor) return;
   boothLoadedFor = n;
-  fetch(API_URL + "?mode=network&n=" + encodeURIComponent(n)).then(function(r){ return r.json(); }).then(function(r){
+  fetch(API_URL + "?mode=network&n=" + encodeURIComponent(n), { credentials:"omit" }).then(function(r){ return r.json(); }).then(function(r){
     if (!r || !r.ok || !r.booth || netName() !== n) return;
     if (boothEmpty()) fillBooth(r.booth);
     if (r.by){ $("boothBy").textContent = "פרטי הדוכן של " + n + " כבר התחילו להתמלא (" + r.by + "). אפשר להשלים ולעדכן."; $("boothBy").style.display = "block"; }
@@ -418,8 +418,14 @@ function submit(){
   saveDraft();
   var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שומר…"; show("");
   var body = { action:"save", token:token, p:d.p, ex:null, booth: d.p.muzeon === "כן" ? d.booth : null, website:$("website").value };
-  fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body) })
-    .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; })
+  /* 26.10: no Google cookies — a browser signed in to Google got an error page instead of the reply (the save itself went through).
+     If the reply still does not arrive, ask the server whether it was saved (e-mail + phone). */
+  fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
+    .then(function(r){ return r.json(); })
+    .catch(function(){
+      return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
+        .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; });
+    })
     .then(function(r){
       btn.disabled = false; btn.textContent = "עדכון";
       if (r && r.ok){
@@ -451,7 +457,7 @@ $("copyBtn").addEventListener("click", function(){
   if (draft){ fillP(draft.p, draft.title); fillBooth(draft.booth); }
   refresh();
   if (!t){ loadBooth(); return; }
-  fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t)).then(function(r){ return r.json(); }).then(function(r){
+  fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t), { credentials:"omit" }).then(function(r){ return r.json(); }).then(function(r){
     if (!r || !r.ok) return;
     token = t; try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){}
     $("submitBtn").textContent = "עדכון";

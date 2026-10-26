@@ -384,8 +384,14 @@ function submit(){
   saveDraft();
   var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שומר…"; show("");
   var body = { action:"save", token:token, p:d.p, ex:null, website:$("website").value };
-  fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body) })
-    .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; })
+  /* 26.10: no Google cookies — a browser signed in to Google got an error page instead of the reply (the save itself went through).
+     If the reply still does not arrive, ask the server whether it was saved (e-mail + phone). */
+  fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
+    .then(function(r){ return r.json(); })
+    .catch(function(){
+      return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
+        .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; });
+    })
     .then(function(r){
       btn.disabled = false; btn.textContent = "עדכון";
       if (r && r.ok){
@@ -424,7 +430,7 @@ function updateHelp(){
   if (draft){ fillP(draft.p); }
   refresh();
   if (!t) return;
-  fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t)).then(function(r){ return r.json(); }).then(function(r){
+  fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t), { credentials:"omit" }).then(function(r){ return r.json(); }).then(function(r){
     if (!r || !r.ok) return;
     token = t; try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){}
     $("submitBtn").textContent = "עדכון";
