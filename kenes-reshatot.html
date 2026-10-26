@@ -422,12 +422,24 @@ function submit(){
   var body = { action:"save", cid:cid, token:token, p:d.p, ex:null, booth: d.p.muzeon === "כן" ? d.booth : null, website:$("website").value };
   /* 26.10: no Google cookies — a browser signed in to Google got an error page instead of the reply (the save itself went through).
      If the reply still does not arrive, ask the server whether it was saved (e-mail + phone). */
-  fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
-    .then(function(r){ return r.json(); })
-    .catch(function(){
-      return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
-        .then(function(r){ return r.json(); }).catch(function(){ return {ok:false, unreadable:true}; });
-    })
+  /* 26.10: up to 3 tries, a few seconds apart, before the error is shown (a busy server, a moment offline).
+     Not for a reply the server gave on purpose (missing fields): that one is shown at once. */
+  function saveOnce(){
+    return fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
+      .then(function(r){ return r.json(); })
+      .catch(function(){
+        return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
+          .then(function(r){ return r.json(); }).catch(function(){ return navigator.onLine === false ? {ok:false, offline:true} : {ok:false, unreadable:true}; });
+      });
+  }
+  function saveTry(n){
+    return saveOnce().then(function(r){
+      var final = (r && (r.ok || r.unreadable)) || (r && /^(missing|no_school|bad_action)$/.test(r.error || "")) || n >= 3;
+      if (final) return r;
+      return new Promise(function(res){ setTimeout(res, 2500 * n); }).then(function(){ return saveTry(n + 1); });
+    });
+  }
+  saveTry(1)
     .then(function(r){
       btn.disabled = false; btn.textContent = "עדכון";
       if (r && r.ok){
