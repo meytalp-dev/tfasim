@@ -121,13 +121,13 @@ footer a{color:var(--mute)}
 <div class="part" style="--c:var(--a2)">חלק 2<b>חומר הדרכה לצוות ב-NotebookLM</b></div>
 
 <div class="step" style="--c:var(--a2)"><h2><i>9</i>נוטבוק לצורך שלי</h2>
-<div class="mine" id="mineNeed">קודם בוחרים צורך בשלב 7.</div>
+<div class="mine" id="mineNeed"></div>
 <ol><li>פותחים NotebookLM ולוחצים <b>נוטבוק חדש</b>.</li>
 <li>מעתיקים את המקורות. בנוטבוק בוחרים <b>אתרים</b> ומדביקים.</li>
 <li>מעתיקים את הפרומפט, משלימים את שם בית הספר, ושולחים.</li></ol>
 <a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener">פתיחת NotebookLM</a>
-<button class="btn ghost" type="button" id="cpSrc" disabled>העתקת המקורות</button>
-<button class="btn ghost" type="button" id="cpPr" disabled>העתקת הפרומפט</button></div>
+<button class="btn ghost" type="button" id="cpSrc">העתקת המקורות</button>
+<button class="btn ghost" type="button" id="cpPr">העתקת הפרומפט</button></div>
 
 <div class="step" style="--c:var(--a2)"><h2><i>10</i>מוציאים תוצר אחד</h2>
 <p>בצד ימין של הנוטבוק, בסטודיו, לוחצים על התוצר.</p>
@@ -233,7 +233,17 @@ footer a{color:var(--mute)}
   function showNeed() {
     var n = NEEDS[st.need];
     box.querySelectorAll(".need").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === st.need ? "true" : "false"); });
-    if (!n) return;
+    var mn = document.getElementById("mineNeed");
+    if (!n) {
+      /* עוד לא נבחר צורך: בוחרים כאן, באותו מקום של הכפתורים */
+      mn.innerHTML = "לאיזה צורך? <span class=\"opts\" style=\"margin-top:6px\"></span>";
+      Object.keys(NEEDS).forEach(function (id) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = NEEDS[id].t;
+        b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
+        mn.querySelector(".opts").appendChild(b);
+      });
+      return;
+    }
     document.getElementById("ideas").hidden = false;
     document.getElementById("ideaList").innerHTML = n.ideas.map(function (x) { return "<li><b>" + x[0] + "</b><br><span>" + x[1] + "</span></li>"; }).join("");
     document.getElementById("mineNeed").textContent = "הצורך שלי: " + n.t;
@@ -249,8 +259,8 @@ footer a{color:var(--mute)}
   }
   function fb(t) { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); } catch (e) {} a.remove(); }
   document.querySelectorAll("[data-copy]").forEach(function (b) { b.onclick = function () { copy(document.getElementById(b.dataset.copy).textContent, b); }; });
-  document.getElementById("cpSrc").onclick = function () { var n = NEEDS[st.need]; if (n) copy([KITS + st.need + ".html"].concat(n.src).join("\n"), this); };
-  document.getElementById("cpPr").onclick = function () { var n = NEEDS[st.need]; if (n) copy(PROMPT.replace("{need}", n.t), this); };
+  document.getElementById("cpSrc").onclick = function () { var n = NEEDS[st.need]; if (!n) { document.getElementById("mineNeed").scrollIntoView({ block: "center" }); return; } copy([KITS + st.need + ".html"].concat(n.src).join("\n"), this); };
+  document.getElementById("cpPr").onclick = function () { var n = NEEDS[st.need]; if (!n) { document.getElementById("mineNeed").scrollIntoView({ block: "center" }); return; } copy(PROMPT.replace("{need}", n.t), this); };
 })();
 </script>
 </body>
