@@ -72,7 +72,7 @@ footer a{color:var(--mute)}
 <div class="step" style="--c:var(--a)"><h2><i>1</i>מה נעשה היום</h2>
 <ol><li>מסתכלים בנתונים של בית הספר ובוחרים צורך אחד.</li>
 <li>בונים פעולות לצוות, בזוגות.</li>
-<li>מכינים חומר הדרכה לצוות במחברת של Gemini.</li></ol></div>
+<li>מכינים חומר הדרכה לצוות ב-NotebookLM.</li></ol></div>
 
 <div class="step" style="--c:var(--a)"><h2><i>2</i>פותחים את הדשבורד של בית הספר</h2>
 <a class="btn" id="dash" target="_blank" rel="noopener" href="../mipui/">פתיחת הדשבורד</a></div>
@@ -118,23 +118,23 @@ footer a{color:var(--mute)}
 <details class="ideas" id="ideas" hidden><summary>רעיונות לצורך שבחרתי</summary><ul id="ideaList"></ul></details></div>
 
 <!-- ============ חלק 2 ============ -->
-<div class="part" style="--c:var(--a2)">חלק 2<b>חומר הדרכה לצוות: מחברת ב-Gemini</b></div>
+<div class="part" style="--c:var(--a2)">חלק 2<b>חומר הדרכה לצוות ב-NotebookLM</b></div>
 
-<div class="step" style="--c:var(--a2)"><h2><i>9</i>מחברת לצורך שלי</h2>
+<div class="step" style="--c:var(--a2)"><h2><i>9</i>נוטבוק לצורך שלי</h2>
 <div class="mine" id="mineNeed"></div>
-<ol><li>פותחים את Gemini וכותבים: <b>פתח מחברת</b>.</li>
-<li>מעתיקים את המקורות, מדביקים ושולחים.</li>
+<ol><li>פותחים NotebookLM ולוחצים <b>נוטבוק חדש</b>.</li>
+<li>מעתיקים את המקורות. בנוטבוק בוחרים <b>אתרים</b> ומדביקים.</li>
 <li>מעתיקים את הפרומפט, משלימים את שם בית הספר, ושולחים.</li></ol>
-<a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">פתיחת Gemini</a>
+<a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener">פתיחת NotebookLM</a>
 <button class="btn ghost" type="button" id="cpSrc">העתקת המקורות</button>
 <button class="btn ghost" type="button" id="cpPr">העתקת הפרומפט</button></div>
 
 <div class="step" style="--c:var(--a2)"><h2><i>10</i>מוציאים תוצר אחד</h2>
-<p>כותבים ל-Gemini, באותה מחברת: <b>הכן מזה</b>, ואת שם התוצר.</p>
+<p>בצד ימין של הנוטבוק, בסטודיו, לוחצים על התוצר.</p>
 <div class="mine" id="mineOut">ההמלצה תופיע אחרי שבוחרים צורך.</div></div>
 
 <div class="step" style="--c:var(--a2)"><h2><i>11</i>חומר ההדרכה שלי</h2>
-<label class="f">הקישור למחברת<small>במחברת: שיתוף ← העתקת קישור.</small><input type="url" data-k="nb" dir="ltr"></label>
+<label class="f">הקישור לנוטבוק<small>בנוטבוק: שיתוף ← העתקת קישור.</small><input type="url" data-k="nb" dir="ltr"></label>
 <label class="f">איזה תוצר יצא</label>
 <div class="opts" data-k="product" data-opts="מצגת|סרטון|כרטיסי עזר|פודקאסט"></div>
 <label class="f">מתי הוא מגיע למורים<input type="text" data-k="nbwhen"></label></div>
