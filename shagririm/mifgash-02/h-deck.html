@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מפגש 2 · הובלה · מצגת</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10344F;--mute:#5E6B78;--line:#DDE4EA;--a:#1D6FA5;--a2:#2B7A78;--a3:#C2620C;--p:#6B55B5;--bg:#F6F8FA}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0B2236;font-family:'Assistant',Arial,sans-serif;color:var(--ink);overflow:hidden}
+.stage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.s{position:absolute;width:1600px;height:900px;background:#fff;display:none;padding:80px 110px;transform-origin:center center;overflow:hidden}
+.s.on{display:block}
+.s .tag{font-size:24px;font-weight:700;color:var(--c,var(--a));letter-spacing:.5px}
+.s h1{font-size:76px;line-height:1.1;margin:14px 0 18px;font-weight:800}
+.s h2{font-size:58px;line-height:1.15;margin:12px 0 26px;font-weight:800}
+.s p.lead{font-size:34px;line-height:1.45;color:var(--mute);margin:0}
+.s .big{font-size:44px;line-height:1.35;font-weight:700}
+.bar{position:absolute;top:0;right:0;left:0;height:14px;background:var(--c,var(--a))}
+.cover{background:var(--ink);color:#fff}
+.cover h1{font-size:96px}
+.cover p.lead{color:#C9D6E2}
+.cover .tag{color:#9FC4E4}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:20px}
+.card{border:2px solid var(--line);border-radius:22px;padding:28px 32px}
+.card b{display:block;font-size:34px;margin-bottom:6px}
+.card span{font-size:27px;color:var(--mute);line-height:1.4}
+.plus{display:flex;gap:22px;align-items:center;margin-top:46px;flex-wrap:wrap}
+.plus div{background:#EAF2F9;border-radius:18px;padding:22px 30px;font-size:36px;font-weight:700}
+.plus i{font-style:normal;font-size:44px;color:var(--mute)}
+.steps{list-style:none;margin:24px 0 0;padding:0;counter-reset:n}
+.steps li{counter-increment:n;display:flex;gap:22px;align-items:baseline;font-size:36px;margin:16px 0;line-height:1.35}
+.steps li::before{content:counter(n);flex:0 0 56px;height:56px;border-radius:50%;background:var(--c,var(--a));color:#fff;font-weight:800;font-size:28px;display:flex;align-items:center;justify-content:center}
+.steps li small{display:block;font-size:24px;color:var(--mute)}
+.parts{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:30px}
+.parts div{border-radius:22px;padding:30px;color:#fff;font-size:30px;line-height:1.35}
+.parts div b{display:block;font-size:40px;margin-bottom:8px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:20px;margin-top:30px}
+.kpis div{background:#EAF2F9;border-radius:20px;padding:24px 20px}
+.kpis b{display:block;font-size:56px;font-weight:800;color:var(--a)}
+.kpis span{font-size:23px;line-height:1.35;display:block}
+table.plan{width:100%;border-collapse:separate;border-spacing:0 12px;font-size:27px;margin-top:10px}
+table.plan td{padding:14px 20px;background:#F6F8FA}
+table.plan td:first-child{border-radius:0 14px 14px 0;font-weight:700;width:32%;color:#fff}
+table.plan td:last-child{border-radius:14px 0 0 14px}
+.timer{position:absolute;bottom:60px;left:110px;font-size:30px;font-weight:700;background:var(--c,var(--a));color:#fff;border-radius:40px;padding:10px 26px}
+.where{position:absolute;bottom:60px;right:110px;font-size:26px;color:var(--mute)}
+.q{font-size:64px;font-weight:800;line-height:1.2;margin:20px 0}
+.cloud{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:center;margin-top:30px;max-height:470px;overflow:hidden}
+.cloud span{font-weight:800;color:var(--c,var(--a))}
+.wall{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin-top:24px;max-height:540px;overflow:hidden}
+.wall div{background:#F3F0FB;border-radius:16px;padding:16px 22px;font-size:27px;line-height:1.35}
+.bars{margin-top:40px}
+.bars .r{display:grid;grid-template-columns:300px 1fr 90px;gap:20px;align-items:center;margin:22px 0;font-size:34px;font-weight:700}
+.bars .t{height:58px;background:#EEF2F6;border-radius:12px;overflow:hidden}
+.bars .t i{display:block;height:100%;background:var(--c,var(--a));width:0;transition:width .6s}
+.empty{font-size:30px;color:var(--mute);margin-top:40px}
+.notes{position:fixed;bottom:0;right:0;left:0;background:rgba(11,34,54,.95);color:#fff;font-size:18px;line-height:1.5;padding:14px 24px;display:none;white-space:pre-wrap;z-index:5}
+.notes.on{display:block}
+.nav{position:fixed;bottom:14px;left:14px;display:flex;gap:8px;z-index:6}
+.nav button{background:rgba(255,255,255,.15);color:#fff;border:0;border-radius:8px;padding:8px 14px;font:600 16px 'Assistant';cursor:pointer}
+.num{position:fixed;bottom:18px;right:18px;color:rgba(255,255,255,.6);font-size:15px;z-index:6}
+.foot{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-size:18px;color:#9AA7B3}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+<!-- 1 שער -->
+<section class="s cover" data-n="13:40 · עד שכולם נכנסים: הדף המלווה פתוח (הקישור בהודעה ובאדווה).
+לפני: לבדוק שיתוף מסך, ושהמצגת מתחברת לנתונים (שקף 3 מתמלא).">
+  <div class="tag">שגרירי חדשנות · מסלול הובלה · מפגש 2 · 28.10</div>
+  <h1>הצורך והפעולות</h1>
+  <p class="lead">היום הנתונים של הצוות שלכם הופכים לתוכנית, ולחומר הדרכה ראשון.</p>
+  <p class="lead" style="margin-top:60px;color:#fff;font-size:30px">פתחו את הדף המלווה מאדווה: מפגש 2</p>
+  <div class="foot">המנהל להכשרה מקצועית · משרד העבודה · impactos</div>
+</section>
+
+<!-- 2 מה נעשה היום -->
+<section class="s" data-n="13:45 · השקף שהיה חסר במפגש הכלים: מה עושים היום, ומה יוצאים איתו.
+&quot;כל מה שתכתבו בדף המלווה נשמר, והופך לפרק 2 בתיק ההטמעה של בית הספר.&quot;">
+  <div class="bar"></div>
+  <div class="tag">מה נעשה היום</div>
+  <h2>שלושה חלקים, ותוצר אחד</h2>
+  <div class="parts">
+    <div style="background:#6B55B5"><b>2030</b>לאן הולך החינוך המקצועי</div>
+    <div style="background:#1D6FA5"><b>תוכנית עבודה</b>הנתונים של הצוות, צורך אחד, ופעולות</div>
+    <div style="background:#2B7A78"><b>חומר הדרכה</b>NotebookLM מכין חומר לצוות שלכם</div>
+  </div>
+  <p class="big" style="margin-top:50px">יוצאים עם: <span style="color:var(--a)">פרק 2 בתיק ההטמעה של בית הספר</span></p>
+</section>
+
+<!-- 3 שאלה פתוחה: ענן -->
+<section class="s" style="--c:var(--p)" data-live="cloud:w2030" data-n="13:48 · דף מלווה, שלב א. מחכים דקה, ומקריאים כמה מילים מהענן.">
+  <div class="bar"></div>
+  <div class="tag">פתיחה · 2030</div>
+  <div class="q">ב-2030, מה התלמידים שלכם יעשו בעבודה, שהיום עוד לא עושים?</div>
+  <div class="cloud" data-out></div>
+  <div class="where">דף מלווה · שלב א</div>
+</section>
+
+<!-- 4 העולם משתנה -->
+<section class="s" style="--c:var(--p)" data-n="13:51">
+  <div class="bar"></div>
+  <div class="tag">01 · העולם משתנה</div>
+  <h1>AI כבר לא רק עונה.<br>הוא מתחיל לפעול.</h1>
+  <div class="plus"><div>פחות תפעול של כלים</div><i>·</i><div>יותר ניהול תהליכים</div></div>
+</section>
+
+<!-- 5 שוק העבודה -->
+<section class="s" style="--c:var(--p)" data-n="13:53 · &quot;שימו לב: המקצועות נשארים. מה שמשתנה הוא איך עובדים בהם.&quot;">
+  <div class="bar"></div>
+  <div class="tag">02 · שוק העבודה</div>
+  <h1>המקצועות נשארים.<br>העבודה משתנה.</h1>
+  <div class="plus"><div>מומחיות מקצועית</div><i>+</i><div>כלים חכמים</div><i>+</i><div>שיקול דעת</div></div>
+</section>
+
+<!-- 6 משימה: מגמה -->
+<section class="s" style="--c:var(--p)" data-live="wall:megama" data-n="13:55 · דף מלווה, שלב ב. שתי דקות. מקריאים שתיים מהקיר.">
+  <div class="bar"></div>
+  <div class="tag">משימה · 2 דקות</div>
+  <div class="q" style="font-size:52px">מגמה אחת אצלכם: מה ייראה בה אחרת ב-2030?</div>
+  <div class="wall" data-out></div>
+  <div class="where">דף מלווה · שלב ב</div>
+</section>
+
+<!-- 7 למידה אישית -->
+<section class="s" style="--c:var(--p)" data-n="13:58">
+  <div class="bar"></div>
+  <div class="tag">03 · למידה אישית</div>
+  <h1>לא כולם צריכים<br>את אותו מסלול.</h1>
+  <div class="plus"><div>קצב אישי</div><i>·</i><div>אתגרים אמיתיים</div><i>·</i><div>למידה משותפת</div></div>
+</section>
+
+<!-- 8 הערכה -->
+<section class="s" style="--c:var(--p)" data-n="13:59">
+  <div class="bar"></div>
+  <div class="tag">04 · הערכה חדשה</div>
+  <h1>לא רק לדעת.<br>להוכיח יכולת.</h1>
+  <div class="plus"><div>פחות תשובות מוכנות</div><i>·</i><div>יותר פתרון בעיות, ביצוע והסבר</div></div>
+</section>
+
+<!-- 9 תפקיד המורה -->
+<section class="s" style="--c:var(--p)" data-n="14:00">
+  <div class="bar"></div>
+  <div class="tag">05 · תפקיד המורה</div>
+  <h1>המורה לא נעלם.<br>התפקיד מתרחב.</h1>
+  <div class="plus"><div>ממעביר ידע</div><i>←</i><div>למאמן, מנטור ומעצב למידה</div></div>
+</section>
+
+<!-- 10 סקר: איפה רחוק -->
+<section class="s" style="--c:var(--p)" data-live="bars:far:למידה אישית|הערכה|תפקיד המורה" data-n="14:01 · דף מלווה, שלב ג. &quot;זו התחושה שלכם. עוד מעט נראה מה הנתונים של הצוות אומרים.&quot;">
+  <div class="bar"></div>
+  <div class="tag">רגע אחד</div>
+  <div class="q" style="font-size:56px">איפה בית הספר שלכם הכי רחוק מ-2030?</div>
+  <div class="bars" data-out></div>
+  <div class="where">דף מלווה · שלב ג</div>
+</section>
+
+<!-- 11 תפקיד הרכז -->
+<section class="s" style="--c:var(--p)" data-n="14:03">
+  <div class="bar"></div>
+  <div class="tag">06 · התפקיד שלכם</div>
+  <h1>ממומחה לכלים<br>למוביל שינוי.</h1>
+  <p class="lead" style="font-size:38px;margin-top:30px">ההשפעה האמיתית: שינוי בתרבות הלמידה בבית הספר.</p>
+</section>
+
+<!-- 12 חמישה צעדים -->
+<section class="s" style="--c:var(--p)" data-n="14:04">
+  <div class="bar"></div>
+  <div class="tag">07 · מתחילים עכשיו</div>
+  <h2>חמישה צעדים עד 2030</h2>
+  <ol class="steps">
+    <li>מגדירים מחדש את דמות הבוגר</li>
+    <li>מחברים AI לכל מגמה מקצועית</li>
+    <li>מעצבים הערכה מבוססת ביצוע</li>
+    <li>מפתחים מורים כמעצבי למידה</li>
+    <li>מודדים שינוי אמיתי בלמידה</li>
+  </ol>
+  <p class="big" style="margin-top:22px;color:var(--p)">לא חייבים לשנות הכול. חייבים להתחיל.</p>
+</section>
+
+<!-- 13 גשר -->
+<section class="s cover" data-n="14:05 · הגשר לחלק 1.">
+  <div class="tag">חלק 1 · תוכנית העבודה</div>
+  <h1 style="font-size:84px">איזה שינוי אחד?</h1>
+  <p class="lead" style="font-size:40px">מתחילים מהנתונים של הצוות שלכם.</p>
+</section>
+
+<!-- 14 סטודיו א -->
+<section class="s" data-n="14:06 · 20 דקות. אני בקיר, עוקבת.
+תקלה נפוצה: Gemini לא קורא את הקובץ. לוודא שהעלו את הקובץ (פלוס), ולא רק הדביקו.
+אין מספיק תשובות בבית הספר? עובדים על הדשבורד של בית הספר לדוגמה.">
+  <div class="bar"></div>
+  <div class="tag">20 דקות · לבד</div>
+  <h2>הנתונים של הצוות שלכם</h2>
+  <ol class="steps">
+    <li>פותחים את הדשבורד<small>שלב 2</small></li>
+    <li>מה הפתיע, ממה התרשמתי לטובה, איפה האתגר<small>שלב 3</small></li>
+    <li>ההשערה שלי: מה הצורך<small>שלב 4</small></li>
+    <li>מורידים את קובץ הנתונים, ושואלים את Gemini<small>שלב 5</small></li>
+    <li>מה Gemini מצא, ובמה זה שונה ממני<small>שלב 6</small></li>
+  </ol>
+  <div class="timer">20:00</div>
+</section>
+
+<!-- 15 מה ראינו אנחנו -->
+<section class="s" data-n="14:26 · &quot;ועכשיו מה ראינו אנחנו, בכל המסלול.&quot; מהגיליון החי, 27.10.
+&quot;רוב המורים כבר משתמשים. מה שחסר: מאיפה להתחיל, מה מותר, ומי לומד איתי.&quot;">
+  <div class="bar"></div>
+  <div class="tag">מה ראינו אנחנו</div>
+  <h2>231 מורים מ-17 בתי ספר במסלול ההובלה</h2>
+  <div class="kpis">
+    <div><b>81%</b><span>משתמשים ב-AI כל שבוע או כל יום</span></div>
+    <div><b>35%</b><span>אצלם התלמידים לא עבדו עם AI בכיתה בחודש האחרון</span></div>
+    <div><b>50%</b><span>יודעים מה מותר ומה אסור בבית הספר</span></div>
+    <div><b>50%</b><span>אומרים שבצוות משתפים ולומדים יחד</span></div>
+    <div><b>43%</b><span>רוצים השתלמות מסודרת</span></div>
+  </div>
+  <p class="lead" style="margin-top:40px;font-size:32px">הפער הוא לא במיומנות. הוא בכיתה, במה מותר, ובמי לומד איתי.</p>
+</section>
+
+<!-- 16 ארבעת הצרכים והשיבוץ -->
+<section class="s" data-n="14:30 · הצורך של כל בית ספר, לפי המיפוי שלו. מופיע גם בדף המלווה, שלב 7, עם השותפים.
+בתי ספר בלי מספיק נתונים בוחרים צורך בעצמם בשלב 7.">
+  <div class="bar"></div>
+  <div class="tag">הצורך שלכם, לפי המיפוי</div>
+  <h2 style="margin-bottom:6px">ארבעה צרכים</h2>
+  <table class="plan">
+    <tr><td style="background:#1D6FA5">מהשימוש הפרטי לכיתה</td><td>פלמחים · ביר אל מכסור · בית הערבה · אלאופוק · אום אל פחם בנות</td></tr>
+    <tr><td style="background:#6B55B5">מה מותר בבית הספר</td><td>הדר · אנרגיטק · דרור גליל</td></tr>
+    <tr><td style="background:#2B7A78">אין זמן, לומדים יחד</td><td>חברתי חיפה · נווה מדבר · זוקו קריית ביאליק</td></tr>
+    <tr><td style="background:#C2620C">מי שרוצה להעמיק</td><td>נצרת · אלמנארה · שפרעם · סחנין · ח'טוואת ירכא</td></tr>
+  </table>
+  <div class="where">דף מלווה · שלב 7</div>
+</section>
+
+<!-- 17 זוגות -->
+<section class="s" data-n="14:33 · חדרים בזום לפי הצורך. 15 דקות.
+&quot;שלוש פעולות, ולכל אחת מתי. ואיך נדע שזה עובד.&quot; בדף המלווה יש רעיונות לכל צורך.">
+  <div class="bar"></div>
+  <div class="tag">15 דקות · בזוגות</div>
+  <h2>הפעולות לצוות</h2>
+  <ol class="steps">
+    <li>שלוש פעולות לצוות, ולכל אחת: מתי</li>
+    <li>איך נדע שזה עובד</li>
+    <li>תקועים? רעיונות לצורך שלכם, בדף המלווה</li>
+  </ol>
+  <div class="timer">15:00</div>
+  <div class="where">דף מלווה · שלב 8</div>
+</section>
+
+<!-- 18 הפסקה -->
+<section class="s cover" data-n="14:50 · 10 דקות.">
+  <div class="tag">הפסקה</div>
+  <h1>עשר דקות</h1>
+  <p class="lead">אחרי ההפסקה: חומר הדרכה לצוות, ב-NotebookLM.</p>
+</section>
+
+<!-- 19 NotebookLM -->
+<section class="s" style="--c:var(--a2)" data-n="15:00 · שקף אחד על הכלי, ואז ישר להדגמה.">
+  <div class="bar"></div>
+  <div class="tag">חלק 2 · חומר הדרכה לצוות</div>
+  <h2>NotebookLM</h2>
+  <div class="split">
+    <div class="card"><b>עונה רק מהמקורות</b><span>מה שאתם נותנים לו, לא מכל האינטרנט</span></div>
+    <div class="card"><b>מראה מאיפה</b><span>ליד כל משפט, המקור</span></div>
+    <div class="card"><b>מוציא תוצרים</b><span>מצגת, סרטון, כרטיסי עזר, פודקאסט</span></div>
+    <div class="card"><b>מוכן לכל צורך</b><span>מקורות ופרומפט, בכפתור אחד בדף המלווה</span></div>
+  </div>
+</section>
+
+<!-- 20 הדגמה -->
+<section class="s" style="--c:var(--a2)" data-n="15:03 · הדגמה חיה על &quot;מהשימוש הפרטי לכיתה&quot;. 7 דקות.
+אם משהו נתקע: להראות את התוצר שהוכן מראש.">
+  <div class="bar"></div>
+  <div class="tag">הדגמה</div>
+  <h2>ככה זה נראה</h2>
+  <ol class="steps" style="--c:var(--a2)">
+    <li>NotebookLM ← נוטבוק חדש</li>
+    <li>העתקת המקורות ← אתרים ← הדבקה</li>
+    <li>העתקת הפרומפט ← שם בית הספר ← שליחה</li>
+    <li>בסטודיו: לוחצים על התוצר</li>
+  </ol>
+  <div class="where">דף מלווה · שלבים 9 ו-10</div>
+</section>
+
+<!-- 21 סטודיו ב -->
+<section class="s" style="--c:var(--a2)" data-n="15:10 · 25 דקות. מי שסיים: שלב 11, ואז AI Studio בתחתית הדף.">
+  <div class="bar"></div>
+  <div class="tag">25 דקות · לבד</div>
+  <h2>נוטבוק לצורך שלכם</h2>
+  <table class="plan">
+    <tr><td style="background:#1D6FA5">מהשימוש הפרטי לכיתה</td><td>מצגת לישיבת צוות</td></tr>
+    <tr><td style="background:#6B55B5">מה מותר בבית הספר</td><td>כרטיסי עזר: העקרונות והרמזור</td></tr>
+    <tr><td style="background:#2B7A78">אין זמן, לומדים יחד</td><td>סרטון קצר לקבוצת הצוות</td></tr>
+    <tr><td style="background:#C2620C">מי שרוצה להעמיק</td><td>פודקאסט (סקירה קולית)</td></tr>
+  </table>
+  <div class="timer" style="background:var(--a2)">25:00</div>
+  <div class="where">דף מלווה · שלבים 9 עד 11</div>
+</section>
+
+<!-- 22 שניים מראים -->
+<section class="s" style="--c:var(--a2)" data-n="15:35 · שניים משתפים מסך, דקה וחצי כל אחד.">
+  <div class="bar"></div>
+  <div class="tag">זרקור</div>
+  <h1>שניים מראים</h1>
+  <p class="lead">מה יצא, ולמי בצוות זה הולך.</p>
+</section>
+
+<!-- 23 משימת שטח -->
+<section class="s" style="--c:var(--a3)" data-n="15:42 · &quot;הכול כבר שמור בתיק ההטמעה. באדווה: תיק ההטמעה הבית ספרי.&quot;">
+  <div class="bar"></div>
+  <div class="tag">משימת שטח · עד 4.11</div>
+  <h2>החומר מגיע לצוות</h2>
+  <ol class="steps" style="--c:var(--a3)">
+    <li>מעבירים את חומר ההדרכה לצוות, או קובעים תאריך</li>
+    <li>כותבים מה עשיתם ומה המורים אמרו</li>
+  </ol>
+  <p class="big" style="margin-top:40px">הכול נשמר בתיק ההטמעה של בית הספר.</p>
+  <div class="where">דף מלווה · שלב 12</div>
+</section>
+
+<!-- 24 סיום -->
+<section class="s cover" data-n="15:50 · משוב בדף המלווה, שלב 13. רזרבה עד 16:00.">
+  <div class="tag">משוב · דף מלווה, שלב 13</div>
+  <h1>תודה</h1>
+  <p class="lead">נתראה ב-4.11</p>
+  <div class="foot">המנהל להכשרה מקצועית · משרד העבודה · impactos</div>
+</section>
+
+</div>
+<div class="notes" id="notes"></div>
+<div class="nav"><button id="prev">הקודם</button><button id="next">הבא</button><button id="nt">הערות (N)</button><button id="fs">מסך מלא (F)</button></div>
+<div class="num" id="num"></div>
+
+<script>
+(function () {
+  var API = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec?api=data&t=h&s=2";
+  var S = [].slice.call(document.querySelectorAll(".s")), i = 0, notes = document.getElementById("notes");
+  try { i = Math.max(0, Math.min(S.length - 1, parseInt(location.hash.slice(1), 10) - 1 || 0)); } catch (e) {}
+  function fit() { var k = Math.min(innerWidth / 1600, innerHeight / 900); S.forEach(function (s) { s.style.transform = "scale(" + k + ")"; }); }
+  function show() {
+    S.forEach(function (s, j) { s.classList.toggle("on", j === i); });
+    notes.textContent = S[i].dataset.n || "";
+    document.getElementById("num").textContent = (i + 1) + " / " + S.length;
+    history.replaceState(null, "", "#" + (i + 1));
+    live();
+  }
+  function go(d) { i = Math.max(0, Math.min(S.length - 1, i + d)); show(); }
+  document.getElementById("prev").onclick = function () { go(-1); };
+  document.getElementById("next").onclick = function () { go(1); };
+  document.getElementById("nt").onclick = function () { notes.classList.toggle("on"); };
+  document.getElementById("fs").onclick = function () { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); };
+  addEventListener("keydown", function (e) {
+    if (e.key === "ArrowLeft" || e.key === "PageDown" || e.key === " ") go(1);
+    else if (e.key === "ArrowRight" || e.key === "PageUp") go(-1);
+    else if (e.key === "n" || e.key === "N" || e.key === "מ") notes.classList.toggle("on");
+    else if (e.key === "f" || e.key === "F" || e.key === "כ") document.getElementById("fs").click();
+  });
+  addEventListener("resize", fit);
+
+  /* שקפים חיים: ענן, קיר וגרף מתוך הדף המלווה. מתרעננים כל 8 שניות כשהשקף מוצג */
+  var tmr;
+  function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function live() {
+    clearTimeout(tmr);
+    var spec = S[i].dataset.live; if (!spec) return;
+    var parts = spec.split(":"), kind = parts[0], key = parts[1], out = S[i].querySelector("[data-out]");
+    fetch(API + "&x=" + Date.now()).then(function (r) { return r.json(); }).then(function (d) {
+      var vals = (d.a && d.a[key]) || [];
+      if (!vals.length) { out.innerHTML = '<div class="empty">מחכים לתשובות מהדף המלווה…</div>'; }
+      else if (kind === "cloud") {
+        var c = {}; vals.forEach(function (v) { v = v.trim(); if (v) c[v] = (c[v] || 0) + 1; });
+        var ks = Object.keys(c).sort(function (a, b) { return c[b] - c[a]; }).slice(0, 40), mx = c[ks[0]] || 1;
+        out.innerHTML = ks.map(function (k) { return '<span style="font-size:' + (28 + 44 * c[k] / mx) + 'px">' + esc(k) + "</span>"; }).join("");
+      } else if (kind === "wall") {
+        out.innerHTML = vals.slice(-12).reverse().map(function (v) { return "<div>" + esc(v) + "</div>"; }).join("");
+      } else if (kind === "bars") {
+        var opts = parts[2].split("|"), cnt = {}; vals.forEach(function (v) { cnt[v] = (cnt[v] || 0) + 1; });
+        var tot = vals.length;
+        out.innerHTML = opts.map(function (o) { var n = cnt[o] || 0, p = Math.round(100 * n / tot);
+          return '<div class="r"><span>' + esc(o) + '</span><div class="t"><i style="width:' + p + '%"></i></div><span>' + n + "</span></div>"; }).join("");
+      }
+    }).catch(function () { out.innerHTML = '<div class="empty">אין חיבור לנתונים כרגע.</div>'; });
+    tmr = setTimeout(live, 8000);
+  }
+  fit(); show();
+})();
+</script>
+</body>
+</html>

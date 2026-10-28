@@ -67,6 +67,19 @@ footer a{color:var(--mute)}
 <div class="warn" id="nokey" hidden>פתחו את הדף מאדווה, כדי שמה שתכתבו יישמר בתיק ההטמעה. בינתיים זה נשמר רק במחשב הזה.</div>
 
 <!-- ============ חלק 1 ============ -->
+<div class="part" style="--c:#6B55B5">פתיחה<b>2030</b></div>
+
+<div class="step" style="--c:#6B55B5"><h2><i>א</i>ב-2030</h2>
+<label class="f">מה התלמידים שלכם יעשו בעבודה, שהיום עוד לא עושים?<small>מילה או שתיים. מופיע על המסך, בלי שם.</small><input type="text" maxlength="40" data-live="w2030"></label>
+<button class="btn" type="button" data-send="w2030">שליחה</button></div>
+
+<div class="step" style="--c:#6B55B5"><h2><i>ב</i>מגמה אחת אצלכם</h2>
+<label class="f">מה ייראה בה אחרת ב-2030?<small>שורה אחת. מופיע על המסך, בלי שם.</small><input type="text" maxlength="160" data-live="megama" placeholder="למשל: חשמל: התלמידים מאבחנים תקלות עם עוזר חכם"></label>
+<button class="btn" type="button" data-send="megama">שליחה</button></div>
+
+<div class="step" style="--c:#6B55B5"><h2><i>ג</i>איפה בית הספר שלכם הכי רחוק מ-2030?</h2>
+<div class="opts" data-livechoice="far" data-opts="למידה אישית|הערכה|תפקיד המורה"></div></div>
+
 <div class="part" style="--c:var(--a)">חלק 1<b>תוכנית העבודה</b></div>
 
 <div class="step" style="--c:var(--a)"><h2><i>1</i>מה נעשה היום</h2>
@@ -103,8 +116,8 @@ footer a{color:var(--mute)}
 <div class="step" style="--c:var(--a)"><h2><i>6</i>מה Gemini מצא</h2>
 <label class="f">האם זה דומה להשערה שלי? במה זה שונה?<textarea data-k="gemini"></textarea></label></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>7</i>הצורך שבחרתי</h2>
-<p>לפי הבחירה נחלקים לזוגות.</p>
+<div class="step" style="--c:var(--a)"><h2><i>7</i>הצורך שלנו</h2>
+<p id="needNote">בוחרים צורך אחד. לפיו נחלקים לזוגות.</p>
 <div class="needs" id="needs"></div></div>
 
 <div class="step" style="--c:var(--a)"><h2><i>8</i>הפעולות לצוות</h2>
@@ -231,12 +244,51 @@ footer a{color:var(--mute)}
     el.addEventListener("input", function () { st[k] = el.value; save(); });
   });
 
+  /* פתיחה: תשובות לקיר ולגרף במצגת (בלי שם) */
+  document.querySelectorAll("[data-send]").forEach(function (b) {
+    b.onclick = function () {
+      var inp = document.querySelector('[data-live="' + b.dataset.send + '"]'), v = (inp.value || "").trim();
+      if (!v) { inp.focus(); return; }
+      post({ kind: "answer", track: "h", s: 2, cid: CID, key: b.dataset.send, value: v });
+      st["o_" + b.dataset.send] = v; save();
+      b.textContent = "נשלח"; b.classList.add("ok");
+    };
+    var inp = document.querySelector('[data-live="' + b.dataset.send + '"]');
+    if (st["o_" + b.dataset.send]) { inp.value = st["o_" + b.dataset.send]; b.textContent = "נשלח"; b.classList.add("ok"); }
+    inp.addEventListener("input", function () { b.textContent = "שליחה"; b.classList.remove("ok"); });
+  });
+  document.querySelectorAll("[data-livechoice]").forEach(function (el) {
+    var k = el.dataset.livechoice;
+    el.dataset.opts.split("|").forEach(function (o) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = o;
+      b.setAttribute("aria-pressed", st["o_" + k] === o ? "true" : "false");
+      b.onclick = function () { st["o_" + k] = o; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: k, value: o });
+        el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); };
+      el.appendChild(b);
+    });
+  });
+
+  /* 28.10.26: השיבוץ מראש לפי המיפוי של בית הספר (מיטל). בית ספר שלא ברשימה בוחר בעצמו */
+  var PLAN = {
+    kita: ["תיכון יוצר עתיד פלמחים", "עתיד יוצר אבדאע ביר אל מכסור", "אורט בית הערבה", "אלאופוק א.א.פחם", "אום אל פחם בנות"],
+    mutar: ["תיכון הדר", "עמל אנרגיטק", "דרור גליל"],
+    zman: ["תיכון חברתי חיפה", "דרור נווה מדבר", "תיכון עתיד יוצר עוצמ\"ה זוקו קריית ביאליק"],
+    haamaka: ["עמל נצרת", "אלמנארה", "תיכון בקהילה מהאראת שפרעם 54106", "תיכון אלאמאני סחנין 54100", "ח'טוואת ירכא אבו סנאן"]
+  };
+  var norm = function (x) { return String(x || "").replace(/["'׳״\s]/g, ""); }, planned = "";
+  Object.keys(PLAN).forEach(function (id) { PLAN[id].forEach(function (n) { if (H.sc && norm(n) === norm(H.sc)) planned = id; }); });
+  if (planned) {
+    if (!st.need) { st.need = planned; st.needt = NEEDS[planned].t; save(); }
+    var mates = PLAN[planned].filter(function (n) { return norm(n) !== norm(H.sc); });
+    document.getElementById("needNote").innerHTML = "לפי המיפוי של בית הספר שלכם: <b>" + NEEDS[planned].t + "</b>.<br>עובדים עם: " + mates.join(", ") + ".";
+  }
+
   /* בחירת הצורך */
   var box = document.getElementById("needs");
   Object.keys(NEEDS).forEach(function (id) {
     var b = document.createElement("button"); b.type = "button"; b.className = "need"; b.dataset.id = id;
     b.innerHTML = NEEDS[id].t + "<small>" + NEEDS[id].s + "</small>";
-    b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
+    b.onclick = function () { st.need = id; st.needt = NEEDS[id].t; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
     box.appendChild(b);
   });
   function showNeed() {
@@ -248,7 +300,7 @@ footer a{color:var(--mute)}
     Object.keys(NEEDS).forEach(function (id) {
       var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = NEEDS[id].t;
       b.setAttribute("aria-pressed", id === st.need ? "true" : "false");
-      b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
+      b.onclick = function () { st.need = id; st.needt = NEEDS[id].t; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
       mn.querySelector(".opts").appendChild(b);
     });
     if (!n) return;
