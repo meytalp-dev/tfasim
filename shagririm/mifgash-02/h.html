@@ -167,6 +167,8 @@ footer a{color:var(--mute)}
 <label class="f">מה המורים אמרו<textarea data-k="fieldsaid"></textarea></label></div>
 
 <div class="step" style="--c:var(--a3)"><h2><i>14</i>משוב</h2>
+<label class="f">בסך הכול, איך היה המפגש?<small>1 לא טוב · 5 מצוין</small></label>
+<div class="opts" data-k="fb_rate" data-opts="1|2|3|4|5"></div>
 <label class="f">ההוראות היו</label>
 <div class="opts" data-k="fb_clear" data-opts="ברורות|די ברורות|לא ברורות"></div>
 <label class="f">הקצב היה</label>
@@ -241,7 +243,8 @@ footer a{color:var(--mute)}
       el.dataset.opts.split("|").forEach(function (o) {
         var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = o;
         b.setAttribute("aria-pressed", st[k] === o ? "true" : "false");
-        b.onclick = function () { st[k] = o; el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); save(); };
+        b.onclick = function () { st[k] = o; el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); save();
+          if (k === "fb_rate") post({ kind: "feedback", track: "h", s: 2, cid: CID, value: { rate: o, good: "", change: st.fb_stuck || "" } }); };
         el.appendChild(b);
       });
       return;
