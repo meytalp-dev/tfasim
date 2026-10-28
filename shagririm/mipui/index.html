@@ -57,6 +57,7 @@
 (function () {
   // המפתח נשמר בדפדפן, כדי שאפשר יהיה לחזור לדף בלי הקישור (למשל מהתפריט של סביבת הלמידה)
   var K = new URLSearchParams(location.search).get('k') || '';
+  var DATA_ONLY = new URLSearchParams(location.search).get('v') === 'data';
   if (K) mStore('mipui_k', K); else K = mStore('mipui_k') || '';
   var main = document.getElementById('main');
   var SV = MIPUI_SURVEY;
@@ -105,7 +106,9 @@
     var msg = 'שלום לכולם, אני ממפה איך הצוות שלנו משתמש ב-AI, כדי שנבנה יחד למידה שמתאימה לנו באמת. ' +
       'זה לוקח כ-4 דקות. אשמח שכל אחד ואחת ימלאו עד סוף השבוע:\n' + qUrl;
     main.innerHTML =
-      '<div class="h2">' + mEsc(me.school) + '</div><p class="sub">השאלון לצוות מוכן. שלחו אותו לצוות, וכאן תראו את התשובות מצטברות.</p>' +
+      '<div class="h2">' + mEsc(me.school) + '</div><p class="sub">' + (DATA_ONLY ? 'הנתונים של הצוות שלכם.' : 'השאלון לצוות מוכן. שלחו אותו לצוות, וכאן תראו את התשובות מצטברות.') + '</p>' +
+      /* 28.10.26: ?v=data (מהדף המלווה של מפגש 2 בהובלה) = רק הנתונים. השאר נשאר בדף, מוסתר, כדי שהכפתורים לא יישברו */
+      '<div' + (DATA_ONLY ? ' hidden' : '') + '>' +
       '<div class="g2" style="margin-bottom:16px">' +
         '<div class="card"><h3><svg class="i"><use href="#i-send"/></svg>השאלון לצוות</h3>' +
           '<div class="linkbox"><span class="ltr">' + mEsc(qUrl) + '</span><button class="btn sm" id="cpLink"><svg class="i"><use href="#i-copy"/></svg>העתקה</button></div>' +
@@ -129,6 +132,7 @@
       '</div>' +
       '<div id="forms" style="margin-top:16px"></div>' +
       '<div id="exEd" style="margin-top:16px"></div>' +
+      '</div>' +
       '<div class="row" style="justify-content:space-between;margin:26px 0 12px"><div class="h2" style="margin:0">הדשבורד</div>' +
         '<div class="row"><span class="note" id="upd"></span><button class="btn sm" id="refB"><svg class="i"><use href="#i-refresh"/></svg>רענון</button></div></div>' +
       '<div id="dash"><div class="loading">טוען את התשובות…</div></div>';

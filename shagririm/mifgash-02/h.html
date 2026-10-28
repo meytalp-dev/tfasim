@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מפגש 2 · הצורך והפעולות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10344F;--mute:#5E6B78;--line:#DDE4EA;--bg:#F6F8FA;--a:#1D6FA5;--a2:#2B7A78;--a3:#C2620C;--ok:#2E7D32}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 'Assistant',Arial,sans-serif}
+header{background:var(--ink);color:#fff;padding:22px 16px}
+header .in,.wrap{max-width:760px;margin:0 auto}
+header small{opacity:.8;font-size:14px}
+header h1{margin:2px 0 4px;font-size:30px;line-height:1.2}
+header p{margin:0;opacity:.9}
+.wrap{padding:0 16px 60px}
+.part{margin:28px 0 8px;font-size:15px;font-weight:700;letter-spacing:.3px;color:var(--c)}
+.part b{display:block;font-size:22px;color:var(--ink)}
+.step{background:#fff;border:1px solid var(--line);border-inline-start:5px solid var(--c);border-radius:12px;padding:16px 18px;margin-top:12px}
+.step h2{margin:0 0 6px;font-size:20px;display:flex;gap:10px;align-items:baseline}
+.step h2 i{font-style:normal;background:var(--c);color:#fff;border-radius:50%;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.step p{margin:4px 0}
+.step ol,.step ul{margin:6px 0;padding-inline-start:22px}
+.step li{margin:3px 0}
+label.f{display:block;margin-top:10px;font-weight:600}
+label.f small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+textarea,input[type=text],input[type=url]{width:100%;margin-top:4px;border:1px solid #C9D3DC;border-radius:8px;padding:9px 11px;font:16px 'Assistant',Arial,sans-serif;color:var(--ink);background:#FCFDFE}
+textarea{min-height:64px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0 8px;background:var(--c);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:600 16px 'Assistant',Arial,sans-serif;cursor:pointer;text-decoration:none}
+.btn.ghost{background:#fff;color:var(--c);border:1.5px solid var(--c)}
+.btn.ok{background:var(--ok)}
+.pr{white-space:pre-wrap;background:#F1F5F9;border-radius:8px;padding:12px 14px;font-size:15px;margin-top:8px}
+.needs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+.need{border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fff;text-align:right;font:600 17px 'Assistant',Arial,sans-serif;color:var(--ink)}
+.need small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+.need[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;box-shadow:inset 0 0 0 1.5px var(--c)}
+.rows{display:grid;gap:8px;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 130px;gap:8px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+.mine{background:#F1F5F9;border-radius:10px;padding:10px 12px;margin-top:6px;font-weight:600}
+.ideas{margin-top:8px}
+.ideas summary{cursor:pointer;color:var(--c);font-weight:600}
+.ideas li{margin:6px 0}
+.ideas span{color:var(--mute);font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.opt{border:1.5px solid var(--line);border-radius:20px;padding:6px 14px;background:#fff;cursor:pointer;font:16px 'Assistant',Arial,sans-serif;color:var(--ink)}
+.opt[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;font-weight:600}
+.saved{position:fixed;bottom:14px;left:14px;background:var(--ink);color:#fff;border-radius:20px;padding:6px 14px;font-size:14px;opacity:0;transition:opacity .3s}
+.saved.on{opacity:.92}
+.warn{background:#FFF4E5;border:1px solid #F3C98B;border-radius:10px;padding:10px 14px;margin-top:16px;font-size:15px}
+.more{margin-top:12px}
+.more summary{cursor:pointer;font-weight:600;color:var(--mute)}
+footer{text-align:center;color:var(--mute);font-size:13px;margin-top:30px}
+footer a{color:var(--mute)}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <small>שגרירי חדשנות · מסלול הובלה · מפגש 2</small>
+  <h1>הצורך והפעולות</h1>
+  <p id="who">מה שתכתבו כאן נשמר בתיק ההטמעה של בית הספר.</p>
+</div></header>
+
+<div class="wrap">
+<div class="warn" id="nokey" hidden>פתחו את הדף מאדווה, כדי שמה שתכתבו יישמר בתיק ההטמעה. בינתיים זה נשמר רק במחשב הזה.</div>
+
+<!-- ============ חלק 1 ============ -->
+<div class="part" style="--c:var(--a)">חלק 1<b>תוכנית העבודה</b></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>1</i>מה נעשה היום</h2>
+<ol><li>מסתכלים בנתונים של בית הספר ובוחרים צורך אחד.</li>
+<li>בונים פעולות לצוות, בזוגות.</li>
+<li>מכינים חומר הדרכה לצוות ב-NotebookLM.</li></ol></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>2</i>פותחים את הדשבורד של בית הספר</h2>
+<a class="btn" id="dash" target="_blank" rel="noopener" href="../mipui/">פתיחת הדשבורד</a></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>3</i>מה ראיתי בנתונים</h2>
+<label class="f">מה הפתיע אותי<textarea data-k="surprise"></textarea></label>
+<label class="f">ממה התרשמתי לטובה<textarea data-k="good"></textarea></label>
+<label class="f">איפה האתגר<textarea data-k="challenge"></textarea></label></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>4</i>ההשערה שלי</h2>
+<label class="f">מה הצורך המרכזי של הצוות?<small>לפני שבודקים עם Gemini.</small><textarea data-k="guess"></textarea></label></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>5</i>בודקים עם Gemini</h2>
+<ol><li>בדשבורד לוחצים <b>הורדת התשובות בלי שמות</b>.</li>
+<li>פותחים את Gemini ומעלים את הקובץ.</li>
+<li>מעתיקים את הפרומפט, מדביקים ושולחים.</li></ol>
+<a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener">פתיחת Gemini</a>
+<div class="pr" id="pGem">לפניך קובץ תשובות של צוות מורים לשאלון על בינה מלאכותית, בלי שמות.
+על סמך הקובץ בלבד:
+1. כמה מורים ענו?
+2. מה מפתיע בנתונים?
+3. מה החוזקות של הצוות?
+4. מה האתגרים?
+5. מה הצורך המרכזי של הצוות, במשפט אחד, ומה בנתונים מראה אותו?
+בעברית פשוטה.</div>
+<button class="btn ghost" type="button" data-copy="pGem">העתקת הפרומפט</button></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>6</i>מה Gemini מצא</h2>
+<label class="f">האם זה דומה להשערה שלי? במה זה שונה?<textarea data-k="gemini"></textarea></label></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>7</i>הצורך שבחרתי</h2>
+<p>לפי הבחירה נחלקים לזוגות.</p>
+<div class="needs" id="needs"></div></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>8</i>הפעולות לצוות</h2>
+<p>בזוגות. שלוש פעולות, ולכל אחת מתי.</p>
+<div class="rows">
+  <div class="row"><input type="text" data-k="act1" placeholder="פעולה 1: מה עושים"><input type="text" data-k="when1" placeholder="מתי"></div>
+  <div class="row"><input type="text" data-k="act2" placeholder="פעולה 2: מה עושים"><input type="text" data-k="when2" placeholder="מתי"></div>
+  <div class="row"><input type="text" data-k="act3" placeholder="פעולה 3: מה עושים"><input type="text" data-k="when3" placeholder="מתי"></div>
+</div>
+<label class="f">איך נדע שזה עובד<textarea data-k="measure"></textarea></label>
+<details class="ideas" id="ideas" hidden><summary>רעיונות לצורך שבחרתי</summary><ul id="ideaList"></ul></details></div>
+
+<!-- ============ חלק 2 ============ -->
+<div class="part" style="--c:var(--a2)">חלק 2<b>חומר הדרכה לצוות ב-NotebookLM</b></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>9</i>נוטבוק לצורך שלי</h2>
+<div class="mine" id="mineNeed">קודם בוחרים צורך בשלב 7.</div>
+<ol><li>פותחים NotebookLM ולוחצים <b>נוטבוק חדש</b>.</li>
+<li>מעתיקים את המקורות. בנוטבוק בוחרים <b>אתרים</b> ומדביקים.</li>
+<li>מעתיקים את הפרומפט, משלימים את שם בית הספר, ושולחים.</li></ol>
+<a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener">פתיחת NotebookLM</a>
+<button class="btn ghost" type="button" id="cpSrc" disabled>העתקת המקורות</button>
+<button class="btn ghost" type="button" id="cpPr" disabled>העתקת הפרומפט</button></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>10</i>מוציאים תוצר אחד</h2>
+<p>בצד ימין של הנוטבוק, בסטודיו, לוחצים על התוצר.</p>
+<div class="mine" id="mineOut">ההמלצה תופיע אחרי שבוחרים צורך.</div></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>11</i>חומר ההדרכה שלי</h2>
+<label class="f">הקישור לנוטבוק<small>בנוטבוק: שיתוף ← העתקת קישור.</small><input type="url" data-k="nb" dir="ltr"></label>
+<label class="f">איזה תוצר יצא</label>
+<div class="opts" data-k="product" data-opts="מצגת|סרטון|כרטיסי עזר|פודקאסט"></div>
+<label class="f">מתי הוא מגיע למורים<input type="text" data-k="nbwhen"></label></div>
+
+<!-- ============ סגירה ============ -->
+<div class="part" style="--c:var(--a3)">סגירה<b>משימת שטח ומשוב</b></div>
+
+<div class="step" style="--c:var(--a3)"><h2><i>12</i>משימת שטח עד 4.11</h2>
+<p>מעבירים את חומר ההדרכה לצוות, או קובעים תאריך.</p>
+<label class="f">מה עשיתי, ועם מי<textarea data-k="field"></textarea></label>
+<label class="f">מה המורים אמרו<textarea data-k="fieldsaid"></textarea></label></div>
+
+<div class="step" style="--c:var(--a3)"><h2><i>13</i>משוב</h2>
+<label class="f">ההוראות היו</label>
+<div class="opts" data-k="fb_clear" data-opts="ברורות|די ברורות|לא ברורות"></div>
+<label class="f">הקצב היה</label>
+<div class="opts" data-k="fb_pace" data-opts="מהיר מדי|בדיוק|איטי מדי"></div>
+<label class="f">איפה נתקעתי, או מה היה חסר<textarea data-k="fb_stuck"></textarea></label>
+<details class="more"><summary>סיימתם מוקדם? AI Studio</summary>
+<p>פותחים את <a href="https://aistudio.google.com/" target="_blank" rel="noopener">AI Studio</a>, מעלים את אותו קובץ ומבקשים גרף של המעכבים.</p></details></div>
+
+<footer>המנהל להכשרה מקצועית · משרד העבודה · נבנה עם <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>
+</div>
+<div class="saved" id="saved">נשמר</div>
+
+<script>
+(function () {
+  var API = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
+  var KITS = "https://tfasim.pedagogiamh.co.il/shagririm/mifgash-02/kits/";
+  var GUIDE = "https://meyda.education.gov.il/files/Pop/0files/lemida-metukshevet/AI/AI-Usage-Guidelines.pdf";
+  var POP = "https://pop.education.gov.il/sherutey-tiksuv-bachinuch/international-digital-ai-tools/";
+  var NEEDS = {
+    kita: { t: "מהשימוש הפרטי לכיתה", s: "המורים משתמשים לעצמם, לא עם התלמידים", src: [POP], out: "מצגת לישיבת צוות",
+      ideas: [["שיעור אחד, מדרגה אחת", "כל מורה מנסה שיעור אחד בשבועיים הקרובים"], ["דקת הדגמה בישיבת צוות", "מורה אחד מראה מה עשה עם התלמידים"], ["משוב לפי מחוון", "המורה מקבל טיוטת משוב ובודק אותה"], ["עמית ליד המחשב", "הרכז מכין עם מורה שיעור אחד"]] },
+    mutar: { t: "מה מותר בבית הספר", s: "חצי מהמורים לא יודעים מה מותר", src: [GUIDE], out: "כרטיסי עזר: העקרונות והרמזור",
+      ideas: [["רמזור בישיבת צוות", "המורים ממקמים דוגמאות בירוק, צהוב, אדום"], ["עמוד אחד בחדר המורים", "\"מה סוכם עם ההנהלה\" בחמש שורות"], ["בדיקת פרטיות בדקה", "לפני כל שימוש: יש כאן שם, ציון או פרט מזהה?"], ["משפט ציון קבוע", "\"השתמשתי ב-AI כדי ___, ובדקתי ___\""]] },
+    zman: { t: "אין זמן, לומדים יחד", s: "לומדים בתוך זמן שכבר קיים", src: [POP], out: "סרטון קצר לקבוצת הצוות",
+      ideas: [["10 דקות בישיבה קיימת", "הדגמה קצרה בכל ישיבת צוות שנייה"], ["עמית ליד המחשב", "בשעה חלונה, על משימה אמיתית"], ["טיפ השבוע", "סרטון של דקה בקבוצת הצוות"], ["הקבוצה הראשונה", "4 עד 6 מתנדבים שמובילים את השאר"]] },
+    haamaka: { t: "מי שרוצה להעמיק", s: "מורים שכבר בפנים ורוצים יותר", src: [POP], out: "פודקאסט (סקירה קולית)",
+      ideas: [["קבוצת מתקדמים", "חצי שעה פעם בחודש, כל אחד מביא משהו שניסה"], ["עוזר אישי לכל מורה", "Gem קבוע למקצוע"], ["משוב בשתי רמות", "שאלת המשך שונה לכל רמה"], ["כל אחד מלווה אחד", "מורה מתקדם מלווה עמית במשך חודש"]] }
+  };
+  var PROMPT = "את/ה יועץ/ת פדגוגי/ת לבית ספר טכנולוגי.\nבית הספר שלי: ___\nהצורך שלנו: {need}\nעל סמך המקורות בלבד, הכן/י חומר הדרכה לצוות המורים:\n1. מה המורים צריכים לדעת, ב-5 נקודות קצרות.\n2. שלושה רעיונות מעשיים, עם דוגמה ממקצוע טכנולוגי.\n3. צעד ראשון שכל מורה יכול לעשות השבוע.\nבעברית פשוטה.";
+
+  /* מי אני: אדווה מעבירה אחרי # את המפתח האישי, השם ובית הספר */
+  var H = {};
+  location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) H[p[0]] = decodeURIComponent(p[1] || ""); });
+  var K = /^[A-Za-z0-9]{6,40}$/.test(H.k || "") ? H.k : "";
+  if (K) {
+    document.getElementById("dash").href = "../mipui/?v=data&k=" + encodeURIComponent(K);
+    if (H.n) document.getElementById("who").textContent = (H.n + (H.sc ? " · " + H.sc : "")) + " · מה שתכתבו כאן נשמר בתיק ההטמעה.";
+  } else document.getElementById("nokey").hidden = false;
+
+  var LS = "tik-s2-" + (K || "local"), st = {};
+  try { st = JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) {}
+  var CID = (function () { try { var c = localStorage.getItem("shag-cid"); if (!c) { c = "c" + Math.random().toString(36).slice(2, 10); localStorage.setItem("shag-cid", c); } return c; } catch (e) { return "c" + Date.now(); } })();
+
+  var tmr, savedEl = document.getElementById("saved");
+  function save() {
+    try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+    clearTimeout(tmr);
+    tmr = setTimeout(function () {
+      if (K) post({ kind: "tik", track: "h", s: 2, k: K, name: H.n || "", school: H.sc || "", value: st });
+      savedEl.classList.add("on"); setTimeout(function () { savedEl.classList.remove("on"); }, 1200);
+    }, 900);
+  }
+  function post(o) {
+    try { fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (e) {}
+  }
+
+  /* שדות טקסט */
+  document.querySelectorAll("[data-k]").forEach(function (el) {
+    var k = el.dataset.k;
+    if (el.classList.contains("opts")) {
+      el.dataset.opts.split("|").forEach(function (o) {
+        var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = o;
+        b.setAttribute("aria-pressed", st[k] === o ? "true" : "false");
+        b.onclick = function () { st[k] = o; el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); save(); };
+        el.appendChild(b);
+      });
+      return;
+    }
+    if (st[k]) el.value = st[k];
+    el.addEventListener("input", function () { st[k] = el.value; save(); });
+  });
+
+  /* בחירת הצורך */
+  var box = document.getElementById("needs");
+  Object.keys(NEEDS).forEach(function (id) {
+    var b = document.createElement("button"); b.type = "button"; b.className = "need"; b.dataset.id = id;
+    b.innerHTML = NEEDS[id].t + "<small>" + NEEDS[id].s + "</small>";
+    b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
+    box.appendChild(b);
+  });
+  function showNeed() {
+    var n = NEEDS[st.need];
+    box.querySelectorAll(".need").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === st.need ? "true" : "false"); });
+    if (!n) return;
+    document.getElementById("ideas").hidden = false;
+    document.getElementById("ideaList").innerHTML = n.ideas.map(function (x) { return "<li><b>" + x[0] + "</b><br><span>" + x[1] + "</span></li>"; }).join("");
+    document.getElementById("mineNeed").textContent = "הצורך שלי: " + n.t;
+    document.getElementById("mineOut").textContent = "מומלץ לצורך שלך: " + n.out + ".";
+    document.getElementById("cpSrc").disabled = false;
+    document.getElementById("cpPr").disabled = false;
+  }
+  showNeed();
+
+  function copy(text, btn) {
+    var done = function () { var o = btn.textContent; btn.textContent = "הועתק"; btn.classList.add("ok"); setTimeout(function () { btn.textContent = o; btn.classList.remove("ok"); }, 1600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); }); else { fb(text); done(); }
+  }
+  function fb(t) { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); } catch (e) {} a.remove(); }
+  document.querySelectorAll("[data-copy]").forEach(function (b) { b.onclick = function () { copy(document.getElementById(b.dataset.copy).textContent, b); }; });
+  document.getElementById("cpSrc").onclick = function () { var n = NEEDS[st.need]; if (n) copy([KITS + st.need + ".html"].concat(n.src).join("\n"), this); };
+  document.getElementById("cpPr").onclick = function () { var n = NEEDS[st.need]; if (n) copy(PROMPT.replace("{need}", n.t), this); };
+})();
+</script>
+</body>
+</html>
