@@ -88,6 +88,12 @@ body.mabat #supCard,body.mabat #list{display:none}
 .sup.full .n{color:var(--mint);font-weight:600}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .chip{background:#fff4e5;color:#8a4b00;border:1px solid #f6d9ae;border-radius:999px;padding:3px 12px;font-size:15px}
+.chip.ok{background:#e6f7f0;color:#0b6b4f;border-color:#a8e3cc}
+.chip.no{background:#fdecec;color:#a11d1d;border-color:#f3bcbc;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 4px 12px;font-size:14.5px;color:var(--muted)}
+.legend .chip{font-size:14px;padding:2px 10px}
+.up-row.ok b{color:#0b6b4f}
+.tag-ok{display:inline-block;background:#e6f7f0;color:#0b6b4f;border:1px solid #a8e3cc;border-radius:999px;padding:0 9px;font-size:13px;font-weight:600;margin-inline-start:6px;vertical-align:1px}
 .copy{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #c9d5ee;background:#fff;color:var(--navy);border-radius:12px;
   padding:6px 12px;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer}
 .copy svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -139,6 +145,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <div class="loadfail" id="mFail">לא הצלחנו לטעון את ההעלאות. נסו לרענן את הדף.</div>
     </div>
     <h2 class="sec">טרם העלו — לפי מפקח.ת</h2>
+    <div class="legend" id="mLegend"></div>
     <div id="mMissing"></div>
     <h2 class="sec">מה הועלה</h2>
     <div class="card" id="mUploads"></div>
@@ -338,24 +345,39 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   var ICON_COPY = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
   var ICON_OPEN = '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
 
+  // אושרו בוועדה — פרוטוקול ישיבה 2 (15.9.26) + עדכוני מיטל 28.10.26 (צור ברק, ביר אל מכסור, עתיד באר שבע)
+  var APPROVED = {};
+  ['42919', '42924', '52901', '52909', '52916', '52918', '52919', '52920', '52921', '52922', '52923', '82918', '82921',
+   '44011', '44050', '54008', '54017', '54021',
+   '43403', '53403', '53405', '63401', '83424',
+   '45001', '45002', '45005', '45007', '55003', '65007', '65079',
+   '46101', '51511', '55621'].forEach(function (c) { APPROVED[c] = 1; });
+
   function renderMabat() {
     var has = function (s) { return (uploads[s[0]] || []).length > 0; };
+    var chipCls = function (s) { return APPROVED[s[0]] ? ' ok' : (has(s) ? '' : ' no'); };
+    var nOk = SCHOOLS.filter(function (s) { return APPROVED[s[0]]; }).length;
+    var nNo = SCHOOLS.filter(function (s) { return !APPROVED[s[0]] && !has(s); }).length;
+    $('mLegend').innerHTML = '<span><span class="chip ok">ירוק</span> אושר · ' + nOk + '</span>' +
+      '<span><span class="chip">כתום</span> הועלה, טרם אושר · ' + (SCHOOLS.length - nOk - nNo) + '</span>' +
+      '<span><span class="chip no">אדום</span> אין לנו סל · ' + nNo + '</span>';
     var done = SCHOOLS.filter(has).length;
     $('mCount').textContent = 'הועלו ' + done + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
     $('mBar').style.width = Math.round(done / SCHOOLS.length * 100) + '%';
 
     var groups = Object.keys(names).map(function (n) {
       var all = SCHOOLS.filter(function (s) { return s[3].indexOf(n) > -1; });
-      var miss = all.filter(function (s) { return !has(s); }).map(function (s) { return s[1]; })
-        .sort(function (a, b) { return a.localeCompare(b, 'he'); });
-      return { name: n, total: all.length, miss: miss };
+      var missS = all.filter(function (s) { return !has(s); })
+        .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
+      var miss = missS.map(function (s) { return s[1]; });
+      return { name: n, total: all.length, miss: miss, missS: missS };
     }).sort(function (a, b) { return b.miss.length - a.miss.length || a.name.localeCompare(b.name, 'he'); });
 
     $('mMissing').innerHTML = groups.map(function (g, i) {
       if (!g.miss.length) return '<div class="sup full"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">הכול הועלה · ' + g.total + ' בתי ספר</span></div></div>';
       return '<div class="sup"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">חסרים ' + g.miss.length + ' מתוך ' + g.total + '</span>' +
         '<button type="button" class="copy" data-i="' + i + '">' + ICON_COPY + 'העתקה</button></div>' +
-        '<div class="chips">' + g.miss.map(function (m) { return '<span class="chip">' + esc(m) + '</span>'; }).join('') + '</div></div>';
+        '<div class="chips">' + g.missS.map(function (s) { return '<span class="chip' + chipCls(s) + '">' + esc(s[1]) + '</span>'; }).join('') + '</div></div>';
     }).join('');
     $('mMissing').onclick = function (ev) {
       var b = ev.target.closest('.copy'); if (!b) return;
@@ -372,7 +394,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     rows.sort(function (a, b) { return (b.x.t || 0) - (a.x.t || 0); });
     $('mUploads').innerHTML = rows.length ? rows.map(function (r) {
       var link = /^https:\/\/drive\.google\.com\//.test(r.x.u || '') ? '<a class="open" href="' + esc(r.x.u) + '" target="_blank" rel="noopener">' + ICON_OPEN + 'פתיחת הקובץ</a>' : '';
-      return '<div class="up-row"><div class="info"><b>' + esc(r.s[1]) + '</b><div class="meta">' + esc(r.x.by || '') + ' · <bdi>' + esc(r.x.f) + '</bdi> · ' + esc(r.x.at) + '</div></div>' + link + '</div>';
+      var ok = APPROVED[r.s[0]];
+      return '<div class="up-row' + (ok ? ' ok' : '') + '"><div class="info"><b>' + esc(r.s[1]) + '</b>' + (ok ? '<span class="tag-ok">מאושר</span>' : '') + '<div class="meta">' + esc(r.x.by || '') + ' · <bdi>' + esc(r.x.f) + '</bdi> · ' + esc(r.x.at) + '</div></div>' + link + '</div>';
     }).join('') : '<p class="empty">עוד לא הועלו קבצים</p>';
   }
 
