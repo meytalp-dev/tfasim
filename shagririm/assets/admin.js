@@ -24,6 +24,8 @@
   /* מפגש שהדף המלווה שלו הוא הלשונית "הדף המלווה" של המצגת החיה (3.10.26: דף מלווה אחד).
      אותה רשימה כמו EXT_PAGE ב-shell.js. התשובות נאספות בשרת המפגש החי ומוצגות בדשבורד שלו. */
   var EXT_PAGE = { 1: "mifgash-01/" };
+  /* 28.10.26: מפגש 2 (כמו ב-shell.js). בהובלה: מצגת ודף מלווה חדשים, h-deck.html ו-h.html */
+  EXT_PAGE[2] = "mifgash-02/";
   /* משאבי המפגש — אותה רשימה כמו sessionRes ב-shell.js. אצל מיטל השאלון במצב בדיקה (לא נספר),
      ומיפוי הצוות נפתח במבט-העל שלה. */
   function sessionRes(tr, num) {
@@ -40,16 +42,20 @@
       ["NotebookLM (היום: Gemini Notebook)", "מה המורים כתבו: נושאים, פרסונות ורעיונות", "https://notebooklm.google.com/"],
       ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
     ];
-    /* 18.10.26: כלי מפגש 2, מסלול ההובלה (אותה רשימה כמו ב-shell.js) */
+    /* 28.10.26: כלי מפגש 2, מסלול ההובלה (אותה רשימה כמו ב-shell.js) */
     if (Number(num) === 2 && t === "h") return [
-      ["Google AI Studio", "הכלי של היום: שיחה קולית עם אבי, תרגום, טבלאות ואפליקציה ממשפט", "https://aistudio.google.com/"],
-      ["NotebookLM (היום: Gemini Notebook)", "להכרה: עונה רק מהמקורות, ומוציא פודקאסט, בוחן ומפת חשיבה", "https://notebooklm.google.com/"],
+      ["הדשבורד של בית הספר", "אצל הרכזים: רק הנתונים של בית הספר שלהם. אצלך: מבט-על", "mipui/"],
+      ["רעיונות לפי מקצוע", "176 רעיונות לעבודה עם AI עם התלמידים, עם פרומפט מוכן לכל רעיון", "mifgash-02/kits/raayonot.html"],
+      ["NotebookLM", "נוטבוק חדש, מקורות ופרומפט מהדף המלווה, שלב 10", "https://notebooklm.google.com/"],
       ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"]
     ];
     return [];
   }
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
-  function extUrl(tr, num, view) { return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : ""; }
+  function extUrl(tr, num, view) {
+    if (Number(num) === 2 && tr === "הובלה") return "mifgash-02/" + (view === "deck" ? "h-deck.html" : "h.html");
+    return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : "";
+  }
   var TRACKS = ["כלים", "הובלה"];
   var DAYS = { "כלים": "ימי שני", "הובלה": "ימי רביעי" };
   var VIEWS = { home: 1, kit: 1, desk: 1, ans: 1, att: 1, subs: 1, people: 1, set: 1, news: 1, newsq: 1, newsadd: 1 };
