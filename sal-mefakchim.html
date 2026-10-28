@@ -107,6 +107,29 @@ body.mabat #supCard,body.mabat #list{display:none}
 .open{display:inline-flex;align-items:center;gap:6px;color:var(--blue);font-weight:600;text-decoration:none;font-size:15px;white-space:nowrap}
 .open svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .empty{color:var(--muted);text-align:center;margin:0}
+/* הערות סקירה */
+.rv-intro{color:var(--muted);font-size:15px;margin:-4px 4px 12px;line-height:1.5}
+.rv{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s);margin-bottom:12px}
+.rv>summary{list-style:none;cursor:pointer;padding:14px 18px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rv>summary::-webkit-details-marker{display:none}
+.rv>summary h3{font-family:'Rubik',sans-serif;font-size:18px;margin:0;font-weight:600;flex:1 1 180px}
+.rv>summary::after{content:'+';font-family:'Rubik',sans-serif;font-size:22px;color:var(--muted);line-height:1}
+.rv[open]>summary::after{content:'−'}
+.rv-body{padding:0 18px 16px}
+.rv-meta{color:var(--muted);font-size:14.5px;margin:0 0 6px;display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center}
+.rv-meta>span{min-width:0;overflow-wrap:anywhere}
+.rv h4{font-family:'Rubik',sans-serif;font-size:16px;color:var(--navy);margin:14px 0 6px;font-weight:600}
+.rv-f{border-top:1px solid var(--line);padding:9px 0;font-size:15.5px}
+.rv-f .top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.rv-f b{font-weight:600}
+.rv-f .amt{font-weight:700;color:var(--ink);white-space:nowrap}
+.rv-f .src{color:var(--muted);font-size:14px;white-space:nowrap}
+.rv-f q{display:block;color:#3d4a70;font-size:14.5px;margin-top:3px;quotes:'״' '״'}
+.rv-f .why{font-size:14.5px;color:#3d4a70;margin-top:2px}
+.ty{display:inline-block;border-radius:999px;padding:0 9px;font-size:13px;font-weight:600;border:1px solid}
+.ty.big{background:#fdecec;color:#a11d1d;border-color:#f3bcbc}
+.ty.eq{background:#fff4e5;color:#8a4b00;border-color:#f6d9ae}
+.rv-other{margin:6px 0 0;padding-inline-start:20px;font-size:14.5px;color:#3d4a70}
 footer{text-align:center;padding:34px 20px 44px;color:var(--muted);font-size:14.5px}
 footer a{color:var(--navy);font-weight:600;text-decoration:none}
 .credit{margin-top:10px;font-size:.72rem;color:#8A97A6}
@@ -147,6 +170,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <h2 class="sec">כל בתי הספר — לפי מפקח.ת</h2>
     <div class="legend" id="mLegend"></div>
     <div id="mMissing"></div>
+    <h2 class="sec" id="rvH" hidden>הערות סקירה — סלים שטרם אושרו</h2>
+    <p class="rv-intro" id="rvIntro" hidden></p>
+    <div id="mReview"></div>
     <h2 class="sec">מה הועלה</h2>
     <div class="card" id="mUploads"></div>
   </section>
@@ -161,6 +187,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
 </footer>
 
+<script src="sal-review.js"></script>
 <script>
 (function () {
   'use strict';
@@ -401,8 +428,51 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     }).join('') : '<p class="empty">עוד לא הועלו קבצים</p>';
   }
 
+  // הערות סקירה (sal-review.js) — רק לבתי ספר שעוד לא אושרו
+  var COMPONENTS = ['מקצוע וחניכות', 'ייעוצי-טיפולי', 'פדגוגיה חדשנית', 'חברתי-ערכי', 'כללי'];
+  function shekel(n) { return n == null ? '' : Number(n).toLocaleString('he-IL') + ' ₪'; }
+  function renderReview() {
+    var R = window.SAL_REVIEW;
+    if (!R || !R.schools) return;
+    var list = R.schools.filter(function (s) { return !APPROVED[s.code]; });
+    if (!list.length) return;
+    var nBig = 0, nEq = 0;
+    list.forEach(function (s) { s.flags.forEach(function (f) { if (f.type === 'מעל 40,000') nBig++; else nEq++; }); });
+    $('rvH').hidden = false;
+    $('rvIntro').hidden = false;
+    $('rvIntro').textContent = 'סקירה של ' + list.length + ' סלים שהועלו וטרם אושרו (' + R.date + '), לפי מסמך סל התוכניות — עדכון 2. ' +
+      nBig + ' תוכניות מעל 40,000 ₪ · ' + nEq + ' סימונים של רכישה, הצטיידות, שיפוץ או מרחב למידה. אלה הערות לבדיקה, לא החלטה.';
+    $('mReview').innerHTML = list.map(function (s) {
+      var big = s.flags.filter(function (f) { return f.type === 'מעל 40,000'; }).length;
+      var eq = s.flags.length - big;
+      var sc = SCHOOLS.filter(function (x) { return x[0] === s.code; })[0];
+      var head = '<summary><h3>' + esc(sc ? sc[1] : s.name) + '</h3>' +
+        (big ? '<span class="ty big">' + big + ' מעל 40,000</span>' : '') +
+        (eq ? '<span class="ty eq">' + eq + ' רכישה/מרחב</span>' : '') +
+        (!s.flags.length ? '<span class="chip ok">אין סימונים</span>' : '') + '</summary>';
+      var meta = '<div class="rv-meta"><span><bdi>' + esc(s.file) + '</bdi></span>' +
+        (s.students ? '<span>' + s.students + ' תלמידים</span>' : '') +
+        (s.totalBudget ? '<span>תקציב ' + shekel(s.totalBudget) + '</span>' : '') +
+        (/^https:\/\/(drive|docs)\.google\.com\//.test(s.url || '') ? '<a class="open" href="' + esc(s.url) + '" target="_blank" rel="noopener">' + ICON_OPEN + 'פתיחת הקובץ</a>' : '') + '</div>';
+      var groups = COMPONENTS.map(function (c) {
+        var fl = s.flags.filter(function (f) { return (COMPONENTS.indexOf(f.component) > -1 ? f.component : 'כללי') === c; });
+        if (!fl.length) return '';
+        return '<h4>' + esc(c) + '</h4>' + fl.map(function (f) {
+          return '<div class="rv-f"><div class="top"><span class="ty ' + (f.type === 'מעל 40,000' ? 'big' : 'eq') + '">' + esc(f.type) + '</span>' +
+            '<b>' + esc(f.program) + '</b>' + (f.amount != null ? '<span class="amt">' + shekel(f.amount) + '</span>' : '') +
+            (f.page != null && f.page !== '' ? '<span class="src">' + (/^\d+$/.test(String(f.page)) ? 'עמ׳ ' : '') + esc(f.page) + '</span>' : '') + '</div>' +
+            (f.quote ? '<q>' + esc(f.quote) + '</q>' : '') + (f.note ? '<div class="why">' + esc(f.note) + '</div>' : '') + '</div>';
+        }).join('');
+      }).join('');
+      var other = (s.other || []).concat(s.readIssues ? [s.readIssues] : []);
+      var otherHtml = other.length ? '<h4>הערות נוספות</h4><ul class="rv-other">' + other.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul>' : '';
+      return '<details class="rv">' + head + '<div class="rv-body">' + meta + groups + otherHtml + '</div></details>';
+    }).join('');
+  }
+
   if (location.hash === '#mabat') {
     document.body.classList.add('mabat');
+    renderReview();
     document.title = 'סל תוכניות — מבט־על';
     document.querySelector('.hero h1').textContent = 'סל תוכניות — מבט־על';
     document.querySelector('.hero p').textContent = 'מה המפקחים העלו, ובאילו בתי ספר עוד חסר.';
