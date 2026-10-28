@@ -90,6 +90,7 @@ body.mabat #supCard,body.mabat #list{display:none}
 .chip{background:#e3ebff;color:#1638a0;border:1px solid #9fb6f2;border-radius:999px;padding:3px 12px;font-size:15px;font-weight:600}
 .chip.ok{background:#e6f7f0;color:#0b6b4f;border-color:#a8e3cc;font-weight:400}
 .chip.no{background:#fdecec;color:#a11d1d;border-color:#f3bcbc;font-weight:600}
+.chip.vd{background:#c2185b;color:#fff;border-color:#a3134c;font-weight:700}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 4px 12px;font-size:14.5px;color:var(--muted)}
 .legend .chip{font-size:14px;padding:2px 10px}
 .up-row.ok b{color:#0b6b4f}
@@ -380,25 +381,30 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
    '45001', '45002', '45005', '45007', '55003', '65007', '65079',
    '46101', '51511', '55621'].forEach(function (c) { APPROVED[c] = 1; });
 
+  // עולים לוועדה ב-29.10.26 (רשימת מיטל 28.10.26)
+  var VAADA = {};
+  ['83425', '54112', '64101', '54101', '54113', '54106', '54100', '54108', '54109', '54102',
+   '55400', '82922', '54009', '62903', '42925', '82923', '54107', '54105'].forEach(function (c) { VAADA[c] = 1; });
+
   function renderMabat() {
     var has = function (s) { return (uploads[s[0]] || []).length > 0; };
-    var chipCls = function (s) { return APPROVED[s[0]] ? ' ok' : (has(s) ? '' : ' no'); };
-    var nOk = SCHOOLS.filter(function (s) { return APPROVED[s[0]]; }).length;
-    var nNo = SCHOOLS.filter(function (s) { return !APPROVED[s[0]] && !has(s); }).length;
-    $('mLegend').innerHTML = '<span><span class="chip ok">ירוק</span> אושר · ' + nOk + '</span>' +
-      '<span><span class="chip">כחול</span> הסל אצלנו, טרם אושר · ' + (SCHOOLS.length - nOk - nNo) + '</span>' +
-      '<span><span class="chip no">אדום</span> אין לנו סל · ' + nNo + '</span>';
+    var kind = function (s) { return APPROVED[s[0]] ? 0 : VAADA[s[0]] ? 1 : has(s) ? 2 : 3; };
+    var chipCls = function (s) { return [' ok', ' vd', '', ' no'][kind(s)]; };
+    var cnt = function (k) { return SCHOOLS.filter(function (s) { return kind(s) === k; }).length; };
+    $('mLegend').innerHTML = '<span><span class="chip ok">ירוק</span> אושר · ' + cnt(0) + '</span>' +
+      '<span><span class="chip vd">ורוד</span> לוועדה 29.10 · ' + cnt(1) + '</span>' +
+      '<span><span class="chip">כחול</span> הסל אצלנו, טרם אושר · ' + cnt(2) + '</span>' +
+      '<span><span class="chip no">אדום</span> אין לנו סל · ' + cnt(3) + '</span>';
     var done = SCHOOLS.filter(has).length;
     $('mCount').textContent = 'הועלו ' + done + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
     $('mBar').style.width = Math.round(done / SCHOOLS.length * 100) + '%';
 
     var groups = Object.keys(names).map(function (n) {
       var all = SCHOOLS.filter(function (s) { return s[3].indexOf(n) > -1; });
-      // כל בתי הספר של המפקח.ת: מאושרים, אחריהם הועלו, ובסוף מה שחסר
-      var rank = function (s) { return APPROVED[s[0]] ? 0 : (has(s) ? 1 : 2); };
-      var allS = all.slice().sort(function (a, b) { return rank(a) - rank(b) || a[1].localeCompare(b[1], 'he'); });
-      var miss = allS.filter(function (s) { return rank(s) === 2; }).map(function (s) { return s[1]; });
-      var ok = allS.filter(function (s) { return rank(s) === 0; }).length;
+      // כל בתי הספר של המפקח.ת: מאושרים, לוועדה, הועלו, ובסוף מה שחסר
+      var allS = all.slice().sort(function (a, b) { return kind(a) - kind(b) || a[1].localeCompare(b[1], 'he'); });
+      var miss = allS.filter(function (s) { return !APPROVED[s[0]] && !has(s); }).map(function (s) { return s[1]; });
+      var ok = allS.filter(function (s) { return kind(s) === 0; }).length;
       return { name: n, total: all.length, ok: ok, miss: miss, allS: allS };
     }).sort(function (a, b) { return b.miss.length - a.miss.length || a.name.localeCompare(b.name, 'he'); });
 
