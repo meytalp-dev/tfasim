@@ -680,7 +680,8 @@
     var help = rows.map(function (x) { return x.help; }).filter(Boolean);
     var story = rows.map(function (x) { return x.story; }).filter(Boolean);
     var words = topWords(help.concat(story));
-    h += '<details class="fold"><summary>התשובות הפתוחות · ' + (help.length + story.length) + '</summary>';
+    h += '<details class="fold"><summary>מה המורים כתבו במילים שלהם · ' + (help.length + story.length) + '</summary>' +
+      '<p class="note" style="margin:0 6px 10px">התשובות לשתי השאלות הפתוחות: "מה הכי היה עוזר לך השנה" ו"סיפור או התלבטות". הכפתור "הכנה לניתוח AI" מעתיק אותן בלי שמות, כדי לבקש מ-Gemini סיכום.</p>';
     h += '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0"><svg class="i"><use href="#i-text"/></svg>התשובות הפתוחות · ' + (help.length + story.length) + '</h3>' +
       '<button class="btn pri sm" id="aiB"><svg class="i"><use href="#i-spark"/></svg>הכנה לניתוח AI</button></div>' +
       (words.length ? '<div class="note" style="font-weight:700;margin-bottom:6px">מילים שחוזרות</div><div class="words" style="margin-bottom:12px">' + words.map(function (w) { return '<span>' + mEsc(w[0]) + ' ×' + w[1] + '</span>'; }).join('') + '</div>' : '') +
