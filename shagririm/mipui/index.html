@@ -622,7 +622,11 @@
     var never = rows.filter(function (x) { return x.freq === 'never'; }).length;
     var mid = n - lead - never;
     var conf = avg(rows, 'conf'), ready = avg(rows, 'ready');
-    var h = testNote + '<div class="g4" style="margin-bottom:16px">' +
+    // 17.10.26: קובץ בלי שמות ובלי תשובות פתוחות, שורה לכל מורה. 28.10.26: "קובץ הנתונים", בראש הדשבורד
+    var h = testNote + '<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0"><svg class="i"><use href="#i-spark"/></svg>קובץ הנתונים</h3>' +
+      '<button class="btn pri sm" id="csvB"><svg class="i"><use href="#i-copy"/></svg>הורדת התשובות בלי שמות</button></div>' +
+      '<p class="note">שורה לכל מורה, בלי שמות. מורידים, ומעלים ל-Gemini.</p></div>';
+    h += '<div class="g4" style="margin-bottom:16px">' +
       '<div class="kpi"><div class="v">' + n + (r.staff ? '<small> /' + r.staff + '</small>' : '') + '</div><div class="l">' + (r.staff ? 'ענו · ' + pct(n, r.staff) + '% מהצוות' : 'ענו') + '</div></div>' +
       '<div class="kpi"><div class="v">' + pct(weekly, n) + '%</div><div class="l">משתמשים לפחות פעם בשבוע</div></div>' +
       '<div class="kpi"><div class="v">' + (conf == null ? '–' : conf.toFixed(1)) + '<small> /5</small></div><div class="l">תחושת ביטחון</div></div>' +
@@ -635,17 +639,21 @@
       '</div><div class="legend"><span><i style="background:#10344F"></i>מובילים: משתמשים כל שבוע ומעלה, וביטחון 4 ומעלה</span><span><i style="background:#1D6FA5"></i>מתנסים: ניסו או משתמשים לפעמים</span><span><i style="background:#C2620C"></i>טרם התחילו: אף פעם</span></div>' +
       '<p class="note" style="margin-top:10px">המובילים הם שותפים טבעיים להדרכת עמיתים. למי שטרם התחיל/ה מתאים יותר להתנסות קצרה בתוך ישיבת צוות.</p></div>';
 
-    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'freq', null, 'fixed') + bars(rows, 'block') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + scaleCard(rows, 'conf') + scaleCard(rows, 'ready') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'tools') + bars(rows, 'use') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'class', null, 'fixed') + gridCard(rows, 'right', 'שימוש נכון') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + gridCard(rows, 'school', 'בבית הספר שלנו') + bars(rows, 'learn') + '</div>';
-    h += '<div class="g2" style="margin-bottom:16px">' + bars(rows, 'sen', null, 'fixed') + '<div></div></div>';
-    h += extraCards(rows, r.extra || []);
+    /* 28.10.26: החלקים מקופלים, כדי שהדשבורד לא יהיה דף ארוך */
+    function fold(t, inner) { return '<details class="fold"><summary>' + t + '</summary>' + inner + '</details>'; }
+    h += fold('תדירות ומה מעכב', '<div class="g2">' + bars(rows, 'freq', null, 'fixed') + bars(rows, 'block') + '</div>');
+    h += fold('ביטחון ומוכנות', '<div class="g2">' + scaleCard(rows, 'conf') + scaleCard(rows, 'ready') + '</div>');
+    h += fold('כלים ושימושים', '<div class="g2">' + bars(rows, 'tools') + bars(rows, 'use') + '</div>');
+    h += fold('בכיתה, ושימוש נכון', '<div class="g2">' + bars(rows, 'class', null, 'fixed') + gridCard(rows, 'right', 'שימוש נכון') + '</div>');
+    h += fold('בבית הספר, ואיך נוח ללמוד', '<div class="g2">' + gridCard(rows, 'school', 'בבית הספר שלנו') + bars(rows, 'learn') + '</div>');
+    h += fold('ותק', '<div class="g2">' + bars(rows, 'sen', null, 'fixed') + '<div></div></div>');
+    var ex = extraCards(rows, r.extra || []);
+    if (ex) h += fold('השאלות שהוספתם', ex);
 
     // פילוח לפי תחום הוראה
     var bySubj = {};
     rows.forEach(function (x) { (bySubj[x.subj] = bySubj[x.subj] || []).push(x); });
+    var hs = h; h = '';
     h += '<div class="card" style="margin-bottom:16px"><h3>לפי תחום הוראה</h3><table class="t"><tr><th>תחום</th><th>ענו</th><th>כל שבוע ומעלה</th><th>ביטחון</th><th>מוכנות</th></tr>';
     Q.subj.opts.forEach(function (o) {
       var g = bySubj[o.id] || [];
@@ -660,28 +668,25 @@
     if (mk.length) h += '<div class="note" style="font-weight:700;margin:12px 0 6px">המגמות שנכתבו</div><div class="words">' + mk.map(function (m) { return '<span>' + mEsc(m) + (meg[m] > 1 ? ' ×' + meg[m] : '') + '</span>'; }).join('') + '</div>';
     h += '</div>';
 
+    h = hs + fold('לפי תחום הוראה', h);
     if (r.first && r.first.length) {
       h += '<div class="card" style="margin-bottom:16px"><h3><svg class="i"><use href="#i-flag"/></svg>רוצים להיות בצוות הראשון · ' + r.first.length + '</h3>' +
         '<div class="words">' + r.first.map(function (x) { return '<span>' + mEsc(x) + '</span>'; }).join('') + '</div>' +
         '</div>';
     }
 
-    h += whoTable(rows);
-
-    // 17.10.26: קובץ בלי שמות ובלי תשובות פתוחות, שורה לכל מורה, לשאלות הצלבה ב-Gemini (מפגש 2)
-    h += '<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between;margin-bottom:6px"><h3 style="margin:0"><svg class="i"><use href="#i-spark"/></svg>לשאול את הנתונים</h3>' +
-      '<button class="btn pri sm" id="csvB"><svg class="i"><use href="#i-copy"/></svg>הורדת התשובות בלי שמות</button></div>' +
-      '<p class="note">קובץ עם שורה לכל מורה, בלי שמות ובלי התשובות הפתוחות. מעלים אותו ל-Gemini, עדיף בחשבון של בית הספר, ושואלים שאלות שהדשבורד לא עונה עליהן. למשל: מי משתמש/ת כל יום אבל לא הביא/ה AI לכיתה, ובאיזה תחום?</p></div>';
+    h += fold('מי ענה', whoTable(rows));
 
     var help = rows.map(function (x) { return x.help; }).filter(Boolean);
     var story = rows.map(function (x) { return x.story; }).filter(Boolean);
     var words = topWords(help.concat(story));
+    h += '<details class="fold"><summary>התשובות הפתוחות · ' + (help.length + story.length) + '</summary>';
     h += '<div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 style="margin:0"><svg class="i"><use href="#i-text"/></svg>התשובות הפתוחות · ' + (help.length + story.length) + '</h3>' +
       '<button class="btn pri sm" id="aiB"><svg class="i"><use href="#i-spark"/></svg>הכנה לניתוח AI</button></div>' +
       (words.length ? '<div class="note" style="font-weight:700;margin-bottom:6px">מילים שחוזרות</div><div class="words" style="margin-bottom:12px">' + words.map(function (w) { return '<span>' + mEsc(w[0]) + ' ×' + w[1] + '</span>'; }).join('') + '</div>' : '') +
       '<div id="aiBox" style="display:none;margin-bottom:12px"></div>' +
       quotes('מה הכי היה עוזר', help, '') + quotes('סיפורים והתלבטויות', story, 'margin-top:12px;') +
-      '</div>';
+      '</div></details>';
 
     box.innerHTML = h;
     box.querySelectorAll('tr[data-w]').forEach(function (tr) {

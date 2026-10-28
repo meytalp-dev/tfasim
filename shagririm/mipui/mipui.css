@@ -180,3 +180,12 @@ html[lang="ar"] .qwrap .opt .mk::before { content: counter(o, arabic-indic); }
 /* העיגולים מאחורי הטקסט, גם כשהכותרת ארוכה */
 .qwrap .qq, .qwrap .qstart h1 { isolation: isolate; }
 .qwrap .qq::before, .qwrap .qq::after, .qwrap .qstart h1::before, .qwrap .qstart h1::after { z-index: -1; }
+
+/* 28.10.26: חלקי הדשבורד מקופלים */
+.fold { background: #fff; border: 1px solid var(--line, #DDE4EA); border-radius: 14px; margin-bottom: 12px; }
+.fold > summary { cursor: pointer; padding: 14px 18px; font-weight: 700; font-size: 1.05rem; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.fold > summary::-webkit-details-marker { display: none; }
+.fold > summary::after { content: "+"; font-size: 1.3rem; color: #1D6FA5; }
+.fold[open] > summary::after { content: "�2"; }
+.fold[open] { padding: 0 12px 12px; background: transparent; border-color: transparent; }
+.fold[open] > summary { padding: 14px 6px; }
