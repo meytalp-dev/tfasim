@@ -283,10 +283,16 @@ footer a{color:var(--mute)}
   };
   var norm = function (x) { return String(x || "").replace(/["'׳״\s]/g, ""); }, planned = "";
   Object.keys(PLAN).forEach(function (id) { PLAN[id].forEach(function (n) { if (H.sc && norm(n) === norm(H.sc)) planned = id; }); });
+  /* 28.10.26: חדר בזום לכל זוג (או שלישייה). אותה חלוקה בקובץ החדרים של מיטל */
+  var ROOMS = [["חדר 1 · מהשימוש הפרטי לכיתה", ["תיכון יוצר עתיד פלמחים", "אורט בית הערבה"]], ["חדר 2 · מהשימוש הפרטי לכיתה", ["עתיד יוצר אבדאע ביר אל מכסור", "אלאופוק א.א.פחם", "אום אל פחם בנות"]], ["חדר 3 · מה מותר בבית הספר", ["תיכון הדר", "עמל אנרגיטק", "דרור גליל"]], ["חדר 4 · אין זמן, לומדים יחד", ["תיכון חברתי חיפה", "דרור נווה מדבר", "תיכון עתיד יוצר עוצמ\"ה זוקו קריית ביאליק"]], ["חדר 5 · מי שרוצה להעמיק", ["עמל נצרת", "אלמנארה"]], ["חדר 6 · מי שרוצה להעמיק", ["תיכון בקהילה מהאראת שפרעם 54106", "תיכון אלאמאני סחנין 54100", "ח'טוואת ירכא אבו סנאן"]], ["חדר 7 · בוחרים צורך", ["המכון החסידי טכנולוגי", "אוהלי תמימים עתיד כפר חב\"ד"]], ["חדר 8 · בוחרים צורך", ["מרכז תורני טכנולוגי נחלים", "בת עמי"]], ["חדר 9 · בוחרים צורך", ["התיכון החברתי ת״א-יפו", "עתיד גליל מערבי ירכא", "טל חרמון"]]];
+  var myRoom = null;
+  ROOMS.forEach(function (r) { r[1].forEach(function (n) { if (H.sc && norm(n) === norm(H.sc)) myRoom = r; }); });
+  var roomTxt = myRoom ? "<br><b>" + myRoom[0].split(" · ")[0] + "</b> בזום, עם: " + myRoom[1].filter(function (n) { return norm(n) !== norm(H.sc); }).join(", ") + "." : "";
   if (planned) {
     if (!st.need) { st.need = planned; st.needt = NEEDS[planned].t; save(); }
-    var mates = PLAN[planned].filter(function (n) { return norm(n) !== norm(H.sc); });
-    document.getElementById("needNote").innerHTML = "לפי המיפוי של בית הספר שלכם: <b>" + NEEDS[planned].t + "</b>.<br>עובדים עם: " + mates.join(", ") + ".";
+    document.getElementById("needNote").innerHTML = "לפי המיפוי של בית הספר שלכם: <b>" + NEEDS[planned].t + "</b>." + roomTxt;
+  } else if (myRoom) {
+    document.getElementById("needNote").innerHTML = "בוחרים יחד עם השותפים צורך אחד." + roomTxt;
   }
 
   /* בחירת הצורך */
