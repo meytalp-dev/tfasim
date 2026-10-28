@@ -450,24 +450,20 @@
 
     if (!c.open) {
       bigEl.textContent = "— — — —";
-      noteEl.textContent = "הרישום סגור";
+      /* 28.10.26: אין פתיחה וסגירה ידניות. הרישום נפתח ונסגר לבד לפי השעה. */
+      noteEl.textContent = "הרישום סגור · נפתח לבד רבע שעה לפני המפגש";
       ttl.textContent = "רישום נוכחות";
       drawRing(0, 1);
-      el("t-openBtn").hidden = false;
-      el("t-closeBtn").hidden = true;
       el("t-copyCode").hidden = true;
       return;
     }
 
-    el("t-openBtn").hidden = true;
-    el("t-closeBtn").hidden = false;
     el("t-copyCode").hidden = false;
     ttl.textContent = "רישום נוכחות · מפגש " + c.session;
     /* 19.10.26: אין קוד להקרין. הרכזים לוחצים "אני כאן" בעמוד המפגש. */
     bigEl.textContent = "פתוח";
     drawRing(1, 1);
-    noteEl.textContent = "הרכזים לוחצים \"אני כאן\" בעמוד המפגש" +
-      (c.auto ? " · נפתח לבד לפי השעה, ונסגר בסוף המפגש" : "");
+    noteEl.textContent = "הרכזים לוחצים \"אני כאן\" בעמוד המפגש · נסגר לבד בסוף המפגש";
   }
 
   /* השעון מתרוקן בדפדפן, והשרת נשאל רק כשהחלון נגמר. התצוגה נשארת על
@@ -770,15 +766,15 @@
     var openHere = T.code && T.code.open && Number(T.code.session) === Number(L.session);
 
     btn.disabled = !n;
-    btn.className = openHere && n ? "warn" : "";
-    lbl.textContent = openHere ? "סיום המפגש ואישור הנוכחות" : "אישור נוכחות המפגש";
+    btn.className = "";
+    lbl.textContent = "אישור נוכחות המפגש";
 
     note.className = "";
     if (!L.session) { note.textContent = "לבחור מפגש."; return; }
     if (n) {
       note.textContent = n + " ממתינים לאישור" +
         (L.counts.review ? " · " + L.counts.review + " מסומנים לבדיקה ולא יאושרו" : "") +
-        (openHere ? " · הרישום עדיין פתוח וייסגר בלחיצה" : "");
+        (openHere ? " · הרישום עדיין פתוח, ומי שיירשם אחרי האישור ימתין לאישור הבא" : "");
       return;
     }
     if (L.counts.registered) {
@@ -807,24 +803,21 @@
 
     var list = pendingApproval();
     if (!list.length) { toast("אין מה לאשר", true); return; }
-    var openHere = T.code && T.code.open && Number(T.code.session) === session;
-
     var q = "לאשר את הנוכחות של " + list.length + " משתתפים במפגש " + session + "?";
     if (L.counts.review) q += "\n" + L.counts.review + " מסומנים לבדיקה ולא יאושרו.";
-    if (openHere) q += "\nהרישום ייסגר, ומי שלא נרשם עד עכשיו לא יוכל להירשם.";
     q += "\n\nאחרי האישור הנוכחות נכתבת לקובץ של שני בסנכרון הבא.";
     if (!w.confirm(q)) return;
 
-    sendApprove(track, session, openHere, "");
+    sendApprove(track, session, "");
   }
 
-  /* מופרד כדי שאפשר יהיה לחזור עליו עם עקיפה, בלי לשאול הכל שוב */
-  function sendApprove(track, session, openHere, force) {
+  /* מופרד כדי שאפשר יהיה לחזור עליו עם עקיפה, בלי לשאול הכל שוב.
+     28.10.26: האישור לא סוגר את הרישום — הוא נסגר לבד בסוף המפגש. */
+  function sendApprove(track, session, force) {
     var btn = el("t-okBtn");
     if (btn) btn.disabled = true;
     api({
-      action: "meetApprove", track: track, session: session,
-      close: openHere ? "כן" : "", force: force || ""
+      action: "meetApprove", track: track, session: session, force: force || ""
     }).then(function (r) {
       /* השרת חוסם אישור סופי לפני שיובא דוח הזום, כדי שההצלבה לא תתבטל.
          העקיפה קיימת למקרה שזום נפל ביום המפגש, והיא נרשמת ביומן. */
@@ -834,53 +827,16 @@
           "בלי הדוח אי אפשר לדעת מי באמת היה בזום, ומי קיבל את הקוד מחבר.\n" +
           "מומלץ לייבא קודם את הדוח (הכפתור \"ייבוא דוח זום\") ורק אז לאשר.\n\n" +
           "לאשר בכל זאת, בלי הצלבה? זה יירשם ביומן.";
-        if (w.confirm(ask)) sendApprove(track, session, openHere, "כן");
+        if (w.confirm(ask)) sendApprove(track, session, "כן");
         else renderApprove();
         return;
       }
       if (!r || r.ok !== true) { toast(errText(r && r.error), true); renderApprove(); return; }
-      if (r.closed) {
-        T.code = { ok: true, open: false, track: T.track, codeMinutes: (T.code && T.code.codeMinutes) || 5 };
-        renderCode();
-      }
       toast("אושרו " + r.approved + " משתתפים" +
         (r.skipped && r.skipped.review ? " · " + r.skipped.review + " נשארו לבדיקה" : "") +
-        (r.closed ? " · הרישום נסגר" : "") +
         (r.forced ? " · בלי הצלבת זום" : ""));
       loadLive();
     }).catch(function () { toast(errText("network"), true); renderApprove(); });
-  }
-
-  /* ---------------------------- פתיחה וסגירה ---------------------------- */
-
-  function openReg() {
-    var n = Number(el("t-session").value);
-    if (!n) { toast("לבחור מפגש", true); return; }
-    api({ action: "meetOpen", session: n }).then(function (r) {
-      if (!r || r.ok !== true) {
-        toast(errText(r && r.error) + (r && r.session ? " (מפגש " + r.session + ")" : ""), true);
-        return;
-      }
-      T.code = r;
-      T.sel = Number(r.session);
-      T.endsAt = Date.now() + (Number(r.secondsLeft) || 0) * 1000;
-      toast(r.again ? "הרישום כבר היה פתוח" : "הרישום נפתח למפגש " + r.session);
-      renderCode();
-      loadLive();
-    }).catch(function () { toast(errText("network"), true); });
-  }
-
-  function closeReg() {
-    var open = T.code && T.code.open ? Number(T.code.session) : 0;
-    if (!open) { toast(errText("notopen"), true); return; }
-    if (!w.confirm("לסגור את הרישום למפגש " + open + "? מי שלא נרשם עד עכשיו לא יוכל להירשם.")) return;
-    api({ action: "meetClose", session: open }).then(function (r) {
-      if (!r || r.ok !== true) { toast(errText(r && r.error), true); return; }
-      T.code = { ok: true, open: false, track: T.track, codeMinutes: (T.code && T.code.codeMinutes) || 5 };
-      toast("הרישום נסגר");
-      renderCode();
-      loadLive();
-    }).catch(function () { toast(errText("network"), true); });
   }
 
   /* ---------------------------- המפתח והשער ---------------------------- */
@@ -959,8 +915,6 @@
       var b = ev.target.closest ? ev.target.closest("button[data-track]") : null;
       if (b) setTrack(b.getAttribute("data-track"));
     });
-    el("t-openBtn").addEventListener("click", openReg);
-    el("t-closeBtn").addEventListener("click", closeReg);
     el("t-okBtn").addEventListener("click", approveMeeting);
     el("t-copy").addEventListener("click", copyReminder);
     el("t-copyCode").addEventListener("click", copyZoomChat);
