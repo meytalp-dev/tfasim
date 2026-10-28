@@ -243,19 +243,17 @@ footer a{color:var(--mute)}
     var n = NEEDS[st.need];
     box.querySelectorAll(".need").forEach(function (b) { b.setAttribute("aria-pressed", b.dataset.id === st.need ? "true" : "false"); });
     var mn = document.getElementById("mineNeed");
-    if (!n) {
-      /* עוד לא נבחר צורך: בוחרים כאן, באותו מקום של הכפתורים */
-      mn.innerHTML = "לאיזה צורך? <span class=\"opts\" style=\"margin-top:6px\"></span>";
-      Object.keys(NEEDS).forEach(function (id) {
-        var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = NEEDS[id].t;
-        b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
-        mn.querySelector(".opts").appendChild(b);
-      });
-      return;
-    }
+    /* 28.10.26: ארבעת הצרכים תמיד גלויים כאן, הנבחר מסומן. מחליפים בלחיצה */
+    mn.innerHTML = "לאיזה צורך? <span class=\"opts\" style=\"margin-top:6px\"></span>";
+    Object.keys(NEEDS).forEach(function (id) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = NEEDS[id].t;
+      b.setAttribute("aria-pressed", id === st.need ? "true" : "false");
+      b.onclick = function () { st.need = id; save(); post({ kind: "answer", track: "h", s: 2, cid: CID, key: "need", value: NEEDS[id].t }); showNeed(); };
+      mn.querySelector(".opts").appendChild(b);
+    });
+    if (!n) return;
     document.getElementById("ideas").hidden = false;
     document.getElementById("ideaList").innerHTML = n.ideas.map(function (x) { return "<li><b>" + x[0] + "</b><br><span>" + x[1] + "</span></li>"; }).join("");
-    document.getElementById("mineNeed").textContent = "הצורך שלי: " + n.t;
     document.getElementById("mineOut").textContent = "מומלץ לצורך שלך: " + n.out + ".";
     document.getElementById("cpSrc").disabled = false;
     document.getElementById("cpPr").disabled = false;
