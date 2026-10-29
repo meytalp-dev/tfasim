@@ -447,7 +447,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     SCHOOLS.forEach(function (s) { (uploads[s[0]] || []).forEach(function (x) { rows.push({ s: s, x: x }); }); });
     rows.sort(function (a, b) { return (b.x.t || 0) - (a.x.t || 0); });
     $('mUploads').innerHTML = rows.length ? rows.map(function (r) {
-      var link = /^https:\/\/drive\.google\.com\//.test(r.x.u || '') ? '<a class="open" href="' + esc(r.x.u) + '" target="_blank" rel="noopener">' + ICON_OPEN + 'פתיחת הקובץ</a>' : '';
+      var link = /^https:\/\/(drive|docs)\.google\.com\//.test(r.x.u || '') ? '<a class="open" href="' + esc(r.x.u) + '" target="_blank" rel="noopener">' + ICON_OPEN + 'פתיחת הקובץ</a>' : '';
       var ok = APPROVED[r.s[0]];
       return '<div class="up-row' + (ok ? ' ok' : '') + '"><div class="info"><b>' + esc(r.s[1]) + '</b>' + (ok ? '<span class="tag-ok">מאושר</span>' : '') + '<div class="meta">' + esc(r.x.by || '') + ' · <bdi>' + esc(r.x.f) + '</bdi> · ' + esc(r.x.at) + '</div></div>' + link + '</div>';
     }).join('') : '<p class="empty">עוד לא הועלו קבצים</p>';
