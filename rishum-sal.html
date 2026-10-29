@@ -70,6 +70,9 @@ input:focus,select:focus{outline:none;border-color:var(--blue);background-color:
 .slist input{width:18px;height:18px;margin:0;accent-color:var(--blue);flex:none}
 .slist label[hidden]{display:none}
 .scount{font-size:14.5px;color:var(--muted);margin-top:6px}
+.allbtn{margin-top:10px;font:inherit;font-size:15px;font-weight:600;color:var(--blue);background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 14px;cursor:pointer}
+.allbtn:hover{border-color:var(--blue)}
+#h_mabat{margin:10px 0 0}
 #form input.hp{position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
 .actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
 .btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
@@ -114,7 +117,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         <label class="chk"><input type="checkbox" name="role" value="מפקח.ת פדגוגי.ת">מפקח.ת פדגוגי.ת</label>
         <label class="chk"><input type="checkbox" name="role" value="מפקח.ת מקצועי.ת">מפקח.ת מקצועי.ת</label>
         <label class="chk"><input type="checkbox" name="role" value="מפקחת מערך טיפולי">מפקחת מערך טיפולי</label>
+        <label class="chk"><input type="checkbox" name="role" value="מטה — מבט־על על כל בתי הספר והרשתות">מטה — מבט־על על כל בתי הספר והרשתות</label>
       </div>
+      <div class="hint" id="h_mabat" hidden>תירשמו עם כל 64 בתי הספר וכל הרשתות. אין צורך לסמן בתי ספר.</div>
       <div class="err" id="e_roles">נא לסמן תפקיד</div>
     </div>
 
@@ -147,6 +152,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <div class="cond" id="c_sup">
       <div class="ql">בתי הספר שבפיקוחך <span class="req">*</span></div>
       <input type="search" id="f_sfilter" placeholder="חיפוש בית ספר" aria-label="חיפוש בית ספר">
+      <button type="button" class="allbtn" id="sall">סימון כל בתי הספר</button>
       <div class="slist" id="slist"></div>
       <div class="scount" id="scount">לא נבחרו בתי ספר</div>
       <div class="err" id="e_sup">נא לסמן לפחות בית ספר אחד</div>
@@ -239,13 +245,16 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     return [].slice.call(document.querySelectorAll('input[name=role]:checked')).map(function (c) { return c.value; });
   }
   function has(r) { return roles().indexOf(r) > -1; }
-  function isSup() { return roles().some(function (r) { return r.indexOf('מפקח') === 0; }); }
+  var MABAT = 'מטה — מבט־על על כל בתי הספר והרשתות';
+  // מבט־על כולל את כל בתי הספר, ולכן לא מסמנים בתי ספר
+  function isSup() { return !has(MABAT) && roles().some(function (r) { return r.indexOf('מפקח') === 0; }); }
 
   function sync() {
     $('c_school').classList.toggle('on', has('מנהל.ת בית ספר'));
     $('c_network').classList.toggle('on', has('נציג.ת רשת'));
     $('c_megama').classList.toggle('on', has('מפקח.ת מקצועי.ת'));
     $('c_sup').classList.toggle('on', isSup());
+    $('h_mabat').hidden = !has(MABAT);
   }
   document.querySelectorAll('input[name=role]').forEach(function (c) {
     c.addEventListener('change', function () { sync(); clearErr('roles'); $('roles').classList.remove('bad'); });
@@ -279,11 +288,20 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   function supChecked() {
     return [].slice.call($('slist').querySelectorAll('input:checked')).map(function (c) { return c.value; });
   }
-  $('slist').addEventListener('change', function () {
+  function supCount() {
     var n = supChecked().length;
     $('scount').textContent = n ? 'נבחרו ' + n + ' בתי ספר' : 'לא נבחרו בתי ספר';
     if (n === 1) $('scount').textContent = 'נבחר בית ספר אחד';
+    var all = n === $('slist').querySelectorAll('input').length;
+    $('sall').textContent = all ? 'ביטול הסימון' : 'סימון כל בתי הספר';
     $('slist').classList.remove('bad'); clearErr('sup');
+  }
+  $('slist').addEventListener('change', supCount);
+  $('sall').addEventListener('click', function () {
+    var boxes = $('slist').querySelectorAll('input');
+    var on = supChecked().length < boxes.length;
+    boxes.forEach(function (c) { c.checked = on; });
+    supCount();
   });
   $('f_sfilter').addEventListener('input', function () {
     var q = this.value.trim();
