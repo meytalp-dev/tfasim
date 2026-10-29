@@ -193,12 +193,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
 
     <div class="q">
-      <span class="qtext">כשרות <span class="req">*</span></span>
+      <span class="qtext">כשרות <span class="opt">(רק למי שצריך)</span></span>
       <div class="opts" id="kosherBox">
         <input type="radio" name="kosher" id="k1" value="כשרות רגילה"><label for="k1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>כשרות רגילה</label>
         <input type="radio" name="kosher" id="k2" value="כשרות הרב לנדאו"><label for="k2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>כשרות הרב לנדאו</label>
       </div>
-      <div class="err" id="e_kosher">נא לבחור כשרות.</div>
     </div>
 
     <div class="q">
@@ -354,6 +353,13 @@ function refresh(){
   updateHelp();
 }
 $("form").addEventListener("change", function(){ refresh(); saveDraft(); });
+/* kosher is optional: a second click on the chosen option clears it */
+document.querySelectorAll('input[name="kosher"]').forEach(function(r){
+  var lab = document.querySelector('label[for="'+r.id+'"]');
+  lab.addEventListener("mousedown", function(){ r._was = r.checked; });
+  lab.addEventListener("touchstart", function(){ r._was = r.checked; }, {passive:true});
+  lab.addEventListener("click", function(e){ if (r._was){ e.preventDefault(); r.checked = false; r._was = false; refresh(); saveDraft(); } });
+});
 $("form").addEventListener("input", function(){ clearTimeout(refresh.t); refresh.t = setTimeout(function(){ refresh(); saveDraft(); }, 300); });
 
 /* ---------- validation ---------- */
@@ -366,7 +372,6 @@ function validate(d){
   bad("org", !!d.roleKind && !sch && !d.org, "org");
   bad("school", sch && SCHOOLS.indexOf(d.p.school) < 0, "schoolSearch");
   bad("network", hasNet(d.roleKind) && NETWORKS.indexOf(d.p.network) < 0, "network");
-  bad("kosher", !d.p.kosher);
   bad("phone", d.p.phone.replace(/\D/g,"").length < 9, "phone");
   bad("email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.p.email), "email");
   bad("muzeon", d.roleKind === PRINCIPAL && !d.p.muzeon);
