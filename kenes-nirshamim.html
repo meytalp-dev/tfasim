@@ -219,17 +219,20 @@ function where(p) {
 }
 function roleLabel(p) { return String(p.role || "").replace(/^נציג\.ת רשת/, "נציג.ת רשת"); }
 
+function declined(p) { return p.attendance === "לא"; }
+
 function render() {
-  var inv = DATA.inv, people = DATA.people, m = build(inv, people);
-  var reg = inv.filter(function (r) { return m.regOf[r.id]; }), miss = inv.filter(function (r) { return !m.regOf[r.id]; });
+  var inv = DATA.inv, responses = DATA.people, people = responses.filter(function (p) { return !declined(p); }), no = responses.filter(declined), m = build(inv, responses);
+  var reg = inv.filter(function (r) { return m.regOf[r.id] && !declined(m.regOf[r.id]); }), miss = inv.filter(function (r) { return !m.regOf[r.id]; });
   var total = inv.length, pct = total ? Math.round(reg.length / total * 100) : 0;
   var groups = GROUP_ORDER.filter(function (g) { return inv.some(function (r) { return r.g === g; }); })
     .concat(inv.map(function (r) { return r.g; }).filter(function (g, i, a) { return GROUP_ORDER.indexOf(g) < 0 && a.indexOf(g) === i; }));
 
   var h = '<header><div class="eyebrow">כנס מנהלים ורשתות · 23.11.26 · ג׳ייקובס חדרה</div>' +
-    '<h1>מי נרשם לכנס</h1>' +
+    '<h1>מענה להזמנה לכנס</h1>' +
     '<p class="lede">מול רשימת המוזמנים. ההצלבה לפי המייל, ואם אין התאמה, לפי השם. כולל את טופס הרשתות.</p>' +
-    '<div class="big"><b>' + people.length + '</b><span>נרשמו · מהם <b style="font-size:inherit;color:var(--teal)">' + reg.length + '</b> מתוך ' + total + ' מוזמנים (' + pct + '%)</span></div>' +
+    '<div class="big"><b>' + people.length + '</b><span>אישרו הגעה · מהם <b style="font-size:inherit;color:var(--teal)">' + reg.length + '</b> מתוך ' + total + ' מוזמנים (' + pct + '%)</span></div>' +
+    '<p class="sub">לא יגיעו: ' + no.length + ' · טרם השיבו: ' + miss.length + ' מתוך ' + total + ' מוזמנים. מי שסימנו שלא יגיעו אינם נכללים במספר המשתתפים הצפוי.</p>' +
     '<div class="bar"><i style="width:' + pct + '%"></i></div>' +
     '<div class="meta"><span>עודכן ' + new Date(DATA.fetched).toLocaleString("he-IL", { hour: "2-digit", minute: "2-digit", day: "numeric", month: "numeric" }) + '</span>' +
     '<button type="button" id="reload">רענון</button><span>' + esc(DATA.who) + '</span></div></header>';
@@ -238,11 +241,11 @@ function render() {
   /* a tile opens the list of who registered in that group, right under the tiles */
   if (GSEL && groups.indexOf(GSEL) < 0) GSEL = "";
   h += '<section><div class="kick">לפי קבוצה · לחיצה על קבוצה מציגה מי נרשם בה</div><div class="groups">' + groups.map(function (g) {
-    var all = inv.filter(function (r) { return r.g === g; }), n = all.filter(function (r) { return m.regOf[r.id]; }).length;
+    var all = inv.filter(function (r) { return r.g === g; }), n = all.filter(function (r) { return m.regOf[r.id] && !declined(m.regOf[r.id]); }).length;
     return '<button type="button" class="g' + (GSEL === g ? ' on' : '') + '" data-group="' + esc(g) + '" aria-expanded="' + (GSEL === g) + '"><b>' + n + '</b> <small>מתוך ' + all.length + '</small><div>' + esc(GROUP_NAME[g] || g) + '</div><div class="gb"><i style="width:' + (all.length ? n / all.length * 100 : 0) + '%"></i></div></button>';
   }).join("") + '</div>';
   if (GSEL) {
-    var gin = inv.filter(function (r) { return r.g === GSEL && m.regOf[r.id]; });
+    var gin = inv.filter(function (r) { return r.g === GSEL && m.regOf[r.id] && !declined(m.regOf[r.id]); });
     h += '<div class="gpanel"><div class="gph"><b>' + esc(GROUP_NAME[GSEL] || GSEL) + ' · נרשמו ' + gin.length + '</b><button type="button" class="gclose" data-group="' + esc(GSEL) + '">סגירה</button></div>' +
       (gin.length ? '<div class="chips">' + gin.map(function (r) {
         var p = m.regOf[r.id], w = where(p) || String(p.role || "").replace(/^[^·]*·\s*/, "");
@@ -252,7 +255,7 @@ function render() {
   h += '</section>';
 
   /* who has not registered */
-  h += '<section><div class="kick">לרדוף אחרי</div><h2>טרם נרשמו · ' + miss.length + ' מתוך ' + total + '</h2>' +
+  h += '<section><div class="kick">לרדוף אחרי</div><h2>טרם השיבו · ' + miss.length + ' מתוך ' + total + '</h2>' +
     '<p class="sub">לפי קבוצה. "העתקת מיילים" מעתיקה את כל הכתובות של הקבוצה, להדבקה בשורת הנמענים (בעותק מוסתר).</p>';
   groups.forEach(function (g) {
     var list = miss.filter(function (r) { return r.g === g; });
@@ -264,8 +267,14 @@ function render() {
       '<button type="button" class="btn" data-copy-mails="' + esc(g) + '">' + ICON.mail + 'העתקת מיילים (' + list.filter(function (r) { return r.email; }).length + ')</button>' +
       '<button type="button" class="btn" data-copy-names="' + esc(g) + '">' + ICON.copy + 'העתקת שמות</button></div></details>';
   });
-  if (!miss.length) h += '<p class="empty">כל המוזמנים נרשמו.</p>';
+  if (!miss.length) h += '<p class="empty">כל המוזמנים השיבו.</p>';
   h += '</section>';
+
+  /* declines are responses, not expected attendees or reminder targets */
+  h += '<section><div class="kick">השיבו שלא יגיעו</div><h2>לא יגיעו · ' + no.length + '</h2>' +
+    '<div class="chips">' + no.map(function (p) {
+      return '<span class="chip">' + esc(p.name) + (where(p) ? ' <small>· ' + esc(where(p)) + '</small>' : '') + '</span>';
+    }).join("") + '</div>' + (no.length ? '' : '<p class="empty">אין תשובות של אי-הגעה.</p>') + '</section>';
 
   /* registered */
   var shown = people.filter(function (p) {
@@ -273,7 +282,7 @@ function render() {
     return [p.name, p.role, p.school, p.network, p.email].join(" ").indexOf(Q) >= 0;
   }).sort(function (a, b) { return String(b.at).localeCompare(String(a.at)); });
   var muz = people.filter(function (p) { return p.muzeon === "כן" && !/^נציג\.ת רשת/.test(p.role); }).length;
-  h += '<section><div class="kick">נרשמו</div><h2>' + people.length + ' נרשמו</h2>' +
+  h += '<section><div class="kick">נרשמו</div><h2>' + people.length + ' אישרו הגעה</h2>' +
     '<p class="sub">מוזיאון החדשנות: ' + muz + ' מנהלים אמרו "כן" · דוכנים בתערוכת הרשתות: ' + DATA.booths.length +
     (DATA.booths.length ? ' (' + DATA.booths.map(function (b) { return esc(b.network); }).join(", ") + ')' : '') + '</p>' +
     '<div class="tools"><input type="search" class="search" id="q" placeholder="חיפוש לפי שם, בית ספר, רשת" value="' + esc(Q) + '">' +
@@ -290,10 +299,11 @@ function render() {
   h += '</section>';
 
   /* outside the list */
-  if (m.outside.length) {
-    h += '<section><div class="kick">לבדיקה</div><h2>נרשמו ולא ברשימת המוזמנים · ' + m.outside.length + '</h2>' +
+  var outside = m.outside.filter(function (p) { return !declined(p); });
+  if (outside.length) {
+    h += '<section><div class="kick">לבדיקה</div><h2>נרשמו ולא ברשימת המוזמנים · ' + outside.length + '</h2>' +
       '<p class="sub">לא נמצאה התאמה לפי מייל או שם. אולי נרשמו עם כתובת אחרת, או שהגיעו מהפצה של מישהו אחר. הם לא נחשבים כאן כ"טרם נרשמו".</p>' +
-      '<div class="chips">' + m.outside.map(function (p) { return '<span class="chip" style="background:var(--teal-soft);color:var(--teal)">' + esc(p.name) + ' <small style="color:var(--teal)">· ' + esc(where(p) || roleLabel(p)) + '</small></span>'; }).join("") + '</div></section>';
+      '<div class="chips">' + outside.map(function (p) { return '<span class="chip" style="background:var(--teal-soft);color:var(--teal)">' + esc(p.name) + ' <small style="color:var(--teal)">· ' + esc(where(p) || roleLabel(p)) + '</small></span>'; }).join("") + '</div></section>';
   }
 
   h += '<footer>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br>נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>';
@@ -303,11 +313,11 @@ function render() {
 }
 
 function csv() {
-  var cols = [["at", "נרשם.ה"], ["name", "שם"], ["role", "תפקיד"], ["school", "בית ספר"], ["network", "רשת"], ["phone", "נייד"], ["email", "מייל"],
+  var cols = [["attendance", "הגעה לכנס"], ["at", "נרשם.ה"], ["name", "שם"], ["role", "תפקיד"], ["school", "בית ספר"], ["network", "רשת"], ["phone", "נייד"], ["email", "מייל"],
               ["kosher", "כשרות"], ["food", "אוכל"], ["foodNote", "רגישות / הערה"], ["muzeon", "מוזיאון / דוכן"]];
   var cell = function (v) { v = String(v == null ? "" : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   var lines = [cols.map(function (c) { return c[1]; }).concat(["ברשימת המוזמנים"]).join(",")].concat(DATA.people.map(function (p) {
-    return cols.map(function (c) { return cell(p[c[0]]); }).concat([p._inv ? "כן" : "לא"]).join(",");
+    return cols.map(function (c) { return cell(c[0] === "attendance" ? (declined(p) ? "לא יגיעו" : "אישרו הגעה") : p[c[0]]); }).concat([p._inv ? "כן" : "לא"]).join(",");
   }));
   var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
   var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "nirshamim-kenes-23-11.csv";
