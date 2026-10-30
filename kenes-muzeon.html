@@ -136,7 +136,14 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <input type="text" class="hp" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
 
     <!-- ============ הרשמה ============ -->
-    <div class="part">הרשמה לכנס</div>
+    <div class="part">מענה להזמנה לכנס</div>
+    <div class="q">
+      <span class="qtext">הגעה לכנס <span class="req">*</span></span>
+      <div class="opts" id="attendanceBox">
+        <input type="radio" name="attendance" id="a1" value="כן" checked><label for="a1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אשמח להגיע לכנס</label>
+        <input type="radio" name="attendance" id="a2" value="לא"><label for="a2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>לצערי לא אגיע לכנס</label>
+      </div>
+    </div>
 
     <div class="q">
       <label class="qtext" for="name">שם מלא <span class="req">*</span></label>
@@ -192,6 +199,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       </div>
     </div>
 
+    <div id="attendanceDetails">
     <div class="q">
       <span class="qtext">כשרות <span class="opt">(רק למי שצריך)</span></span>
       <div class="opts" id="kosherBox">
@@ -230,6 +238,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
     </div>
 
+    </div>
     <div class="actions">
       <button type="submit" class="btn" id="submitBtn">הרשמה</button>
       <p class="privacy">אפשר לחזור לטופס ולעדכן. כל שמירה מעדכנת את הקודמת.</p>
@@ -322,7 +331,7 @@ function atSchool(r){ return r === PRINCIPAL || r === "רכז.ת פדגוגי.ת
 function hasNet(r){ return atSchool(r) || r === "רשת"; }
 function collect(){
   var r = val("role"), sch = atSchool(r), org = $("org").value.trim();
-  return { p:{ name:$("name").value.trim(), role: sch || !r ? r : r + (org ? " · " + org : ""),
+  return { p:{ attendance:val("attendance"), name:$("name").value.trim(), role: sch || !r ? r : r + (org ? " · " + org : ""),
                school: sch ? $("school").value : "", network: hasNet(r) ? $("network").value : "",
                phone:$("phone").value.trim(), email:$("email").value.trim(), kosher:val("kosher"), food:val("food"), foodNote:$("foodNote").value.trim(),
                muzeon: r === PRINCIPAL ? val("muzeon") : "" }, ex:null, roleKind:r, org:org };
@@ -330,6 +339,7 @@ function collect(){
 function fillP(p){
   if (!p) return;
   ["name","phone","email","foodNote"].forEach(function(k){ if (p[k]) $(k).value = p[k]; });
+  setRadio("attendance", p.attendance || "כן");
   var role = String(p.role || ""), m = role.match(/^(מטה|רשת|אחר)( · (.*))?$/);
   if (m){ setRadio("role", m[1]); if (m[3]) $("org").value = m[3]; } else if (role) setRadio("role", role);
   if (p.food) setRadio("food", p.food);
@@ -343,6 +353,8 @@ function fillP(p){
 /* ---------- conditional parts ---------- */
 function refresh(){
   var r = val("role");
+  $("attendanceDetails").hidden = val("attendance") === "לא";
+  $("submitBtn").textContent = val("attendance") === "לא" ? "שמירת תשובה" : (token ? "עדכון" : "הרשמה");
   $("schoolWrap").classList.toggle("on", atSchool(r));
   $("netWrap").classList.toggle("on", hasNet(r));
   renderSchoolPick();
@@ -374,7 +386,7 @@ function validate(d){
   bad("network", hasNet(d.roleKind) && NETWORKS.indexOf(d.p.network) < 0, "network");
   bad("phone", d.p.phone.replace(/\D/g,"").length < 9, "phone");
   bad("email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.p.email), "email");
-  bad("muzeon", d.roleKind === PRINCIPAL && !d.p.muzeon);
+  bad("muzeon", d.p.attendance !== "לא" && d.roleKind === PRINCIPAL && !d.p.muzeon);
   if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
   return ok;
 }
@@ -416,20 +428,20 @@ function submit(){
       if (r && r.ok){
         token = r.token || token;
         /* confirmation mail: the merhav relay pulls it from the server and sends it (26.10) */
-        if (r.mail) relayMail(r.mail);
+        if (r.mail && d.p.attendance !== "לא") relayMail(r.mail);
         $("okBox").classList.remove("nolink");
         try{ localStorage.setItem(TOKEN_KEY, token); localStorage.removeItem(DRAFT_KEY); }catch(e){}
-        $("okTitle").textContent = r.updated ? "העדכון נשמר" : "נרשמת לכנס";
-        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. פרטים נוספים יישלחו בנפרד." : "נתראה ב-23.11.");
+        $("okTitle").textContent = d.p.attendance === "לא" ? "תשובתך נשמרה" : (r.updated ? "העדכון נשמר" : "נרשמת לכנס");
+        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.attendance === "לא" ? "רשמנו שלא תגיעו לכנס. אפשר לחזור לטופס ולעדכן את התשובה בכל שלב." : d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. פרטים נוספים יישלחו בנפרד." : "נתראה ב-23.11.");
         $("myLink").value = linkFor(token);
         show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
       } else if (r && r.unreadable){
         /* 26.10: the ministry network blocks the domain Google replies from. The save reached the server,
            so the relay sends the confirmation (by our own cid) and the page says so honestly. */
-        setTimeout(function(){ relayMail(cid); }, 1200);
+        if (d.p.attendance !== "לא") setTimeout(function(){ relayMail(cid); }, 1200);
         try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
-        $("okTitle").textContent = "ההרשמה נשלחה";
-        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". בדקות הקרובות יגיע אלייך מייל אישור. אם לא יגיע תוך רבע שעה, כתבו לנו בכפתור שבתחתית הדף.";
+        $("okTitle").textContent = "התשובה נשלחה";
+        $("okText").textContent = d.p.attendance === "לא" ? "התשובה נשלחה. אם לא תתקבל הודעת שמירה, אפשר לנסות שוב או לפנות אלינו בכפתור שבתחתית הדף." : "תודה, " + d.p.name.split(" ")[0] + ". בדקות הקרובות יגיע אלייך מייל אישור. אם לא יגיע תוך רבע שעה, כתבו לנו בכפתור שבתחתית הדף.";
         $("okBox").classList.add("nolink");
         show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
       } else { show("bad"); $("badBox").scrollIntoView({behavior:"smooth", block:"center"}); }
@@ -459,6 +471,7 @@ function updateHelp(){
   var t = q || saved, draft = null;
   try{ draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }catch(e){}
   if (draft){ fillP(draft.p); }
+  if (new URLSearchParams(location.search).get("attendance") === "no") setRadio("attendance", "לא");
   refresh();
   if (!t) return;
   fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t), { credentials:"omit" }).then(function(r){ return r.json(); }).then(function(r){
@@ -466,6 +479,7 @@ function updateHelp(){
     token = t; try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){}
     $("submitBtn").textContent = "עדכון";
     if (!draft) fillP(r.p);
+    if (new URLSearchParams(location.search).get("attendance") === "no") { setRadio("attendance", "לא"); refresh(); }
   }).catch(function(){});
 })();
 </script>
