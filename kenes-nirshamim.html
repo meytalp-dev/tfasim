@@ -195,7 +195,7 @@ function build(invitees, people) {
     if (inv && !regOf[inv.id]) take(inv, p); else left.push(p);
   });
   /* last name alike + (first name alike / same school / same e-mail user); one clear candidate only */
-  var outside = [];
+  var rest = [];
   left.forEach(function (p) {
     var pw = nameWords(p.name), mu = mailUser(p.email);
     var cands = invitees.filter(function (r) { return !regOf[r.id]; }).map(function (r) {
@@ -207,7 +207,20 @@ function build(invitees, people) {
       if (!((l && (f || org || um)) || (l2 && (f2 || org || um)))) return null;
       return { r: r, s: ((l && f) || (l2 && f2) ? 2 : 0) + (org ? 1 : 0) + (um ? 1 : 0) };
     }).filter(Boolean).sort(function (a, b) { return b.s - a.s; });
-    if (cands.length && (cands.length === 1 || cands[0].s > cands[1].s)) take(cands[0].r, p); else outside.push(p);
+    if (cands.length && (cands.length === 1 || cands[0].s > cands[1].s)) take(cands[0].r, p); else rest.push(p);
+  });
+  /* 31.10: still unmatched = registered twice (other e-mail) or a colleague from an invited school; both are on the list */
+  var outside = [];
+  rest.forEach(function (p) {
+    var pw = nameWords(p.name), mu = mailUser(p.email);
+    var twin = invitees.filter(function (r) {
+      var fw = nameWords(r.first), lw = nameWords(r.last);
+      if (mu && mu.length >= 4 && mu === mailUser(r.email)) return true;
+      return fw.length && lw.length && ((hasAll(fw, pw, true) && hasAll(lw, pw, false)) || (hasAll(lw, pw, true) && hasAll(fw, pw, false)));
+    })[0];
+    var school = p.school && invitees.filter(function (r) { return normName(r.role) === normName(p.school); })
+      .sort(function (a, b) { return (b.g === p.role) - (a.g === p.role); })[0];
+    if (twin || school) p._inv = twin || school; else outside.push(p);
   });
   return { regOf: regOf, outside: outside };
 }
