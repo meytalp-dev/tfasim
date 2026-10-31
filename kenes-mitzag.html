@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>מוזיאון החדשנות · המיצג שלכם</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M3 21h18M5 21V10M19 21V10M9 21v-7h6v7M2 10l10-7 10 7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --blue-soft:#eaf0ff; --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415; --amber-soft:#fff4e6;
+  --w1:#2D6BFF; --w2:#FF4F2B; --w3:#10A35A; --w4:#9B4DFF; --w5:#E09A00;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px;position:relative}
+.strip{height:6px;background:linear-gradient(90deg,var(--w1) 0 20%,var(--w2) 20% 40%,var(--w3) 40% 60%,var(--w4) 60% 80%,var(--w5) 80%)}
+.site{padding:22px 0 0}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;display:block}
+@media (max-width:480px){.logo{height:46px}}
+
+.hero{text-align:center;padding:18px 0 4px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+  box-shadow:var(--shadow-s);border-radius:999px;padding:7px 18px;font-size:15px;font-weight:700;color:var(--navy)}
+.eyebrow svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(28px,6vw,40px);line-height:1.18;margin:16px 0 12px;font-weight:700;color:var(--navy)}
+.hero .lede{font-size:18px;color:#3d4a70;max-width:54ch;margin:0 auto}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:30px;margin-top:22px}
+@media (max-width:560px){.card{padding:22px 16px}}
+.part{display:flex;align-items:center;gap:10px;font-family:'Rubik',sans-serif;font-size:14px;font-weight:600;color:var(--blue);margin:34px 0 20px}
+.part.first{margin-top:0}
+.part::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.part + .q,.intro + .q,.muzeon + .q{margin-top:0;padding-top:0;border-top:0}
+.qtext{font-family:'Rubik',sans-serif;font-size:19px;color:var(--navy);font-weight:600;line-height:1.38;margin-bottom:8px;display:block}
+.qtext .req{color:var(--blue)}
+.qtext .opt{color:var(--muted);font-family:'Assistant',sans-serif;font-size:15px;font-weight:500}
+.hint{color:var(--muted);font-size:15px;margin:-2px 0 12px;line-height:1.5}
+.sub{font-weight:700;color:#3d4a70;font-size:15.5px;margin:14px 0 6px;display:block}
+.sub:first-of-type{margin-top:4px}
+
+input[type=text],input[type=tel],input[type=email],textarea{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+textarea{min-height:84px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:7px}
+.err.on{display:block}
+.count{font-size:13.5px;color:var(--muted);text-align:left;margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opts.one{grid-template-columns:1fr}
+@media (max-width:520px){.opts{grid-template-columns:1fr}}
+.opts input{position:absolute;opacity:0;width:0;height:0}
+.opts label{display:flex;align-items:center;gap:11px;padding:12px 14px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  cursor:pointer;font-weight:600;font-size:16px;color:#25325a;line-height:1.35;transition:border-color .16s var(--ease),background .16s var(--ease)}
+.opts label .box{flex:0 0 auto;width:20px;height:20px;border:2px solid #b9c4dc;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.opts.multi label .box{border-radius:6px}
+.opts label .box svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
+.opts label:hover{border-color:var(--sky);background:#fff}
+.opts input:checked + label{border-color:var(--blue);background:var(--blue-soft);color:var(--navy)}
+.opts input:checked + label .box{background:var(--blue);border-color:var(--blue)}
+.opts input:checked + label .box svg{opacity:1}
+.opts input:focus-visible + label{outline:3px solid rgba(24,92,255,.4);outline-offset:2px}
+.opts input:disabled + label{opacity:.45;cursor:default}
+.opts label small{display:block;font-weight:500;color:var(--muted);font-size:14px;direction:ltr;text-align:right}
+
+.muzeon{background:linear-gradient(160deg,#f3f6ff,#fbfcff);border:1px solid var(--line);border-radius:18px;padding:18px 18px 16px;margin-bottom:22px}
+.muzeon h3{display:flex;align-items:center;gap:9px;font-family:'Rubik',sans-serif;font-size:19px;color:var(--navy);margin:0 0 8px}
+.muzeon h3 svg{width:22px;height:22px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.muzeon p{margin:0 0 8px;color:#3d4a70;font-size:16px}
+.muzeon ul{margin:4px 0 0;padding:0 20px 0 0;color:#3d4a70;font-size:16px}
+.muzeon li{margin-bottom:4px}
+.who{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-radius:14px;background:var(--blue-soft);border:2px solid var(--blue);font-weight:700;color:var(--navy);margin-bottom:22px}
+.who svg{width:20px;height:20px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.who span{font-weight:500;color:#3d4a70}
+.cond{display:none;margin-top:10px}
+.cond.on{display:block}
+.photo-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.photo-row label.pick{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border:2px dashed #b9c4dc;border-radius:14px;cursor:pointer;font-weight:600;color:var(--navy);background:#fbfcff}
+.photo-row label.pick svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.photo-row img{width:88px;height:66px;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:none}
+.photo-row img.on{display:block}
+.photo-row .ph-note{font-size:14.5px;color:var(--muted)}
+
+.gate{text-align:center;padding:10px 0}
+.gate h2{font-family:'Rubik',sans-serif;color:var(--navy);font-size:22px;margin:0 0 8px}
+.gate p{color:#3d4a70;margin:0 0 14px}
+.gate .two{margin:0 0 12px;text-align:right}
+.gate .err{text-align:center}
+.btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26)}
+.btn:disabled{opacity:.6;cursor:default}
+.actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.privacy{margin-top:14px;font-size:14.5px;color:var(--muted);text-align:center}
+.msg{display:none;border-radius:18px;padding:22px;margin-top:20px;text-align:center}
+.msg.on{display:block}
+.msg.ok{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1}
+.msg.fail{background:#fff7f8;border:1px solid #f4c9ce}
+.msg svg.big{width:42px;height:42px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msg.ok svg.big{stroke:var(--mint)}
+.msg.fail svg.big{stroke:var(--danger)}
+.msg h3{font-family:'Rubik',sans-serif;font-size:22px;margin:8px 0 6px;color:var(--navy)}
+.msg p{margin:0 0 6px;color:#3d4a70;font-size:16.5px}
+.again{background:#fff;border:2px solid var(--danger);color:var(--danger);border-radius:12px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:15.5px;cursor:pointer;margin-top:12px}
+.demo{background:var(--amber-soft);color:var(--amber);border:1px solid #f3d3a8;border-radius:12px;padding:10px 14px;font-weight:700;font-size:15px;text-align:center;margin-top:16px}
+input.hp{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+
+footer{text-align:center;padding:30px 20px 40px;color:var(--muted);font-size:14.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-s);border-radius:999px;padding:10px 20px;font-size:15px;font-weight:600;color:var(--muted)!important;margin-bottom:18px}
+.helpbtn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.credit{margin-top:12px;font-size:13.5px;opacity:.85}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header class="site"><div class="wrap"><img class="logo" src="https://pedagogiamh.co.il/logo.png" alt="משרד העבודה · המנהל להכשרה מקצועית" onerror="this.style.display='none'"></div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-7 10 7"/></svg>כנס מנהלים · 23.11</span>
+    <h1>מוזיאון החדשנות: המיצג שלכם</h1>
+    <p class="lede">תודה שבחרתם להציג. כמה שאלות על המיצג, ומהן נבנה את השלט ואת המשחק במוזיאון.</p>
+  </section>
+  <div id="demoNote" class="demo" hidden>תצוגה מקדימה: הפרטים לדוגמה, ושום דבר לא נשמר.</div>
+
+  <!-- ============ entry without the personal link ============ -->
+  <section class="card" id="gate" hidden>
+    <div class="gate">
+      <h2>כניסה לטופס המיצג</h2>
+      <p>הזינו את המייל והנייד שאיתם נרשמתם לכנס.</p>
+      <div class="two">
+        <input type="email" id="gEmail" autocomplete="email" inputmode="email" placeholder="מייל" dir="ltr">
+        <input type="tel" id="gPhone" autocomplete="tel" inputmode="tel" placeholder="נייד" dir="ltr">
+      </div>
+      <button type="button" class="btn" id="gBtn">כניסה</button>
+      <div class="err" id="e_gate">לא מצאנו הרשמה עם המייל והנייד האלה. נסו שוב, או כתבו לנו בכפתור שבתחתית הדף.</div>
+      <div class="err" id="e_notp">הטופס מיועד למנהלי בתי הספר שנרשמו לכנס. אם זו טעות, כתבו לנו בכפתור שבתחתית הדף.</div>
+    </div>
+  </section>
+
+  <form class="card" id="form" novalidate hidden>
+    <input type="text" class="hp" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <div class="who" id="who"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21v-6h6v6M2 10l10-7 10 7"/></svg><b id="whoSchool"></b><span id="whoName"></span></div>
+
+    <div class="muzeon">
+      <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v.01M11 12h1v5h1"/></svg>איך זה יעבוד במוזיאון</h3>
+      <ul>
+        <li><b>אף אחד לא צריך לעמוד ליד המיצג.</b> מהתשובות שלכם נעצב שלט, והוא יספר את הסיפור.</li>
+        <li>המשתתפים ישחקו במשחק בטלפון: יפתרו חידה על כל מיצג, ישקיעו במיזמים שהיו רוצים לקחת לבית הספר שלהם, ויוכלו <b>לשלוח לכם שאלה</b>.</li>
+        <li>מי שירצה, יקבל מסלול אישי של מיצגים שמתאימים לאתגר שלו.</li>
+        <li>אחרי הכנס תקבלו במייל את כל מה שהמבקרים כתבו על המיצג שלכם.</li>
+      </ul>
+    </div>
+
+    <!-- ============ א. המיצג ============ -->
+    <div class="part first">א. המיצג</div>
+
+    <div class="q">
+      <label class="qtext" for="x_title">שם המיצג <span class="req">*</span></label>
+      <p class="hint">שם קצר שיופיע על השלט ובמשחק.</p>
+      <input type="text" id="x_title" maxlength="60" placeholder="למשל: המוסך של השכונה">
+      <div class="err" id="e_title">נא לכתוב שם למיצג.</div>
+    </div>
+
+    <div class="q">
+      <label class="qtext" for="x_initiative">היוזמה במשפט אחד <span class="req">*</span></label>
+      <input type="text" id="x_initiative" maxlength="160" placeholder="למשל: תלמידי י״א מתקנים רכבים של קשישים בעיר, יחד עם מוסך מקומי">
+      <div class="err" id="e_initiative">נא לכתוב משפט על היוזמה.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">לאיזה עיקרון המיצג שייך? <span class="req">*</span></span>
+      <p class="hint">המוזיאון בנוי בחמישה אגפים, אגף לכל עיקרון.</p>
+      <div class="opts one" id="wingBox">
+        <input type="radio" name="wing" id="w1" value="למידה דואלית ופיתוח מיומנויות"><label for="w1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>למידה דואלית ופיתוח מיומנויות</label>
+        <input type="radio" name="wing" id="w2" value="האדם היוצר והחברה במרכז"><label for="w2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>האדם היוצר והחברה במרכז</label>
+        <input type="radio" name="wing" id="w3" value="רלוונטיות לכל אדם"><label for="w3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>רלוונטיות לכל אדם</label>
+        <input type="radio" name="wing" id="w4" value="פתיחת אפשרויות ואופקים"><label for="w4"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>פתיחת אפשרויות ואופקים</label>
+        <input type="radio" name="wing" id="w5" value="מודל חי ודינאמי"><label for="w5"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מודל חי ודינאמי</label>
+        <input type="radio" name="wing" id="w6" value="לא קשור לעיקרון מסוים"><label for="w6"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>לא קשור לעיקרון מסוים</label>
+      </div>
+      <div class="err" id="e_wing">נא לבחור עיקרון.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">איזה אתגר המיזם פותר? <span class="req">*</span> <span class="opt">(עד שניים)</span></span>
+      <p class="hint">לפי זה נמליץ על המיצג שלכם למשתתפים שמתמודדים עם אותו אתגר.</p>
+      <div class="opts multi" id="challengeBox">
+        <input type="checkbox" name="challenge" id="c1" value="שייכות ומניעת נשירה"><label for="c1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>שייכות ומניעת נשירה</label>
+        <input type="checkbox" name="challenge" id="c2" value="השתלבות בתעסוקה וקשר עם מעסיקים"><label for="c2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>השתלבות בתעסוקה וקשר עם מעסיקים</label>
+        <input type="checkbox" name="challenge" id="c3" value="פערים לימודיים והוראה מותאמת"><label for="c3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>פערים לימודיים והוראה מותאמת</label>
+        <input type="checkbox" name="challenge" id="c4" value="למידה משמעותית ומעורבות תלמידים"><label for="c4"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>למידה משמעותית ומעורבות תלמידים</label>
+        <input type="checkbox" name="challenge" id="c5" value="צוות ופיתוח מקצועי"><label for="c5"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>צוות ופיתוח מקצועי</label>
+        <input type="checkbox" name="challenge" id="c6" value="הורים וקהילה"><label for="c6"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>הורים וקהילה</label>
+        <input type="checkbox" name="challenge" id="c7" value="חדשנות וטכנולוגיה"><label for="c7"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>חדשנות וטכנולוגיה</label>
+        <input type="checkbox" name="challenge" id="c8" value="אחר"><label for="c8"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אחר</label>
+      </div>
+      <div class="cond" id="challengeOtherWrap"><input type="text" id="x_challengeOther" maxlength="80" placeholder="איזה אתגר?"></div>
+      <div class="err" id="e_challenge">נא לבחור אתגר אחד או שניים.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">הסיפור של המיזם <span class="req">*</span></span>
+      <p class="hint">שלושה משפטים קצרים. זה מה שיופיע על השלט.</p>
+      <label class="sub" for="x_problem">מה הייתה הבעיה?</label>
+      <textarea id="x_problem" maxlength="400" placeholder="למשל: תלמידי המגמה לא פגשו לקוחות אמיתיים עד סוף י״ב"></textarea>
+      <label class="sub" for="x_did">מה עשינו?</label>
+      <textarea id="x_did" maxlength="400"></textarea>
+      <label class="sub" for="x_changed">מה השתנה?</label>
+      <textarea id="x_changed" maxlength="400"></textarea>
+      <div class="err" id="e_story">נא למלא את שלושת החלקים של הסיפור.</div>
+    </div>
+
+    <div class="q">
+      <label class="qtext" for="x_failed">מה לא עבד, או טיפ למי שרוצה ליישם אצלו <span class="opt">(רשות)</span></label>
+      <textarea id="x_failed" maxlength="400" placeholder="למשל: בהתחלה ניסינו עם כל השכבה, ורק בקבוצה קטנה זה הצליח"></textarea>
+    </div>
+
+    <!-- ============ ב. מה יהיה באולם ============ -->
+    <div class="part">ב. מה יהיה באולם</div>
+
+    <div class="q">
+      <span class="qtext">מה תציגו? <span class="req">*</span></span>
+      <div class="opts multi" id="objBox">
+        <input type="checkbox" name="obj" id="o1" value="חפץ"><label for="o1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>חפץ</label>
+        <input type="checkbox" name="obj" id="o2" value="תוצרי תלמידים"><label for="o2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>תוצרי תלמידים</label>
+        <input type="checkbox" name="obj" id="o3" value="סרטון"><label for="o3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>סרטון</label>
+        <input type="checkbox" name="obj" id="o4" value="פוסטר או תמונות"><label for="o4"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>פוסטר או תמונות</label>
+        <input type="checkbox" name="obj" id="o5" value="אחר"><label for="o5"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אחר</label>
+      </div>
+      <label class="sub" for="x_objNote">במשפט: מה בדיוק יהיה שם?</label>
+      <input type="text" id="x_objNote" maxlength="200" placeholder="למשל: מנוע שהתלמידים שיפצו, ולידו טאבלט עם סרטון של דקה">
+      <div class="err" id="e_obj">נא לסמן מה תציגו.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">מה צריך למיצג? <span class="opt">(אפשר לסמן כמה)</span></span>
+      <div class="opts multi" id="needsBox">
+        <input type="checkbox" name="needs" id="n1" value="שולחן"><label for="n1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>שולחן</label>
+        <input type="checkbox" name="needs" id="n2" value="חשמל"><label for="n2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>חשמל</label>
+        <input type="checkbox" name="needs" id="n3" value="מסך"><label for="n3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מסך</label>
+        <input type="checkbox" name="needs" id="n4" value="קיר לתלייה"><label for="n4"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>קיר לתלייה</label>
+        <input type="checkbox" name="needs" id="n5" value="מקום על הרצפה"><label for="n5"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מקום על הרצפה</label>
+        <input type="checkbox" name="needs" id="n6" value="אינטרנט"><label for="n6"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אינטרנט</label>
+      </div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">תמונה של המיזם <span class="opt">(רשות)</span></span>
+      <p class="hint">תופיע בכרטיס של המיצג במשחק. רק תמונה שמותר לפרסם.</p>
+      <div class="photo-row">
+        <label class="pick" for="x_photo"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="15" rx="2"/><circle cx="12" cy="12.5" r="3.5"/><path d="M8 5l1.5-2h5L16 5"/></svg>בחירת תמונה</label>
+        <input type="file" id="x_photo" accept="image/*" hidden>
+        <img id="phPrev" alt="">
+        <span class="ph-note" id="phNote"></span>
+      </div>
+    </div>
+
+    <!-- ============ ג. המשחק ============ -->
+    <div class="part">ג. המשחק</div>
+
+    <div class="q">
+      <span class="qtext">חידה על המיצג <span class="opt">(רשות)</span></span>
+      <p class="hint">שאלה שהתשובה עליה נמצאת במיצג או בשלט, כך שאפשר לפתור אותה לבד. לא בא לכם? נכתוב אנחנו מתוך הסיפור.</p>
+      <input type="text" id="x_quiz" maxlength="160" placeholder="למשל: כמה רכבים תיקנו התלמידים בשנה הראשונה?">
+      <input type="text" id="x_quizA" maxlength="100" placeholder="התשובה הנכונה" style="margin-top:10px">
+      <div class="two">
+        <input type="text" id="x_quizB" maxlength="100" placeholder="תשובה לא נכונה">
+        <input type="text" id="x_quizC" maxlength="100" placeholder="עוד תשובה לא נכונה">
+      </div>
+      <div class="err" id="e_quiz">אם כותבים חידה, צריך שאלה, תשובה נכונה ושתי תשובות לא נכונות.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">לאן לשלוח לכם שאלות של מבקרים בזמן הכנס? <span class="req">*</span></span>
+      <div class="opts one" id="askBox">
+        <input type="radio" name="askTo" id="a1" value="phone"><label for="a1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span>לנייד שלי<small id="aPhone"></small></span></label>
+        <input type="radio" name="askTo" id="a2" value="email"><label for="a2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span>למייל שלי<small id="aEmail"></small></span></label>
+        <input type="radio" name="askTo" id="a3" value="other"><label for="a3"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>למישהו אחר מהצוות</label>
+      </div>
+      <div class="cond" id="askOtherWrap"><input type="text" id="x_askOther" maxlength="120" placeholder="שם, ונייד או מייל"></div>
+      <p class="hint" style="margin:10px 0 0">שאלה שלא תספיקו לענות עליה בכנס תגיע אליכם במייל אחריו.</p>
+      <div class="err" id="e_askTo">נא לבחור לאן לשלוח את השאלות.</div>
+    </div>
+
+    <div class="q">
+      <span class="qtext">איש קשר להמשך, למי שירצה ללמוד עוד <span class="opt">(רשות)</span></span>
+      <div class="opts" id="contactBox">
+        <input type="radio" name="contact" id="ct1" value="me"><label for="ct1"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>אני</label>
+        <input type="radio" name="contact" id="ct2" value="other"><label for="ct2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>מישהו אחר מהצוות</label>
+      </div>
+      <div class="cond" id="contactOtherWrap"><input type="text" id="x_contactOther" maxlength="120" placeholder="שם, תפקיד, ונייד או מייל"></div>
+    </div>
+
+    <div class="actions">
+      <button type="submit" class="btn" id="submitBtn">שליחה</button>
+      <p class="privacy">אפשר לחזור לטופס ולעדכן עד הכנס. כל שמירה מעדכנת את הקודמת.</p>
+    </div>
+
+    <div class="msg ok" id="okBox">
+      <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.6-4.9"/></svg>
+      <h3 id="okTitle">המיצג נשמר</h3>
+      <p id="okText"></p>
+    </div>
+    <div class="msg fail" id="badBox">
+      <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <h3>השמירה לא הושלמה</h3>
+      <p id="badText">לא הצלחנו לוודא שהפרטים נקלטו. הם שמורים בדפדפן, ואפשר לנסות שוב.</p>
+      <button type="button" class="again" id="retryBtn">נסו שוב</button>
+    </div>
+  </form>
+</main>
+
+<footer>
+  <a class="helpbtn" id="helpBtn" href="mailto:merhav@pedagogiamh.co.il">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+    נתקלתם בבעיה? שלחו הודעה
+  </a>
+  <div>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbzwzbcv2BPft8rNmK1U-ADYlcQ3sxt1_khT7YyZzXYsmIB8LzKqZXNMAzewli0TsWQU/exec";
+var TOKEN_KEY = "kenes-muzeon-token", DRAFT_KEY = "kenes-mitzag-draft";
+var TEXT_KEYS = ["title","initiative","problem","did","changed","failed","objNote","quiz","quizA","quizB","quizC"];
+
+var $ = function(id){ return document.getElementById(id); };
+var token = "", me = null, photo = null;
+var DEMO = new URLSearchParams(location.search).get("demo") === "1";
+
+/* ---------- read / write fields ---------- */
+function val(name){ var b = document.querySelector('input[name="'+name+'"]:checked'); return b ? b.value : ""; }
+function vals(name){ return [].map.call(document.querySelectorAll('input[name="'+name+'"]:checked'), function(b){ return b.value; }); }
+function setRadio(name, v){ [].forEach.call(document.querySelectorAll('input[name="'+name+'"]'), function(b){ b.checked = (b.value === v); }); }
+function setChecks(name, list){ [].forEach.call(document.querySelectorAll('input[name="'+name+'"]'), function(b){ b.checked = list.indexOf(b.value) >= 0; }); }
+function split(v){ return String(v || "").split(" | ").filter(String); }
+
+/* the stored values are readable text, so the sheet makes sense as is */
+function collect(){
+  var ex = {};
+  TEXT_KEYS.forEach(function(k){ ex[k] = $("x_"+k).value.trim(); });
+  ex.wing = val("wing");
+  var ch = vals("challenge"), other = $("x_challengeOther").value.trim();
+  ex.challenge = ch.map(function(c){ return c === "אחר" && other ? "אחר: " + other : c; });
+  ex.obj = vals("obj");
+  ex.needs = vals("needs");
+  var a = val("askTo");
+  ex.askTo = a === "phone" ? "נייד · " + (me && me.phone || "") :
+             a === "email" ? "מייל · " + (me && me.email || "") :
+             a === "other" ? "אחר · " + $("x_askOther").value.trim() : "";
+  var c = val("contact");
+  ex.contact = c === "me" ? "המנהל.ת" : c === "other" ? "אחר · " + $("x_contactOther").value.trim() : "";
+  return ex;
+}
+function fill(ex){
+  if (!ex) return;
+  TEXT_KEYS.forEach(function(k){ if (ex[k]) $("x_"+k).value = ex[k]; });
+  if (ex.wing) setRadio("wing", ex.wing);
+  var ch = Array.isArray(ex.challenge) ? ex.challenge : split(ex.challenge);
+  setChecks("challenge", ch.map(function(c){ return /^אחר: /.test(c) ? "אחר" : c; }));
+  ch.forEach(function(c){ var m = c.match(/^אחר: (.*)$/); if (m) $("x_challengeOther").value = m[1]; });
+  setChecks("obj", Array.isArray(ex.obj) ? ex.obj : split(ex.obj));
+  setChecks("needs", Array.isArray(ex.needs) ? ex.needs : split(ex.needs));
+  var a = String(ex.askTo || "");
+  if (/^נייד/.test(a)) setRadio("askTo", "phone");
+  else if (/^מייל/.test(a)) setRadio("askTo", "email");
+  else if (/^אחר · /.test(a)){ setRadio("askTo", "other"); $("x_askOther").value = a.replace(/^אחר · /, ""); }
+  var c = String(ex.contact || "");
+  if (c === "המנהל.ת") setRadio("contact", "me");
+  else if (/^אחר · /.test(c)){ setRadio("contact", "other"); $("x_contactOther").value = c.replace(/^אחר · /, ""); }
+  if (ex.photo === "yes") $("phNote").textContent = "כבר הועלתה תמונה. אפשר להחליף.";
+  refresh();
+}
+
+/* ---------- conditional parts ---------- */
+function refresh(){
+  var ch = vals("challenge");
+  $("challengeOtherWrap").classList.toggle("on", ch.indexOf("אחר") >= 0);
+  [].forEach.call(document.querySelectorAll('input[name="challenge"]'), function(b){ b.disabled = !b.checked && ch.length >= 2; });
+  $("askOtherWrap").classList.toggle("on", val("askTo") === "other");
+  $("contactOtherWrap").classList.toggle("on", val("contact") === "other");
+}
+$("form").addEventListener("change", function(){ refresh(); saveDraft(); });
+$("form").addEventListener("input", function(){ clearTimeout(saveDraft.t); saveDraft.t = setTimeout(saveDraft, 400); });
+
+/* ---------- validation ---------- */
+function validate(ex){
+  var ok = true, first = null;
+  function bad(id, cond, fields){
+    $("e_"+id).classList.toggle("on", cond);
+    (fields || []).forEach(function(f){ $(f).classList.toggle("bad", cond && !$(f).value.trim()); });
+    if (cond){ ok = false; first = first || $("e_"+id); }
+  }
+  bad("title", !ex.title, ["x_title"]);
+  bad("initiative", !ex.initiative, ["x_initiative"]);
+  bad("wing", !ex.wing);
+  bad("challenge", !ex.challenge.length || (vals("challenge").indexOf("אחר") >= 0 && !$("x_challengeOther").value.trim()), ["x_challengeOther"]);
+  bad("story", !ex.problem || !ex.did || !ex.changed, ["x_problem","x_did","x_changed"]);
+  bad("obj", !ex.obj.length);
+  var q = [ex.quiz, ex.quizA, ex.quizB, ex.quizC], some = q.some(String), all = q.every(String);
+  bad("quiz", some && !all, ["x_quiz","x_quizA","x_quizB","x_quizC"]);
+  bad("askTo", !val("askTo") || (val("askTo") === "other" && !$("x_askOther").value.trim()), ["x_askOther"]);
+  if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
+  return ok;
+}
+
+/* ---------- draft in the browser ---------- */
+function saveDraft(){ if (!me) return; try{ localStorage.setItem(DRAFT_KEY, JSON.stringify({ school: me.school, ex: collect() })); }catch(e){} }
+function loadDraft(){ try{ var d = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); return d && me && d.school === me.school ? d.ex : null; }catch(e){ return null; } }
+
+/* ---------- photo: shrunk in the browser to ~1600px JPEG ---------- */
+$("x_photo").addEventListener("change", function(){
+  var f = this.files && this.files[0]; if (!f) return;
+  $("phNote").textContent = "מכינה את התמונה…";
+  var img = new Image(), url = URL.createObjectURL(f);
+  img.onload = function(){
+    var s = Math.min(1, 1600 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+    c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    photo = { data: c.toDataURL("image/jpeg", 0.82), mime: "image/jpeg" };
+    $("phPrev").src = photo.data; $("phPrev").classList.add("on");
+    $("phNote").textContent = "התמונה תישמר עם המיצג.";
+    URL.revokeObjectURL(url);
+  };
+  img.onerror = function(){ $("phNote").textContent = "לא הצלחנו לקרוא את הקובץ. נסו תמונה אחרת."; };
+  img.src = url;
+});
+
+/* ---------- save ---------- */
+function show(which){ $("okBox").classList.toggle("on", which === "ok"); $("badBox").classList.toggle("on", which === "bad"); }
+function done(){
+  $("submitBtn").disabled = false; $("submitBtn").textContent = "עדכון";
+  try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
+  $("okText").textContent = "תודה, " + String(me.name).split(" ")[0] + ". המיצג של " + me.school + " נשמר. אפשר לחזור לקישור הזה ולעדכן עד הכנס.";
+  show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
+}
+function submit(){
+  var ex = collect(); if (!validate(ex)) return;
+  saveDraft();
+  var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שומר…"; show("");
+  if (DEMO){ setTimeout(done, 600); return; }
+  var body = JSON.stringify({ action:"exhibit", token:token, ex:ex, photo:photo, website:$("website").value });
+  function once(){
+    return fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:body, credentials:"omit", redirect:"follow" })
+      .then(function(r){ return r.json(); }).catch(function(){ return { ok:false, net:true }; });
+  }
+  /* up to 3 tries, a few seconds apart (a busy server, a moment offline) */
+  function attempt(n){
+    return once().then(function(r){
+      if ((r && r.ok) || (r && !r.net && r.error !== "busy") || n >= 3) return r;
+      return new Promise(function(res){ setTimeout(res, 2500 * n); }).then(function(){ return attempt(n + 1); });
+    });
+  }
+  attempt(1).then(function(r){
+    if (r && r.ok){ photo = null; done(); return; }
+    btn.disabled = false; btn.textContent = "שליחה";
+    show("bad"); $("badBox").scrollIntoView({behavior:"smooth", block:"center"});
+  });
+}
+$("form").addEventListener("submit", function(ev){ ev.preventDefault(); submit(); });
+$("retryBtn").addEventListener("click", submit);
+
+/* ---------- help button: a real mailto link ---------- */
+function updateHelp(){
+  var s = me && me.school || "";
+  var body = "שלום,\nנתקלתי בבעיה בטופס המיצג למוזיאון החדשנות (כנס 23.11)" + (s ? " · " + s : "") + ".\n\nתיאור הבעיה:\n";
+  $("helpBtn").href = "mailto:merhav@pedagogiamh.co.il?subject=" + encodeURIComponent("בעיה בטופס המיצג · כנס 23.11" + (s ? " · " + s : "")) + "&body=" + encodeURIComponent(body);
+}
+
+/* ---------- start: personal link → saved token → entry by e-mail + phone ---------- */
+function openForm(p, ex){
+  me = p;
+  $("whoSchool").textContent = p.school;
+  $("whoName").textContent = p.name;
+  $("aPhone").textContent = p.phone || "";
+  $("aEmail").textContent = p.email || "";
+  $("gate").hidden = true; $("form").hidden = false;
+  fill(loadDraft() || ex);
+  if (ex && ex.title) $("submitBtn").textContent = "עדכון";
+  updateHelp();
+}
+function load(t){
+  return fetch(API_URL + "?mode=load&t=" + encodeURIComponent(t), { credentials:"omit" })
+    .then(function(r){ return r.json(); })
+    .then(function(r){
+      if (!r || !r.ok) return false;
+      if (r.p.role !== "מנהל.ת" || !r.p.school){ showGate(); $("e_notp").classList.add("on"); return true; }
+      token = t; try{ localStorage.setItem(TOKEN_KEY, t); }catch(e){}
+      openForm(r.p, r.ex);
+      return true;
+    }).catch(function(){ return false; });
+}
+function showGate(){ $("gate").hidden = false; $("form").hidden = true; }
+$("gBtn").addEventListener("click", function(){
+  var em = $("gEmail").value.trim().toLowerCase(), ph = $("gPhone").value.trim();
+  $("e_gate").classList.remove("on"); $("e_notp").classList.remove("on");
+  if (!em || ph.replace(/\D/g, "").length < 9){ $("e_gate").classList.add("on"); return; }
+  var b = this; b.disabled = true; b.textContent = "בודקת…";
+  fetch(API_URL + "?mode=check&email=" + encodeURIComponent(em) + "&phone=" + encodeURIComponent(ph), { credentials:"omit" })
+    .then(function(r){ return r.json(); })
+    .then(function(r){ return r && r.ok && r.token ? load(r.token) : false; })
+    .catch(function(){ return false; })
+    .then(function(ok){ b.disabled = false; b.textContent = "כניסה"; if (!ok) $("e_gate").classList.add("on"); });
+});
+
+(function start(){
+  updateHelp();
+  if (DEMO){
+    $("demoNote").hidden = false;
+    openForm({ name:"ישראלה ישראלי", school:"בית ספר לדוגמה", phone:"050-0000000", email:"principal@example.com" }, null);
+    return;
+  }
+  var q = new URLSearchParams(location.search).get("t"), saved = "";
+  try{ saved = localStorage.getItem(TOKEN_KEY) || ""; }catch(e){}
+  var t = q || saved;
+  if (!t){ showGate(); return; }
+  load(t).then(function(ok){ if (!ok) showGate(); });
+})();
+</script>
+</body>
+</html>
