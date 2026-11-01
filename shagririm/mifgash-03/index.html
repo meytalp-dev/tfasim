@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מפגש 3 · NotebookLM והצורך שלנו</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10344F;--mute:#5E6B78;--line:#DDE4EA;--bg:#F6F8FA;--a:#1D6FA5;--a2:#2B7A78;--a3:#C2620C;--a4:#6B55B5;--ok:#2E7D32;--ff:'Assistant',Arial,sans-serif}
+html[lang=ar]{--ff:'Noto Sans Arabic','Assistant',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--ff)}
+header{background:var(--ink);color:#fff;padding:22px 16px}
+header .in,.wrap{max-width:760px;margin:0 auto}
+header small{opacity:.8;font-size:14px}
+header h1{margin:2px 0 4px;font-size:30px;line-height:1.2}
+header p{margin:0;opacity:.9}
+.lang{display:flex;gap:6px;margin-bottom:10px}
+.lang button{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5);border-radius:16px;padding:3px 12px;font:600 14px var(--ff);cursor:pointer}
+.lang button[aria-pressed=true]{background:#fff;color:var(--ink);border-color:#fff}
+.wrap{padding:0 16px 90px}
+.part{margin:28px 0 8px;font-size:15px;font-weight:700;letter-spacing:.3px;color:var(--c)}
+.part b{display:block;font-size:22px;color:var(--ink)}
+.part small{display:block;font-weight:400;color:var(--mute);font-size:15px;letter-spacing:0}
+.step{background:#fff;border:1px solid var(--line);border-inline-start:5px solid var(--c);border-radius:12px;padding:16px 18px;margin-top:12px}
+.step h2{margin:0 0 6px;font-size:20px;display:flex;gap:10px;align-items:baseline}
+.step h2 i{font-style:normal;background:var(--c);color:#fff;border-radius:50%;min-width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.step h2 em{font-style:normal;font-weight:400;font-size:15px;color:var(--mute)}
+.step p{margin:4px 0}
+.step ol,.step ul{margin:6px 0;padding-inline-start:22px}
+.step li{margin:3px 0}
+label.f{display:block;margin-top:10px;font-weight:600}
+label.f small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+textarea,input[type=text],input[type=url]{width:100%;margin-top:4px;border:1px solid #C9D3DC;border-radius:8px;padding:9px 11px;font:16px var(--ff);color:var(--ink);background:#FCFDFE}
+textarea{min-height:64px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0 8px;background:var(--c);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:600 16px var(--ff);cursor:pointer;text-decoration:none}
+.btn.ghost{background:#fff;color:var(--c);border:1.5px solid var(--c)}
+.btn.ok{background:var(--ok)}
+.pr{white-space:pre-wrap;background:#F1F5F9;border-radius:8px;padding:12px 14px;font-size:15px;margin-top:8px}
+.shot{display:block;width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:8px;margin:8px 0}
+.shot.w{max-width:440px}
+.flow{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin:10px 0;padding:10px 12px;background:#F1F5F9;border-radius:10px}
+.flow .arr{font-size:26px;color:var(--a3);font-weight:700;line-height:1}
+.flow .lbl{display:block;font-size:13px;color:var(--mute);margin-bottom:2px}
+.flow .fake{display:inline-block;border:1.5px solid var(--c);color:var(--c);background:#fff;border-radius:10px;padding:6px 12px;font-weight:600;font-size:15px;box-shadow:0 0 0 3px #F3C98B}
+.flow img{display:block;max-width:220px;width:100%;height:auto;border-radius:6px;border:1px solid var(--line)}
+.needs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:8px}
+.need{border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fff;text-align:right;font:600 17px var(--ff);color:var(--ink)}
+.need small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+.need[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;box-shadow:inset 0 0 0 1.5px var(--c)}
+.rows{display:grid;gap:8px;margin-top:6px}
+.row{display:grid;grid-template-columns:1fr 120px 150px;gap:8px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+.mine{background:#F1F5F9;border-radius:10px;padding:10px 12px;margin-top:6px;font-weight:600}
+.help{margin-top:12px;font-size:15px}
+.help a{color:var(--c);font-weight:600}
+.ideas,.more{margin-top:10px}
+.ideas summary,.more summary{cursor:pointer;color:var(--c);font-weight:600}
+.ideas li{margin:6px 0}
+.ideas span{color:var(--mute);font-size:14px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.opt{border:1.5px solid var(--line);border-radius:20px;padding:6px 14px;background:#fff;cursor:pointer;font:16px var(--ff);color:var(--ink)}
+.opt[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;font-weight:600}
+.saved{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:20px;padding:6px 14px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none}
+.saved.on{opacity:.92}
+.warn{background:#FFF4E5;border:1px solid #F3C98B;border-radius:10px;padding:10px 14px;margin-top:16px;font-size:15px}
+.sub{margin-top:10px;color:var(--ok);font-weight:600}
+.watch{margin-top:16px;background:#FFF8EC;border:2px solid var(--a3);border-radius:14px;padding:16px 18px}
+.watch h2{margin:0 0 4px;font-size:22px;color:var(--a3)}
+.watch p{margin:0 0 10px;font-size:15px;color:var(--mute)}
+.vids{display:grid;grid-template-columns:200px 1fr;gap:14px;align-items:start}
+@media(max-width:560px){.vids{grid-template-columns:1fr}.v-tall video{max-width:220px}}
+.vids figure{margin:0}
+.vids video{display:block;width:100%;border-radius:10px;background:#000}
+.v-tall video{aspect-ratio:9/16}
+.v-wide video{aspect-ratio:16/9}
+.vids figcaption{margin-top:6px;font-size:15px;line-height:1.35}
+.vids figcaption span{display:block;color:var(--mute);font-size:14px}
+.stuckbtn{position:fixed;bottom:14px;left:14px;z-index:5;background:var(--a3);color:#fff;border:0;border-radius:24px;padding:10px 18px;font:700 16px var(--ff);cursor:pointer;box-shadow:0 4px 14px rgba(16,52,79,.25)}
+.modal{position:fixed;inset:0;z-index:10;background:rgba(16,52,79,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.modal[hidden]{display:none}
+.modal .box{background:#fff;border-radius:14px;padding:18px;max-width:520px;width:100%;--c:var(--a3)}
+.modal h3{margin:0 0 4px;font-size:20px}
+@media(min-width:600px){.modal{align-items:center}}
+footer{text-align:center;color:var(--mute);font-size:13px;margin-top:30px}
+footer a{color:var(--mute)}
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div class="lang"><button type="button" data-lang="he">עברית</button><button type="button" data-lang="ar">العربية</button></div>
+  <small id="trk"></small>
+  <h1 data-ar="NotebookLM والحاجة لدينا">NotebookLM והצורך שלנו</h1>
+  <p id="who"></p>
+</div></header>
+
+<div class="wrap">
+<div class="warn" id="nokey" hidden data-ar="افتحوا الصفحة من أدفا، كي يُحفظ ما تكتبونه في ملف التطبيق. حاليًا يُحفظ فقط على هذا الحاسوب.">פתחו את הדף מאדווה, כדי שמה שתכתבו יישמר בתיק ההטמעה. בינתיים זה נשמר רק במחשב הזה.</div>
+
+<div class="watch">
+<h2 data-ar="قبل أن نبدأ: يُنصح بالمشاهدة">לפני שמתחילים: מומלץ לצפות</h2>
+<p data-ar="فيديوهان قصيران عن Gemini Notebook (بالعبرية). أُنتجا في NotebookLM نفسه، من المصادر.">שני סרטונים על Gemini Notebook. שניהם נוצרו ב-NotebookLM עצמו, מתוך מקורות.</p>
+<div class="vids">
+  <figure class="v-tall"><video controls preload="none" playsinline poster="media/3-drachim.jpg" src="media/3-drachim.mp4"></video>
+    <figcaption><b data-ar="3 طرق لدمج Gemini Notebook في التعلّم">3 דרכים לשלב את Gemini Notebook בלמידה</b><span data-ar="دقيقة واحدة">דקה אחת</span></figcaption></figure>
+  <figure class="v-wide"><video controls preload="none" playsinline poster="media/haozer-lakita.jpg" src="media/haozer-lakita.mp4"></video>
+    <figcaption><b data-ar="Gemini Notebook: المساعد للصف">Gemini Notebook: העוזר לכיתה</b><span data-ar="7 دقائق">7 דקות</span></figcaption></figure>
+</div></div>
+
+<div class="step" style="--c:var(--ink)"><h2><span data-ar="ماذا نفعل في الوحدة">מה עושים ביחידה</span></h2>
+<ol><li data-ar="<b>تمرين 1:</b> دفتر أول، سهل جدًا: عرض تقديمي عن أفكار لاستخدام AI في موضوعكم.">  <b>תרגיל 1:</b> נוטבוק ראשון, קל מאוד: מצגת עם רעיונות לשימוש ב-AI במקצוע שלכם.</li>
+<li data-ar="<b>تمرين 2:</b> دفتر من مواد موضوعكم: اختبار وإنفوغرافيك.">  <b>תרגיל 2:</b> נוטבוק מחומרים של המקצוע שלכם: בוחן ואינפוגרפיקה.</li>
+<li data-ar="<b>المهمة:</b> دفتر يقترح حلولًا لحاجة الطاقم، وتختارون الحل الذي تتبنّونه.">  <b>המשימה:</b> נוטבוק שמציע פתרונות לצורך של הצוות, ואתם בוחרים את הפתרון שאתם מאמצים.</li></ol>
+<p><span data-ar="التسليم">הגשה</span> <b id="due"></b>. <span data-ar="كل ما تكتبونه يُحفظ تلقائيًا.">כל מה שכותבים נשמר לבד.</span></p>
+<p id="pre" hidden data-ar="ما كتبتموه في اللقاء 2 موجود هنا. أكملوا فقط ما ينقص.">מה שכתבתם במפגש 2 כבר כאן. משלימים רק מה שחסר.</p>
+<p class="help"><span data-ar="عالقون؟ زر «علقت» في أسفل الشاشة يرسل لنا رسالة ونساعدكم عن بُعد.">נתקעתם? הכפתור "נתקעתי" בתחתית המסך שולח לנו הודעה, ונעזור לכם מרחוק.</span><br>
+<a href="https://lerani.co.il/training/notebooklm/presentation.html" target="_blank" rel="noopener" data-ar="عرض تقديمي يشرح NotebookLM (بالعبرية)">מצגת שמסבירה את NotebookLM</a></p></div>
+
+<!-- ============ תרגיל 1 ============ -->
+<div class="part" style="--c:var(--a4)" data-ar="تمرين 1 · حوالي 15 دقيقة<b>دفتر أول: عرض تقديمي</b>">תרגיל 1 · כ-15 דקות<b>נוטבוק ראשון: מצגת</b></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>1</i><span data-ar="نختار موضوعًا">בוחרים מקצוע</span></h2>
+<div class="opts" id="subs"></div>
+<input type="text" data-k="ex1other" id="ex1other" hidden data-ph="איזה מקצוע?|أي موضوع؟"></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>2</i><span data-ar="دفتر جديد">נוטבוק חדש</span></h2>
+<p data-ar="نفتح NotebookLM ونضغط <b>«נוטבוק חדש»</b> (دفتر جديد).">פותחים NotebookLM ולוחצים <b>נוטבוק חדש</b>.</p>
+<img class="shot" src="img/nb-1-new.jpg" alt="" style="max-width:140px">
+<a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener" data-ar="فتح NotebookLM">פתיחת NotebookLM</a></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>3</i><span data-ar="نبحث عن مصادر">מחפשים מקורות</span></h2>
+<button class="btn ghost" type="button" id="cpEx1" data-ar="نسخ البحث">העתקת החיפוש</button>
+<div class="pr" id="pEx1"></div>
+<p style="margin-top:10px" data-ar="في نافذة إضافة المصادر نلصق في مربع البحث في الأعلى، ونضغط على السهم.">בחלון הוספת המקורות מדביקים בתיבת החיפוש למעלה, ולוחצים על החץ.</p>
+<img class="shot w" src="img/ex1-search.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>4</i><span data-ar="نستورد المصادر">מייבאים את המקורות</span></h2>
+<p data-ar="بعد بضع ثوانٍ تظهر المصادر التي وُجدت. نضغط <b>«ייבוא»</b> (استيراد).">אחרי כמה שניות מופיעים המקורות שנמצאו. לוחצים <b>ייבוא</b>.</p>
+<img class="shot" src="img/ex1-import.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>5</i><span data-ar="نُخرج عرضًا تقديميًا">מוציאים מצגת</span></h2>
+<p data-ar="أولًا اللغة: ترس الإعدادات ← <b>«שפת הפלט»</b> ← العربية.">קודם השפה: גלגל השיניים ← <b>שפת הפלט</b> ← עברית.</p>
+<img class="shot" src="img/nb-12-outlang.jpg" alt="" style="max-width:200px">
+<p data-ar="ثم في الاستوديو نضغط <b>«מצגת»</b> (عرض تقديمي). ينتظر بضع دقائق.">אחר כך, בסטודיו, לוחצים <b>מצגת</b>. זה לוקח כמה דקות.</p>
+<img class="shot" src="img/studio-slides.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a4)"><h2><i>6</i><span data-ar="الرابط للدفتر">הקישור לנוטבוק</span></h2>
+<label class="f"><span data-ar="في الدفتر: مشاركة ← نسخ الرابط، ونلصق هنا.">בנוטבוק: שיתוף ← העתקת קישור, ומדביקים כאן.</span><input type="url" data-k="ex1nb" dir="ltr"></label></div>
+
+<!-- ============ תרגיל 2 ============ -->
+<div class="part" style="--c:var(--a2)" data-ar="تمرين 2 · حوالي 20 دقيقة<b>دفتر من مواد موضوعكم</b>">תרגיל 2 · כ-20 דקות<b>נוטבוק מחומרים של המקצוע שלכם</b></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>7</i><span data-ar="دفتر جديد مع مادة لديكم">נוטבוק חדש, עם חומר שיש לכם</span></h2>
+<p data-ar="دفتر جديد آخر. هذه المرة نضيف مادة من موضوعكم: ورقة عمل، كرّاسة، عرض تقديمي، أو موقع.">עוד נוטבוק חדש. הפעם מוסיפים חומר מהמקצוע שלכם: דף עבודה, חוברת, מצגת או אתר.</p>
+<p data-ar="ملف؟ نضغط <b>«העלאת קבצים»</b> (رفع ملفات).">קובץ? לוחצים <b>העלאת קבצים</b>.</p>
+<img class="shot w" src="img/src-upload.jpg" alt="">
+<p data-ar="موقع؟ نضغط <b>«אתרים»</b> (مواقع)، نلصق الرابط ونضغط <b>«הוספה»</b>.">אתר? לוחצים <b>אתרים</b>, מדביקים את הקישור ולוחצים <b>הוספה</b>.</p>
+<img class="shot w" src="img/src-websites.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>8</i><span data-ar="اختبار وإنفوغرافيك">בוחן ואינפוגרפיקה</span></h2>
+<p data-ar="في الاستوديو نضغط <b>«בוחן»</b> (اختبار)، ثم <b>«אינפוגרפיקה»</b>.">בסטודיו לוחצים <b>בוחן</b>, ואחר כך <b>אינפוגרפיקה</b>.</p>
+<img class="shot" src="img/studio-quiz-info.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>9</i><span data-ar="الرابط للدفتر">הקישור לנוטבוק</span></h2>
+<label class="f"><span data-ar="مشاركة ← نسخ الرابط، ونلصق هنا.">שיתוף ← העתקת קישור, ומדביקים כאן.</span><input type="url" data-k="ex2nb" dir="ltr"></label></div>
+
+<!-- ============ המשימה ============ -->
+<div class="part" style="--c:var(--a)" data-ar="المهمة · للتسليم<b>حلول لحاجة الطاقم</b>">המשימה · להגשה<b>פתרונות לצורך של הצוות</b></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>10</i><span data-ar="نفتح الداشبورد للمدرسة">פותחים את הדשבורד של בית הספר</span></h2>
+<a class="btn" id="dash" target="_blank" rel="noopener" href="../mipui/?v=data" data-ar="فتح الداشبورد">פתיחת הדשבורד</a>
+<p style="margin-top:10px"><span data-ar="لا توجد بعد إجابات من الطاقم؟ أولًا">אין עדיין תשובות מהצוות? קודם</span> <a id="sheelon" href="../mipui/" target="_blank" rel="noopener" data-ar="نرسل الاستبيان للطاقم">שולחים לצוות את השאלון</a>.</p></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>11</i><span data-ar="ماذا رأيت في المعطيات">מה ראיתי בנתונים</span></h2>
+<label class="f"><span data-ar="ما الذي فاجأني">מה הפתיע אותי</span><textarea data-k="surprise"></textarea></label>
+<label class="f"><span data-ar="ما الذي أعجبني">ממה התרשמתי לטובה</span><textarea data-k="good"></textarea></label>
+<label class="f"><span data-ar="أين التحدي">איפה האתגר</span><textarea data-k="challenge"></textarea></label>
+<label class="f"><span data-ar="فرضيتي: ما هي الحاجة المركزية للطاقم؟">ההשערה שלי: מה הצורך המרכזי של הצוות?</span><textarea data-k="guess"></textarea></label>
+<details class="more"><summary data-ar="اختياري: نفحص الفرضية مع Gemini">רשות: בודקים את ההשערה עם Gemini</summary>
+<ol><li data-ar="في الداشبورد نضغط <b>«הורדת התשובות בלי שמות»</b> (تنزيل الإجابات بدون أسماء).">בדשבורד לוחצים <b>הורדת התשובות בלי שמות</b>.</li>
+<li data-ar="نفتح Gemini ونرفع الملف، ننسخ البرومبت ونرسله.">פותחים את Gemini, מעלים את הקובץ, מעתיקים את הפרומפט ושולחים.</li></ol>
+<a class="btn" href="https://gemini.google.com/app" target="_blank" rel="noopener" data-ar="فتح Gemini">פתיחת Gemini</a>
+<button class="btn ghost" type="button" id="cpGem" data-ar="نسخ البرومبت">העתקת הפרומפט</button>
+<div class="pr" id="pGem"></div>
+<label class="f"><span data-ar="ماذا وجد Gemini؟ هل يشبه فرضيتي؟">מה Gemini מצא? האם זה דומה להשערה שלי?</span><textarea data-k="gemini"></textarea></label></details></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>12</i><span data-ar="حاجتنا">הצורך שלנו</span></h2>
+<p id="needNote"></p>
+<div class="needs" id="needs"></div></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>13</i><span data-ar="دفتر جديد مع معطيات المدرسة">נוטבוק חדש, עם הנתונים של בית הספר</span></h2>
+<p data-ar="1. نفتح دفترًا جديدًا.">1. פותחים נוטבוק חדש.</p>
+<p data-ar="2. في الداشبورد، عند الإجابات المفتوحة: <b>«הכנה לניתוח AI»</b> ثم <b>«העתקה»</b>.">2. בדשבורד, ליד התשובות הפתוחות: <b>הכנה לניתוח AI</b>, ואז <b>העתקה</b>.</p>
+<img class="shot w" src="img/nb-0b-box.jpg" alt="">
+<a class="btn ghost" id="dash2" target="_blank" rel="noopener" href="../mipui/?v=data" data-ar="فتح الداشبورد">פתיחת הדשבורד</a>
+<p style="margin-top:10px" data-ar="3. في الدفتر نضغط <b>«טקסט שהועתק»</b> (نص منسوخ)…">3. בנוטבוק לוחצים <b>טקסט שהועתק</b>…</p>
+<img class="shot w" src="img/src-copied.jpg" alt="">
+<p data-ar="4. …نلصق ونضغط <b>«הוספה»</b> (إضافة).">4. …מדביקים ולוחצים <b>הוספה</b>.</p>
+<img class="shot" src="img/nb-3-paste.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>14</i><span data-ar="نضيف المصادر للحاجة">מוסיפים את המקורות לצורך</span></h2>
+<div class="mine" id="mineNeed"></div>
+<div class="flow">
+  <div><span class="lbl" data-ar="1. هنا ننسخ">1. כאן מעתיקים</span><button class="btn ghost" type="button" id="cpSrc" style="margin:0" data-ar="نسخ المصادر">העתקת המקורות</button></div>
+  <span class="arr">←</span>
+  <div><span class="lbl" data-ar="2. في الدفتر">2. בנוטבוק</span><img src="img/add-sources.jpg" alt=""></div>
+  <span class="arr">←</span>
+  <div><span class="lbl" data-ar="3. نضغط «אתרים»، نلصق ← «הוספה»">3. לוחצים "אתרים", מדביקים ← "הוספה"</span><img src="img/src-websites.jpg" alt=""></div>
+</div></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>15</i><span data-ar="نسأل الدفتر عن حلول">שואלים את הנוטבוק על פתרונות</span></h2>
+<button class="btn ghost" type="button" id="cpPr" data-ar="نسخ البرومبت">העתקת הפרומפט</button>
+<div class="pr" id="pNb"></div>
+<p style="margin-top:10px" data-ar="نلصق في مربع الأسئلة ونضغط على السهم.">מדביקים בתיבת השאלות ולוחצים על החץ.</p>
+<img class="shot" src="img/nb-4-ask.jpg" alt=""></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>16</i><span data-ar="ماذا اقترح الدفتر، وماذا أتبنّى">מה הנוטבוק הציע, ומה אני מאמץ/ת</span></h2>
+<label class="f"><span data-ar="ماذا اقترح الدفتر؟<small>باختصار، بكلماتكم.</small>">מה הנוטבוק הציע?<small>בקצרה, במילים שלכם.</small></span><textarea data-k="suggest"></textarea></label>
+<label class="f"><span data-ar="الحل الذي أتبنّاه، ولماذا">הפתרון שאני מאמץ/ת, ולמה</span><textarea data-k="adopt"></textarea></label>
+<label class="f"><span data-ar="رابط الدفتر<small>مشاركة ← نسخ الرابط.</small>">הקישור לנוטבוק<small>שיתוף ← העתקת קישור.</small></span><input type="url" data-k="nb" dir="ltr"></label></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>17</i><span data-ar="ثلاث خطوات للطاقم">שלוש פעולות לצוות</span></h2>
+<p data-ar="كيف ننفّذ الحل؟ لكل خطوة: متى، ومع مَن.">איך מוציאים את הפתרון לפועל? לכל פעולה: מתי, ועם מי.</p>
+<div class="rows">
+  <div class="row"><input type="text" data-k="act1" data-ph="פעולה 1: מה עושים|الخطوة 1: ماذا نفعل"><input type="text" data-k="when1" data-ph="מתי|متى"><input type="text" data-k="who1" data-ph="עם מי|مع مَن"></div>
+  <div class="row"><input type="text" data-k="act2" data-ph="פעולה 2: מה עושים|الخطوة 2: ماذا نفعل"><input type="text" data-k="when2" data-ph="מתי|متى"><input type="text" data-k="who2" data-ph="עם מי|مع مَن"></div>
+  <div class="row"><input type="text" data-k="act3" data-ph="פעולה 3: מה עושים|الخطوة 3: ماذا نفعل"><input type="text" data-k="when3" data-ph="מתי|متى"><input type="text" data-k="who3" data-ph="עם מי|مع مَن"></div>
+</div>
+<details class="ideas" id="ideas" hidden><summary data-ar="أفكار للحاجة التي اخترتها">רעיונות לצורך שבחרתי</summary><ul id="ideaList"></ul></details></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>18</i><span data-ar="قواعدنا الأساسية">כללי הבסיס שלנו</span></h2>
+<ol><li data-ar="لا ندخل أسماء أو تفاصيل تعريفية للطلاب والمعلمين.">לא מזינים שמות או פרטים מזהים של תלמידים ומורים.</li>
+<li data-ar="نرفع فقط ملفات بدون أسماء، مثل الملف من الداشبورد.">מעלים רק קבצים בלי שמות, כמו הקובץ מהדשבורד.</li>
+<li data-ar="المعلم/ة يفحص كل ناتج قبل أن يصل إلى الطالب/ة.">מורה בודק/ת כל תוצר לפני שהוא מגיע לתלמיד/ה.</li>
+<li data-ar="السلامة والمحتوى المهني فقط من مصدر معتمد.">בטיחות ותוכן מקצועי רק ממקור מאושר.</li></ol>
+<label class="f"><span data-ar="ماذا أيضًا عندنا؟<small>يمكن تركه فارغًا.</small>">מה עוד אצלנו?<small>אפשר להשאיר ריק.</small></span><textarea data-k="rules"></textarea></label></div>
+
+<div class="step" style="--c:var(--ok)"><h2><i>19</i><span data-ar="نسلّم">מגישים</span></h2>
+<p data-ar="بعد الروابط الثلاثة، وما اقترحه الدفتر، والحل الذي تتبنّونه.">אחרי שלושת הקישורים, מה הנוטבוק הציע, והפתרון שאתם מאמצים.</p>
+<button class="btn ok" type="button" id="submit" data-ar="سلّمت">הגשתי</button>
+<p class="sub" id="subOk" hidden></p>
+<p class="warn" id="subMiss" hidden></p></div>
+
+<div class="step" style="--c:var(--a2)"><h2><i>20</i><span data-ar="أفكار لدرس مع AI">רעיונות לשיעור עם AI</span></h2>
+<p data-ar="أفكار حسب الموضوع، مع برومبت جاهز لكل فكرة (بالعبرية).">רעיונות לפי מקצוע, עם פרומפט מוכן לכל רעיון.</p>
+<a class="btn ghost" href="../mifgash-02/kits/raayonot.html" target="_blank" rel="noopener" data-ar="صفحة الأفكار">דף הרעיונות</a></div>
+
+<div class="step" style="--c:var(--a3)"><h2><i>21</i><span data-ar="تغذية راجعة">משוב</span></h2>
+<label class="f"><span data-ar="إجمالًا، كيف كانت الوحدة؟<small>1 ليست جيدة · 5 ممتازة</small>">בסך הכול, איך הייתה היחידה?<small>1 לא טובה · 5 מצוינת</small></span></label>
+<div class="opts" data-k="fb_rate" data-opts="1|2|3|4|5"></div>
+<label class="f"><span data-ar="التعليمات كانت">ההוראות היו</span></label>
+<div class="opts" data-k="fb_clear" data-opts="ברורות|די ברורות|לא ברורות" data-opts-ar="واضحة|واضحة إلى حد ما|غير واضحة"></div>
+<label class="f"><span data-ar="أين علقت، أو ماذا كان ينقص">איפה נתקעתי, או מה היה חסר</span><textarea data-k="fb_stuck"></textarea></label></div>
+
+<footer><span data-ar="إدارة التأهيل المهني · وزارة العمل · بُني مع">המנהל להכשרה מקצועית · משרד העבודה · נבנה עם</span> <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>
+</div>
+
+<button class="stuckbtn" type="button" id="stuckOpen" data-ar="علقت">נתקעתי</button>
+<div class="modal" id="stuck" hidden><div class="box">
+  <h3 data-ar="علقت">נתקעתי</h3>
+  <p data-ar="اكتبوا في جملة أين علقتم. تصلنا رسالة ونعود إليكم.">כתבו במשפט איפה נתקעתם. ההודעה מגיעה אלינו, ונחזור אליכם.</p>
+  <label class="f"><span data-ar="في أي خطوة؟">באיזה שלב?</span><input type="text" id="stuckStep"></label>
+  <label class="f"><span data-ar="ماذا حدث؟">מה קרה?</span><textarea id="stuckMsg"></textarea></label>
+  <button class="btn" type="button" id="stuckSend" style="--c:var(--a3)" data-ar="إرسال">שליחה</button>
+  <button class="btn ghost" type="button" id="stuckClose" style="--c:var(--mute)" data-ar="إغلاق">סגירה</button>
+  <p class="sub" id="stuckOk" hidden data-ar="وصلتنا الرسالة. نعود إليكم قريبًا.">ההודעה הגיעה אלינו. נחזור אליכם בהקדם.</p>
+</div></div>
+<div class="saved" id="saved"></div>
+
+<script>
+(function () {
+  var API = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
+  /* ממסר המרחב: שולח מ-merhav את מייל "נתקעתי" שהשרת שמר (src=shaglive) */
+  var RELAY = "https://script.google.com/macros/s/AKfycbxbudrzz-JSNpEeHwayjq6u8Xmz4dAsmV8FQGwHjZDeC3g028_I2uk2wX2Pi762ULZD1w/exec";
+  var KITS = "https://tfasim.pedagogiamh.co.il/shagririm/mifgash-02/kits/";
+  var GUIDE = "https://meyda.education.gov.il/files/Pop/0files/lemida-metukshevet/AI/AI-Usage-Guidelines.pdf";
+  var POP = "https://pop.education.gov.il/sherutey-tiksuv-bachinuch/international-digital-ai-tools/";
+  var RUBRIC = "https://meyda.education.gov.il/files/Nihulyeda/ai/highschool_midicator.pdf";
+  var PLC = "https://avneyrosha.org.il/wp-content/uploads/2024/09/%D7%A7%D7%94%D7%99%D7%9C%D7%94-%D7%9E%D7%A7%D7%A6%D7%95%D7%A2%D7%99%D7%AA-%D7%9C%D7%95%D7%9E%D7%93%D7%AA-%D7%91%D7%91%D7%99%D7%AA-%D7%94%D7%A1%D7%A4%D7%A8.pdf";
+  /* אותם ארבעה צרכים כמו במפגש 2 בהובלה (mifgash-02/h.html). he / ar. בתיק נשמר תמיד השם בעברית */
+  var NEEDS = {
+    kita: { t: ["מהשימוש הפרטי לכיתה", "من الاستخدام الشخصي إلى الصف"], s: ["המורים משתמשים לעצמם, לא עם התלמידים", "المعلمون يستخدمون لأنفسهم، لا مع الطلاب"], src: [POP],
+      ideas: [[["שיעור אחד, מדרגה אחת", "כל מורה מנסה שיעור אחד בשבועיים הקרובים"], ["درس واحد، درجة واحدة", "كل معلم يجرّب درسًا واحدًا خلال الأسبوعين القادمين"]],
+        [["דקת הדגמה בישיבת צוות", "מורה אחד מראה מה עשה עם התלמידים"], ["دقيقة عرض في اجتماع الطاقم", "معلم واحد يُري ما فعله مع الطلاب"]],
+        [["משוב לפי מחוון", "המורה מקבל טיוטת משוב ובודק אותה"], ["تغذية راجعة حسب مقياس تقييم", "المعلم يحصل على مسودة تغذية راجعة ويفحصها"]],
+        [["עמית ליד המחשב", "הרכז מכין עם מורה שיעור אחד"], ["زميل بجانب الحاسوب", "المركّز يُعدّ مع معلم درسًا واحدًا"]]] },
+    mutar: { t: ["מה מותר בבית הספר", "ما المسموح في المدرسة"], s: ["חצי מהמורים לא יודעים מה מותר", "نصف المعلمين لا يعرفون ما المسموح"], src: [GUIDE],
+      ideas: [[["רמזור בישיבת צוות", "המורים ממקמים דוגמאות בירוק, צהוב, אדום"], ["إشارة ضوئية في اجتماع الطاقم", "المعلمون يضعون أمثلة في الأخضر والأصفر والأحمر"]],
+        [["עמוד אחד בחדר המורים", "\"מה סוכם עם ההנהלה\" בחמש שורות"], ["صفحة واحدة في غرفة المعلمين", "«ما اتُّفق عليه مع الإدارة» في خمسة أسطر"]],
+        [["בדיקת פרטיות בדקה", "לפני כל שימוש: יש כאן שם, ציון או פרט מזהה?"], ["فحص خصوصية في دقيقة", "قبل كل استخدام: هل يوجد اسم أو علامة أو تفصيل تعريفي؟"]],
+        [["משפט ציון קבוע", "\"השתמשתי ב-AI כדי ___, ובדקתי ___\""], ["جملة ثابتة للإشارة", "«استخدمت AI من أجل ___، وفحصت ___»"]]] },
+    zman: { t: ["אין זמן, לומדים יחד", "لا وقت، نتعلم معًا"], s: ["לומדים בתוך זמן שכבר קיים", "نتعلم داخل وقت موجود أصلًا"], src: [PLC],
+      ideas: [[["10 דקות בישיבה קיימת", "הדגמה קצרה בכל ישיבת צוות שנייה"], ["10 دقائق في اجتماع قائم", "عرض قصير في كل اجتماع طاقم ثانٍ"]],
+        [["עמית ליד המחשב", "בשעה חלונה, על משימה אמיתית"], ["زميل بجانب الحاسوب", "في ساعة فراغ، على مهمة حقيقية"]],
+        [["טיפ השבוע", "סרטון של דקה בקבוצת הצוות"], ["نصيحة الأسبوع", "فيديو مدته دقيقة في مجموعة الطاقم"]],
+        [["הקבוצה הראשונה", "4 עד 6 מתנדבים שמובילים את השאר"], ["المجموعة الأولى", "4 إلى 6 متطوعين يقودون الباقين"]]] },
+    haamaka: { t: ["מי שרוצה להעמיק", "مَن يريد التعمّق"], s: ["מורים שכבר בפנים ורוצים יותר", "معلمون بدأوا ويريدون المزيد"], src: [RUBRIC],
+      ideas: [[["קבוצת מתקדמים", "חצי שעה פעם בחודש, כל אחד מביא משהו שניסה"], ["مجموعة متقدمين", "نصف ساعة مرة في الشهر، كل واحد يُحضر شيئًا جرّبه"]],
+        [["עוזר אישי לכל מורה", "פרומפט קבוע למקצוע, בקובץ משותף"], ["مساعد شخصي لكل معلم", "برومبت ثابت للموضوع، في ملف مشترك"]],
+        [["משוב בשתי רמות", "שאלת המשך שונה לכל רמה"], ["تغذية راجعة بمستويين", "سؤال متابعة مختلف لكل مستوى"]],
+        [["כל אחד מלווה אחד", "מורה מתקדם מלווה עמית במשך חודש"], ["كل واحد يرافق واحدًا", "معلم متقدم يرافق زميلًا لمدة شهر"]]] }
+  };
+  /* מקצועות לתרגיל 1. נשמר בעברית */
+  var SUBS = [["חשמל", "كهرباء"], ["מכונאות רכב", "ميكانيكا السيارات"], ["מחשבים", "حاسوب"], ["עיצוב ואופנה", "تصميم وأزياء"], ["קוסמטיקה", "تجميل"],
+    ["מלונאות ובישול", "فندقة وطبخ"], ["נגרות", "نجارة"], ["מתמטיקה", "رياضيات"], ["אנגלית", "إنجليزية"], ["עברית", "عبرية"], ["ערבית", "عربية"],
+    ["היסטוריה", "تاريخ"], ["אזרחות", "مدنيات"], ["מדעים", "علوم"], ["אחר", "آخر"]];
+  var P_EX1 = ["רעיונות לשימוש בבינה מלאכותית בהוראת {s} בבית ספר מקצועי", "أفكار لاستخدام الذكاء الاصطناعي في تدريس {s} في مدرسة مهنية"];
+  var P_GEM = ["לפניך קובץ תשובות של צוות מורים לשאלון על בינה מלאכותית, בלי שמות.\nעל סמך הקובץ בלבד:\n1. כמה מורים ענו?\n2. מה מפתיע בנתונים?\n3. מה החוזקות של הצוות?\n4. מה האתגרים?\n5. מה הצורך המרכזי של הצוות, במשפט אחד, ומה בנתונים מראה אותו?\nבעברית פשוטה.",
+    "أمامك ملف إجابات طاقم معلمين على استبيان حول الذكاء الاصطناعي، بدون أسماء.\nبالاعتماد على الملف فقط:\n1. كم معلمًا أجاب؟\n2. ما المفاجئ في المعطيات؟\n3. ما نقاط قوة الطاقم؟\n4. ما التحديات؟\n5. ما الحاجة المركزية للطاقم، في جملة واحدة، وما الذي يُظهرها في المعطيات؟\nبالعربية البسيطة."];
+  var P_NB = ["את/ה יועץ/ת פדגוגי/ת לבית ספר מקצועי.\nבית הספר שלי: {school}\nהצורך שלנו: {need}\nעל סמך המקורות בלבד:\n1. מה עלה בשאלון של הצוות: 3 ממצאים, בלי שמות.\n2. הצע/י 4 פתרונות לצורך. לכל פתרון: מה עושים, מי, כמה זמן זה לוקח, ומה צריך.\n3. איזה פתרון הכי מתאים לצוות שלנו, ולמה?\nבעברית פשוטה.",
+    "أنت مستشار/ة تربوي/ة لمدرسة مهنية.\nمدرستي: {school}\nحاجتنا: {need}\nبالاعتماد على المصادر فقط:\n1. ما الذي ظهر في استبيان الطاقم: 3 نتائج، بدون أسماء.\n2. اقترح/ي 4 حلول للحاجة. لكل حل: ماذا نفعل، مَن، كم من الوقت يستغرق، وماذا نحتاج.\n3. أي حل هو الأنسب لطاقمنا، ولماذا؟\nبالعربية البسيطة."];
+  var TX = {
+    trk: ["שגרירי חדשנות · {tr} · מפגש 3 · יחידה בקצב אישי", "سفراء الابتكار · {tr} · اللقاء 3 · وحدة بوتيرة شخصية"],
+    trk_k: ["מסלול הכלים", "مسار الأدوات"], trk_h: ["מסלול הובלה", "مسار القيادة"],
+    who: ["מה שתכתבו כאן נשמר בתיק ההטמעה של בית הספר.", "ما تكتبونه هنا يُحفظ في ملف التطبيق المدرسي."],
+    whoK: ["מה שתכתבו כאן נשמר בתיק ההטמעה.", "ما تكتبونه هنا يُحفظ في ملف التطبيق."],
+    due: ["עד {d}", "حتى {d}"],
+    need0: ["בוחרים צורך אחד.", "نختار حاجة واحدة."],
+    needP: ["במפגש 2, לפי המיפוי של בית הספר שלכם: <b>{n}</b>.", "في اللقاء 2، حسب مسح مدرستكم: <b>{n}</b>."],
+    which: ["לאיזה צורך?", "لأي حاجة؟"],
+    sub: ["הוגש ב-{d}. אפשר לעדכן עד {u}.", "سُلّم في {d}. يمكن التحديث حتى {u}."],
+    miss: ["עוד חסר: {m}. אפשר להגיש בכל זאת, ולהשלים עד {u}.", "ما زال ينقص: {m}. يمكن التسليم الآن والإكمال حتى {u}."],
+    m_ex1nb: ["קישור לנוטבוק של תרגיל 1", "رابط دفتر التمرين 1"], m_ex2nb: ["קישור לנוטבוק של תרגיל 2", "رابط دفتر التمرين 2"],
+    m_nb: ["קישור לנוטבוק של המשימה", "رابط دفتر المهمة"], m_suggest: ["מה הנוטבוק הציע", "ماذا اقترح الدفتر"], m_adopt: ["הפתרון שאני מאמץ/ת", "الحل الذي أتبنّاه"],
+    saved: ["נשמר", "حُفظ"], copied: ["הועתק", "تم النسخ"], sending: ["שולחים…", "نرسل…"]
+  };
+
+  /* מי אני: אדווה מעבירה אחרי # את המפתח האישי, השם, בית הספר והמסלול */
+  var H = {};
+  location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) H[p[0]] = decodeURIComponent(p[1] || ""); });
+  var K = /^[A-Za-z0-9]{6,40}$/.test(H.k || "") ? H.k : "";
+  var T = H.t === "h" ? "h" : "k";
+  /* כל מסלול במועד שלו, כמו בגיליון "מפגשים" (מיטל, 1.11.26) */
+  var DUE = { k: "16.11", h: "18.11" };
+  var L = 0;  // 0 עברית, 1 ערבית
+  try { L = (H.l || localStorage.getItem("shag-lang")) === "ar" ? 1 : 0; } catch (e) { L = H.l === "ar" ? 1 : 0; }
+  function tx(k) { return TX[k][L]; }
+  if (K) {
+    document.getElementById("dash").href = document.getElementById("dash2").href = "../mipui/?v=data&k=" + encodeURIComponent(K);
+    document.getElementById("sheelon").href = "../mipui/?k=" + encodeURIComponent(K);
+  } else document.getElementById("nokey").hidden = false;
+
+  var LS = "tik-s3-" + (K || "local"), st = {};
+  try { st = JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) {}
+  var CID = (function () { try { var c = localStorage.getItem("shag-cid"); if (!c) { c = "c" + Math.random().toString(36).slice(2, 10); localStorage.setItem("shag-cid", c); } return c; } catch (e) { return "c" + Date.now(); } })();
+
+  var tmr, savedEl = document.getElementById("saved");
+  function save() {
+    st.track = T === "h" ? "הובלה" : "כלים";
+    st.lang = L ? "ערבית" : "עברית";
+    try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+    clearTimeout(tmr);
+    tmr = setTimeout(function () {
+      if (K) post({ kind: "tik", track: T, s: 3, k: K, name: H.n || "", school: H.sc || "", value: st });
+      savedEl.classList.add("on"); setTimeout(function () { savedEl.classList.remove("on"); }, 1200);
+    }, 900);
+  }
+  function post(o) {
+    try { return fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (e) { return Promise.reject(e); }
+  }
+
+  /* שפה: כל אלמנט עם data-ar מחליף את התוכן שלו. הערך שנשמר בשדות בחירה הוא תמיד העברית */
+  function setLang() {
+    document.documentElement.lang = L ? "ar" : "he";
+    document.querySelectorAll("[data-ar]").forEach(function (el) {
+      if (el.dataset.he === undefined) el.dataset.he = el.innerHTML;
+      el.innerHTML = L ? el.dataset.ar : el.dataset.he;
+    });
+    document.querySelectorAll("[data-ph]").forEach(function (el) { el.placeholder = el.dataset.ph.split("|")[L]; });
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", (b.dataset.lang === "ar") === !!L ? "true" : "false"); });
+    document.getElementById("trk").textContent = tx("trk").replace("{tr}", tx("trk_" + T));
+    document.getElementById("who").textContent = K && H.n ? H.n + (H.sc ? " · " + H.sc : "") + " · " + tx("whoK") : tx("who");
+    document.getElementById("due").textContent = tx("due").replace("{d}", DUE[T]);
+    document.getElementById("pGem").textContent = P_GEM[L];
+    document.getElementById("needNote").innerHTML = planned ? tx("needP").replace("{n}", NEEDS[planned].t[L]) : tx("need0");
+    savedEl.textContent = tx("saved");
+    render();
+  }
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.onclick = function () { L = b.dataset.lang === "ar" ? 1 : 0; try { localStorage.setItem("shag-lang", b.dataset.lang); } catch (e) {} setLang(); };
+  });
+
+  /* שדות */
+  function bind() {
+    document.querySelectorAll("[data-k]").forEach(function (el) {
+      var k = el.dataset.k;
+      if (el.classList.contains("opts")) {
+        el.innerHTML = "";
+        var he = el.dataset.opts.split("|"), ar = (el.dataset.optsAr || el.dataset.opts).split("|");
+        he.forEach(function (o, i) {
+          var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = L ? ar[i] : o;
+          b.setAttribute("aria-pressed", st[k] === o ? "true" : "false");
+          b.onclick = function () { st[k] = o; el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); save();
+            if (k === "fb_rate") post({ kind: "feedback", track: T, s: 3, cid: CID, value: { rate: o, good: "", change: st.fb_stuck || "" } }); };
+          el.appendChild(b);
+        });
+        return;
+      }
+      el.value = st[k] || "";
+      if (!el.dataset.bound) { el.dataset.bound = "1"; el.addEventListener("input", function () { st[k] = el.value; save(); if (k === "ex1other") showEx1(); }); }
+    });
+  }
+
+  /* תרגיל 1: מקצוע ← החיפוש להעתקה */
+  function subName() {
+    if (st.ex1sub === "אחר") return (st.ex1other || "").trim() || "___";
+    for (var i = 0; i < SUBS.length; i++) if (SUBS[i][0] === st.ex1sub) return SUBS[i][L];
+    return "___";
+  }
+  function showEx1() {
+    var box = document.getElementById("subs");
+    box.innerHTML = "";
+    SUBS.forEach(function (s) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = s[L];
+      b.setAttribute("aria-pressed", st.ex1sub === s[0] ? "true" : "false");
+      b.onclick = function () { st.ex1sub = s[0]; save(); showEx1(); };
+      box.appendChild(b);
+    });
+    document.getElementById("ex1other").hidden = st.ex1sub !== "אחר";
+    document.getElementById("pEx1").textContent = P_EX1[L].replace("{s}", subName());
+  }
+
+  /* השיבוץ ממפגש 2 בהובלה (28.10.26). בית ספר שלא ברשימה בוחר בעצמו */
+  var PLAN = {
+    kita: ["תיכון יוצר עתיד פלמחים", "עתיד יוצר אבדאע ביר אל מכסור", "אורט בית הערבה", "אלאופוק א.א.פחם", "אום אל פחם בנות"],
+    mutar: ["תיכון הדר", "עמל אנרגיטק", "דרור גליל", "מצפה רמון"],
+    zman: ["תיכון חברתי חיפה", "דרור נווה מדבר", "תיכון עתיד יוצר עוצמ\"ה זוקו קריית ביאליק", "בית אל"],
+    haamaka: ["עמל נצרת", "אלמנארה", "תיכון בקהילה מהאראת שפרעם 54106", "תיכון אלאמאני סחנין 54100", "ח'טוואת ירכא אבו סנאן"]
+  };
+  var norm = function (x) { return String(x || "").replace(/["'׳״\s]/g, ""); }, planned = "";
+  if (T === "h") Object.keys(PLAN).forEach(function (id) { PLAN[id].forEach(function (n) { if (H.sc && norm(n) === norm(H.sc)) planned = id; }); });
+
+  /* בחירת הצורך */
+  var box = document.getElementById("needs");
+  function pick(id) { st.need = id; st.needt = NEEDS[id].t[0]; save(); showNeed(); }
+  function showNeed() {
+    var n = NEEDS[st.need];
+    box.innerHTML = "";
+    Object.keys(NEEDS).forEach(function (id) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "need";
+      b.innerHTML = NEEDS[id].t[L] + "<small>" + NEEDS[id].s[L] + "</small>";
+      b.setAttribute("aria-pressed", id === st.need ? "true" : "false");
+      b.onclick = function () { pick(id); };
+      box.appendChild(b);
+    });
+    var mn = document.getElementById("mineNeed");
+    mn.innerHTML = tx("which") + " <span class=\"opts\" style=\"margin-top:6px\"></span>";
+    Object.keys(NEEDS).forEach(function (id) {
+      var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = NEEDS[id].t[L];
+      b.setAttribute("aria-pressed", id === st.need ? "true" : "false");
+      b.onclick = function () { pick(id); };
+      mn.querySelector(".opts").appendChild(b);
+    });
+    document.getElementById("pNb").textContent = nbPrompt();
+    if (!n) return;
+    document.getElementById("ideas").hidden = false;
+    document.getElementById("ideaList").innerHTML = n.ideas.map(function (x) { return "<li><b>" + x[L][0] + "</b><br><span>" + x[L][1] + "</span></li>"; }).join("");
+  }
+  function nbPrompt() { var n = NEEDS[st.need]; return P_NB[L].replace("{school}", H.sc || "___").replace("{need}", n ? n.t[L] : "___"); }
+
+  /* הגשה: אפשר להגיש גם עם חוסרים, ואז רואים מה חסר */
+  function showSub() {
+    if (!st.submitted) return;
+    var ok = document.getElementById("subOk");
+    ok.hidden = false; ok.textContent = tx("sub").replace("{d}", st.submitted).replace("{u}", DUE[T]);
+    var miss = ["ex1nb", "ex2nb", "nb", "suggest", "adopt"].filter(function (k) { return !String(st[k] || "").trim(); }).map(function (k) { return tx("m_" + k); });
+    var mm = document.getElementById("subMiss");
+    mm.hidden = !miss.length; mm.textContent = miss.length ? tx("miss").replace("{m}", miss.join(" · ")).replace("{u}", DUE[T]) : "";
+  }
+  document.getElementById("submit").onclick = function () {
+    var d = new Date(); st.submitted = d.getDate() + "." + (d.getMonth() + 1); save(); showSub();
+  };
+
+  function render() { bind(); showEx1(); showNeed(); showSub(); }
+  setLang();
+
+  /* מילוי מראש מהתיק: מה שכבר נכתב כאן, ואם אין, מה שנכתב במפגש 2 בהובלה */
+  var FROM2 = ["surprise", "good", "challenge", "guess", "gemini", "need", "needt", "act1", "when1", "act2", "when2", "act3", "when3"];
+  function plan() { if (!st.need && planned) { st.need = planned; st.needt = NEEDS[planned].t[0]; return true; } return false; }
+  if (K) fetch(API + "?api=tik&k=" + encodeURIComponent(K)).then(function (r) { return r.json(); }).then(function (d) {
+    var s3 = (d && d.s && d.s["3"]) || {}, s2 = (d && d.s && d.s["2"]) || {}, got = false, pre = false;
+    Object.keys(s3).forEach(function (k) { if (!st[k] && s3[k]) { st[k] = s3[k]; got = true; } });
+    FROM2.forEach(function (k) { if (!st[k] && s2[k]) { st[k] = s2[k]; pre = got = true; } });
+    if (plan()) got = true;
+    if (pre) document.getElementById("pre").hidden = false;
+    if (got) { try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {} render(); }
+  }).catch(function () { if (plan()) render(); });
+  else if (plan()) render();
+
+  /* נתקעתי: שורה בגיליון + מייל ל-merhav דרך הממסר. השלב = הכרטיס שנראה עכשיו במסך */
+  var modal = document.getElementById("stuck");
+  function currentStep() {
+    var best = null;
+    document.querySelectorAll(".step h2").forEach(function (h) { if (h.getBoundingClientRect().top < window.innerHeight * 0.45) best = h; });
+    return best ? best.textContent.replace(/\s+/g, " ").trim() : "";
+  }
+  document.getElementById("stuckOpen").onclick = function () {
+    document.getElementById("stuckStep").value = currentStep();
+    document.getElementById("stuckOk").hidden = true;
+    modal.hidden = false; document.getElementById("stuckMsg").focus();
+  };
+  document.getElementById("stuckClose").onclick = function () { modal.hidden = true; };
+  modal.addEventListener("click", function (e) { if (e.target === modal) modal.hidden = true; });
+  document.getElementById("stuckSend").onclick = function () {
+    var msg = document.getElementById("stuckMsg"), btn = this;
+    if (!msg.value.trim()) { msg.focus(); return; }
+    var id = ""; var a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var rnd = window.crypto && crypto.getRandomValues ? crypto.getRandomValues(new Uint8Array(32)) : null;
+    for (var i = 0; i < 32; i++) id += a[(rnd ? rnd[i] : Math.floor(Math.random() * 256)) % a.length];
+    var o = btn.textContent; btn.textContent = tx("sending"); btn.disabled = true;
+    post({ kind: "stuck", track: T, s: 3, id: id, name: H.n || "", school: H.sc || "", step: document.getElementById("stuckStep").value, msg: msg.value, lang: L ? "ערבית" : "עברית" })
+      .then(function () { return fetch(RELAY + "?src=shaglive&id=" + id, { mode: "no-cors" }); })
+      .catch(function () {})
+      .then(function () { btn.textContent = o; btn.disabled = false; msg.value = ""; document.getElementById("stuckOk").hidden = false; });
+  };
+
+  function copy(text, btn) {
+    var o = btn.textContent;
+    var done = function () { btn.textContent = tx("copied"); btn.classList.add("ok"); setTimeout(function () { btn.textContent = o; btn.classList.remove("ok"); }, 1600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); }); else { fb(text); done(); }
+  }
+  function fb(t) { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); } catch (e) {} a.remove(); }
+  function needFirst() { if (NEEDS[st.need]) return true; document.getElementById("needs").scrollIntoView({ block: "center" }); return false; }
+  document.getElementById("cpEx1").onclick = function () { if (subName() === "___") { document.getElementById("subs").scrollIntoView({ block: "center" }); return; } copy(P_EX1[L].replace("{s}", subName()), this); };
+  document.getElementById("cpGem").onclick = function () { copy(P_GEM[L], this); };
+  document.getElementById("cpSrc").onclick = function () { if (needFirst()) copy([KITS + st.need + ".html"].concat(NEEDS[st.need].src).join("\n"), this); };
+  document.getElementById("cpPr").onclick = function () { if (needFirst()) copy(nbPrompt(), this); };
+})();
+</script>
+</body>
+</html>

@@ -26,6 +26,8 @@
   var EXT_PAGE = { 1: "mifgash-01/" };
   /* 28.10.26: מפגש 2 (כמו ב-shell.js). בהובלה: מצגת ודף מלווה חדשים, h-deck.html ו-h.html */
   EXT_PAGE[2] = "mifgash-02/";
+  /* 1.11.26: מפגש 3 א-סינכרוני, דף אחד לשני המסלולים, בלי מצגת */
+  EXT_PAGE[3] = "mifgash-03/";
   /* משאבי המפגש — אותה רשימה כמו sessionRes ב-shell.js. אצל מיטל השאלון במצב בדיקה (לא נספר),
      ומיפוי הצוות נפתח במבט-העל שלה. */
   function sessionRes(tr, num) {
@@ -54,6 +56,7 @@
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
   function extUrl(tr, num, view) {
     if (Number(num) === 2 && tr === "הובלה") return "mifgash-02/" + (view === "deck" ? "h-deck.html" : "h.html");
+    if (Number(num) === 3) return "mifgash-03/#t=" + (tr === "הובלה" ? "h" : "k");
     return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : "";
   }
   var TRACKS = ["כלים", "הובלה"];
@@ -644,7 +647,8 @@
       return '<div class="v2-bigitem quiet"><span class="ic">' + ico(icon) + '</span><span class="tx"><b>' + esc(title) + "</b><span>" + esc(sub) + "</span></span></div>";
     }
     h += '<div class="v2-big">';
-    if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "deck"), "slides", "מצגת המפגש", "אותה מצגת שהרכזים פותחים. הערות המרצה מוצגות רק לך", "פתיחה");
+    if (Number(s.num) === 3) h += quiet("slides", "מצגת המפגש", "ביחידה עצמית אין מצגת.");
+    else if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "deck"), "slides", "מצגת המפגש", "אותה מצגת שהרכזים פותחים. הערות המרצה מוצגות רק לך", "פתיחה");
     else if (str(s.slides)) h += big(s.slides, "slides", "מצגת המפגש", "נפתחת בלשונית נפרדת", "פתיחה");
     else h += quiet("slides", "מצגת המפגש", s.isUnit ? "ביחידה עצמית אין מצגת." : "המצגת עוד לא הועלתה (עמודה \"קישור מצגת\" בגיליון).");
     if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "comp"), "studio", "הדף המלווה", "כאן הרכזים עונים במהלך המפגש, והתשובות עולות לשקפים", "פתיחה", true);

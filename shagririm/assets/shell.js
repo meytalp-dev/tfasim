@@ -31,6 +31,9 @@
   var EXT_PAGE = { 1: "mifgash-01/" };
   /* 17.10.26: מפגש 2 — רק במסלול הכלים. 18.10.26: גם במסלול ההובלה (אותו קובץ, לשונית הובלה, ?t=h) */
   EXT_PAGE[2] = "mifgash-02/";
+  /* 1.11.26: מפגש 3 א-סינכרוני: דף אחד לשני המסלולים, פרק בתיק ההטמעה. אין מצגת */
+  EXT_PAGE[3] = "mifgash-03/";
+  var NO_DECK = { 3: true };
   /* משאבי המפגש שמובנים במערכת (3.10.26: "הכול במקום אחד"). נוספים לחומרים שבגיליון.
      [כותרת, שורת הסבר, כתובת]. אותה רשימה ב-admin.js (שם הקישורים במצב בדיקה). */
   function sessionRes(num) {
@@ -58,10 +61,25 @@
       ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך אחרי המפגש", "https://lerani.co.il/training/notebooklm/presentation.html"],
       ["תיק ההטמעה הבית ספרי", "כל מה שכתבתם בדפים המלווים, פרק לכל מפגש", "#v=tik"]
     ];
+    /* 1.11.26: מפגש 3, אותם משאבים בשני המסלולים */
+    if (num === 3) return [
+      ["הדשבורד של בית הספר", "הנתונים של הצוות, ו\"הכנה לניתוח AI\" להעתקה לנוטבוק", "mipui/?v=data" + (tk ? "&k=" + encodeURIComponent(tk) : "")],
+      ["השאלון לצוות", "אין עדיין תשובות מהצוות? הקישור לשאלון וההודעה לשליחה", "mipui/" + (tk ? "?k=" + encodeURIComponent(tk) : "")],
+      ["רעיונות לפי מקצוע", "176 רעיונות לעבודה עם AI עם התלמידים, לפי מגמה ומקצוע, עם פרומפט מוכן לכל רעיון", "mifgash-02/kits/raayonot.html"],
+      ["NotebookLM", "הנוטבוק של משימת ההגשה", "https://notebooklm.google.com/"],
+      ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך", "https://lerani.co.il/training/notebooklm/presentation.html"],
+      ["תיק ההטמעה הבית ספרי", "כל מה שכתבתם בדפים המלווים, פרק לכל מפגש", "#v=tik"]
+    ];
     return [];
   }
   function extPageUrl(num, view) {
     var u = EXT_PAGE[num];
+    /* 1.11.26: מפגש 3, שני המסלולים: מפתח, שם, בית ספר ומסלול אחרי # */
+    if (num === 3) {
+      var tk3 = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
+      return "mifgash-03/#k=" + encodeURIComponent(tk3) + "&n=" + encodeURIComponent(str(S.me.name)) + "&sc=" + encodeURIComponent(str(S.me.school)) +
+        "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k");
+    }
     /* 28.10.26: מפגש 2 בהובלה = דף מלווה חדש. המפתח, השם ובית הספר אחרי # (לא נשלחים לשרת של האתר) */
     if (num === 2 && str(S.me.track) === "הובלה") {
       var tk2 = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
@@ -470,7 +488,7 @@
         ? quietItem("studio", "הדף המלווה", "עמוד העבודה של המפגש. נפתח כאן ביום המפגש.")
         : '<a class="v2-bigitem primary" href="' + esc(extPageUrl(s.num)) + '" target="_blank" rel="noopener">' +
           '<span class="ic">' + ico("studio") + '</span><span class="tx"><b>הדף המלווה</b><span>' +
-          "כאן עונים במהלך המפגש, והתשובות עולות לשקפים</span></span>" +
+          (NO_DECK[s.num] ? "עובדים בקצב אישי, והכול נשמר בתיק ההטמעה" : "כאן עונים במהלך המפגש, והתשובות עולות לשקפים") + "</span></span>" +
           '<span class="end"><span class="v2-btn primary">פתיחה</span></span></a>';
     } else if (s.hasPage) {
       pg.innerHTML = '<button type="button" class="v2-bigitem primary" id="v2-open-page">' +
@@ -486,7 +504,9 @@
     /* 2 · מצגת המפגש. רק Google Slides נפתח בתוך העמוד; השרת מחליט (slidesEmbed). */
     var sl = el("v2-item-slides"), fr = el("v2-slides");
     fr.hidden = true; fr.innerHTML = ""; S.slidesOpen = false;
-    if (EXT_PAGE[s.num] && !s.locked) {
+    if (EXT_PAGE[s.num] && NO_DECK[s.num]) {
+      sl.innerHTML = quietItem("slides", "מצגת המפגש", "יחידה בקצב אישי, בלי מצגת.");
+    } else if (EXT_PAGE[s.num] && !s.locked) {
       sl.innerHTML = '<a class="v2-bigitem" href="' + esc(extPageUrl(s.num, "deck")) + '" target="_blank" rel="noopener">' +
         '<span class="ic">' + ico("slides") + '</span><span class="tx"><b>מצגת המפגש</b><span>נפתחת בלשונית נפרדת</span></span>' +
         '<span class="end"><span class="v2-btn">פתיחה</span></span></a>';
@@ -716,8 +736,19 @@
       ["הצורך", [["guess", "ההשערה שלי"], ["gemini", "מה Gemini מצא"], ["needt", "הצורך שלנו"]]],
       ["הפעולות לצוות", [["act1", "פעולה 1", "when1"], ["act2", "פעולה 2", "when2"], ["act3", "פעולה 3", "when3"], ["measure", "איך נדע שזה עובד"]]],
       ["חומר ההדרכה", [["nb", "הקישור לנוטבוק", "", "link"], ["product", "התוצר"], ["nbwhen", "מתי מגיע למורים"]]],
-      ["משימת השטח", [["field", "מה עשיתי, ועם מי"], ["fieldsaid", "מה המורים אמרו"]]]] }
+      ["משימת השטח", [["field", "מה עשיתי, ועם מי"], ["fieldsaid", "מה המורים אמרו"]]]] },
+    /* 1.11.26: מפגש 3 א-סינכרוני, שני המסלולים */
+    3: { t: "NotebookLM והצורך שלנו", groups: [
+      ["התרגילים", [["ex1sub", "תרגיל 1: מקצוע"], ["ex1nb", "תרגיל 1: הנוטבוק", "", "link"], ["ex2nb", "תרגיל 2: הנוטבוק", "", "link"]]],
+      ["מה ראיתי בנתונים", [["surprise", "מה הפתיע אותי"], ["good", "ממה התרשמתי לטובה"], ["challenge", "איפה האתגר"]]],
+      ["הצורך", [["guess", "ההשערה שלי"], ["gemini", "מה Gemini מצא"], ["needt", "הצורך שלנו"]]],
+      ["הפתרון", [["suggest", "מה הנוטבוק הציע"], ["adopt", "הפתרון שאני מאמץ/ת, ולמה"], ["nb", "הקישור לנוטבוק", "", "link"]]],
+      ["הפעולות לצוות", [["act1", "פעולה 1", "when1", "", "who1"], ["act2", "פעולה 2", "when2", "", "who2"], ["act3", "פעולה 3", "when3", "", "who3"]]],
+      ["כללי הבסיס", [["rules", "מה הוספנו"]]],
+      ["הגשה", [["submitted", "הוגש ב-"]]]] }
   };
+  /* פרק 2 קיים רק בהובלה: הכלים עבדו במפגש 2 בדף אחר, בלי תיק */
+  var TIK_TRACK = { 2: "h" };
   function renderTik() {
     var box = el("v2-other"), tk = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
     var hov = str(S.me.track) === "הובלה";
@@ -725,14 +756,15 @@
       '<p>כל מפגש מוסיף פרק לתוכנית ההטמעה של בית הספר. מה שכותבים בדף המלווה נשמר כאן לבד.</p></div><div id="tik-ch"><div class="v2-card"><p>טוענים…</p></div></div>';
     var ch1 = '<div class="v2-card"><p class="v2-eyebrow">פרק 1 · מפגש 1</p><h3>המיפוי</h3><p>שאלון לצוות, והנתונים של בית הספר בדשבורד.</p>' +
       '<p><a href="mipui/?v=data' + (tk ? "&k=" + encodeURIComponent(tk) : "") + '" target="_blank" rel="noopener">פתיחת הדשבורד</a></p></div>';
-    if (!hov) { el("tik-ch").innerHTML = ch1 + '<div class="v2-card"><p>הפרקים הבאים יתמלאו מהדפים המלווים של המפגשים.</p></div>'; return; }
     fetch(TIK_API + encodeURIComponent(tk)).then(function (r) { return r.json(); }).then(function (d) {
       var h = ch1;
       Object.keys(TIK_CH).forEach(function (n) {
+        if (TIK_TRACK[n] && TIK_TRACK[n] !== (hov ? "h" : "k")) return;
         var c = TIK_CH[n], v = (d && d.s && d.s[n]) || {}, body = "";
         c.groups.forEach(function (g) {
           var rows = g[1].map(function (f) {
             var val = str(v[f[0]]); if (f[2] && str(v[f[2]])) val += (val ? " · " : "") + "מתי: " + str(v[f[2]]);
+            if (f[4] && str(v[f[4]])) val += (val ? " · " : "") + "עם מי: " + str(v[f[4]]);
             if (!val) return "";
             var shown = f[3] === "link" && /^https?:\/\//.test(val) ? '<a href="' + esc(val) + '" target="_blank" rel="noopener">' + esc(val) + "</a>" : esc(val).replace(/\n/g, "<br>");
             return "<li><b>" + esc(f[1]) + ":</b> " + shown + "</li>";
