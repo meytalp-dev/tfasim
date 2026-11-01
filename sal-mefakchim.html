@@ -175,6 +175,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       <div class="bar"><i id="mBar" style="width:0"></i></div>
       <div class="loadfail" id="mFail">לא הצלחנו לטעון את ההעלאות. נסו לרענן את הדף.</div>
     </div>
+    <h2 class="sec" id="noSalT" hidden>אין לנו סל תוכניות</h2>
+    <p class="rv-intro" id="noSalIntro" hidden></p>
+    <div id="mNoSal"></div>
     <h2 class="sec">כל בתי הספר — לפי מפקח.ת</h2>
     <div class="legend" id="mLegend"></div>
     <div id="mMissing"></div>
@@ -442,6 +445,29 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       if (navigator.clipboard) navigator.clipboard.writeText(text).then(ok, function () { window.prompt('העתיקו:', text); });
       else window.prompt('העתיקו:', text);
     };
+
+    // אין לנו סל: בתי ספר שהסל שלהם לא הועלה כלל. סל שהועלה וממתין לאישור — אצלנו, לא חסר.
+    var noSalGroups = Object.keys(names).map(function (n) {
+      var miss = SCHOOLS.filter(function (s) { return s[3].indexOf(n) > -1 && !(uploads[s[0]] || []).length; })
+        .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
+      return { name: n, miss: miss };
+    }).filter(function (g) { return g.miss.length; })
+      .sort(function (a, b) { return b.miss.length - a.miss.length || a.name.localeCompare(b.name, 'he'); });
+    var noSalTotal = noSalGroups.reduce(function (t, g) { return t + g.miss.length; }, 0);
+    if (noSalTotal) {
+      $('noSalT').hidden = false;
+      $('noSalIntro').hidden = false;
+      $('noSalT').textContent = 'אין לנו סל תוכניות — ' + noSalTotal + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
+      $('noSalIntro').textContent = 'בתי הספר האלה לא העלו את הסל באתר. סל שהועלה וממתין לאישור נמצא אצלנו ולא מופיע כאן.';
+      $('mNoSal').innerHTML = noSalGroups.map(function (g) {
+        return '<div class="sup"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">' + g.miss.length + ' חסרים</span></div>' +
+          '<div class="chips">' + g.miss.map(function (s) {
+            var cls = NOSAL[s[0]] ? 'chip ok ns' : VAADA[s[0]] ? 'chip vd' : 'chip no';
+            var note = NOSAL[s[0]] ? ' · בלי סל' : VAADA[s[0]] ? ' · לוועדה' : '';
+            return '<span class="' + cls + '">' + esc(s[1]) + note + '</span>';
+          }).join('') + '</div></div>';
+      }).join('');
+    }
 
     var rows = [];
     SCHOOLS.forEach(function (s) { (uploads[s[0]] || []).forEach(function (x) { rows.push({ s: s, x: x }); }); });
