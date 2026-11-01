@@ -422,6 +422,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       return fetchJson(API, { method: 'POST', body: JSON.stringify({ action: 'submit', id: ID, data: data }) }, 45000);
     }).then(function (d) {
       if (!d.ok) throw new Error(d.error || 'fail');
+      /* התראה במייל לתיבת המרחב — לא מחכים לה; הפנייה כבר נשמרה */
+      fetch(FILES_API, { method: 'POST', body: JSON.stringify({ action: 'notify', school: data.school, name: data.name, email: data.email, issue: data.issue, details: data.details }) }).catch(function () {});
       picked = []; showFiles();
       $('form').hidden = true;
       $('okMsg').classList.add('on');
