@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 320 350'%3E%3Cpath d='M74 300 V118 C74 72 102 44 148 44 H160' fill='none' stroke='%231D4F5E' stroke-width='76' stroke-linecap='round'/%3E%3Crect x='206' y='22' width='80' height='312' rx='40' fill='%237F9A8E'/%3E%3C/svg%3E">
+<title>חניכות · מערכת רכזי החניכות</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="base.css">
+<style>
+/* כיוון ב׳ מעודכן: נייר חם, פטרול במקום שחור, רוביק לכותרות. סקירת בית הספר ראשונה, "היום" והעוזר בעמודה בצד, ניווט עליון. */
+:root{--bg:#F6F2E9;--card:#FFFDF8;--ink:#1D4F5E;--text:#243B42;--muted:#6B7272;--line:#DCD3C2;--accent:#1D4F5E;--on-accent:#fff;--tint:#EEF3F0;
+ --ok:#5B6E4F;--on-ok:#fff;--no:#B8791C;--on-no:#fff;--self:#1D4F5E;--on-self:#fff;--warn:#A4621A;--focus:#B8791C;
+ --head:'Rubik',sans-serif;--body:'Assistant',sans-serif;--fs:17px;--r-btn:8px;--r-card:10px;--r-cell:50%;--r-mark:12px;--cell:34px}
+body{color:var(--text);line-height:1.55}
+h1,h2,h3{color:var(--ink)}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:2px solid var(--ink);padding:12px clamp(16px,3vw,40px);gap:12px 24px}
+.top .mark{background:var(--ink);color:#fff}.brand b{font-size:1.3em;font-weight:800}
+.nav{display:flex;gap:4px;flex-wrap:wrap}
+.nav a{display:inline-flex;align-items:center;gap:.35em;padding:.45em .7em;font-size:.95em;border-radius:999px;color:var(--ink);text-decoration:none;font-weight:600;font-family:var(--head)}
+.nav a:hover{background:var(--tint)}.nav a.cur{background:var(--ink);color:#fff}
+.btn.primary{background:var(--ink)}
+.page{max-width:1240px;margin:0 auto;padding:24px clamp(16px,3vw,40px);display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:24px 32px;align-items:start}
+.side{position:sticky;top:76px;display:grid;gap:16px;order:1}
+.content{display:grid;gap:28px;min-width:0}.page,.side{min-width:0}
+.sec{scroll-margin-top:84px}
+.side .sec{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 18px;box-shadow:0 10px 30px -24px rgba(29,79,94,.5)}
+#today{border-inline-start:5px solid var(--no)}#today h2{font-size:1.1em;margin-bottom:4px}
+#agent{border-inline-start:5px solid var(--ink)}#agent .cmd{background:var(--bg)}
+.chip{background:transparent;border-color:var(--ink);color:var(--ink)}
+.content .sec h2{font-size:1.7em;font-weight:800;letter-spacing:-.01em}
+.sub-h{font-size:1.05em;margin:22px 0 8px}
+.sec-head{margin-bottom:14px}
+/* סקירה */
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:12px 10px;text-align:center}
+.kpi b{display:block;font-family:var(--head);font-size:1.7em;color:var(--ink);line-height:1.1}.kpi span{font-size:.85em;color:var(--muted)}.kpi span small{display:block;color:var(--warn);font-size:.9em}
+.mg-table{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.mg-row{display:grid;grid-template-columns:1.6fr repeat(6,1fr);gap:8px;padding:10px 14px;border-top:1px solid var(--line);align-items:center}
+.mg-row:first-child{border-top:0}.mg-head{font-size:.82em;color:var(--muted);background:var(--tint)}
+.mg-row b{font-family:var(--head);color:var(--ink)}
+.pbar{display:inline-block;width:46px;height:6px;background:var(--line);border-radius:3px;vertical-align:middle;margin-inline-end:6px;overflow:hidden}.pbar i{display:block;height:100%;background:var(--ok)}
+.tag{display:inline-block;font-style:normal;font-size:.8em;padding:.1em .6em;border-radius:999px;background:var(--tint);color:var(--muted)}
+.tag.ok{background:#E3E9DC;color:var(--ok)}.tag.no{background:#F3E6CF;color:var(--warn)}.tag.mid{background:#F3E6CF;color:var(--warn)}
+.pyr-bar{display:flex;height:34px;border-radius:8px;overflow:hidden;gap:2px}
+.pyr-seg{display:grid;place-items:center;color:#fff;font-family:var(--head);font-weight:700;min-width:28px}
+.s0{background:#B8791C}.s1{background:#7F9A8E}.s2{background:#5B6E4F}.s3{background:#1D4F5E}.s4{background:#143742}
+.pyr-leg{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0;font-size:.9em}.pyr-leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-inline-end:6px}
+.drop{display:grid;place-items:center;gap:6px;padding:20px;border:2px dashed var(--ink);border-radius:var(--r-card);background:var(--bg);text-align:center}.drop .i{width:2em;height:2em;color:var(--ink)}
+.up-cols{margin-top:12px;font-size:.9em}.up-alt{margin-top:8px;font-size:.9em}
+/* נוכחות — היומן */
+.btn.big{font-size:1.08em;padding:.7em 1.3em}
+/* הכניסה: הלוגו בגדול, ומתחתיו טופס אחד */
+#gate{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 0}
+body[data-view=gate] #gate{display:flex}
+body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:not(#gate .foot){display:none}
+.gate-card{width:100%;max-width:440px;display:grid;justify-items:center;gap:6px}
+.gate-logo{width:clamp(150px,34vw,210px);height:auto;margin-bottom:6px}
+.gate-word{width:clamp(220px,60vw,330px);height:auto;margin-bottom:22px}
+.gate-form{width:100%;display:grid;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;box-shadow:0 14px 40px -28px rgba(29,79,94,.45)}
+.gate-h{font-size:1.3em;margin:0}
+.field{display:grid;gap:5px;font-size:.92em;color:var(--muted)}
+.field select,.field input{font:inherit;font-size:1.05rem;color:var(--text);padding:.65em .9em;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%}
+.field input.find{border-bottom-width:1px;border-radius:8px;padding-inline-start:.9em}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gate-btn{justify-content:center;margin-top:4px}
+.gate-note{display:flex;gap:.5em;align-items:flex-start;margin:4px 0 0;font-size:.85em;color:var(--muted)}.gate-note .i{flex:none;margin-top:.2em}
+.gate-alt{margin:0;text-align:center;font-size:.92em;color:var(--muted);padding-top:8px;border-top:1px solid var(--line)}
+.gate-sent{margin:0;color:var(--muted)}
+.gate-code{font-size:1.8rem!important;letter-spacing:.4em;text-align:center;font-family:var(--head)}
+#gCodeS .lnk,#gPass .lnk,#gRec .lnk{justify-self:center}
+.gate-msg{margin:0;font-size:.92em;color:var(--muted);min-height:0}.gate-msg:empty{display:none}.gate-msg.bad{color:var(--warn);font-weight:600}
+.gate-check{display:flex;gap:.5em;align-items:center;font-size:.92em;color:var(--text)}.gate-check input{width:20px;height:20px}
+.rec-code{font-family:var(--head);font-size:1.35em;letter-spacing:.12em;text-align:center;background:var(--bg);border:1px dashed var(--ink);border-radius:8px;padding:.6em;color:var(--ink);word-break:break-all}
+.fp{font-family:var(--head);font-size:1.8em;letter-spacing:.15em;text-align:center;color:var(--ink)}
+.save-st{font-size:.82em;color:var(--muted);white-space:nowrap}.save-st.bad{color:var(--warn);font-weight:700}.save-st:empty{display:none}
+.mon-pick{font:inherit;font-size:.95em;padding:.35em .6em;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+#gate .foot{padding-top:32px}
+.brand-mark{width:40px;height:auto}
+/* "מה דורש טיפול" מקופל */
+#today summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none}#today summary::-webkit-details-marker{display:none}
+#today summary::after{content:'';width:8px;height:8px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);margin-inline-start:auto}
+#today[open] summary::after{transform:rotate(135deg)}#today[open] summary{margin-bottom:6px}
+#today .count{background:var(--no);color:#fff;border-radius:999px;padding:.05em .55em;font-weight:700}
+/* מסכים: רק המקטע של המסך הנוכחי מוצג. הריבועים בצד רק בסקירה */
+.content>.sec{display:none}.side{display:none}
+body[data-view=overview] #overview,body[data-view=att] #att,body[data-view=students] #students,body[data-view=employers] #employers,body[data-view=checklist] #checklist,body[data-view=reports] #reports,body[data-view=admin] #admin,body[data-view=national] #national,body[data-view=schools] #schools,body[data-view=program] #program,body[data-view=links] #links,body[data-view=more] #more,body[data-view=sub] #sub{display:block}
+/* צ'ק ליסט */
+.chk-grid{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.chk-row{display:grid;grid-template-columns:1.4fr repeat(4,1fr) 70px;gap:8px;align-items:center;padding:8px 14px;border-top:1px solid var(--line)}
+.chk-row:first-child{border-top:0}.chk-head{background:var(--tint);font-size:.85em;color:var(--muted)}.chk-head small{display:block;font-size:.85em}
+.chk-row .name{text-align:start}.chk-row .name small{display:block;color:var(--muted);font-weight:400;font-size:.8em}
+.chk-cell{display:inline-flex;align-items:center;gap:8px;padding:.4em .7em;border-radius:999px;border:1px solid var(--line);color:var(--muted);font-family:var(--head);font-size:.9em;justify-self:start}
+.chk-cell i{width:14px;height:14px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*360deg),var(--line) 0)}
+.chk-cell.full{background:var(--ok);border-color:var(--ok);color:#fff}.chk-cell.full i{background:#fff}
+.chk-cell.part{color:var(--ink);border-color:var(--ink)}
+.chk-sum{font-family:var(--head);font-weight:700;color:var(--ink)}
+.chk-det{margin-top:14px;background:var(--card);border:1.5px solid var(--ink);border-radius:var(--r-card);padding:16px 18px}
+.chk-items{list-style:none;margin:0;padding:0}.chk-items li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid var(--line)}
+.chk-items li:first-child{border-top:0}.chk-items label{display:flex;gap:.6em;align-items:center;cursor:pointer}.chk-items input{width:18px;height:18px;accent-color:var(--ok)}
+.chk-items li.ok label{color:var(--muted);text-decoration:line-through}.chk-items small{color:var(--muted);white-space:nowrap}.chk-items small.warn{color:var(--warn);font-weight:600}
+.cal-list{display:grid;gap:8px}
+.cal-m{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:10px 16px}
+.cal-m summary{display:flex;align-items:center;gap:12px;cursor:pointer;list-style:none;font-family:var(--head)}.cal-m summary::-webkit-details-marker{display:none}
+.cal-m summary b{font-size:1.1em;color:var(--ink)}.cal-m.past{opacity:.75}.cal-m.cur{border-color:var(--ink);border-width:1.5px}
+.cal-m[open] summary{margin-bottom:6px}
+.chk-cell .cl{display:none}
+@media (max-width:760px){.chk-row{grid-template-columns:1fr 1fr;padding:10px 12px}.chk-row .name{grid-column:1/-1}.chk-head{display:none}.chk-cell{justify-self:stretch;border-radius:10px;flex-wrap:wrap}.chk-cell .cl{display:block;flex-basis:100%;font-size:.8em;font-weight:400;opacity:.85;font-family:var(--body)}}
+body[data-view=overview] .side{display:grid}
+body:not([data-view=overview]) .page{grid-template-columns:minmax(0,1fr);max-width:1000px}
+body[data-view=att] .page{max-width:900px}
+/* דיווח נוכחות — שורה, רשימה, כפתור */
+#att{background:var(--card);border:1.5px solid var(--ink);border-radius:var(--r-card);padding:22px 24px}
+.att-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.finder .find{border:0;border-bottom:2px solid var(--ink);border-radius:0;background:transparent;font-size:1.1em;padding-inline-start:2.2em}
+.finder .find.big{font-size:1.3em;padding-block:.5em}
+.finder-ic{inset-inline-start:.4em;top:.9em}
+.roster{padding:0}
+.roster-head{display:flex;align-items:center;gap:10px;padding:14px 0 6px}.roster-head b{font-family:var(--head);font-size:1.15em;color:var(--ink)}
+#roster .row{display:grid;grid-template-columns:170px 1fr 60px;align-items:center;gap:16px;min-height:58px;border-top:1px solid var(--line);padding:8px 0}
+.who small{font-size:.82em}
+#roster .cells{gap:8px;flex-wrap:nowrap}
+#roster .cell{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:.85em;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:none}
+#roster .cell small{display:none}#roster .cell span{font-weight:500;font-size:1em}
+#roster .cell.p,#roster .cell.s{background:var(--ink);border-color:var(--ink);color:#fff}
+#roster .cell.a{border-color:var(--no);color:var(--no);text-decoration:none;background:transparent}
+#roster .cell::after{display:none}
+#roster .cell:disabled{cursor:default}
+#roster .sum{font-size:.82em}
+.roster-foot{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:16px 0 0;margin-top:4px}
+.daypick{display:flex;gap:6px;margin:4px 0 6px}
+.dp{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);color:var(--muted);font-family:var(--head);font-weight:600}
+.dp.on{background:var(--ink);border-color:var(--ink);color:#fff}
+/* פירוט לפי ימים (בדוחות) */
+.fold-rep summary{list-style:none;cursor:pointer}.fold-rep summary::-webkit-details-marker{display:none}
+.fold-rep[open] summary{margin-bottom:10px}
+.fold-rep .row{grid-template-columns:130px 1fr 70px}
+.cells{gap:5px}
+.cell{width:38px;height:38px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font-family:var(--head);display:grid;place-items:center;line-height:1;padding:3px 0;position:relative;font-size:.75em}
+.cell small{font-size:.7em;opacity:.75}.cell span{font-weight:700;font-size:1.05em}
+.cell.p,.cell.s{background:var(--ink);border-color:var(--ink);color:#fff}
+.cell.a{background:#fff;color:var(--no);border-color:var(--no);text-decoration:line-through}
+.cell.s::after{content:'';position:absolute;bottom:3px;left:50%;width:4px;height:4px;border-radius:50%;background:#fff;transform:translateX(-50%)}
+.sum{text-align:start}
+.field-report{border-top:0;margin-top:4px;padding-top:0}
+.phone{border-color:var(--ink);border-radius:22px}
+/* ניהול */
+.users,.perm{list-style:none;margin:0 0 10px;padding:0}
+.users li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);align-items:center}
+.users li span{grid-column:1;color:var(--muted);font-size:.85em;direction:ltr;text-align:end}.users li em{grid-row:1/3}
+.perm li{padding:6px 0;border-top:1px solid var(--line)}.perm label{display:flex;gap:.5em;align-items:start;cursor:pointer}
+.kv-line{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
+.rep h3 small{font-weight:400;color:var(--muted);font-size:.8em}
+/* תלמידים */
+.grp{border-top:1px solid var(--line);padding:8px 0}.grp summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;font-family:var(--head);font-weight:700;color:var(--ink);padding:6px 0}
+.grp summary::-webkit-details-marker{display:none}.grp summary small{color:var(--muted);font-weight:400;font-family:var(--body)}
+.grp summary::after{content:'';width:8px;height:8px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);margin-inline-start:auto}
+.grp[open] summary::after{transform:rotate(135deg)}
+#stuHits .stu:first-child{border-top:0}
+.stu{grid-template-columns:1.2fr 1.4fr auto auto}
+.stage{font-size:.8em;padding:.15em .6em;border-radius:999px;color:#fff}
+.tik{background:var(--card);border:1px solid var(--ink);border-radius:var(--r-card);padding:18px;margin-top:16px}
+.tik h2{font-size:1.4em!important}
+.tik-grid{grid-template-columns:1fr 1fr}.tik-card.wide{grid-column:1/-1}.tik-card{min-width:0}.log-add input{min-width:0;flex:1}
+.stage-row{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
+.st{font-size:.82em;padding:.3em .8em;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--card);cursor:pointer;min-height:32px}.st:disabled{cursor:default;opacity:.55}.st.cur:disabled,.st.done:disabled{opacity:1}
+.st.done{border-color:var(--ok);color:var(--ok)}.st.cur{background:var(--ink);border-color:var(--ink);color:#fff;font-weight:700}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:.95em}.kv dt{color:var(--muted)}.kv dd{margin:0}
+.talks li{justify-content:space-between}.talks li span{flex:1}.talks li small{color:var(--muted)}
+.up-l{margin-inline-start:auto;font-size:.85em}
+/* חוץ ופנים */
+.mg-table.six .mg-row{grid-template-columns:1.6fr repeat(5,1fr)}
+.tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.tab{display:inline-flex;align-items:center;gap:.4em;padding:.6em 1em;font-family:var(--head);font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
+.tab.cur{color:var(--ink);border-bottom-color:var(--ink)}
+body[data-frames=out] #empTabs,body[data-frames=in] #empTabs{display:none}
+.place-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.pl{display:inline-flex;align-items:center;gap:.4em;padding:.45em .9em;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;font-weight:600;color:var(--muted)}
+.pl input{margin:0}.pl.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.place-row select{font:inherit;padding:.45em .8em;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+/* הערות, סטטוסים נוספים, טפסי הוספה */
+.row-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.newform{background:var(--card);border:1.5px solid var(--ink);border-radius:var(--r-card);padding:16px 18px;margin-bottom:14px;display:grid;gap:12px}
+.newform .find{border:1px solid var(--line);border-radius:8px;padding-inline-start:.9em;font-size:1rem}
+.newform .field select{font-size:1rem}
+.snote{display:block;color:var(--warn);font-size:.8em;margin-top:2px}
+.snote.big{display:flex;align-items:center;gap:.4em;font-size:.95em;margin:6px 0 0}
+#roster .cell.n,.cell.n{border-color:transparent;background:var(--tint);color:var(--muted)}
+.cell.x,#roster .cell.x{background:#F6EBD6;border:1.5px dashed var(--warn);color:var(--warn)}
+.cell.has-note::before{content:'';position:absolute;top:-6px;inset-inline-end:-6px;width:16px;height:16px;border-radius:50%;border:1.5px solid var(--card);background:var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 20h4l10-10-4-4L4 16z'/%3E%3C/svg%3E") center/9px no-repeat;z-index:1}
+.att-legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82em;color:var(--muted);padding:2px 0 10px}
+.att-legend span{display:inline-flex;align-items:center;gap:6px}.att-legend .cell{width:18px!important;height:18px!important;font-size:0;padding:0;border-radius:50%;display:inline-block;position:relative}
+.att-legend .cell.has-note{border:1px solid var(--line);background:transparent}.att-legend .cell.has-note::before{top:-3px;inset-inline-end:-3px;width:13px;height:13px;background-size:7px}
+#roster .sum{display:grid;gap:4px;justify-items:start}
+.note-btn{display:inline-flex;align-items:center;gap:.3em;font-size:.82em;text-decoration:none;color:var(--muted)}.note-btn .i{width:.9em;height:.9em}
+.notes-box{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;padding:10px 0 4px}
+.notes-box label{display:grid;grid-template-columns:70px 1fr;align-items:center;gap:8px;font-size:.85em;color:var(--muted)}
+.notes-box input{font:inherit;font-size:.95rem;padding:.4em .7em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+.day-notes{list-style:none;margin:6px 0 0;padding:0;font-size:.85em;color:var(--muted);grid-column:1/-1}.day-notes li{padding:2px 0}.day-notes b{color:var(--ink);margin-inline-end:.4em}
+.fold-rep .row{grid-template-columns:130px 1fr 70px;grid-auto-flow:row}
+.docs-l li.na{color:var(--muted)}.docs-l li span{flex:1}.dnote{font-style:normal;color:var(--warn);font-size:.85em}
+.stu.left b,.row.left .name{color:var(--muted);text-decoration:line-through}
+.kv dd a{color:var(--ink)}
+/* מעסיקים */
+.emp-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.emp{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px}
+.emp-h{display:flex;justify-content:space-between;align-items:center;gap:8px}.emp-h b{font-family:var(--head);color:var(--ink);font-size:1.1em}
+.emp small{display:block;color:var(--muted);margin-bottom:8px}.emp .kv{margin-bottom:10px}
+.emp-b{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.wiz-cta{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px;padding:16px 18px;background:var(--tint);border-radius:var(--r-card)}
+.wiz-cta h3{display:flex;align-items:center;gap:.4em;margin-bottom:4px}
+.wiz{margin-top:12px;background:var(--card);border:1px solid var(--ink);border-radius:var(--r-card);padding:16px 18px}
+.wiz-row{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin-bottom:10px}.wiz-row label{display:grid;gap:4px;font-size:.9em;color:var(--muted)}
+.wiz select,.rep select{font:inherit;padding:.5em .8em;border:1px solid var(--line);border-radius:var(--r-btn);background:var(--bg)}
+.wiz-res{list-style:none;margin:0;padding:0}.wiz-res li{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.wiz-res li span{flex:1}
+.wiz-leads{margin-top:14px;padding-top:12px;border-top:2px solid var(--ink)}.wiz-leads h3{margin-bottom:6px}
+.leads{list-style:none;margin:0;padding:0}.leads li{display:grid;grid-template-columns:auto auto 1fr;gap:4px 12px;align-items:center;padding:6px 0}
+.lead-st{font-size:.82em;padding:.1em .6em;border-radius:999px;background:var(--tint)}.lead-st.s3{background:#E3E9DC;color:var(--ok)}
+/* דוחות */
+.rep-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rep{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px}
+.rep h3{display:flex;align-items:center;gap:.4em;margin-bottom:6px}.rep p{margin:0 0 10px}
+.rep-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.content>.sec,.mg-table{min-width:0;max-width:100%}
+/* לוגו ב-SVG */
+svg.gate-logo,svg.brand-mark{aspect-ratio:320/350;height:auto;display:block}svg.gate-word{aspect-ratio:3/1;height:auto;display:block}
+.brand-mark{width:36px}
+/* תפקידים: רכז.ת עורך.ת; מנהל.ת ומנהל.ת המערכת רק רואים */
+.sys-only,.nav a.sys-only{display:none}body[data-role=system] .sys-only,body[data-role=system] .nav a.sys-only{display:inline-flex}
+body[data-role=manager] .edit,body[data-role=system] .edit,body[data-role=manager] #agent,body[data-role=system] #agent{display:none!important}
+body[data-role=manager] #roster .cell,body[data-role=manager] .tik input,body[data-role=manager] .tik select,body[data-role=manager] .tik .dp,body[data-role=manager] .chk-items input,body[data-role=manager] .perm input,
+body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data-role=system] .tik select,body[data-role=system] .tik .dp,body[data-role=system] .chk-items input,body[data-role=system] .perm input{pointer-events:none}
+/* יום בלי תעסוקה לכל הכיתה */
+.off-btn{margin-inline-start:auto;text-decoration:none;color:var(--ink)}
+.off-list{display:flex;flex-wrap:wrap;gap:6px;padding:0 0 10px}
+.off-chip{display:inline-flex;align-items:center;gap:.5em;font-size:.85em;padding:.2em .8em;border-radius:999px;background:var(--tint);color:var(--muted)}.off-chip button{font-size:1.15em;line-height:1;color:var(--warn)}
+.off-form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 12px;margin-bottom:10px;border:1.5px solid var(--ink);border-radius:var(--r-card);background:var(--card)}
+.off-form select{font:inherit;padding:.45em .8em;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+/* שעות הגעה ויציאה */
+#roster .notes-box{grid-template-columns:repeat(auto-fill,minmax(440px,1fr))}
+.notes-box label{grid-template-columns:64px 1fr 104px 104px}
+.notes-box input[type=time]{padding:.3em .4em;direction:ltr;font-family:var(--head);min-width:0}
+.tm{font-family:var(--head);color:var(--ink);font-size:.92em;direction:ltr;display:inline-block;margin-inline-end:.4em}
+/* מצב התלמיד.ה, השעיה, היסטוריית שיבוץ */
+.susp-row{margin-top:10px}.susp-row label{display:inline-flex;align-items:center;gap:.4em;color:var(--muted);font-size:.9em}
+.susp-row .find{width:96px;padding:.35em .6em;border:1px solid var(--line);border-radius:8px;font-size:.95rem}.susp-row .find.why{width:auto;flex:1;min-width:120px}
+#statusCard select{font:inherit;padding:.45em .8em;border:1px solid var(--line);border-radius:8px;background:var(--bg)}
+.hist{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}.hist summary{display:flex;align-items:center;gap:.4em;cursor:pointer;list-style:none;font-weight:600;color:var(--ink);font-size:.95em}.hist summary::-webkit-details-marker{display:none}.hist summary small{color:var(--muted);font-weight:400}
+.hist .chk-items li{display:block;font-size:.92em}.hist .chk-items b{color:var(--ink);margin-inline-end:.3em}
+.tag.susp{background:#F3E6CF;color:var(--warn)}
+.chk-items input:disabled{accent-color:var(--ok);opacity:1}.chk-items small.auto{color:var(--ok);font-weight:600}
+/* שורות מקופלות במקום ריבועים, ומסכי משנה */
+.rows{display:grid;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.grp .rows{margin:4px 0 8px}
+.rowbtn{display:grid;grid-template-columns:auto 1fr auto 14px;grid-template-rows:auto auto;gap:2px 12px;align-items:center;width:100%;text-align:start;padding:12px 16px;border-top:1px solid var(--line);color:var(--text);text-decoration:none;background:var(--card)}
+.rows>.rowbtn:first-child{border-top:0}.rowbtn:hover{background:var(--tint)}
+.rowbtn>.i{grid-row:1/3;color:var(--ink);width:1.3em;height:1.3em}.rowbtn b{font-family:var(--head);color:var(--ink);font-size:1.05em}
+.rowbtn small{grid-column:2/4;color:var(--muted);font-size:.88em}.rowbtn .rtag{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.arr{grid-row:1/3;grid-column:4;width:9px;height:9px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(135deg)}
+.rowbtn.sys-only{display:none}body[data-role=system] .rowbtn.sys-only{display:grid}
+#sub>.sec-head{padding:6px 0 10px;border-bottom:1px solid var(--line);justify-content:flex-start}
+#sub>.sec-head .btn{order:-1}
+#subTitle{font-size:1.5em!important}
+.sub-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:18px 20px;margin-bottom:14px}
+.sub-card.newform{border-color:var(--line)}.sub-card h3{display:flex;align-items:center;gap:.4em;margin-bottom:10px}.sub-card h3 small{font-weight:400;font-size:.75em;margin-inline-start:auto}
+.tik-sub{margin:0 0 12px}
+.masn .mf{padding:10px 0;border-top:1px solid var(--line)}.masn .mf .find{border:1px solid var(--line);border-radius:8px;padding:.45em .8em;font-size:.95rem;background:var(--bg)}
+.place-row .pl input[type=checkbox]{margin:0}
+.off-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;border:0;padding:0;background:none}
+.rec-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rec-row .tag{display:inline-flex;align-items:center;gap:.3em}
+/* הערות ושעות — שורה לכל יום */
+.nt-list{display:grid;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;margin-top:8px}
+.nt-row{display:grid;grid-template-columns:110px minmax(0,1fr) 120px 120px;gap:12px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
+.nt-row:first-child{border-top:0}.nt-head{background:var(--tint);font-size:.85em;color:var(--muted)}
+.nt-day{font-family:var(--head);color:var(--ink);display:grid}.nt-st{font-family:var(--body);font-weight:400;font-size:.78em;color:var(--muted)}.nt-st.a{color:var(--no)}.nt-st.p,.nt-st.s{color:var(--ok)}
+.nt-row input{font:inherit;font-size:.95rem;width:100%;min-width:0;padding:.4em .7em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
+.nt-row input[type=time]{direction:ltr;font-family:var(--head);text-align:center}
+.nt-t span{display:none}
+/* תוכנית החניכות */
+.prog-kpis{grid-template-columns:repeat(6,1fr)}.prog-kpis .kpi b{font-size:1.25em}
+.kpi-in{display:grid;gap:4px;justify-items:center}.kpi-in input{width:90px;font:inherit;font-family:var(--head);font-size:1.25em;font-weight:700;color:var(--ink);text-align:center;border:1px solid var(--line);border-radius:8px;background:var(--bg)}.kpi-in span{font-size:.85em;color:var(--muted)}
+.beats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.beat{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:12px 14px;color:var(--muted)}
+.beat .i{grid-row:1/3}.beat b{font-family:var(--head);color:var(--ink)}.beat small{font-size:.85em}.beat.ok{border-color:var(--ok)}.beat.ok .i{color:var(--ok)}
+.print-doc h3{font-size:1.05em;margin:18px 0 8px}
+.pd-head{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:12px}.pd-logo{width:44px;height:auto}
+.pd-kv{grid-template-columns:auto 1fr auto 1fr}
+.pd-table{width:100%;border-collapse:collapse;font-size:.9em}.pd-table th,.pd-table td{border:1px solid var(--line);padding:6px 8px;text-align:start}.pd-table thead,.pd-table tfoot{background:var(--tint);font-weight:700}
+.pd-text{width:100%;font:inherit;border:1px solid var(--line);border-radius:8px;padding:.5em .8em;background:var(--bg)}
+.pd-sign{margin-top:22px}
+.mg-row.rep7{grid-template-columns:1.4fr 1fr 1.3fr repeat(4,.8fr)}
+@media print{
+  .top,.side,.foot,.noprint,.tabbar,.toast,#sub>.sec-head{display:none!important}
+  body{background:#fff}.page{display:block;padding:0;max-width:none}.sub-card{border:0;padding:0}
+  .pd-text{border:0;border-bottom:1px solid #999;border-radius:0;resize:none}
+}
+/* טפסי אבני הדרך ותזכורות */
+.miles li{flex-wrap:wrap}.miles .mf-open{font-size:.85em;text-decoration:none;padding:.1em .6em;border:1px solid var(--line);border-radius:999px}.miles .mf-open.cur,.miles .mf-open:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mform{border:1.5px solid var(--ink)}.mform .tik-head h3{font-size:1.15em}
+.mf-h{font-family:var(--head);font-size:.95em;color:var(--ink);margin:14px 0 6px;padding-top:10px;border-top:1px solid var(--line)}
+.mf{display:grid;gap:4px;margin:8px 0}.mf>span{font-size:.92em;color:var(--muted)}
+.mf textarea{font:inherit;font-size:1rem;color:var(--text);padding:.55em .8em;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%;resize:vertical}
+.mf-c{display:flex;gap:.6em;align-items:center;padding:5px 0;cursor:pointer}.mf-c input{width:18px;height:18px;accent-color:var(--ok)}
+.scale{display:flex;flex-wrap:wrap;gap:6px}.sc{display:inline-flex;align-items:center;gap:.3em;padding:.3em .8em;border:1px solid var(--line);border-radius:999px;cursor:pointer;font-size:.9em;color:var(--muted)}.sc input{position:absolute;opacity:0;width:0;height:0}.sc.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.mf-b{margin-top:14px;justify-content:flex-start}
+.rem-list{list-style:none;margin:0;padding:0}.rem-list li{padding:6px 0;border-top:1px solid var(--line);font-size:.92em}.rem-list li:first-child{border-top:0}.rem-list small{display:block;color:var(--muted)}.rem-list a{color:var(--ink)}
+.num{width:56px;font:inherit;padding:.2em .4em;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center}
+/* מבט ארצי ובתי ספר */
+.nat-find{margin:0;min-width:260px}
+.chips.filt{margin-bottom:10px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mg-row .name{text-align:start;font-family:var(--head);font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.mg-row .name:hover{text-decoration-color:var(--ink)}
+.mg-row .name small{display:block;color:var(--muted);font-weight:400;font-family:var(--body);font-size:.8em}
+#national .mg-row,#schools .mg-row{grid-template-columns:1.8fr 1.3fr repeat(5,1fr)}
+@media (max-width:1040px){.page{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1;grid-template-columns:1fr 1fr}}
+@media (max-width:760px){
+  .side{grid-template-columns:1fr}.top{position:static}
+  .kpis{grid-template-columns:repeat(3,1fr)}
+  .emp-grid,.rep-grid{grid-template-columns:1fr}
+  .stu{grid-template-columns:1fr 1fr}
+  .wiz-cta{flex-direction:column;align-items:stretch}
+  .content .sec h2{font-size:1.4em}.roster{padding:0 12px}
+  .field-row{grid-template-columns:1fr}.gate-form{padding:18px 16px}
+  #att{padding:16px}.fold-rep .row{grid-template-columns:1fr}
+  #roster .row{grid-template-columns:1fr;gap:8px}#roster .cells{flex-wrap:wrap;gap:8px}#roster .cell{width:44px;height:44px;font-size:.9em}
+  #roster .notes-box{grid-template-columns:1fr}.notes-box label{grid-template-columns:64px 1fr}.notes-box input[type=time]{grid-column:2}
+  .tik-grid{grid-template-columns:1fr}
+  .nat-find{min-width:0;width:100%}.row-head .emp-b{width:100%}
+  .off-form{grid-template-columns:1fr}
+  .nt-head{display:none}.nt-row{grid-template-columns:1fr 1fr;gap:8px;padding:12px}.nt-day{grid-column:1/-1;grid-auto-flow:column;justify-content:start;gap:8px;align-items:baseline}.nt-row>input{grid-column:1/-1}
+  .nt-t{display:grid;gap:2px}.nt-t span{display:block;font-size:.8em;color:var(--muted)}
+  .prog-kpis{grid-template-columns:repeat(2,1fr)}.beats{grid-template-columns:1fr}.pd-kv{grid-template-columns:auto 1fr}
+  .rowbtn{grid-template-columns:auto 1fr 14px}.rowbtn .rtag{grid-column:2;grid-row:2;justify-content:flex-start}.rowbtn small{grid-column:2;grid-row:3}.arr{grid-column:3}
+  #sub>.sec-head{top:0}
+  .pd-table{display:block;overflow-x:auto}
+}
+
+/* ===== סבב תיקונים 31.10 ===== */
+@media (min-width:761px){.top{flex-wrap:nowrap}.top .nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}.top .nav::-webkit-scrollbar{display:none}.nav a{white-space:nowrap}.brand{flex:none}.top .actions{flex:none}}
+@media (min-width:761px) and (max-width:1180px){.nav a .i{display:none}}
+/* העוזר מקופל כמו "מה דורש טיפול" */
+#agent summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;color:var(--ink)}#agent summary::-webkit-details-marker{display:none}
+#agent summary h2{font-size:1.1em}#agent[open] summary{margin-bottom:10px}
+#agent summary::after{content:'';width:8px;height:8px;border-inline-start:2px solid var(--muted);border-bottom:2px solid var(--muted);transform:rotate(-45deg);margin-inline-start:auto}
+#agent[open] summary::after{transform:rotate(135deg)}
+/* הגאנט השנתי */
+.gantt{position:relative;display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:6px 3px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:12px 12px 14px;margin-bottom:6px}
+.gm{grid-row:1;text-align:center;font-family:var(--head);font-size:.82em;color:var(--muted);padding:2px 0;border-radius:6px}.gm.cur{background:var(--ink);color:#fff}.gm.past{opacity:.6}
+.gp{grid-row:2;display:grid;place-items:center;min-height:34px;border-radius:8px;color:#fff;font-family:var(--head);font-size:.8em;font-weight:700;text-align:center;padding:2px 4px;line-height:1.15}
+.gp.s0{background:#94600F}.gp.s1{background:#5C766A}.gp.s2{background:#5B6E4F}.gp.s3{background:#1D4F5E}.gp.s4{background:#143742}
+.gnow{grid-row:1/3;border:2px solid var(--no);border-radius:8px;pointer-events:none;margin:-3px -1px}
+.g-src{margin:0 0 12px}
+.gtag.s0,.gtag.s1,.gtag.s2,.gtag.s3,.gtag.s4{color:#fff}.gtag.s0{background:#94600F}.gtag.s1{background:#5C766A}.gtag.s2{background:#5B6E4F}.gtag.s3{background:#1D4F5E}.gtag.s4{background:#143742}
+.cal-m .chk-items li{flex-wrap:wrap;align-items:center}.mprog{display:inline-flex;align-items:center;gap:10px}
+/* סרגל תחתון — רק בטלפון */
+.tabbar{display:none}
+@media (max-width:760px){
+  .top{flex-wrap:nowrap;padding:10px 16px}.top .nav,#logout{display:none}
+  .top .actions .btn.big{font-size:.95em;padding:.55em .9em}.brand small{font-size:.78em}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;inset-inline:0;z-index:8;background:var(--card);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom));box-shadow:0 -8px 24px -18px rgba(29,79,94,.6)}
+  .tabbar a{display:grid;justify-items:center;align-content:center;gap:2px;min-height:52px;font-size:.74em;font-weight:600;color:var(--muted);text-decoration:none;border-radius:10px}
+  .tabbar a .i{width:22px;height:22px}.tabbar a.cur{color:var(--ink)}.tabbar a.cur .i{color:var(--ink);stroke-width:2.2}
+  body:not([data-view=gate]){padding-bottom:calc(72px + env(safe-area-inset-bottom))}
+  body[data-view=gate] .tabbar{display:none}
+  .toast{bottom:calc(84px + env(safe-area-inset-bottom))}
+  /* טבלאות: כרטיס לכל שורה */
+  .mg-table.cards{overflow:visible}
+  .mg-table.cards .mg-head{display:none}
+  .mg-table.cards .mg-row,.mg-table.cards .mg-row.rep7,#national .mg-table.cards .mg-row,#schools .mg-table.cards .mg-row{grid-template-columns:1fr 1fr;min-width:0;gap:4px 12px;padding:12px 14px}
+  .mg-table.cards .mg-row>span:first-child{grid-column:1/-1;font-size:1.05em}
+  .mg-table.cards .mg-row>span[data-l]::before{content:attr(data-l) " · ";color:var(--muted);font-size:.85em}
+  .mg-table.cards .mg-row>span:empty{display:none}
+  .gantt{grid-template-columns:repeat(11,minmax(52px,1fr));overflow-x:auto}
+  .gp{font-size:.72em}
+}
+/* כפתורים בגודל אצבע במכשירי מגע */
+@media (pointer:coarse){
+  .note-btn,.lnk.mf-open,.mprog .lnk,.rem-list a,.kv dd a,.off-btn,.day-notes a,.up-l{min-height:44px;display:inline-flex;align-items:center}
+  .sc{min-height:44px;padding-inline:1em}.mf-c{min-height:44px}.chk-items label{min-height:44px}
+  .chk-items input,.perm input[type=checkbox],.perm input[type=radio]{width:22px;height:22px}
+  .rep select,.wiz select,.rep-row select{min-height:44px}
+  .dp{width:44px;height:44px}
+}
+</style>
+</head>
+<body data-view="gate">
+<section class="gate" id="gate">
+  <div class="gate-card">
+    <svg class="gate-logo" viewBox="0 0 320 350" aria-hidden="true"><path d="M74 300 V118 C74 72 102 44 148 44 H160" fill="none" stroke="#1D4F5E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 6 H226 A60 60 0 0 1 286 66 V74 C262 78 246 94 238 116 L222 82 H166 Z" fill="#C4862A"/><rect x="206" y="22" width="80" height="312" rx="40" fill="#7F9A8E" stroke="#F6F2E9" stroke-width="9" paint-order="stroke"/></svg>
+    <svg class="gate-word" viewBox="0 0 360 120" role="img" aria-label="חניכות · נוכחות · קשר · צמיחה"><text x="180" y="78" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="800" font-size="86" fill="#1D4F5E">חניכות</text><text x="180" y="112" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="500" font-size="22" fill="#1D4F5E">נוכחות · קשר · צמיחה</text></svg>
+
+    <div class="gate-form" id="gLogin" hidden>
+      <label class="field"><span>בית ספר</span><select id="gSchool"></select></label>
+      <label class="field"><span>מי נכנס.ת</span><select id="gWho"></select></label>
+      <p class="gate-msg" id="mLogin"></p>
+      <button class="btn primary big gate-btn" id="gSend" disabled>שליחת קוד למייל</button>
+      <p class="gate-alt">פעם ראשונה במערכת? <button class="lnk" id="gToReg">הרשמה</button></p>
+    </div>
+
+    <div class="gate-form" id="gReg" hidden>
+      <h2 class="gate-h">הרשמה לראשונה</h2>
+      <label class="field"><span>בית ספר</span><select id="rSchool"></select></label>
+      <label class="field"><span>שם מלא</span><input class="find" id="rName" autocomplete="name"></label>
+      <label class="field"><span>תפקיד</span><select id="rRole"><option value="rakaz">רכז.ת החניכות</option><option value="principal">מנהל.ת בית הספר</option></select></label>
+      <div class="field-row"><label class="field"><span>מייל</span><input class="find" id="rMail" type="email" dir="ltr" autocomplete="email"></label><label class="field"><span>טלפון</span><input class="find" id="rPhone" type="tel" dir="ltr" autocomplete="tel"></label></div>
+      <p class="gate-msg" id="mReg"></p>
+      <button class="btn primary big gate-btn" id="rSend">שליחת הבקשה</button>
+      <p class="gate-alt">כבר רשומ.ה? <button class="lnk" id="gToLogin">כניסה</button></p>
+    </div>
+
+    <div class="gate-form" id="gCodeS" hidden>
+      <p class="gate-sent">שלחנו קוד בן 6 ספרות ל-<b dir="ltr" id="gSentTo"></b></p>
+      <label class="field"><span>הקוד מהמייל</span><input class="gate-code" id="gCode" inputmode="numeric" maxlength="6" placeholder="••••••" dir="ltr" autocomplete="one-time-code"></label>
+      <p class="gate-msg" id="mCode"></p>
+      <button class="btn primary big gate-btn" id="gEnter">כניסה</button>
+      <button class="lnk" id="gBack">חזרה</button>
+    </div>
+
+    <div class="gate-form" id="gPass" hidden>
+      <h2 class="gate-h" id="gHello">שלום</h2>
+      <label class="field"><span>הסיסמה שלך</span><input class="find" id="pPass" type="password" autocomplete="current-password"></label>
+      <label class="gate-check"><input type="checkbox" id="pRemember">לזכור במכשיר הזה 30 יום</label>
+      <p class="gate-msg" id="mPass"></p>
+      <button class="btn primary big gate-btn" id="pEnter">כניסה</button>
+      <button class="lnk" id="pForgot">שכחתי את הסיסמה</button>
+    </div>
+
+    <div class="gate-form" id="gInit" hidden>
+      <div id="iStep1">
+        <h2 class="gate-h">בית הספר נכנס לראשונה</h2>
+        <p class="gate-msg">השמות של התלמידים מוצפנים במחשב שלך. הסיסמה פותחת אותם, ואף אחד אחר לא יכול לשחזר אותה.</p>
+        <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="iPass1" type="password" autocomplete="new-password"></label>
+        <label class="field"><span>שוב את הסיסמה</span><input class="find" id="iPass2" type="password" autocomplete="new-password"></label>
+        <p class="gate-msg" id="mInit"></p>
+        <button class="btn primary big gate-btn" id="iMake">יצירת הסיסמה</button>
+      </div>
+      <div id="iStep2" hidden>
+        <h2 class="gate-h">קוד השחזור</h2>
+        <p class="gate-msg">אם הסיסמה תישכח, רק הקוד הזה פותח את המידע. להדפיס ולשמור במקום נעול. לא לשלוח במייל או בוואטסאפ.</p>
+        <div class="rec-code" id="iRec" dir="ltr"></div>
+        <button class="btn" id="iPrint">הדפסה</button>
+        <label class="gate-check"><input type="checkbox" id="iSaved">שמרתי את הקוד</label>
+        <button class="btn primary big gate-btn" id="iGo" disabled>כניסה למערכת</button>
+      </div>
+    </div>
+
+    <div class="gate-form" id="gNew" hidden>
+      <h2 class="gate-h">יצירת סיסמה</h2>
+      <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="nPass1" type="password" autocomplete="new-password"></label>
+      <label class="field"><span>שוב את הסיסמה</span><input class="find" id="nPass2" type="password" autocomplete="new-password"></label>
+      <p class="gate-msg" id="mNew"></p>
+      <button class="btn primary big gate-btn" id="nMake">יצירת הסיסמה</button>
+    </div>
+
+    <div class="gate-form" id="gWait" hidden>
+      <h2 class="gate-h">מחכים לאישור הרכז.ת</h2>
+      <p class="gate-msg">להקריא לרכז.ת החניכות את קוד האימות. הרכז.ת מאשר.ת במסך "ניהול · משתמשים".</p>
+      <div class="fp" id="wFp" dir="ltr"></div>
+      <p class="gate-msg" id="mWait"></p>
+      <button class="btn primary big gate-btn" id="wAgain">בדיקה שוב</button>
+    </div>
+
+    <div class="gate-form" id="gRec" hidden>
+      <h2 class="gate-h">שחזור בקוד המודפס</h2>
+      <label class="field"><span>קוד השחזור</span><input class="find" id="recCode" dir="ltr" autocomplete="off"></label>
+      <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="recPass1" type="password" autocomplete="new-password"></label>
+      <label class="field"><span>שוב את הסיסמה</span><input class="find" id="recPass2" type="password" autocomplete="new-password"></label>
+      <p class="gate-msg" id="mRec"></p>
+      <button class="btn primary big gate-btn" id="recGo">שחזור וכניסה</button>
+      <button class="lnk" id="recBack">חזרה</button>
+    </div>
+
+    <div class="gate-form" id="gBusy" hidden><p class="gate-msg">פותח את הנתונים…</p></div>
+  </div>
+  <footer class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
+</section>
+<div id="app"></div>
+<script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="app.js"></script><script src="gate.js"></script>
+</body>
+</html>
