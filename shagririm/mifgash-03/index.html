@@ -57,6 +57,9 @@ textarea{min-height:64px;resize:vertical}
 .help a{color:var(--c);font-weight:600}
 .ideas,.more{margin-top:10px}
 .ideas summary,.more summary{cursor:pointer;color:var(--c);font-weight:600}
+.step .more{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+.more[open]{background:#FAFBFC}
+.note{margin-top:10px!important;font-size:15px}
 .ideas li{margin:6px 0}
 .ideas span{color:var(--mute);font-size:14px}
 .opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
@@ -109,70 +112,51 @@ footer a{color:var(--mute)}
 </div></div>
 
 <div class="step" style="--c:var(--ink)"><h2><span data-ar="ماذا نفعل في الوحدة">מה עושים ביחידה</span></h2>
-<ol><li data-ar="<b>تمرين 1:</b> دفتر أول: عرض تقديمي عن أفكار لاستخدام AI في موضوعكم.">  <b>תרגיל 1:</b> נוטבוק ראשון: מצגת עם רעיונות לשימוש ב-AI במקצוע שלכם.</li>
-<li data-ar="<b>تمرين 2:</b> دفتر من مواد موضوعكم: اختبار وإنفوغرافيك.">  <b>תרגיל 2:</b> נוטבוק מחומרים של המקצוע שלכם: בוחן ואינפוגרפיקה.</li>
-<li data-ar="<b>المهمة:</b> دفتر يقترح حلولًا لحاجة الطاقم، وتختارون الحل الذي تتبنّونه.">  <b>המשימה:</b> נוטבוק שמציע פתרונות לצורך של הצוות, ואתם בוחרים את הפתרון שאתם מאמצים.</li></ol>
+<ol><li data-ar="<b>المهمة 1: NotebookLM في موضوعي.</b> دفتر واحد: عرض تقديمي بأفكار لاستخدام AI، اختبار وإنفوغرافيك.">  <b>משימה 1: NotebookLM במקצוע שלי.</b> נוטבוק אחד: מצגת עם רעיונות לשימוש ב-AI, בוחן ואינפוגרפיקה.</li>
+<li data-ar="<b>المهمة 2: حاجة المدرسة.</b> دفتر يقترح حلولًا لحاجة الطاقم، وتختارون الحل الذي تتبنّونه.">  <b>משימה 2: הצורך של בית הספר.</b> נוטבוק שמציע פתרונות לצורך של הצוות, ואתם בוחרים את הפתרון שאתם מאמצים.</li></ol>
 <p><span data-ar="التسليم">הגשה</span> <b id="due"></b>. <span data-ar="كل ما تكتبونه يُحفظ تلقائيًا.">כל מה שכותבים נשמר לבד.</span></p>
 <p id="pre" hidden data-ar="ما كتبتموه في اللقاء 2 موجود هنا. أكملوا فقط ما ينقص.">מה שכתבתם במפגש 2 כבר כאן. משלימים רק מה שחסר.</p>
 <p class="help"><span data-ar="عالقون؟ زر «علقت» في أسفل الشاشة يرسل لنا رسالة ونساعدكم عن بُعد.">נתקעתם? הכפתור "נתקעתי" בתחתית המסך שולח לנו הודעה, ונעזור לכם מרחוק.</span><br>
 <a href="https://lerani.co.il/training/notebooklm/presentation.html" target="_blank" rel="noopener" data-ar="عرض تقديمي يشرح NotebookLM (بالعبرية)">מצגת שמסבירה את NotebookLM</a></p></div>
 
 <!-- ============ תרגיל 1 ============ -->
-<div class="part" style="--c:var(--a4)" data-ar="تمرين 1 · حوالي 15 دقيقة<b>دفتر أول: عرض تقديمي</b>">תרגיל 1 · כ-15 דקות<b>נוטבוק ראשון: מצגת</b></div>
+<div class="part" style="--c:var(--a4)" data-ar="المهمة 1 · حوالي 20 دقيقة<b>NotebookLM في موضوعي</b>">משימה 1 · כ-20 דקות<b>NotebookLM במקצוע שלי</b></div>
 
 <div class="step" style="--c:var(--a4)"><h2><i>1</i><span data-ar="نختار موضوعًا">בוחרים מקצוע</span></h2>
 <div class="opts" id="subs"></div>
 <input type="text" data-k="ex1other" id="ex1other" hidden data-ph="איזה מקצוע?|أي موضوع؟"></div>
 
-<div class="step" style="--c:var(--a4)"><h2><i>2</i><span data-ar="دفتر جديد">נוטבוק חדש</span></h2>
-<p data-ar="نفتح NotebookLM ونضغط <b>«נוטבוק חדש»</b> (دفتر جديد).">פותחים NotebookLM ולוחצים <b>נוטבוק חדש</b>.</p>
+<div class="step" style="--c:var(--a4)"><h2><i>2</i><span data-ar="دفتر للموضوع">נוטבוק למקצוע</span></h2>
+<p data-ar="دفتر جديد ← نلصق برومبت البحث ← استيراد ← عرض تقديمي، اختبار وإنفوغرافيك.">נוטבוק חדש ← מדביקים את פרומפט החיפוש ← ייבוא ← מצגת, בוחן ואינפוגרפיקה.</p>
+<a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener" data-ar="فتح NotebookLM">פתיחת NotebookLM</a>
+<button class="btn ghost" type="button" id="cpEx1" data-ar="نسخ برومبت البحث">העתקת פרומפט החיפוש</button>
+<details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+<p data-ar="1. نضغط <b>«נוטבוק חדש»</b> (دفتر جديد).">1. לוחצים <b>נוטבוק חדש</b>.</p>
 <img class="shot" src="img/nb-1-new.jpg" alt="" style="max-width:140px">
-<a class="btn" href="https://notebooklm.google.com/" target="_blank" rel="noopener" data-ar="فتح NotebookLM">פתיחת NotebookLM</a></div>
-
-<div class="step" style="--c:var(--a4)"><h2><i>3</i><span data-ar="نبحث عن مصادر">מחפשים מקורות</span></h2>
-<button class="btn ghost" type="button" id="cpEx1" data-ar="نسخ البحث">העתקת החיפוש</button>
+<p data-ar="2. نلصق برومبت البحث في المربع في الأعلى، ونضغط على السهم:">2. מדביקים את פרומפט החיפוש בתיבה למעלה, ולוחצים על החץ:</p>
 <div class="pr" id="pEx1"></div>
-<p style="margin-top:10px" data-ar="في نافذة إضافة المصادر نلصق في مربع البحث في الأعلى، ونضغط على السهم.">בחלון הוספת המקורות מדביקים בתיבת החיפוש למעלה, ולוחצים על החץ.</p>
-<img class="shot w" src="img/ex1-search.jpg" alt=""></div>
-
-<div class="step" style="--c:var(--a4)"><h2><i>4</i><span data-ar="نستورد المصادر">מייבאים את המקורות</span></h2>
-<p data-ar="بعد بضع ثوانٍ تظهر المصادر التي وُجدت. نضغط <b>«ייבוא»</b> (استيراد).">אחרי כמה שניות מופיעים המקורות שנמצאו. לוחצים <b>ייבוא</b>.</p>
-<img class="shot" src="img/ex1-import.jpg" alt=""></div>
-
-<div class="step" style="--c:var(--a4)"><h2><i>5</i><span data-ar="نُخرج عرضًا تقديميًا">מוציאים מצגת</span></h2>
-<p data-ar="أولًا اللغة: ترس الإعدادات ← <b>«שפת הפלט»</b> ← العربية.">קודם השפה: גלגל השיניים ← <b>שפת הפלט</b> ← עברית.</p>
-<img class="shot" src="img/nb-12-outlang.jpg" alt="" style="max-width:200px">
-<p data-ar="ثم في الاستوديو نضغط <b>«מצגת»</b> (عرض تقديمي). ينتظر بضع دقائق.">אחר כך, בסטודיו, לוחצים <b>מצגת</b>. זה לוקח כמה דקות.</p>
-<img class="shot" src="img/studio-slides.jpg" alt=""></div>
-
-<div class="step" style="--c:var(--a4)"><h2><i>6</i><span data-ar="الرابط للدفتر">הקישור לנוטבוק</span></h2>
-<label class="f"><span data-ar="في الدفتر: مشاركة ← نسخ الرابط، ونلصق هنا.">בנוטבוק: שיתוף ← העתקת קישור, ומדביקים כאן.</span><input type="url" data-k="ex1nb" dir="ltr"></label></div>
-
-<!-- ============ תרגיל 2 ============ -->
-<div class="part" style="--c:var(--a2)" data-ar="تمرين 2 · حوالي 20 دقيقة<b>دفتر من مواد موضوعكم</b>">תרגיל 2 · כ-20 דקות<b>נוטבוק מחומרים של המקצוע שלכם</b></div>
-
-<div class="step" style="--c:var(--a2)"><h2><i>7</i><span data-ar="دفتر جديد مع مادة لديكم">נוטבוק חדש, עם חומר שיש לכם</span></h2>
-<p data-ar="دفتر جديد آخر. هذه المرة نضيف مادة من موضوعكم: ورقة عمل، كرّاسة، عرض تقديمي، أو موقع.">עוד נוטבוק חדש. הפעם מוסיפים חומר מהמקצוע שלכם: דף עבודה, חוברת, מצגת או אתר.</p>
-<p data-ar="ملف؟ نضغط <b>«העלאת קבצים»</b> (رفع ملفات).">קובץ? לוחצים <b>העלאת קבצים</b>.</p>
+<img class="shot w" src="img/ex1-search.jpg" alt="">
+<p data-ar="3. بعد بضع ثوانٍ نضغط <b>«ייבוא»</b> (استيراد).">3. אחרי כמה שניות לוחצים <b>ייבוא</b>.</p>
+<img class="shot" src="img/ex1-import.jpg" alt="">
+<p data-ar="يمكن أن نضيف أيضًا مادة لديكم: ملف ← <b>«העלאת קבצים»</b>، أو موقع ← <b>«אתרים»</b>.">אפשר להוסיף גם חומר שיש לכם: קובץ ← <b>העלאת קבצים</b>, או אתר ← <b>אתרים</b>.</p>
 <img class="shot w" src="img/src-upload.jpg" alt="">
-<p data-ar="موقع؟ نضغط <b>«אתרים»</b> (مواقع)، نلصق الرابط ونضغط <b>«הוספה»</b>.">אתר? לוחצים <b>אתרים</b>, מדביקים את הקישור ולוחצים <b>הוספה</b>.</p>
-<img class="shot w" src="img/src-websites.jpg" alt=""></div>
+<p data-ar="4. اللغة: ترس الإعدادات ← <b>«שפת הפלט»</b> ← العربية.">4. השפה: גלגל השיניים ← <b>שפת הפלט</b> ← עברית.</p>
+<img class="shot" src="img/nb-12-outlang.jpg" alt="" style="max-width:200px">
+<p data-ar="5. في الاستوديو نضغط <b>«מצגת»</b> (عرض تقديمي). ينتظر بضع دقائق.">5. בסטודיו לוחצים <b>מצגת</b>. זה לוקח כמה דקות.</p>
+<img class="shot" src="img/studio-slides.jpg" alt="">
+<p data-ar="6. ثم في الاستوديو: <b>«בוחן»</b> (اختبار) و<b>«אינפוגרפיקה»</b>.">6. אחר כך, באותו סטודיו: <b>בוחן</b> ו<b>אינפוגרפיקה</b>.</p>
+<img class="shot" src="img/studio-quiz-info.jpg" alt=""></details>
+<label class="f"><span data-ar="رابط الدفتر<small>مشاركة ← نسخ الرابط.</small>">הקישור לנוטבוק<small>שיתוף ← העתקת קישור.</small></span><input type="url" data-k="ex1nb" dir="ltr"></label></div>
 
-<div class="step" style="--c:var(--a2)"><h2><i>8</i><span data-ar="اختبار وإنفوغرافيك">בוחן ואינפוגרפיקה</span></h2>
-<p data-ar="في الاستوديو نضغط <b>«בוחן»</b> (اختبار)، ثم <b>«אינפוגרפיקה»</b>.">בסטודיו לוחצים <b>בוחן</b>, ואחר כך <b>אינפוגרפיקה</b>.</p>
-<img class="shot" src="img/studio-quiz-info.jpg" alt=""></div>
 
-<div class="step" style="--c:var(--a2)"><h2><i>9</i><span data-ar="الرابط للدفتر">הקישור לנוטבוק</span></h2>
-<label class="f"><span data-ar="مشاركة ← نسخ الرابط، ونلصق هنا.">שיתוף ← העתקת קישור, ומדביקים כאן.</span><input type="url" data-k="ex2nb" dir="ltr"></label></div>
 
-<!-- ============ המשימה ============ -->
-<div class="part" style="--c:var(--a)" data-ar="المهمة · للتسليم<b>حلول لحاجة الطاقم</b>">המשימה · להגשה<b>פתרונות לצורך של הצוות</b></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>10</i><span data-ar="نفتح الداشبورد للمدرسة">פותחים את הדשבורד של בית הספר</span></h2>
+<!-- ============ משימה 2 ============ -->
+<div class="part" style="--c:var(--a)" data-ar="المهمة 2<b>حاجة المدرسة</b>">משימה 2<b>הצורך של בית הספר</b></div>
+
+<div class="step" style="--c:var(--a)"><h2><i>3</i><span data-ar="ماذا رأيت في معطيات المدرسة">מה ראיתי בנתונים של בית הספר</span></h2>
 <a class="btn" id="dash" target="_blank" rel="noopener" href="../mipui/?v=data" data-ar="فتح الداشبورد">פתיחת הדשבורד</a>
-<p style="margin-top:10px"><span data-ar="لا توجد بعد إجابات من الطاقم؟ أولًا">אין עדיין תשובות מהצוות? קודם</span> <a id="sheelon" href="../mipui/" target="_blank" rel="noopener" data-ar="نرسل الاستبيان للطاقم">שולחים לצוות את השאלון</a>.</p></div>
-
-<div class="step" style="--c:var(--a)"><h2><i>11</i><span data-ar="ماذا رأيت في المعطيات">מה ראיתי בנתונים</span></h2>
+<p class="note"><span data-ar="لا توجد بعد إجابات من الطاقم؟ أولًا">אין עדיין תשובות מהצוות? קודם</span> <a id="sheelon" href="../mipui/" target="_blank" rel="noopener" data-ar="نرسل الاستبيان للطاقم">שולחים לצוות את השאלון</a>.</p>
 <label class="f"><span data-ar="ما الذي فاجأني">מה הפתיע אותי</span><textarea data-k="surprise"></textarea></label>
 <label class="f"><span data-ar="ما الذي أعجبني">ממה התרשמתי לטובה</span><textarea data-k="good"></textarea></label>
 <label class="f"><span data-ar="أين التحدي">איפה האתגר</span><textarea data-k="challenge"></textarea></label>
@@ -185,43 +169,41 @@ footer a{color:var(--mute)}
 <div class="pr" id="pGem"></div>
 <label class="f"><span data-ar="ماذا وجد Gemini؟ هل يشبه فرضيتي؟">מה Gemini מצא? האם זה דומה להשערה שלי?</span><textarea data-k="gemini"></textarea></label></details></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>12</i><span data-ar="حاجتنا">הצורך שלנו</span></h2>
+<div class="step" style="--c:var(--a)"><h2><i>4</i><span data-ar="حاجتنا">הצורך שלנו</span></h2>
 <p id="needNote"></p>
 <div class="needs" id="needs"></div></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>13</i><span data-ar="دفتر جديد مع معطيات المدرسة">נוטבוק חדש, עם הנתונים של בית הספר</span></h2>
-<p data-ar="1. نفتح دفترًا جديدًا.">1. פותחים נוטבוק חדש.</p>
-<p data-ar="2. في الداشبورد، عند الإجابات المفتوحة: <b>«הכנה לניתוח AI»</b> ثم <b>«העתקה»</b>.">2. בדשבורד, ליד התשובות הפתוחות: <b>הכנה לניתוח AI</b>, ואז <b>העתקה</b>.</p>
-<img class="shot w" src="img/nb-0b-box.jpg" alt="">
-<a class="btn ghost" id="dash2" target="_blank" rel="noopener" href="../mipui/?v=data" data-ar="فتح الداشبورد">פתיחת הדשבורד</a>
-<p style="margin-top:10px" data-ar="3. في الدفتر نضغط <b>«טקסט שהועתק»</b> (نص منسوخ)…">3. בנוטבוק לוחצים <b>טקסט שהועתק</b>…</p>
-<img class="shot w" src="img/src-copied.jpg" alt="">
-<p data-ar="4. …نلصق ونضغط <b>«הוספה»</b> (إضافة).">4. …מדביקים ולוחצים <b>הוספה</b>.</p>
-<img class="shot" src="img/nb-3-paste.jpg" alt=""></div>
-
-<div class="step" style="--c:var(--a)"><h2><i>14</i><span data-ar="نضيف المصادر للحاجة">מוסיפים את המקורות לצורך</span></h2>
+<div class="step" style="--c:var(--a)"><h2><i>5</i><span data-ar="دفتر يقترح حلولًا">נוטבוק שמציע פתרונות</span></h2>
+<p data-ar="دفتر جديد ← نضيف معطيات المدرسة ومصادر الحاجة ← نسأل عن حلول.">נוטבוק חדש ← מוסיפים את הנתונים של בית הספר ואת המקורות לצורך ← שואלים על פתרונות.</p>
 <div class="mine" id="mineNeed"></div>
+<a class="btn ghost" id="dash2" target="_blank" rel="noopener" href="../mipui/?v=data" data-ar="1. المعطيات من الداشبورد">1. הנתונים מהדשבורד</a>
+<button class="btn ghost" type="button" id="cpSrc" data-ar="2. نسخ المصادر">2. העתקת המקורות</button>
+<button class="btn ghost" type="button" id="cpPr" data-ar="3. نسخ البرومبت">3. העתקת הפרומפט</button>
+<details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+<p data-ar="<b>1. المعطيات.</b> في الداشبورد، عند الإجابات المفتوحة: <b>«הכנה לניתוח AI»</b> ثم <b>«העתקה»</b>.">  <b>1. הנתונים.</b> בדשבורד, ליד התשובות הפתוחות: <b>הכנה לניתוח AI</b>, ואז <b>העתקה</b>.</p>
+<img class="shot w" src="img/nb-0b-box.jpg" alt="">
+<p data-ar="في الدفتر نضغط <b>«טקסט שהועתק»</b> (نص منسوخ)، نلصق ونضغط <b>«הוספה»</b>.">בנוטבוק לוחצים <b>טקסט שהועתק</b>, מדביקים ולוחצים <b>הוספה</b>.</p>
+<img class="shot w" src="img/src-copied.jpg" alt="">
+<img class="shot" src="img/nb-3-paste.jpg" alt="">
+<p data-ar="<b>2. المصادر.</b> ننسخ هنا ← «إضافة مصادر» ← «אתרים»، نلصق ← «הוספה»:"><b>2. המקורות.</b> מעתיקים כאן ← "הוספת מקורות" ← "אתרים", מדביקים ← "הוספה":</p>
 <div class="flow">
-  <div><span class="lbl" data-ar="1. هنا ننسخ">1. כאן מעתיקים</span><button class="btn ghost" type="button" id="cpSrc" style="margin:0" data-ar="نسخ المصادر">העתקת המקורות</button></div>
+  <div><span class="lbl" data-ar="هنا ننسخ">כאן מעתיקים</span><span class="fake" data-ar="نسخ المصادر">העתקת המקורות</span></div>
   <span class="arr">←</span>
-  <div><span class="lbl" data-ar="2. في الدفتر">2. בנוטבוק</span><img src="img/add-sources.jpg" alt=""></div>
+  <div><span class="lbl" data-ar="في الدفتر">בנוטבוק</span><img src="img/add-sources.jpg" alt=""></div>
   <span class="arr">←</span>
-  <div><span class="lbl" data-ar="3. نضغط «אתרים»، نلصق ← «הוספה»">3. לוחצים "אתרים", מדביקים ← "הוספה"</span><img src="img/src-websites.jpg" alt=""></div>
-</div></div>
-
-<div class="step" style="--c:var(--a)"><h2><i>15</i><span data-ar="نسأل الدفتر عن حلول">שואלים את הנוטבוק על פתרונות</span></h2>
-<button class="btn ghost" type="button" id="cpPr" data-ar="نسخ البرومبت">העתקת הפרומפט</button>
+  <div><span class="lbl" data-ar="«אתרים»، نلصق">"אתרים", מדביקים</span><img src="img/src-websites.jpg" alt=""></div>
+</div>
+<p data-ar="<b>3. البرومبت.</b> نلصق في مربع الأسئلة ونضغط على السهم:"><b>3. הפרומפט.</b> מדביקים בתיבת השאלות ולוחצים על החץ:</p>
 <div class="pr" id="pNb"></div>
-<p style="margin-top:10px" data-ar="نلصق في مربع الأسئلة ونضغط على السهم.">מדביקים בתיבת השאלות ולוחצים על החץ.</p>
-<img class="shot" src="img/nb-4-ask.jpg" alt=""></div>
+<img class="shot" src="img/nb-4-ask.jpg" alt=""></details></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>16</i><span data-ar="ماذا اقترح الدفتر، وماذا أتبنّى">מה הנוטבוק הציע, ומה אני מאמץ/ת</span></h2>
+<div class="step" style="--c:var(--a)"><h2><i>6</i><span data-ar="ماذا اقترح الدفتر، وماذا أتبنّى">מה הנוטבוק הציע, ומה אני מאמץ/ת</span></h2>
 <label class="f"><span data-ar="ماذا اقترح الدفتر؟<small>باختصار، بكلماتكم.</small>">מה הנוטבוק הציע?<small>בקצרה, במילים שלכם.</small></span><textarea data-k="suggest"></textarea></label>
 <label class="f"><span data-ar="الحل الذي أتبنّاه، ولماذا">הפתרון שאני מאמץ/ת, ולמה</span><textarea data-k="adopt"></textarea></label>
 <label class="f"><span data-ar="رابط الدفتر<small>مشاركة ← نسخ الرابط.</small>">הקישור לנוטבוק<small>שיתוף ← העתקת קישור.</small></span><input type="url" data-k="nb" dir="ltr"></label></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>17</i><span data-ar="ثلاث خطوات للطاقم">שלוש פעולות לצוות</span></h2>
-<p data-ar="كيف ننفّذ الحل؟ لكل خطوة: متى، ومع مَن.">איך מוציאים את הפתרון לפועל? לכל פעולה: מתי, ועם מי.</p>
+<div class="step" style="--c:var(--a)"><h2><i>7</i><span data-ar="ثلاث خطوات للطاقم حسب الحاجة التي حُدّدت">שלוש פעולות לצוות לפי הצורך שזוהה</span></h2>
+<p data-ar="لكل خطوة: ماذا، متى، ومع مَن.">לכל פעולה: מה, מתי, ועם מי.</p>
 <div class="rows">
   <div class="row"><input type="text" data-k="act1" data-ph="פעולה 1: מה עושים|الخطوة 1: ماذا نفعل"><input type="text" data-k="when1" data-ph="מתי|متى"><input type="text" data-k="who1" data-ph="עם מי|مع مَن"></div>
   <div class="row"><input type="text" data-k="act2" data-ph="פעולה 2: מה עושים|الخطوة 2: ماذا نفعل"><input type="text" data-k="when2" data-ph="מתי|متى"><input type="text" data-k="who2" data-ph="עם מי|مع مَن"></div>
@@ -229,24 +211,23 @@ footer a{color:var(--mute)}
 </div>
 <details class="ideas" id="ideas" hidden><summary data-ar="أفكار للحاجة التي اخترتها">רעיונות לצורך שבחרתי</summary><ul id="ideaList"></ul></details></div>
 
-<div class="step" style="--c:var(--a)"><h2><i>18</i><span data-ar="قواعدنا الأساسية">כללי הבסיס שלנו</span></h2>
+<div class="step" style="--c:var(--a)"><h2><i>8</i><span data-ar="قواعدنا الأساسية">כללי הבסיס שלנו</span></h2>
 <ol><li data-ar="لا ندخل أسماء أو تفاصيل تعريفية للطلاب والمعلمين.">לא מזינים שמות או פרטים מזהים של תלמידים ומורים.</li>
 <li data-ar="نرفع فقط ملفات بدون أسماء، مثل الملف من الداشبورد.">מעלים רק קבצים בלי שמות, כמו הקובץ מהדשבורד.</li>
 <li data-ar="المعلم/ة يفحص كل ناتج قبل أن يصل إلى الطالب/ة.">מורה בודק/ת כל תוצר לפני שהוא מגיע לתלמיד/ה.</li>
 <li data-ar="السلامة والمحتوى المهني فقط من مصدر معتمد.">בטיחות ותוכן מקצועי רק ממקור מאושר.</li></ol>
 <label class="f"><span data-ar="ماذا أيضًا عندنا؟<small>يمكن تركه فارغًا.</small>">מה עוד אצלנו?<small>אפשר להשאיר ריק.</small></span><textarea data-k="rules"></textarea></label></div>
 
-<div class="step" style="--c:var(--ok)"><h2><i>19</i><span data-ar="نسلّم">מגישים</span></h2>
-<p data-ar="بعد الروابط الثلاثة، وما اقترحه الدفتر، والحل الذي تتبنّونه.">אחרי שלושת הקישורים, מה הנוטבוק הציע, והפתרון שאתם מאמצים.</p>
+<div class="step" style="--c:var(--ok)"><h2><i>9</i><span data-ar="نسلّم">מגישים</span></h2>
 <button class="btn ok" type="button" id="submit" data-ar="سلّمت">הגשתי</button>
 <p class="sub" id="subOk" hidden></p>
 <p class="warn" id="subMiss" hidden></p></div>
 
-<div class="step" style="--c:var(--a2)"><h2><i>20</i><span data-ar="أفكار لدرس مع AI">רעיונות לשיעור עם AI</span></h2>
+<div class="step" style="--c:var(--a2)"><h2><i>10</i><span data-ar="أفكار لدرس مع AI">רעיונות לשיעור עם AI</span></h2>
 <p data-ar="أفكار حسب الموضوع، مع برومبت جاهز لكل فكرة (بالعبرية).">רעיונות לפי מקצוע, עם פרומפט מוכן לכל רעיון.</p>
 <a class="btn ghost" href="../mifgash-02/kits/raayonot.html" target="_blank" rel="noopener" data-ar="صفحة الأفكار">דף הרעיונות</a></div>
 
-<div class="step" style="--c:var(--a3)"><h2><i>21</i><span data-ar="تغذية راجعة">משוב</span></h2>
+<div class="step" style="--c:var(--a3)"><h2><i>11</i><span data-ar="تغذية راجعة">משוב</span></h2>
 <label class="f"><span data-ar="إجمالًا، كيف كانت الوحدة؟<small>1 ليست جيدة · 5 ممتازة</small>">בסך הכול, איך הייתה היחידה?<small>1 לא טובה · 5 מצוינת</small></span></label>
 <div class="opts" data-k="fb_rate" data-opts="1|2|3|4|5"></div>
 <label class="f"><span data-ar="التعليمات كانت">ההוראות היו</span></label>
@@ -321,8 +302,8 @@ footer a{color:var(--mute)}
     which: ["לאיזה צורך?", "لأي حاجة؟"],
     sub: ["הוגש ב-{d}. אפשר לעדכן עד {u}.", "سُلّم في {d}. يمكن التحديث حتى {u}."],
     miss: ["עוד חסר: {m}. אפשר להגיש בכל זאת, ולהשלים עד {u}.", "ما زال ينقص: {m}. يمكن التسليم الآن والإكمال حتى {u}."],
-    m_ex1nb: ["קישור לנוטבוק של תרגיל 1", "رابط دفتر التمرين 1"], m_ex2nb: ["קישור לנוטבוק של תרגיל 2", "رابط دفتر التمرين 2"],
-    m_nb: ["קישור לנוטבוק של המשימה", "رابط دفتر المهمة"], m_suggest: ["מה הנוטבוק הציע", "ماذا اقترح الدفتر"], m_adopt: ["הפתרון שאני מאמץ/ת", "الحل الذي أتبنّاه"],
+    m_ex1nb: ["משימה 1: קישור לנוטבוק", "المهمة 1: رابط الدفتر"],
+    m_nb: ["משימה 2: קישור לנוטבוק", "المهمة 2: رابط الدفتر"], m_suggest: ["מה הנוטבוק הציע", "ماذا اقترح الدفتر"], m_adopt: ["הפתרון שאני מאמץ/ת", "الحل الذي أتبنّاه"],
     saved: ["נשמר", "حُفظ"], copied: ["הועתק", "تم النسخ"], sending: ["שולחים…", "نرسل…"]
   };
 
@@ -464,7 +445,7 @@ footer a{color:var(--mute)}
     if (!st.submitted) return;
     var ok = document.getElementById("subOk");
     ok.hidden = false; ok.textContent = tx("sub").replace("{d}", st.submitted).replace("{u}", DUE[T]);
-    var miss = ["ex1nb", "ex2nb", "nb", "suggest", "adopt"].filter(function (k) { return !String(st[k] || "").trim(); }).map(function (k) { return tx("m_" + k); });
+    var miss = ["ex1nb", "nb", "suggest", "adopt"].filter(function (k) { return !String(st[k] || "").trim(); }).map(function (k) { return tx("m_" + k); });
     var mm = document.getElementById("subMiss");
     mm.hidden = !miss.length; mm.textContent = miss.length ? tx("miss").replace("{m}", miss.join(" · ")).replace("{u}", DUE[T]) : "";
   }
