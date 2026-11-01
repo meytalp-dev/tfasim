@@ -446,25 +446,35 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       else window.prompt('העתיקו:', text);
     };
 
-    // אין לנו סל: רק בתי ספר שאין להם סל בכלל — לא הועלה לאתר, לא אושר בוועדה ולא עולה לוועדה.
-    // סל שהועלה וממתין לאישור אצלנו; סל שאושר בוועדה קיים; ומי שאושר בלי סל (45001) אינו חסר.
+    // אין לנו סל תוכניות: בתי ספר בלי קובץ שהועלה לאתר, בשלושה מצבים נפרדים —
+    // לא הועלה וגם לא אושר (חסר לגמרי), אושר בוועדה אך הקובץ לא באתר, ואושר בלי סל (לא נדרש קובץ).
+    // אישור בוועדה אינו ראיה שהקובץ אצלנו — מוצג רק מה שמקורו בהעלאות בפועל.
     // בית ספר עם שתי מפקחות מופיע פעם אחת, תחת המפקחת הראשונה, עם ציון הנוספת.
-    var noSalMiss = SCHOOLS.filter(function (s) { return kind(s) === 3; })
-      .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
-    if (noSalMiss.length) {
+    var noFile = SCHOOLS.filter(function (s) { return !has(s); });
+    var nfRank = function (s) { return kind(s) === 3 ? 0 : NOSAL[s[0]] ? 2 : 1; };
+    noFile.sort(function (a, b) { return nfRank(a) - nfRank(b) || a[1].localeCompare(b[1], 'he'); });
+    if (noFile.length) {
+      var nMiss = noFile.filter(function (s) { return kind(s) === 3; }).length;
+      var nAppr = noFile.filter(function (s) { return kind(s) !== 3 && !NOSAL[s[0]]; }).length;
+      var nNs = noFile.filter(function (s) { return NOSAL[s[0]]; }).length;
       var noSalGroups = Object.keys(names).map(function (n) {
-        return { name: n, miss: noSalMiss.filter(function (s) { return s[3][0] === n; }) };
+        return { name: n, miss: noFile.filter(function (s) { return s[3][0] === n; }) };
       }).filter(function (g) { return g.miss.length; })
         .sort(function (a, b) { return b.miss.length - a.miss.length || a.name.localeCompare(b.name, 'he'); });
       $('noSalT').hidden = false;
       $('noSalIntro').hidden = false;
-      $('noSalT').textContent = 'אין לנו סל תוכניות — ' + noSalMiss.length + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
-      $('noSalIntro').textContent = 'בתי הספר האלה לא העלו סל והוא גם לא אושר בוועדה. סל שהועלה וממתין לאישור, או שאושר בוועדה, נמצא אצלנו ולא מופיע כאן.';
+      $('noSalT').textContent = 'אין לנו סל תוכניות — ' + noFile.length + ' מתוך ' + SCHOOLS.length + ' בתי ספר';
+      $('noSalIntro').textContent = nMiss + ' לא העלו והסל גם לא אושר (מסומנים באדום). ' +
+        nAppr + ' אושרו בוועדה אך הקובץ לא הועלה לאתר (מסומנים בירוק). ' +
+        (nNs ? nNs + ' אושר בלי סל ולא נדרש קובץ (מקווקו). ' : '') +
+        'סל שהועלה וממתין לאישור אינו מופיע כאן. בית ספר עם שתי מפקחות מופיע פעם אחת.';
       $('mNoSal').innerHTML = noSalGroups.map(function (g) {
-        return '<div class="sup"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">' + (g.miss.length === 1 ? 'חסר אחד' : g.miss.length + ' חסרים') + '</span></div>' +
+        return '<div class="sup"><div class="sup-h"><h3>' + esc(g.name) + '</h3><span class="n">' + (g.miss.length === 1 ? 'בלי קובץ: 1' : 'בלי קובץ: ' + g.miss.length) + '</span></div>' +
           '<div class="chips">' + g.miss.map(function (s) {
-            var note = s[3].length > 1 ? ' · גם: ' + s[3].slice(1).join(', ') : '';
-            return '<span class="chip no">' + esc(s[1]) + esc(note) + '</span>';
+            var cls = kind(s) === 3 ? 'chip no' : NOSAL[s[0]] ? 'chip ok ns' : 'chip ok';
+            var note = kind(s) === 3 ? '' : NOSAL[s[0]] ? ' · אושר בלי סל' : ' · אושר, אין קובץ באתר';
+            var sup2 = s[3].length > 1 ? ' · גם: ' + s[3].slice(1).join(', ') : '';
+            return '<span class="' + cls + '">' + esc(s[1]) + esc(note + sup2) + '</span>';
           }).join('') + '</div></div>';
       }).join('');
     }
