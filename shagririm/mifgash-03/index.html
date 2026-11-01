@@ -451,7 +451,16 @@ footer a{color:var(--mute)}
   }
   document.getElementById("submit").onclick = function () {
     var d = new Date(); st.submitted = d.getDate() + "." + (d.getMonth() + 1); save(); showSub();
+    /* מייל ל-merhav על כל הגשה (מיטל, 1.11.26), באותו מסלול כמו "נתקעתי" */
+    if (K) { var id = rid(); post({ kind: "submit", track: T, s: 3, id: id, k: K, name: H.n || "", school: H.sc || "", value: st })
+      .then(function () { return fetch(RELAY + "?src=shaglive&id=" + id, { mode: "no-cors" }); }).catch(function () {}); }
   };
+  function rid() {
+    var id = "", a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var rnd = window.crypto && crypto.getRandomValues ? crypto.getRandomValues(new Uint8Array(32)) : null;
+    for (var i = 0; i < 32; i++) id += a[(rnd ? rnd[i] : Math.floor(Math.random() * 256)) % a.length];
+    return id;
+  }
 
   function render() { bind(); showEx1(); showNeed(); showSub(); }
   setLang();
@@ -486,9 +495,7 @@ footer a{color:var(--mute)}
   document.getElementById("stuckSend").onclick = function () {
     var msg = document.getElementById("stuckMsg"), btn = this;
     if (!msg.value.trim()) { msg.focus(); return; }
-    var id = ""; var a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    var rnd = window.crypto && crypto.getRandomValues ? crypto.getRandomValues(new Uint8Array(32)) : null;
-    for (var i = 0; i < 32; i++) id += a[(rnd ? rnd[i] : Math.floor(Math.random() * 256)) % a.length];
+    var id = rid();
     var o = btn.textContent; btn.textContent = tx("sending"); btn.disabled = true;
     post({ kind: "stuck", track: T, s: 3, id: id, name: H.n || "", school: H.sc || "", step: document.getElementById("stuckStep").value, msg: msg.value, lang: L ? "ערבית" : "עברית" })
       .then(function () { return fetch(RELAY + "?src=shaglive&id=" + id, { mode: "no-cors" }); })
