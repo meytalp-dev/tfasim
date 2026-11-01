@@ -253,7 +253,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     </div>
     <div class="msg fail" id="badBox">
       <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-      <h3>ההרשמה לא הושלמה</h3>
+      <h3 id="badTitle">ההרשמה לא הושלמה</h3>
       <p id="badText">לא הצלחנו לוודא שהפרטים נקלטו. הם שמורים בדפדפן, ואפשר לנסות שוב.</p>
       <button type="button" class="again" id="retryBtn">נסו שוב</button>
     </div>
@@ -411,13 +411,13 @@ function submit(){
     return fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
       .then(function(r){ return r.json(); })
       .catch(function(){
-        return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone), { credentials:"omit" })
+        return fetch(API_URL + "?mode=check&email=" + encodeURIComponent(d.p.email) + "&phone=" + encodeURIComponent(d.p.phone) + "&name=" + encodeURIComponent(d.p.name), { credentials:"omit" })
           .then(function(r){ return r.json(); }).catch(function(){ return navigator.onLine === false ? {ok:false, offline:true} : {ok:false, unreadable:true}; });
       });
   }
   function saveTry(n){
     return saveOnce().then(function(r){
-      var final = (r && (r.ok || r.unreadable)) || (r && /^(missing|no_school|bad_action)$/.test(r.error || "")) || n >= 3;
+      var final = (r && (r.ok || r.unreadable)) || (r && /^(missing|no_school|bad_action|not_invited)$/.test(r.error || "")) || n >= 3;
       if (final) return r;
       return new Promise(function(res){ setTimeout(res, 2500 * n); }).then(function(){ return saveTry(n + 1); });
     });
@@ -444,7 +444,14 @@ function submit(){
         $("okText").textContent = d.p.attendance === "לא" ? "התשובה נשלחה. אם לא תתקבל הודעת שמירה, אפשר לנסות שוב או לפנות אלינו בכפתור שבתחתית הדף." : "תודה, " + d.p.name.split(" ")[0] + ". בדקות הקרובות יגיע אלייך מייל אישור. אם לא יגיע תוך רבע שעה, כתבו לנו בכפתור שבתחתית הדף.";
         $("okBox").classList.add("nolink");
         show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
-      } else { show("bad"); $("badBox").scrollIntoView({behavior:"smooth", block:"center"}); }
+      } else {
+        /* 1.11: registration is for invitees only (checked by name or e-mail on the server) */
+        var no = r && r.error === "not_invited";
+        $("badTitle").textContent = no ? "ההרשמה מיועדת למוזמנים בלבד" : "ההרשמה לא הושלמה";
+        $("badText").textContent = no ? "לא מצאנו את השם או המייל ברשימת המוזמנים לכנס. אם קיבלתם הזמנה, הירשמו עם השם המלא ועם כתובת המייל שאליה הגיעה ההזמנה, או כתבו לנו בכפתור שבתחתית הדף." : "לא הצלחנו לוודא שהפרטים נקלטו. הם שמורים בדפדפן, ואפשר לנסות שוב.";
+        $("retryBtn").style.display = no ? "none" : "";
+        show("bad"); $("badBox").scrollIntoView({behavior:"smooth", block:"center"});
+      }
     });
 }
 function newCid(){ var a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a); return "c" + Array.prototype.map.call(a, function(x){ return ("0" + x.toString(16)).slice(-2); }).join(""); }
