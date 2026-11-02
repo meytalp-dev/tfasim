@@ -1,6 +1,6 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-03T01:00:00+02:00',
+  updated: '2026-11-03T01:20:00+02:00',
   waiting: [
     'הפיילוט: להעלות את עתיד בת עמי ובית חנינה בנים בכלי ההכנה ולשלוח את הקודים למנהלים.',
     'רמת דוד: האם יש רכז.ת?',
@@ -19,7 +19,7 @@ window.BOARD = {
     { id: 'map', name: 'מיפוי', role: 'רשימת הפערים בין המוקאפ ל-v2 (קריאה בלבד)', status: 'done', files: ['sochnim/gaps.md'] },
     { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'done', files: ['gas/קוד.js', 'gas/היקף.js', 'gas/appsscript.json', 'api.js', 'store.js', 'hachana/hachana.html', 'tests/server/', 'sochnim/storage-review.md'] },
     { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'done', files: ['gate.js', 'hachana/anashim.html', 'tests/gate/', 'sochnim/roles-views.md'] },
-    { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'doing', files: ['app.js', 'index.html', 'tests/school/'] },
+    { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'review', files: ['app.js', 'index.html', 'tests/school/'] },
     { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'doing', files: ['national.js', 'national.css', 'megamot.js', 'tests/national/'] },
     { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'review', files: ['schools-admin.js', 'tests/admin/'] },
     { id: 'files', name: 'טעינת קבצים', role: 'כלי ההכנה לכל בתי הספר, נקודת פתיחה מספטמבר, עדכון במהלך השנה', status: 'todo', files: ['hachana/megamot-codes.js'] },
@@ -49,7 +49,7 @@ window.BOARD = {
     { id: 'c5', stage: 's2', agent: 'gate', status: 'done', title: 'טעינת רכזים ומנהלים מראש, בלי אישור ידני' },
     { id: 'c6', stage: 's2', agent: 'server', status: 'review', title: 'מיילים גלויים ל-system במסך בתי הספר, לכפתור מייל' },
 
-    { id: 'd1', stage: 's3', agent: 'school', status: 'doing', title: 'השלמת פערים במסכי בית הספר' },
+    { id: 'd1', stage: 's3', agent: 'school', status: 'review', title: 'השלמת פערים במסכי בית הספר' },
     { id: 'd2', stage: 's3', agent: 'national', status: 'doing', title: 'מבט ארצי: מסך ראשי, קטגוריות וחודשים' },
     { id: 'd3', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת פדגוגי.ת' },
     { id: 'd4', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת מקצועי.ת' },
