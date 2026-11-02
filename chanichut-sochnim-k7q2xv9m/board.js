@@ -1,6 +1,6 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-02T19:40:00+02:00',
+  updated: '2026-11-02T19:50:00+02:00',
   waiting: [
     'להריץ את createTriggers בעורך, אם עוד לא רץ: הוא מפעיל את תזכורות ההיעדרות של 16:00.',
     'פיילוט: לפתוח את כלי ההכנה, להעלות את שלושת בתי הספר ולשלוח את הקודים.'
@@ -15,7 +15,7 @@ window.BOARD = {
   ],
   agents: [
     { id: 'super', name: 'סוכן העל', role: 'מחלק משימות, בודק עבודה, מעדכן את הלוח ופורס אחרי אישור', status: 'doing', now: 'מפעיל את גל הבסיס', files: ['sochnim/board.js', 'sochnim/index.html', 'sochnim/CONTRACT.md'] },
-    { id: 'map', name: 'מיפוי', role: 'רשימת הפערים בין המוקאפ ל-v2 (קריאה בלבד)', status: 'doing', files: ['sochnim/gaps.md'] },
+    { id: 'map', name: 'מיפוי', role: 'רשימת הפערים בין המוקאפ ל-v2 (קריאה בלבד)', status: 'done', files: ['sochnim/gaps.md'] },
     { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'doing', files: ['gas/קוד.js', 'sochnim/storage-review.md'] },
     { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'doing', files: ['gate.js', 'sochnim/roles-views.md'] },
     { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'todo', files: ['app.js', 'store.js', 'index.html'] },
@@ -34,7 +34,7 @@ window.BOARD = {
 
     { id: 'b1', stage: 's1', agent: 'super', status: 'done', title: 'דף ניהול הסוכנים' },
     { id: 'b2', stage: 's1', agent: 'super', status: 'done', title: 'ניהול גרסאות מקומי ל-v2' },
-    { id: 'b3', stage: 's1', agent: 'map', status: 'doing', title: 'מיפוי פערים: מוקאפ מול v2, מסך מסך' },
+    { id: 'b3', stage: 's1', agent: 'map', status: 'done', title: 'מיפוי פערים: מוקאפ מול v2, מסך מסך', note: '47 פערים: 5 גדולים, 20 בינוניים, 22 קטנים' },
     { id: 'b4', stage: 's1', agent: 'server', status: 'doing', title: 'בדיקת אחסון ועומס ל-5,111 תלמידים' },
     { id: 'b5', stage: 's1', agent: 'gate', status: 'doing', title: 'איך המבטים בנויים במנור, ומה יהיה כאן לכל תפקיד' },
     { id: 'b6', stage: 's1', agent: 'gate', status: 'doing', title: 'מקור הרכזים והמנהלים לטעינה מראש' },
