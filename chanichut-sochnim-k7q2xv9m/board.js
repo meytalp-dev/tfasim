@@ -1,8 +1,9 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-03T00:40:00+02:00',
+  updated: '2026-11-03T01:00:00+02:00',
   waiting: [
-    'רמת דוד: האם יש רכז.ת? לפי הנספח המשרה לא מאוישת.',
+    'הפיילוט: להעלות את עתיד בת עמי ובית חנינה בנים בכלי ההכנה ולשלוח את הקודים למנהלים.',
+    'רמת דוד: האם יש רכז.ת?',
     'להעביר את נספח בעלי התפקידים מחשבון בית הערבה ל-merhav לפני 12.11.'
   ],
   stages: [
@@ -29,8 +30,8 @@ window.BOARD = {
     { id: 'a1', stage: 's0', agent: 'super', status: 'done', title: 'השרת האמיתי עונה', note: 'נבדק ב-/exec' },
     { id: 'a2', stage: 's0', agent: 'super', status: 'done', title: 'אשף המעסיקים ומאגר סולם כבר בגרסה @3', note: 'נפרס בסשן מקביל, השינויים של הטעינה מראש נשמרו' },
     { id: 'a3', stage: 's0', agent: 'super', status: 'done', title: 'שורת כניסה למנהל.ת המערכת בשרת', note: 'השורה קיימת בשרת' },
-    { id: 'a4', stage: 's0', agent: 'super', status: 'done', title: 'בדיקת כניסה מול השרת האמיתי', note: 'כניסה, הרשאות וחסימות נבדקו. העלאה והפעלה עוד לא' },
-    { id: 'a5', stage: 's0', agent: 'super', status: 'doing', title: 'פיילוט: העלאת שלושת בתי הספר ושליחת קודים', note: 'ההקמה רצה. סוכן העל בודק מול השרת החי עם בית ספר בדוי' },
+    { id: 'a4', stage: 's0', agent: 'super', status: 'done', title: 'בדיקת כניסה מול השרת האמיתי', note: 'כולל זרימה מלאה עם בית ספר בדוי ב-@4: טעינה, הפעלה, פענוח, שמירה, ספירה' },
+    { id: 'a5', stage: 's0', agent: 'super', status: 'todo', title: 'פיילוט: העלאת שלושת בתי הספר ושליחת קודים', note: 'הבדיקה מול השרת החי עברה. מיטל מעלה את בת עמי ובית חנינה בכלי ההכנה' },
 
     { id: 'b1', stage: 's1', agent: 'super', status: 'done', title: 'דף ניהול הסוכנים' },
     { id: 'b2', stage: 's1', agent: 'super', status: 'done', title: 'ניהול גרסאות מקומי ל-v2' },
@@ -46,7 +47,7 @@ window.BOARD = {
     { id: 'c3', stage: 's2', agent: 'server', status: 'done', title: 'הרשאות לפי תפקיד בכל פעולת שרת' },
     { id: 'c4', stage: 's2', agent: 'gate', status: 'done', title: 'כניסה לכל התפקידים' },
     { id: 'c5', stage: 's2', agent: 'gate', status: 'done', title: 'טעינת רכזים ומנהלים מראש, בלי אישור ידני' },
-    { id: 'c6', stage: 's2', agent: 'server', status: 'doing', title: 'מיילים גלויים ל-system במסך בתי הספר, לכפתור מייל' },
+    { id: 'c6', stage: 's2', agent: 'server', status: 'review', title: 'מיילים גלויים ל-system במסך בתי הספר, לכפתור מייל' },
 
     { id: 'd1', stage: 's3', agent: 'school', status: 'doing', title: 'השלמת פערים במסכי בית הספר' },
     { id: 'd2', stage: 's3', agent: 'national', status: 'doing', title: 'מבט ארצי: מסך ראשי, קטגוריות וחודשים' },
