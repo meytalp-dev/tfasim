@@ -1,0 +1,1 @@
+window.REPORT('gate', { at: '2026-11-02T20:05:00+02:00', status: 'doing', now: 'חישבתי כיסוי רכזים מהנספח ומהרשאות חיות, מצליב מקורות למפקחים מקצועיים לפני כתיבת המסמך', note: '', tasks: { b5: 'doing', b6: 'doing' }, touched: ['sochnim/roles-views.md'], blockers: [] });

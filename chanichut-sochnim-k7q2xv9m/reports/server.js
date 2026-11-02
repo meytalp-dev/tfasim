@@ -1,0 +1,1 @@
+window.REPORT('server', { at: '2026-11-02T19:36:00+02:00', status: 'doing', now: 'אספתי מגבלות מהתיעוד של Google, מריץ מודל גודל ועומס', note: 'מגבלת הקובץ הרשמית: 20 מיליון תאים או 100MB', tasks: { b4: 'doing' }, touched: ['sochnim/storage-review.md'], blockers: [] });

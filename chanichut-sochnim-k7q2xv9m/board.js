@@ -1,8 +1,9 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-02T19:20:00+02:00',
+  updated: '2026-11-02T19:40:00+02:00',
   waiting: [
-    'להריץ שוב את setupChanichut בעורך ב-merhav: בשרת עדיין אין שורת כניסה למנהל.ת המערכת, ובלעדיה כלי ההכנה לא נפתח.'
+    'להריץ את createTriggers בעורך, אם עוד לא רץ: הוא מפעיל את תזכורות ההיעדרות של 16:00.',
+    'פיילוט: לפתוח את כלי ההכנה, להעלות את שלושת בתי הספר ולשלוח את הקודים.'
   ],
   stages: [
     { id: 's0', name: '0 · תנאי פתיחה' },
@@ -27,8 +28,8 @@ window.BOARD = {
   tasks: [
     { id: 'a1', stage: 's0', agent: 'super', status: 'done', title: 'השרת האמיתי עונה', note: 'נבדק ב-/exec' },
     { id: 'a2', stage: 's0', agent: 'super', status: 'done', title: 'אשף המעסיקים ומאגר סולם כבר בגרסה @3', note: 'נפרס בסשן מקביל, השינויים של הטעינה מראש נשמרו' },
-    { id: 'a3', stage: 's0', agent: 'super', status: 'blocked', title: 'שורת כניסה למנהל.ת המערכת בשרת', note: 'ממתין להרצה חוזרת של setupChanichut' },
-    { id: 'a4', stage: 's0', agent: 'super', status: 'todo', title: 'בדיקת כניסה מול השרת האמיתי' },
+    { id: 'a3', stage: 's0', agent: 'super', status: 'done', title: 'שורת כניסה למנהל.ת המערכת בשרת', note: 'השורה קיימת בשרת' },
+    { id: 'a4', stage: 's0', agent: 'super', status: 'done', title: 'בדיקת כניסה מול השרת האמיתי', note: 'כניסה, הרשאות וחסימות נבדקו. העלאה והפעלה עוד לא' },
     { id: 'a5', stage: 's0', agent: 'super', status: 'todo', title: 'פיילוט: העלאת שלושת בתי הספר ושליחת קודים', note: 'מיטל לוחצת בכלי' },
 
     { id: 'b1', stage: 's1', agent: 'super', status: 'done', title: 'דף ניהול הסוכנים' },
