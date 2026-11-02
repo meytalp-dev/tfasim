@@ -70,6 +70,8 @@ body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:
 .gate-sent{margin:0;color:var(--muted)}
 .gate-code{font-size:1.8rem!important;letter-spacing:.4em;text-align:center;font-family:var(--head)}
 #gCodeS .lnk,#gPass .lnk,#gRec .lnk{justify-self:center}
+.gate-minhal{width:min(260px,70vw);height:auto;margin-bottom:10px}
+.gate-form>.lnk,.gate-alt .lnk{min-height:44px;padding:0 12px}.gate-minor{justify-self:center;font-size:.9em;color:var(--muted)}
 .gate-msg{margin:0;font-size:.92em;color:var(--muted);min-height:0}.gate-msg:empty{display:none}.gate-msg.bad{color:var(--warn);font-weight:600}
 .gate-check{display:flex;gap:.5em;align-items:center;font-size:.92em;color:var(--text)}.gate-check input{width:20px;height:20px}
 .rec-code{font-family:var(--head);font-size:1.35em;letter-spacing:.12em;text-align:center;background:var(--bg);border:1px dashed var(--ink);border-radius:8px;padding:.6em;color:var(--ink);word-break:break-all}
@@ -240,7 +242,7 @@ svg.gate-logo,svg.brand-mark{aspect-ratio:320/350;height:auto;display:block}svg.
 .brand-mark{width:36px}
 /* תפקידים: רכז.ת עורך.ת; מנהל.ת ומנהל.ת המערכת רק רואים */
 .sys-only,.nav a.sys-only{display:none}body[data-role=system] .sys-only,body[data-role=system] .nav a.sys-only{display:inline-flex}
-body[data-role=manager] .edit,body[data-role=system] .edit,body[data-role=manager] #agent,body[data-role=system] #agent{display:none!important}
+body[data-role]:not([data-role=rakaz]) .edit,body[data-role]:not([data-role=rakaz]) #agent{display:none!important}
 body[data-role=manager] #roster .cell,body[data-role=manager] .tik input,body[data-role=manager] .tik select,body[data-role=manager] .tik .dp,body[data-role=manager] .chk-items input,body[data-role=manager] .perm input,
 body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data-role=system] .tik select,body[data-role=system] .tik .dp,body[data-role=system] .chk-items input,body[data-role=system] .perm input{pointer-events:none}
 /* יום בלי תעסוקה לכל הכיתה */
@@ -399,19 +401,21 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 <body data-view="gate">
 <section class="gate" id="gate">
   <div class="gate-card">
+    <img class="gate-minhal" src="logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית">
     <svg class="gate-logo" viewBox="0 0 320 350" aria-hidden="true"><path d="M74 300 V118 C74 72 102 44 148 44 H160" fill="none" stroke="#1D4F5E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 6 H226 A60 60 0 0 1 286 66 V74 C262 78 246 94 238 116 L222 82 H166 Z" fill="#C4862A"/><rect x="206" y="22" width="80" height="312" rx="40" fill="#7F9A8E" stroke="#F6F2E9" stroke-width="9" paint-order="stroke"/></svg>
     <svg class="gate-word" viewBox="0 0 360 120" role="img" aria-label="חניכות · נוכחות · קשר · צמיחה"><text x="180" y="78" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="800" font-size="86" fill="#1D4F5E">חניכות</text><text x="180" y="112" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="500" font-size="22" fill="#1D4F5E">נוכחות · קשר · צמיחה</text></svg>
 
     <div class="gate-form" id="gLogin" hidden>
-      <label class="field"><span>בית ספר</span><select id="gSchool"></select></label>
+      <label class="field"><span>בית ספר, פיקוח, מטה או רשת</span><select id="gSchool"></select></label>
       <label class="field"><span>מי נכנס.ת</span><select id="gWho"></select></label>
       <p class="gate-msg" id="mLogin"></p>
       <button class="btn primary big gate-btn" id="gSend" disabled>שליחת קוד למייל</button>
-      <p class="gate-alt">פעם ראשונה במערכת? <button class="lnk" id="gToReg">הרשמה</button></p>
+      <button class="lnk gate-minor" id="gToReg">לא מצאתי את עצמי</button>
     </div>
 
     <div class="gate-form" id="gReg" hidden>
-      <h2 class="gate-h">הרשמה לראשונה</h2>
+      <h2 class="gate-h">לא מצאתי את עצמי ברשימה</h2>
+      <p class="gate-msg">משאירים פרטים, והמרחב הפדגוגי מוסיף אחרי בדיקה. אחר כך נכנסים עם קוד למייל.</p>
       <label class="field"><span>בית ספר</span><select id="rSchool"></select></label>
       <label class="field"><span>שם מלא</span><input class="find" id="rName" autocomplete="name"></label>
       <label class="field"><span>תפקיד</span><select id="rRole"><option value="rakaz">רכז.ת החניכות</option><option value="principal">מנהל.ת בית הספר</option></select></label>
@@ -469,6 +473,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 
     <div class="gate-form" id="gNew" hidden>
       <h2 class="gate-h">יצירת סיסמה</h2>
+      <p class="gate-msg">הסיסמה פותחת את שמות התלמידים במכשיר שלך. אחרי שיוצרים אותה, הגישה נפתחת כשהרכז.ת של בית הספר מאשר.ת.</p>
       <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="nPass1" type="password" autocomplete="new-password"></label>
       <label class="field"><span>שוב את הסיסמה</span><input class="find" id="nPass2" type="password" autocomplete="new-password"></label>
       <p class="gate-msg" id="mNew"></p>
@@ -491,6 +496,21 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
       <p class="gate-msg" id="mRec"></p>
       <button class="btn primary big gate-btn" id="recGo">שחזור וכניסה</button>
       <button class="lnk" id="recBack">חזרה</button>
+    </div>
+
+    <div class="gate-form" id="gRakaz" hidden>
+      <h2 class="gate-h">אין עדיין רכז.ת חניכות</h2>
+      <p class="gate-msg">כדי שהמערכת של בית הספר תיפתח, צריך רכז.ת חניכות. הקוד לכניסה יישלח רק למייל שמזינים כאן.</p>
+      <label class="field"><span>שם הרכז.ת</span><input class="find" id="kName" autocomplete="off"></label>
+      <label class="field"><span>המייל של הרכז.ת</span><input class="find" id="kMail" type="email" dir="ltr" autocomplete="off"></label>
+      <p class="gate-msg" id="mRakaz"></p>
+      <button class="btn primary big gate-btn" id="kAdd">הוספת הרכז.ת</button>
+    </div>
+
+    <div class="gate-form" id="gSoon" hidden>
+      <h2 class="gate-h" id="sHello">שלום</h2>
+      <p class="gate-msg">המבט ייפתח בקרוב</p>
+      <button class="btn big gate-btn" id="sOut">יציאה</button>
     </div>
 
     <div class="gate-form" id="gBusy" hidden><p class="gate-msg">פותח את הנתונים…</p></div>

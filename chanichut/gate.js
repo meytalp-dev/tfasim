@@ -5,26 +5,36 @@
       רכז.ת ראשונ.ה יוצר.ת את מפתח בית הספר ומקבל.ת קוד שחזור להדפסה.
       מנהל.ת או רכז.ת נוספ.ת: יוצר.ת סיסמה ומחכה שהרכז.ת יאשר.ו אחרי השוואת קוד אימות.
    3. Store.load → startApp.
+   תפקידים בלי מפתח (system, staff, ped, pro, net): אחרי הקוד נכנסים ישר למבט (startMabat), בלי סיסמה ובלי נתוני בית ספר.
+   תפקיד שלא ברשימה נחסם (2.11.26).
    =================================================================== */
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const STEPS = ['gLogin', 'gReg', 'gCodeS', 'gPass', 'gInit', 'gAct', 'gNew', 'gWait', 'gRec', 'gBusy'];
+  const STEPS = ['gLogin', 'gReg', 'gCodeS', 'gPass', 'gInit', 'gAct', 'gNew', 'gWait', 'gRec', 'gRakaz', 'gSoon', 'gBusy'];
   const show = id => { STEPS.forEach(x => { const el = $(x); if (el) el.hidden = x !== id; }); const f = $(id) && $(id).querySelector('input:not([type=checkbox]),select'); if (f && matchMedia('(pointer:fine)').matches) f.focus(); };
   const msg = (id, t, bad) => { const el = $(id); if (el) { el.textContent = t || ''; el.className = 'gate-msg' + (bad ? ' bad' : ''); } };
   const busy = (b, on, t) => { b.disabled = on; if (t) b.dataset.t = b.dataset.t || b.innerHTML; b.innerHTML = on && t ? t : (b.dataset.t || b.innerHTML); };
-  const ERR = { noperson: 'לא נמצא.ה ברשימת המורשים של בית הספר', wait: 'קוד כבר נשלח. אפשר לבקש שוב בעוד דקה', cap: 'הגענו לתקרה היומית. אפשר לנסות מחר', expired: 'הקוד פג. צריך לשלוח קוד חדש', tries: 'יותר מדי ניסיונות. צריך לשלוח קוד חדש', badcode: 'הקוד לא נכון', badsession: 'החיבור פג. צריך להיכנס שוב', already: 'בית הספר כבר הוגדר. צריך להיכנס מחדש', bad: 'חסרים פרטים' };
+  const ERR = { noperson: 'לא נמצא.ה ברשימת המורשים של בית הספר', wait: 'קוד כבר נשלח. אפשר לבקש שוב בעוד דקה', cap: 'הגענו לתקרה היומית. אפשר לנסות מחר', expired: 'הקוד פג. צריך לשלוח קוד חדש', tries: 'יותר מדי ניסיונות. צריך לשלוח קוד חדש', badcode: 'הקוד לא נכון', badsession: 'החיבור פג. צריך להיכנס שוב', already: 'בית הספר כבר הוגדר. צריך להיכנס מחדש', bad: 'חסרים פרטים', forbidden: 'אין הרשאה לפעולה הזו', hasrakaz: 'בבית הספר כבר יש רכז.ת חניכות פעיל.ה', exists: 'המייל הזה כבר ברשימה של בית הספר', badrole: 'התפקיד הזה לא מוכר במערכת, ולכן אין כניסה' };
   const err = r => ERR[r && r.error] || 'משהו לא עבד (' + ((r && r.error) || 'רשת') + '). כדאי לנסות שוב';
   const BACK_KEY = 'chanichut2-back';
   let SENT_PID = '', ME = null, KEYS = null, SKEY = null, EXTRACT = false, PRIV = null;
 
   /* ---------- 1. בית ספר ומי נכנס.ת ---------- */
+  /* רשימה סגורה של תפקידים (מסמך ההגדרות, סעיף 2). שלושת הראשונים עם מפתח בית ספר */
+  const ROLE = { rakaz: 'רכז.ת החניכות', principal: 'מנהל.ת בית הספר', pedco: 'רכז.ת פדגוגי.ת', system: 'מנהל.ת המערכת', staff: 'מטה', ped: 'מפקח.ת פדגוגי.ת', pro: 'מפקח.ת מקצועי.ת', net: 'מנהל.ת רשת' };
+  const ROLES = Object.keys(ROLE), KEYED = ['rakaz', 'principal', 'pedco'];
+  const noKey = me => !KEYED.includes(me.role);
   const SCH = (window.SCHOOLS || []).map(x => x.name).sort((a, b) => a.localeCompare(b, 'he'));
-  const opts = SCH.map(n => `<option>${esc(n)}</option>`).join('');
-  $('gSchool').innerHTML = '<option value="">בחירה מתוך 64 בתי הספר</option>' + opts;
-  $('rSchool').innerHTML = '<option value="">בחירה מתוך 64 בתי הספר</option>' + opts;
-  try { const last = localStorage.getItem('chanichut2-school'); if (last && SCH.includes(last)) $('gSchool').value = last; } catch (e) {}
+  const NETS = [...new Set((window.SCHOOLS || []).map(x => x.net).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he')).map(n => 'רשת · ' + n);
+  const SYS = 'המרחב הפדגוגי', TOP = ['פיקוח', 'מטה'];
+  const opts = l => l.map(n => `<option>${esc(n)}</option>`).join('');
+  $('gSchool').innerHTML = '<option value="">בחירה: בית ספר, פיקוח, מטה או רשת</option>'
+    + `<optgroup label="פיקוח ומטה">${opts(TOP)}</optgroup><optgroup label="רשתות">${opts(NETS)}</optgroup><optgroup label="${SYS}">${opts([SYS])}</optgroup><optgroup label="בתי הספר">${opts(SCH)}</optgroup>`;
+  $('rSchool').innerHTML = '<option value="">בחירה מתוך 64 בתי הספר</option>' + opts(SCH);
+  const PLACES = TOP.concat(NETS, [SYS], SCH);
+  try { const last = localStorage.getItem('chanichut2-school'); if (last && PLACES.includes(last)) $('gSchool').value = last; } catch (e) {}
   let peopleFor = '';
   async function loadPeople() {
     const school = $('gSchool').value; if (school === peopleFor) return; peopleFor = school;
@@ -32,11 +42,13 @@
     if (!school) return;
     $('gWho').innerHTML = '<option>טוען…</option>';
     const r = await API.call('people', { school });
+    if (school !== peopleFor) return;   /* בינתיים נבחר מקום אחר */
     if (!r.ok) { $('gWho').innerHTML = ''; peopleFor = ''; return msg('mLogin', err(r), true); }
-    const role = { rakaz: 'רכז.ת החניכות', principal: 'מנהל.ת בית הספר', system: 'מנהל.ת המערכת' };
-    $('gWho').innerHTML = r.people.map(p => `<option value="${esc(p.pid)}" data-m="${esc(p.masked)}">${esc(p.name)} · ${role[p.role] || ''}</option>`).join('') || '<option value="">אין עדיין משתמשים מאושרים</option>';
-    $('gSend').disabled = !r.people.length;
-    msg('mLogin', r.people.length ? '' : 'אין עדיין משתמשים מאושרים בבית הספר. אפשר להירשם למטה');
+    /* בלי שם: תפקיד ומייל ממוסך. תפקיד לא מוכר לא מוצג */
+    const L = r.people.filter(p => ROLE[p.role]).sort((a, b) => ROLES.indexOf(a.role) - ROLES.indexOf(b.role));
+    $('gWho').innerHTML = L.map(p => `<option value="${esc(p.pid)}">${ROLE[p.role]} · ⁦${esc(p.masked)}⁩</option>`).join('') || '<option value="">אין עדיין משתמשים מאושרים</option>';
+    $('gSend').disabled = !L.length;
+    msg('mLogin', L.length ? '' : 'אין כאן עדיין משתמשים מאושרים. אפשר לפנות דרך "לא מצאתי את עצמי"');
   }
   $('gSchool').onchange = () => { try { localStorage.setItem('chanichut2-school', $('gSchool').value); } catch (e) {} msg('mLogin'); loadPeople(); };
   $('gSend').onclick = async () => {
@@ -50,7 +62,7 @@
     msg('mCode', r.demoCode ? 'מצב בדיקה · הקוד: ' + r.demoCode : '');
     show('gCodeS');
   };
-  $('gToReg').onclick = () => { $('rSchool').value = $('gSchool').value; show('gReg'); };
+  $('gToReg').onclick = () => { $('rSchool').value = SCH.includes($('gSchool').value) ? $('gSchool').value : ''; show('gReg'); };
   $('gToLogin').onclick = () => show('gLogin');
   $('gBack').onclick = () => show('gLogin');
   $('rSend').onclick = async () => {
@@ -78,14 +90,32 @@
   const rid = () => ME.school + '|' + ME.email;
   async function afterLogin() {
     ME = API.session().me;
-    if (ME.role === 'system') { show('gLogin'); return msg('mLogin', 'המבט הארצי ייפתח בשלב הבא של הבנייה', true); }
+    if (!ME || !ROLES.includes(ME.role)) { ME = null; try { await API.call('logout'); } catch (e) {} API.setSession(null); show('gLogin'); return msg('mLogin', ERR.badrole, true); }
+    if (noKey(ME)) return mabat();
     show('gBusy');
     const saved = await CK.recall(rid());
     if (saved) { SKEY = saved; EXTRACT = false; return enter(); }
     const r = await API.call('keys');
     if (!r.ok) { if (r.error === 'badsession') return logout(); show('gLogin'); return msg('mLogin', err(r), true); }
     KEYS = r;
-    $('gHello').textContent = 'שלום ' + ME.name.split(' ')[0];
+    $('gHello').textContent = 'שלום' + (ME.name ? ' ' + ME.name.split(' ')[0] : '');
+    if (r.me && r.me.wrapped) return show('gPass');
+    /* מנהל.ת בבית ספר בלי רכז.ת פעיל.ה: מוסיפ.ה את הרכז.ת, והקוד הולך רק למייל שהוזן */
+    if (ME.role === 'principal' && !ADDED) { const p = await API.call('people', { school: ME.school }); if (p.ok && !p.people.some(x => x.role === 'rakaz')) return show('gRakaz'); }
+    route();
+  }
+  let ADDED = false;
+  $('kAdd').onclick = async () => {
+    const v = { name: $('kName').value.trim(), email: $('kMail').value.trim() };
+    if (!v.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.email)) return msg('mRakaz', 'צריך שם ומייל תקין', true);
+    const b = $('kAdd'); busy(b, true, 'מוסיף…'); const r = await API.call('rakazAdd', v); busy(b, false);
+    if (!r.ok && r.error !== 'hasrakaz') return msg('mRakaz', err(r), true);
+    ADDED = true; $('kName').value = ''; $('kMail').value = '';
+    route();
+    msg(KEYS.me ? 'mWait' : 'mNew', r.ok ? 'הרכז.ת נוספ.ה ויכול.ה להיכנס עם קוד למייל. אחרי שהרכז.ת י.יכנס, הגישה שלך תיפתח באישור שלו.ה' : err(r));
+  };
+  function route() {
+    const r = KEYS;
     if (r.me && r.me.wrapped) return show('gPass');
     if (r.preloaded && ME.role === 'rakaz') return show('gAct');
     if (r.me && !r.me.wrapped) return waitScreen();
@@ -181,13 +211,19 @@
       show('gLogin'); msg('mLogin', 'הנתונים לא נטענו (' + e.message + '). כדאי לנסות שוב', true);
     }
   }
+  /* בלי מפתח: לא CK, לא Store.load ולא נתוני בית ספר. המבט נבנה בנפרד (startMabat) */
+  function mabat() {
+    if (typeof window.startMabat === 'function') return window.startMabat(ME, { logout });
+    $('sHello').textContent = 'שלום · ' + ROLE[ME.role];
+    show('gSoon');
+  }
+  $('sOut').onclick = () => logout();
   function setBack(on) { try { localStorage.setItem(BACK_KEY, on ? '1' : '0'); } catch (e) {} Store.leave().then(() => location.reload()); }
   async function logout() {
-    try { await Store.leave(); } catch (e) {}
-    if (ME) await CK.forget(rid());
+    if (ME && !noKey(ME)) { try { await Store.leave(); } catch (e) {} await CK.forget(rid()); }
     try { await API.call('logout'); } catch (e) {}
     API.setSession(null);
-    location.replace(location.pathname);
+    location.replace(location.pathname + (API.MOCK ? location.search : ''));
   }
   /* ---------- הרשאות: מי מחכה לאישור ---------- */
   async function users() {
