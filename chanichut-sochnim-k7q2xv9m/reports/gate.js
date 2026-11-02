@@ -1,1 +1,1 @@
-window.REPORT('gate', { at: '2026-11-02T20:30:00+02:00', status: 'review', now: 'המסמך מוכן לעיון: מנור, טבלת תפקידים, כיסוי ורשימת שינויים', note: '51 מתוך 64 בתי ספר עם רכז.ת ומייל; 2 מתוך 19 מפקחים מקצועיים בגיליון ההרשאות', tasks: { b5: 'review', b6: 'review' }, touched: ['sochnim/roles-views.md'], blockers: [] });
+window.REPORT('gate', { at: '2026-11-02T21:00:00+02:00', status: 'doing', now: 'מתחיל את גל הבנייה', note: '', tasks: {"b5":"done","b6":"done"}, touched: [], blockers: [] });
