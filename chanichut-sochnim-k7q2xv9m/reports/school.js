@@ -1,0 +1,1 @@
+window.REPORT('school', { at: '2026-11-03T00:10:00+02:00', status: 'doing', now: 'קורא את app.js ואת המוקאפ, מתחיל את אבני הדרך והמסננת', note: '', tasks: { d1: 'doing' }, touched: ['app.js', 'index.html', 'tests/school/'], blockers: [] });

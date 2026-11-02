@@ -1,0 +1,1 @@
+window.REPORT('national', { at: '2026-11-03T00:30:00+02:00', status: 'doing', now: 'בונה את national.js: startMabat, המסך הראשי והקטגוריות מנתוני natStats', note: '', tasks: { d2: 'doing', d3: 'doing', d4: 'doing' }, touched: ['national.js', 'national.css', 'megamot.js', 'tests/national/'], blockers: [] });

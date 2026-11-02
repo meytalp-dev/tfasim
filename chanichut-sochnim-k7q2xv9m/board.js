@@ -1,8 +1,7 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-03T00:10:00+02:00',
+  updated: '2026-11-03T00:40:00+02:00',
   waiting: [
-    'להריץ בעורך setupChanichut ואז createTriggers (אחרי הפריסה של @4).',
     'רמת דוד: האם יש רכז.ת? לפי הנספח המשרה לא מאוישת.',
     'להעביר את נספח בעלי התפקידים מחשבון בית הערבה ל-merhav לפני 12.11.'
   ],
@@ -21,7 +20,7 @@ window.BOARD = {
     { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'done', files: ['gate.js', 'hachana/anashim.html', 'tests/gate/', 'sochnim/roles-views.md'] },
     { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'doing', files: ['app.js', 'index.html', 'tests/school/'] },
     { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'doing', files: ['national.js', 'national.css', 'megamot.js', 'tests/national/'] },
-    { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'doing', files: ['schools-admin.js', 'tests/admin/'] },
+    { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'review', files: ['schools-admin.js', 'tests/admin/'] },
     { id: 'files', name: 'טעינת קבצים', role: 'כלי ההכנה לכל בתי הספר, נקודת פתיחה מספטמבר, עדכון במהלך השנה', status: 'todo', files: ['hachana/megamot-codes.js'] },
     { id: 'auto', name: 'אוטומציות', role: 'קישור למנטור.ית והעוזר', status: 'todo', files: ['mentor.html', 'assistant.js'] },
     { id: 'qa', name: 'בדיקות ואבטחה', role: 'בדיקות קצה, נייד, דליפת שמות ועומס. לא עורך קוד מערכת', status: 'todo', files: ['tests/'] }
@@ -31,7 +30,7 @@ window.BOARD = {
     { id: 'a2', stage: 's0', agent: 'super', status: 'done', title: 'אשף המעסיקים ומאגר סולם כבר בגרסה @3', note: 'נפרס בסשן מקביל, השינויים של הטעינה מראש נשמרו' },
     { id: 'a3', stage: 's0', agent: 'super', status: 'done', title: 'שורת כניסה למנהל.ת המערכת בשרת', note: 'השורה קיימת בשרת' },
     { id: 'a4', stage: 's0', agent: 'super', status: 'done', title: 'בדיקת כניסה מול השרת האמיתי', note: 'כניסה, הרשאות וחסימות נבדקו. העלאה והפעלה עוד לא' },
-    { id: 'a5', stage: 's0', agent: 'super', status: 'blocked', title: 'פיילוט: העלאת שלושת בתי הספר ושליחת קודים', note: 'ממתין להחלטה על האחסון' },
+    { id: 'a5', stage: 's0', agent: 'super', status: 'doing', title: 'פיילוט: העלאת שלושת בתי הספר ושליחת קודים', note: 'ההקמה רצה. סוכן העל בודק מול השרת החי עם בית ספר בדוי' },
 
     { id: 'b1', stage: 's1', agent: 'super', status: 'done', title: 'דף ניהול הסוכנים' },
     { id: 'b2', stage: 's1', agent: 'super', status: 'done', title: 'ניהול גרסאות מקומי ל-v2' },
@@ -47,13 +46,14 @@ window.BOARD = {
     { id: 'c3', stage: 's2', agent: 'server', status: 'done', title: 'הרשאות לפי תפקיד בכל פעולת שרת' },
     { id: 'c4', stage: 's2', agent: 'gate', status: 'done', title: 'כניסה לכל התפקידים' },
     { id: 'c5', stage: 's2', agent: 'gate', status: 'done', title: 'טעינת רכזים ומנהלים מראש, בלי אישור ידני' },
+    { id: 'c6', stage: 's2', agent: 'server', status: 'doing', title: 'מיילים גלויים ל-system במסך בתי הספר, לכפתור מייל' },
 
     { id: 'd1', stage: 's3', agent: 'school', status: 'doing', title: 'השלמת פערים במסכי בית הספר' },
     { id: 'd2', stage: 's3', agent: 'national', status: 'doing', title: 'מבט ארצי: מסך ראשי, קטגוריות וחודשים' },
     { id: 'd3', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת פדגוגי.ת' },
     { id: 'd4', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת מקצועי.ת' },
-    { id: 'd5', stage: 's3', agent: 'admin', status: 'doing', title: 'מסך ניהול בתי הספר: מי רשום, הופעל ודיווח' },
-    { id: 'd6', stage: 's3', agent: 'admin', status: 'doing', title: 'רשימת "מי טרם" עם העתקה ומייל' },
+    { id: 'd5', stage: 's3', agent: 'admin', status: 'review', title: 'מסך ניהול בתי הספר: מי רשום, הופעל ודיווח' },
+    { id: 'd6', stage: 's3', agent: 'admin', status: 'review', title: 'רשימת "מי טרם" עם העתקה ומייל' },
 
     { id: 'e1', stage: 's4', agent: 'files', status: 'todo', title: 'כלי ההכנה לכל 61 בתי הספר' },
     { id: 'e2', stage: 's4', agent: 'files', status: 'todo', title: 'מסוכמי ספטמבר כנקודת פתיחה' },
