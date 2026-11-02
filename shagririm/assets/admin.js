@@ -499,7 +499,7 @@
           '<button type="button" class="v2-btn" data-go="' + esc(it.go) + '" data-n="' + esc(it.n || "") + '" data-tr="' + esc(it.track) + '">' + esc(it.btn) + "</button></li>";
       }).join("") + "</ul>";
     }
-    h += '<p class="a-foot">הגשות היחידות (3, 5, 7) ייכנסו לתור הזה כשהיחידה הראשונה תיפתח, 2.11 בכלים ו-4.11 בהובלה.</p></div>';
+    h += '<p class="a-foot">הגשות היחידות העצמיות (3, 5, 7) נבדקות במסך “הגשות”: כרטיס לכל הגשה, והתגובה שלך יוצאת במייל ומסמנת “השלים”.</p></div>';
     host.innerHTML = h;
   }
 
@@ -847,22 +847,158 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* הגשות: המבנה מוכן, המסך המלא נבנה עם היחידה הראשונה                 */
+  /* הגשות היחידות העצמיות (2.11.26). כרטיס לכל הגשה מגיליון המפגשים     */
+  /* (mode=subs), ומשפט תגובה של מיטל: נשמר, יוצא במייל מ-merhav, מופיע */
+  /* בתיק ההטמעה של הרכז/ת, ומסמן "השלים" בנוכחות היחידה (ההחלטה 2.11). */
   /* ------------------------------------------------------------------ */
+
+  /* מה מציגים מכל הגשה. המפתחות = שדות הדף המלווה (mifgash-03). יחידות 5 ו-7 יוסיפו רשומה משלהן. */
+  var SUB_VIEW = {
+    3: {
+      main: [["needt", "הצורך"], ["suggest", "מה הנוטבוק הציע"], ["adopt", "הפתרון שאומץ, ולמה"]],
+      nb: ["nb", "הנוטבוק של המשימה"],
+      acts: [["act1", "when1", "who1"], ["act2", "when2", "who2"], ["act3", "when3", "who3"]],
+      more: [["ex1sub", "משימה 1: מקצוע"], ["ex1nb", "משימה 1: נוטבוק", "link"], ["rules", "כללים שהוספו"],
+        ["guess", "ההשערה"], ["gemini", "מה Gemini מצא"], ["surprise", "מה הפתיע"], ["good", "ממה התרשמו"], ["challenge", "איפה האתגר"]],
+      fb: [["fb_rate", "דירוג"], ["fb_clear", "ההוראות היו ברורות?"], ["fb_stuck", "איפה נתקעו"]]
+    }
+  };
+
+  function subUnits(tr) { return sessionsOf(tr).filter(function (s) { return s.isUnit; }); }
+  /* ברירת המחדל: היחידה שהחלון שלה פתוח; אחרת האחרונה שכבר נפתחה; אחרת הראשונה */
+  function subDefaultUnit(units) {
+    var i;
+    for (i = 0; i < units.length; i++) if (units[i].now) return units[i].num;
+    for (i = units.length - 1; i >= 0; i--) if (units[i].past) return units[i].num;
+    return units.length ? units[0].num : 0;
+  }
+  function subDayMs(s) { var a = dmy(s); return a ? new Date(a.y, a.m - 1, a.d).getTime() : 0; }
+  function subInWeek(it) {
+    var ms = subDayMs(it.atDay); if (!ms) return false;
+    var t = new Date(); t.setHours(0, 0, 0, 0);
+    return ms >= t.getTime() - 6 * 86400000;
+  }
+  function subPending(it) { return !it.reply || it.resubmitted; }
 
   function renderSubs() {
     var tr = track();
-    var units = sessionsOf(tr).filter(function (s) { return s.isUnit; });
-    var h = '<div class="a-head"><p class="v2-eyebrow">מסלול ' + esc(tr) + "</p><h2>הגשות היחידות</h2></div>" +
-      '<div class="v2-card"><div class="v2-seg" role="group" aria-label="תור הבדיקה"><button type="button" aria-pressed="true">ממתינים</button><button type="button" aria-pressed="false" disabled>הוחזרו</button><button type="button" aria-pressed="false" disabled>אושרו</button></div>' +
-      '<p class="v2-note" style="margin-top:14px">כאן יופיע תור הבדיקה של שלוש היחידות העצמיות: תוצר כקובץ או קישור, "מה השתנה בעקבות המשוב", גרסאות, ' +
-      'ואישור שלך שנספר כנוכחות "השלים". עד שהיחידה הראשונה נפתחת אין מה להציג.</p>' +
-      '<div class="a-tw"><table class="a-tbl"><thead><tr><th>יחידה</th><th>נושא</th><th>החלון</th><th>מצב</th><th>ממתינים</th></tr></thead><tbody>' +
-      (units.map(function (s) {
-        var st = s.now ? "פתוחה" : s.past ? "נסגרה" : "טרם נפתחה";
-        return '<tr><td translate="no">' + esc(s.num) + "</td><td>" + esc(s.topic) + '</td><td translate="no">' + esc(shortDate(s.opens || s.date)) + "–" + esc(shortDate(s.dueBy)) + "</td><td>" + st + "</td><td>—</td></tr>";
-      }).join("") || '<tr><td colspan="5" class="a-empty">היחידות לא נטענו.</td></tr>') + "</tbody></table></div></div>";
-    el("a-subs").innerHTML = h;
+    var units = subUnits(tr);
+    A.subs = A.subs || { n: 0, q: "pending", when: "all", data: null, track: "" };
+    var S = A.subs;
+    if (S.track !== tr || !S.n || !units.some(function (u) { return u.num === S.n; })) { S.n = subDefaultUnit(units); S.data = null; S.track = tr; }
+    var box = el("a-subs");
+    if (!S.bound) {
+      S.bound = true;
+      box.addEventListener("click", function (ev) {
+        var b = ev.target.closest ? ev.target.closest("button[data-sn],button[data-sq],button[data-sw],button[data-send]") : null;
+        if (!b || b.disabled) return;
+        if (b.hasAttribute("data-sn")) { S.n = Number(b.getAttribute("data-sn")); S.data = null; renderSubs(); }
+        else if (b.hasAttribute("data-sq")) { S.q = b.getAttribute("data-sq"); subList(); }
+        else if (b.hasAttribute("data-sw")) { S.when = b.getAttribute("data-sw"); subList(); }
+        else if (b.hasAttribute("data-send")) subSend(b);
+      });
+    }
+    var unit = null;
+    units.forEach(function (u) { if (u.num === S.n) unit = u; });
+    var segs = units.map(function (u) {
+      return '<button type="button" data-sn="' + esc(u.num) + '" aria-pressed="' + (u.num === S.n) + '" translate="no">יחידה ' + esc(u.num) + "</button>";
+    }).join("");
+    box.innerHTML = '<div class="a-head"><p class="v2-eyebrow">מסלול ' + esc(tr) + (unit ? " · " + esc(shortDate(unit.opens || unit.date)) + "–" + esc(shortDate(unit.dueBy)) : "") + "</p>" +
+      "<h2>הגשות" + (unit ? " · " + esc(unit.topic) : " היחידות") + "</h2></div>" +
+      (units.length > 1 ? '<div class="a-subbar"><div class="v2-seg" role="group" aria-label="יחידה">' + segs + "</div></div>" : "") +
+      '<div id="a-sublist"><div class="v2-card"><p class="a-empty">טוענים את ההגשות…</p></div></div>';
+    if (!units.length) { el("a-sublist").innerHTML = '<div class="v2-card"><p class="a-empty">היחידות לא נטענו.</p></div>'; return; }
+    if (S.data && S.data.n === S.n && S.data.track === tr) { subList(); return; }
+    var n = S.n;
+    get("subs", { track: tr, n: n }).then(function (r) {
+      if (S.n !== n || track() !== tr) return;
+      if (!r || !r.ok) { el("a-sublist").innerHTML = '<div class="v2-card"><p class="v2-note bad">ההגשות לא נטענו (' + esc((r && r.error) || "רשת") + "). לרענן בעוד רגע.</p></div>"; return; }
+      S.data = r;
+      subList();
+    }).catch(function () { el("a-sublist").innerHTML = '<div class="v2-card"><p class="v2-note bad">אין חיבור לשרת. לרענן בעוד רגע.</p></div>'; });
+  }
+
+  function subList() {
+    var S = A.subs, r = S.data, box = el("a-sublist");
+    if (!box || !r) return;
+    var all = r.items || [];
+    var nPending = all.filter(subPending).length, nToday = all.filter(function (i) { return i.today; }).length;
+    var byQ = all.filter(function (i) { return S.q === "all" ? true : S.q === "done" ? !subPending(i) : subPending(i); });
+    var list = byQ.filter(function (i) { return S.when === "today" ? i.today : S.when === "week" ? subInWeek(i) : true; });
+    var seg = function (name, cur, opts) {
+      return '<div class="v2-seg" role="group" aria-label="' + name + '">' + opts.map(function (o) {
+        return '<button type="button" data-' + o[0] + '="' + o[1] + '" aria-pressed="' + (cur === o[1]) + '">' + o[2] + "</button>";
+      }).join("") + "</div>";
+    };
+    var h = '<div class="v2-card a-subtools">' +
+      seg("תור", S.q, [["sq", "pending", "ממתינות" + (nPending ? ' <span class="v2-n">' + nPending + "</span>" : "")], ["sq", "done", "נענו" + (all.length - nPending ? ' <span class="v2-n">' + (all.length - nPending) + "</span>" : "")], ["sq", "all", "הכול"]]) +
+      seg("זמן", S.when, [["sw", "today", "היום" + (nToday ? ' <span class="v2-n">' + nToday + "</span>" : "")], ["sw", "week", "השבוע"], ["sw", "all", "מההתחלה"]]) +
+      '<p class="a-foot" style="margin:10px 0 0">' + (all.length ? all.length + " הגשות ביחידה, " + nPending + " ממתינות לתגובה. " : "עוד לא הוגש דבר ביחידה הזאת. ") +
+      "שליחת תגובה מסמנת לרכז/ת “השלים” בנוכחות היחידה, ויוצאת במייל מהמרחב.</p></div>";
+    if (!list.length) {
+      h += '<div class="v2-card"><p class="a-empty">' + (all.length ? (S.when === "today" ? "אין הגשות מהיום" : S.when === "week" ? "אין הגשות מהשבוע" : "אין הגשות") +
+        (S.q === "pending" ? " שממתינות לתגובה" : S.q === "done" ? " שנענו" : "") + "." : "כשרכז/ת לוחץ/ת “הגשתי” בדף היחידה, ההגשה תופיע כאן.") + "</p></div>";
+    } else h += list.map(subCard).join("");
+    box.innerHTML = h;
+  }
+
+  function subVal(v, link) {
+    var s = str(v); if (!s) return "";
+    if (link || /^https?:\/\/\S+$/.test(s)) return /^https?:\/\//.test(s) ? '<a href="' + esc(s) + '" target="_blank" rel="noopener" dir="ltr">' + esc(s.length > 70 ? s.slice(0, 67) + "…" : s) + "</a>" : esc(s);
+    return esc(s);
+  }
+
+  function subCard(it) {
+    var V = SUB_VIEW[A.subs.n] || SUB_VIEW[3], f = it.fields || {};
+    var tags = "";
+    if (it.today) tags += '<span class="a-tag today">היום</span>';
+    if (it.resubmitted) tags += '<span class="a-tag warn">הוגש מחדש אחרי התגובה</span>';
+    if (it.missing && it.missing.length) tags += '<span class="a-tag warn" title="' + esc(it.missing.join(" · ")) + '">עוד חסר: ' + esc(it.missing.join(" · ")) + "</span>";
+    if (it.stuck && it.stuck.length) tags += '<span class="a-tag warn">לחצו “נתקעתי”</span>';
+    if (it.state === "השלים") tags += '<span class="a-tag ok">השלים</span>';
+    if (/^ar/i.test(str(it.lang))) tags += '<span class="a-tag">הדף בערבית</span>';
+    var dl = "";
+    V.main.forEach(function (m) { var v = str(f[m[0]]); dl += "<dt>" + esc(m[1]) + "</dt><dd>" + (v ? esc(v) : '<span class="a-empty">לא מולא</span>') + "</dd>"; });
+    var acts = V.acts.map(function (a, i) {
+      var v = str(f[a[0]]); if (!v) return "";
+      var extra = [str(f[a[1]]) ? "מתי: " + esc(f[a[1]]) : '<span class="a-miss">בלי תאריך</span>', str(f[a[2]]) ? "עם מי: " + esc(f[a[2]]) : '<span class="a-miss">בלי שותף/ה</span>'];
+      return "<li>" + esc(v) + ' <small class="a-meta">· ' + extra.join(" · ") + "</small></li>";
+    }).filter(String).join("");
+    dl += "<dt>3 הפעולות</dt><dd>" + (acts ? '<ol class="a-acts">' + acts + "</ol>" : '<span class="a-empty">לא מולאו</span>') + "</dd>";
+    var nb = str(f[V.nb[0]]);
+    dl += "<dt>" + esc(V.nb[1]) + "</dt><dd>" + (nb ? subVal(nb, true) : '<span class="a-miss">אין קישור</span>') + "</dd>";
+    var more = V.more.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + subVal(v, m[2] === "link") + "</dd>" : ""; }).join("");
+    var fb = V.fb.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + esc(v) + "</dd>" : ""; }).join("");
+    var stuck = (it.stuck || []).map(function (s) { return "<li>" + (s.step ? "<b>" + esc(s.step) + ":</b> " : "") + esc(s.msg) + ' <small class="a-meta" translate="no">· ' + esc(s.at) + "</small></li>"; }).join("");
+    var done = it.reply ? '<div class="a-reply-done"><b>התגובה שלך</b> · <span translate="no">' + esc(it.reply.at) + "</span>" +
+      (it.reply.mail ? " · מייל: " + esc(it.reply.mail) : "") + "<br>" + esc(it.reply.text) + "</div>" : "";
+    var form = viewer() ? "" : '<div class="a-reply a-admin-only"><label for="sr-' + esc(it.sid) + '"><b>' + (it.reply ? "תגובה נוספת" : "תגובה שלי") + "</b> · משפט או שניים, יגיעו במייל ולתיק ההטמעה</label>" +
+      '<textarea id="sr-' + esc(it.sid) + '" maxlength="1500" placeholder="מה עבד יפה, ומה כדאי לחדד"></textarea>' +
+      '<div class="a-reply-row"><button type="button" class="v2-btn" data-send="' + esc(it.sid) + '">שלח' + (it.state === "השלים" ? "" : " ואשר את היחידה") + "</button>" +
+      '<span class="a-meta" id="srm-' + esc(it.sid) + '"></span></div></div>';
+    return '<article class="a-sub" data-sid="' + esc(it.sid) + '"><div class="a-sub-h"><b>' + esc(it.name) + "</b><span>" + esc(it.school) + '</span><span class="a-meta" translate="no">' + esc(it.at) + "</span>" + tags + "</div>" +
+      "<dl>" + dl + "</dl>" +
+      (stuck ? '<div class="v2-note" style="margin-top:10px"><b>מה כתבו בכפתור &quot;נתקעתי&quot;:</b><ul class="a-acts">' + stuck + "</ul></div>" : "") +
+      (more || fb ? "<details><summary>עוד מההגשה" + (fb ? " והמשוב על היחידה" : "") + "</summary><dl>" + more + (fb ? "<dt><b>המשוב על היחידה</b></dt><dd></dd>" + fb : "") + "</dl></details>" : "") +
+      done + form + "</article>";
+  }
+
+  function subSend(btn) {
+    var S = A.subs, sid = btn.getAttribute("data-send"), ta = el("sr-" + sid), msg = el("srm-" + sid);
+    var text = ta ? str(ta.value) : "";
+    if (!text) { toast("צריך לכתוב משפט לפני השליחה", true); if (ta) ta.focus(); return; }
+    btn.disabled = true; if (msg) msg.textContent = "שולחים…";
+    w.SH_auth.post({ action: "subReply", key: key(), track: track(), n: S.n, sid: sid, text: text }).then(function (r) {
+      if (!r || r.ok !== true) {
+        var m = { nosub: "לא נמצאה הגשה של הרכז/ת הזה/ו.", noperson: "הרכז/ת לא ברשימת המשתתפים.", notext: "צריך לכתוב משפט.", busy: "המערכת עמוסה, לנסות שוב." };
+        toast(m[r && r.error] || "התגובה לא נשלחה (" + ((r && r.error) || "רשת") + ")", true);
+        btn.disabled = false; if (msg) msg.textContent = "";
+        return;
+      }
+      toast(r.mailed === "נשלח" ? "התגובה נשמרה ויצאה במייל" : r.mailed === "אין מייל" ? "התגובה נשמרה. לרכז/ת אין מייל ברשימה, אז היא בתיק בלבד" : "התגובה נשמרה, אבל המייל לא יצא. לנסות שוב מאוחר יותר", r.mailed === "נכשל");
+      S.data = null;
+      renderSubs();
+    }).catch(function () { toast("אין חיבור לשרת", true); btn.disabled = false; if (msg) msg.textContent = ""; });
   }
 
   /* ------------------------------------------------------------------ */
