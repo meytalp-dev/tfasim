@@ -40,6 +40,7 @@
       a.push({ school: x.name, name: 'רכז.ת החניכות (בדיקה)', role: 'rakaz', email: 'rakaz.' + slug + '@school.example', active: 'כן' });
       a.push({ school: x.name, name: 'מנהל.ת בית הספר (בדיקה)', role: 'principal', email: 'menahel.' + slug + '@school.example', active: 'כן' });
       return a; }, []);
+    base.push({ school: 'המרחב הפדגוגי', name: 'המרחב הפדגוגי', role: 'system', email: 'merhav@pedagogiamh.co.il', active: 'כן' });
     return base.concat(d.perms);
   }
   function today() { return new Date(Date.now() + 2 * 36e5).toISOString().slice(0, 10); }
@@ -76,18 +77,36 @@
     }
     var s = d.sessions[q.token];
     if (!s || !active().some(function (x) { return x.email === s.email && x.school === s.school; })) return { ok: false, error: 'badsession' };
+    if (['preload', 'preloadStatus', 'activationSend'].indexOf(q.action) >= 0) {
+      if (s.role !== 'system') return { ok: false, error: 'forbidden' };
+      if (q.action === 'preloadStatus') { var st = {}; (q.schools || []).forEach(function (n) { var x = d.schools[n]; st[n] = { state: !x || !x.recovery ? 'none' : x.pending ? 'pending' : 'active', n: x ? Object.keys(x.recs).length : 0 }; }); return { ok: true, status: st }; }
+      var t = d.schools[q.school] = d.schools[q.school] || { keys: {}, recovery: null, recs: {} };
+      if (q.action === 'activationSend') {
+        if (!t.recovery || !t.pending) return { ok: false, error: 'notpending' };
+        d.outbox.push({ to: q.to, subj: 'קוד הפעלה · ' + q.school, code: q.code, at: new Date().toISOString() }); save(d); return { ok: true };
+      }
+      if (t.recovery && !t.pending) return { ok: false, error: 'active' };
+      if (!t.recovery && Object.keys(t.recs).length) return { ok: false, error: 'hasdata' };
+      if (!q.recovery || !(q.recs || []).length) return { ok: false, error: 'bad' };
+      for (var ri = 0; ri < q.recs.length; ri++) if (!/^stu:[A-Za-z0-9]{2,24}$/.test(q.recs[ri].k) || !q.recs[ri].e || !okCipher(q.recs[ri].e)) return { ok: false, error: 'notencrypted' };
+      t.recs = {}; q.recs.forEach(function (x) { t.recs[x.k] = { p: pick(x.p, STU_PLAIN), e: x.e }; });
+      t.recovery = q.recovery; t.pending = true; save(d); return { ok: true, n: q.recs.length };
+    }
     var sc = d.schools[s.school] = d.schools[s.school] || { keys: {}, recovery: null, recs: {} };
     var edit = s.role === 'rakaz', R = function (o) { save(d); return Object.assign({ ok: true }, o || {}); };
-    if (['keysInit', 'grant', 'put', 'remqSet', 'remSend'].indexOf(q.action) >= 0 && !edit) return { ok: false, error: 'readonly' };
+    if (['keysInit', 'keysActivate', 'grant', 'put', 'remqSet', 'remSend'].indexOf(q.action) >= 0 && !edit) return { ok: false, error: 'readonly' };
     switch (q.action) {
       case 'me': return { ok: true, me: s };
       case 'logout': delete d.sessions[q.token]; return R();
       case 'keys':
-        return { ok: true, initialized: !!sc.recovery, recovery: sc.recovery, me: sc.keys[s.email] || null,
+        return { ok: true, initialized: !!sc.recovery, preloaded: !!(sc.recovery && sc.pending), recovery: sc.recovery, me: sc.keys[s.email] || null,
           users: active().filter(function (p) { return p.school === s.school; }).map(function (p) { var k = sc.keys[p.email]; return { email: p.email, name: p.name, role: p.role, pub: k ? k.pub : null, granted: !!(k && k.wrapped), at: k ? k.at : '' }; }) };
       case 'keysInit':
         if (sc.recovery) return { ok: false, error: 'already' };
         sc.keys[s.email] = { pub: q.pub, encPriv: q.encPriv, wrapped: q.wrapped, at: today() }; sc.recovery = q.recovery; return R();
+      case 'keysActivate':
+        if (!sc.recovery || !sc.pending) return { ok: false, error: 'already' };
+        sc.keys[s.email] = { pub: q.pub, encPriv: q.encPriv, wrapped: q.wrapped, at: today() }; sc.recovery = q.recovery; sc.pending = false; return R();
       case 'keysSet': sc.keys[s.email] = { pub: q.pub, encPriv: q.encPriv, wrapped: q.wrapped || null, at: today() }; return R();
       case 'grant': { var k = sc.keys[String(q.email).toLowerCase()]; if (!k || !q.wrapped) return { ok: false, error: 'nokeys' }; k.wrapped = q.wrapped; k.at = today(); return R(); }
       case 'load':

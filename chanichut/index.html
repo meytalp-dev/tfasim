@@ -308,6 +308,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 .num{width:56px;font:inherit;padding:.2em .4em;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center}
 /* מבט ארצי ובתי ספר */
 .nat-find{margin:0;min-width:260px}
+.grp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:12px 0}.grp-btn{display:grid;gap:2px;min-height:44px;padding:10px 12px;text-align:right;background:var(--card,#fff);border:1px solid var(--line,#ddd);border-radius:10px;font:inherit;color:inherit;cursor:pointer}.grp-btn b{font-family:Rubik,sans-serif;font-weight:700}.grp-btn small{color:var(--muted)}.grp-btn.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .chips.filt{margin-bottom:10px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .mg-row .name{text-align:start;font-family:var(--head);font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.mg-row .name:hover{text-decoration-color:var(--ink)}
 .mg-row .name small{display:block;color:var(--muted);font-weight:400;font-family:var(--body);font-size:.8em}
@@ -442,6 +443,16 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
         <label class="gate-check"><input type="checkbox" id="iSaved">שמרתי את הקוד</label>
         <button class="btn primary big gate-btn" id="iGo" disabled>כניסה למערכת</button>
       </div>
+    </div>
+
+    <div class="gate-form" id="gAct" hidden>
+      <h2 class="gate-h">הפעלת המערכת של בית הספר</h2>
+      <p class="gate-msg">רשימת התלמידים כבר מחכה כאן, מוצפנת. את קוד ההפעלה קיבל.ה מנהל.ת בית הספר במייל.</p>
+      <label class="field"><span>קוד ההפעלה</span><input class="find" id="aCode" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
+      <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="aPass1" type="password" autocomplete="new-password"></label>
+      <label class="field"><span>שוב את הסיסמה</span><input class="find" id="aPass2" type="password" autocomplete="new-password"></label>
+      <p class="gate-msg" id="mAct"></p>
+      <button class="btn primary big gate-btn" id="aGo">פתיחת הרשימה</button>
     </div>
 
     <div class="gate-form" id="gNew" hidden>

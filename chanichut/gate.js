@@ -10,7 +10,7 @@
   'use strict';
   const $ = id => document.getElementById(id);
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const STEPS = ['gLogin', 'gReg', 'gCodeS', 'gPass', 'gInit', 'gNew', 'gWait', 'gRec', 'gBusy'];
+  const STEPS = ['gLogin', 'gReg', 'gCodeS', 'gPass', 'gInit', 'gAct', 'gNew', 'gWait', 'gRec', 'gBusy'];
   const show = id => { STEPS.forEach(x => { const el = $(x); if (el) el.hidden = x !== id; }); const f = $(id) && $(id).querySelector('input:not([type=checkbox]),select'); if (f && matchMedia('(pointer:fine)').matches) f.focus(); };
   const msg = (id, t, bad) => { const el = $(id); if (el) { el.textContent = t || ''; el.className = 'gate-msg' + (bad ? ' bad' : ''); } };
   const busy = (b, on, t) => { b.disabled = on; if (t) b.dataset.t = b.dataset.t || b.innerHTML; b.innerHTML = on && t ? t : (b.dataset.t || b.innerHTML); };
@@ -87,9 +87,10 @@
     KEYS = r;
     $('gHello').textContent = 'שלום ' + ME.name.split(' ')[0];
     if (r.me && r.me.wrapped) return show('gPass');
+    if (r.preloaded && ME.role === 'rakaz') return show('gAct');
     if (r.me && !r.me.wrapped) return waitScreen();
     if (!r.initialized && ME.role === 'rakaz') return show('gInit');
-    if (!r.initialized) { show('gNew'); return msg('mNew', 'הרכז.ת של בית הספר עוד לא נכנס.ה למערכת. אפשר ליצור סיסמה עכשיו, והגישה תיפתח אחרי שהרכז.ת יאשר.ו'); }
+    if (!r.initialized || r.preloaded) { show('gNew'); return msg('mNew', 'הרכז.ת של בית הספר עוד לא נכנס.ה למערכת. אפשר ליצור סיסמה עכשיו, והגישה תיפתח אחרי שהרכז.ת יאשר.ו'); }
     show('gNew');
   }
   $('pEnter').onclick = async () => {
@@ -125,6 +126,20 @@
   $('iPrint').onclick = () => { const w = window.open('', '_blank'); if (!w) return; w.document.write(`<html dir="rtl" lang="he"><meta charset="utf-8"><title>קוד שחזור</title><body style="font-family:Arial;padding:40px;text-align:right"><h2>מערכת רכזי החניכות · קוד שחזור</h2><p>${esc(ME.school)}</p><p style="font-size:26px;letter-spacing:3px;font-weight:bold" dir="ltr">${esc(REC)}</p><p>הקוד פותח את כל המידע של בית הספר אם הסיסמה נשכחה. לשמור במקום נעול. לא לשלוח במייל או בוואטסאפ.</p></body></html>`); w.document.close(); w.print(); };
   $('iSaved').onchange = () => { $('iGo').disabled = !$('iSaved').checked; };
   $('iGo').onclick = () => enter();
+  /* רשימה שנטענה מראש: הקוד שהגיע למנהל.ת פותח את מפתח בית הספר, ומיד מוחלף בקוד שחזור חדש */
+  $('aGo').onclick = async () => {
+    const p1 = $('aPass1').value, p2 = $('aPass2').value; if (!passOk(p1, p2, 'mAct')) return;
+    const b = $('aGo'); busy(b, true, 'פותח…');
+    let sk;
+    try { sk = await CK.unwrapRecovery($('aCode').value, KEYS.recovery); } catch (e) { busy(b, false); return msg('mAct', 'קוד ההפעלה לא נכון', true); }
+    const uk = await CK.newUserKeys(p1);
+    REC = CK.newRecoveryCode();
+    const r = await API.call('keysActivate', { pub: uk.pub, encPriv: uk.encPriv, wrapped: await CK.wrapFor(uk.pub, sk), recovery: await CK.wrapRecovery(REC, sk) });
+    busy(b, false);
+    if (!r.ok) return msg('mAct', err(r), true);
+    SKEY = sk; EXTRACT = true; $('aCode').value = '';
+    $('iRec').textContent = REC; $('iStep1').hidden = true; $('iStep2').hidden = false; show('gInit');
+  };
   /* מנהל.ת / רכז.ת נוספ.ת: סיסמה, ומחכים לאישור */
   $('nMake').onclick = async () => {
     const p1 = $('nPass1').value, p2 = $('nPass2').value; if (!passOk(p1, p2, 'mNew')) return;

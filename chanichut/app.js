@@ -138,7 +138,7 @@ window.startApp = function (R) {
   /* ================= תזכורות על היעדרות =================
      לא נשלחות בלחיצה — יוצאות פעם ביום ב-16:00 על מה שמסומן "לא הגיע.ה" באותו רגע. כך לחיצה בטעות לא שולחת מייל. */
   const REM = [], REM_CFG = R.meta.remCfg;
-  const gradeOf = cls => String(cls).replace(/[0-9]/g, '').trim();
+  const gradeOf = cls => String(cls).split('·')[0].replace(/[0-9]/g, '').trim();
   /* אנשי הקשר לתזכורות — בית הספר מזין במסך "ניהול · משתמשים" (מיטל, 1.11.26) */
   const CT = R.meta.contacts;
   const TEACHER = cls => (CT.cls[cls] || {}).name ? CT.cls[cls].name + ' (מחנך.ת ' + cls + ')' : 'מחנך.ת ' + cls;
@@ -313,6 +313,7 @@ window.startApp = function (R) {
     <section class="sec att" id="att">
       <div class="sec-head att-head"><h2>דיווח נוכחות · <select class="mon-pick" id="monPick" aria-label="חודש">${[0, 1].map(b => { const m = Store.monthInfo(b); return `<option value="${b}" ${MONTH.back === !!b ? 'selected' : ''}>${esc(m.label)}</option>`; }).join('')}</select></h2><button class="btn quiet" data-act="att-close">${ic('back')}חזרה</button></div>
       <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="find" class="find big" placeholder="כיתה או מספר פעולה" autocomplete="off"></div>
+      <div id="grpList" class="grp-list" hidden></div>
       <div id="roster" class="roster" hidden></div>
     </section>
 
@@ -510,8 +511,17 @@ window.startApp = function (R) {
   /* ================= נוכחות ================= */
   const norm = s => String(s || '').replace(/["'״׳\s]/g, '');
   let shown = [];
-  function find(q) { const n = norm(q); shown = n ? active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || s.name.includes(q.trim())) : []; renderRoster(); }
+  function find(q) { const n = norm(q), ex = active().filter(s => norm(s.cls) === n); shown = !n ? [] : ex.length ? ex : active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || s.name.includes(q.trim())); renderRoster(); }
+  /* רשימה שנטענה מראש: אין מספר כיתה, אז בוחרים קבוצה. המספור לפי סדר מספרי הפעולה */
+  function renderGroups() {
+    const box = $('grpList'); if (!box) return;
+    const L = active().filter(s => s.act); box.hidden = !L.length; if (!L.length) { box.innerHTML = ''; return; }
+    const cur = shown.length && shown.every(s => s.cls === shown[0].cls) ? shown[0].cls : '';
+    const names = [...new Set(L.map(s => s.cls))].sort((a, b) => a.localeCompare(b, 'he', { numeric: true }));
+    box.innerHTML = names.map(c => { const g = L.filter(s => s.cls === c); return `<button class="grp-btn ${c === cur ? 'on' : ''}" data-grp="${esc(c)}"><b>${esc(c)} · ${g.length} תלמידים</b><small>מספר פעולה ${esc(g[0].act)}</small><small>${[...new Set(g.map(s => s.mg))].map(esc).join(', ')}</small></button>`; }).join('');
+  }
   $('find').oninput = e => find(e.target.value);
+  $('grpList').onclick = e => { const b = e.target.closest('[data-grp]'); if (b) { $('find').value = b.dataset.grp; find(b.dataset.grp); } };
   const tmTxt = t => t && (t.i || t.o) ? `<span class="tm">${esc(t.i || '')}–${esc(t.o || '')}</span>` : '';
   const offWhy = (s, d) => OFF[s.cls] && OFF[s.cls][d];
   const stLbl = (s, d) => { const v = ATT[s.id][d]; return v === 'a' ? 'לא הגיע.ה' : v === 'x' ? 'היעדרות באישור' : v === 'n' ? (offWhy(s, d) || (suspended(s, d) ? 'השעיה' : 'לא בעבודה')) : v ? 'הגיע.ה' : 'לא סומן'; };
@@ -520,6 +530,7 @@ window.startApp = function (R) {
   const statusTag = s => s.status === 'עזב' ? ' <em class="tag no">עזב.ה</em>' : s.status === 'מושעה' ? ` <em class="tag susp">מושעה.ת${s.susp && s.susp.to ? ' עד ' + esc(s.susp.to) : ''}</em>` : '';
   const LEGEND = `<div class="att-legend" aria-label="מקרא"><span><i class="cell p"></i>הגיע.ה</span><span><i class="cell a"></i>לא הגיע.ה</span><span><i class="cell x"></i>באישור</span><span><i class="cell n"></i>לא בעבודה</span><span><i class="cell"></i>לא סומן</span><span><i class="cell has-note"></i>יש הערה</span></div>`;
   function renderRoster() {
+    renderGroups();
     const r = $('roster');
     if (!shown.length) { r.innerHTML = $('find').value ? '<p class="empty">לא נמצא.</p>' : ''; r.hidden = !$('find').value; return; }
     shown = shown.filter(s => STU.includes(s));
@@ -609,7 +620,7 @@ window.startApp = function (R) {
     const opts = (o, cur2) => Object.entries(o).filter(([eid, e]) => eid === cur2 || canPlace(e)).map(([eid, e]) => `<option value="${eid}" ${eid === cur2 ? 'selected' : ''}>${esc(e.name)}${e.mas === 'לא מאושר' ? ' · לא מאושר' : ''}</option>`).join('');
     const miles = milesOf(s);
     const rems = [...pending().filter(r => r.sid === s.id).map(r => ({ ...r, p: true })), ...REM.filter(r => r.sid === s.id)];
-    return `<p class="hint tik-sub">${esc(s.mg)}${s.track ? ' · מסלול ' + esc(s.track) : ''} · ${esc(s.cls)}${s.act ? ' · מספר פעולה ' + s.act : ''} · ${esc(empName(s.emp))}${who}${s.start ? ' · מ-' + esc(s.start) : ''}</p>${s.note ? `<p class="snote big">${ic('pen')}${esc(s.note)}</p>` : ''}
+    return `<p class="hint tik-sub">${esc(s.mg)}${s.track ? ' · מסלול ' + esc(s.track) : ''} · ${esc(s.cls)}${s.act ? ' · מספר פעולה ' + esc(s.act) : ''} · ${esc(empName(s.emp))}${who}${s.start ? ' · מ-' + esc(s.start) : ''}${s.birth ? ` · שנת לידה ${esc(s.birth)} (גיל ${MONTH.y - s.birth} בערך)` : ''}${s.phone ? ` · <a href="tel:${esc(s.phone)}" dir="ltr">${esc(s.phone)}</a>` : ''}${s.phone2 ? ` · <a href="tel:${esc(s.phone2)}" dir="ltr">${esc(s.phone2)}</a>` : ''}</p>${s.note ? `<p class="snote big">${ic('pen')}${esc(s.note)}</p>` : ''}
       <div class="tik-grid">
         <div class="tik-card wide place" id="placeCard"><h3>${ic('building')}איפה עובד.ת</h3><div class="place-row">
           <label class="pl ${pl === 'out' ? 'on' : ''}"><input type="radio" name="pl" value="out" ${pl === 'out' ? 'checked' : ''}>מעסיק בחוץ</label>

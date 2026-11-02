@@ -9,7 +9,7 @@
   const DOCS = ['תעודת זהות', 'חשבון בנק', 'אישור רפואי', 'טופס מוכנות ליציאה (חתום)', 'הסכם התקשרות עם המעסיק'];
   const MN = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
   const STU_PLAIN = ['id', 'mg', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
-  const STU_PRIV = ['name', 'phone', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor'];
+  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor'];
   const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'masNotes', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'studsTxt', 'kind', 'client', 'hours', 'min'];
   const pick = (o, ks) => { const r = {}; ks.forEach(k => { if (o[k] !== undefined) r[k] = o[k]; }); return r; };
   const ymOf = (y, m) => y + '-' + String(m).padStart(2, '0');
