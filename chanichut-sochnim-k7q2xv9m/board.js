@@ -1,6 +1,6 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-03T04:05:00+02:00',
+  updated: '2026-11-03T04:15:00+02:00',
   waiting: [
     'הפיילוט: להעלות את עתיד בת עמי ובית חנינה בנים בכלי ההכנה ולשלוח את הקודים למנהלים.',
     'רמת דוד: האם יש רכז.ת?',
@@ -23,7 +23,7 @@ window.BOARD = {
     { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'done', files: ['national.js', 'national.css', 'megamot.js', 'tests/national/'] },
     { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'done', files: ['schools-admin.js', 'tests/admin/'] },
     { id: 'files', name: 'טעינת קבצים', role: 'כלי ההכנה לכל בתי הספר, נקודת פתיחה מספטמבר, עדכון במהלך השנה', status: 'review', files: ['hachana/hachana.html', 'hachana/megamot-codes.js', 'hachana/anashim.html', 'tests/files/'] },
-    { id: 'auto', name: 'אוטומציות', role: 'קישור למנטור.ית והעוזר', status: 'doing', files: ['mentor.html', 'mentor.js', 'gas/מנטור.js', 'sochnim/mentor-api.md', 'tests/auto/'] },
+    { id: 'auto', name: 'אוטומציות', role: 'קישור למנטור.ית והעוזר', status: 'review', files: ['mentor.html', 'mentor.js', 'gas/מנטור.js', 'sochnim/mentor-api.md', 'tests/auto/'] },
     { id: 'qa', name: 'בדיקות ואבטחה', role: 'בדיקות קצה, נייד, דליפת שמות ועומס. לא עורך קוד מערכת', status: 'todo', files: ['tests/'] }
   ],
   tasks: [
@@ -63,7 +63,7 @@ window.BOARD = {
     { id: 'e2', stage: 's4', agent: 'files', status: 'review', title: 'מסוכמי ספטמבר כנקודת פתיחה' },
     { id: 'e3', stage: 's4', agent: 'files', status: 'review', title: 'עדכון רשימה במהלך השנה, בלי לדרוס' },
     { id: 'd7', stage: 's4', agent: 'school', status: 'doing', title: 'מיזוג רשימה מעודכנת במסך התלמידים, וכפתור קישור למנטור.ית' },
-    { id: 'e4', stage: 's4', agent: 'auto', status: 'doing', title: 'קישור למנטור.ית' },
+    { id: 'e4', stage: 's4', agent: 'auto', status: 'review', title: 'קישור למנטור.ית' },
     { id: 'e5', stage: 's4', agent: 'school', status: 'doing', title: 'העוזר' },
 
     { id: 'f1', stage: 's5', agent: 'qa', status: 'todo', title: 'בדיקת קצה לכל תפקיד' },
