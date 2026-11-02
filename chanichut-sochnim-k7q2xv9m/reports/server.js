@@ -1,1 +1,1 @@
-window.REPORT('server', { at: '2026-11-02T19:38:00+02:00', status: 'review', now: 'מסמך בדיקת האחסון מוכן: המלצה על קובץ לכל בית ספר ונעילה לפי בית ספר, ממתין להחלטת מיטל', note: 'המספרים הם הערכה עד בדיקת עומס. נמצאו תקלות שיקרו גם בלי עומס, כולל שליחה כפולה של תזכורות', tasks: { b4: 'review' }, touched: ['sochnim/storage-review.md'], blockers: [] });
+window.REPORT('server', { at: '2026-11-02T21:00:00+02:00', status: 'doing', now: 'מתחיל את גל הבנייה', note: '', tasks: {"b4":"done"}, touched: [], blockers: [] });
