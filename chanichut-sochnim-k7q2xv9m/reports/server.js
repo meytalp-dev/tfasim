@@ -1,1 +1,1 @@
-window.REPORT('server', { at: '2026-11-02T21:00:00+02:00', status: 'doing', now: 'מתחיל את גל הבנייה', note: '', tasks: {"b4":"done"}, touched: [], blockers: [] });
+window.REPORT('server', { at: '2026-11-02T18:00:37Z', status: 'doing', now: 'בונה את שכבת האחסון החדשה וטבלת ההיקף', note: '', tasks: { c0: 'doing', c1: 'todo', c2: 'todo', c3: 'doing' }, touched: [], blockers: [] });
