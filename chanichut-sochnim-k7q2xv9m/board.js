@@ -1,6 +1,6 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-02T22:50:00+02:00',
+  updated: '2026-11-02T23:20:00+02:00',
   waiting: [
     'רמת דוד: האם יש רכז.ת? לפי הנספח המשרה לא מאוישת.',
     'להעביר את נספח בעלי התפקידים מחשבון בית הערבה ל-merhav לפני 12.11.',
@@ -16,9 +16,9 @@ window.BOARD = {
     { id: 's5', name: '5 · בדיקה מלאה, פריסה ופיילוט' }
   ],
   agents: [
-    { id: 'super', name: 'סוכן העל', role: 'מחלק משימות, בודק עבודה, מעדכן את הלוח ופורס אחרי אישור', status: 'doing', now: 'מרכז את גל הבנייה הראשון', files: ['sochnim/board.js', 'sochnim/index.html', 'sochnim/CONTRACT.md', 'sochnim/publish.cjs'] },
+    { id: 'super', name: 'סוכן העל', role: 'מחלק משימות, בודק עבודה, מעדכן את הלוח ופורס אחרי אישור', status: 'doing', now: 'בודק את גל הבנייה הראשון לפני פריסה', files: ['sochnim/board.js', 'sochnim/index.html', 'sochnim/CONTRACT.md', 'sochnim/publish.cjs'] },
     { id: 'map', name: 'מיפוי', role: 'רשימת הפערים בין המוקאפ ל-v2 (קריאה בלבד)', status: 'done', files: ['sochnim/gaps.md'] },
-    { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'doing', files: ['gas/קוד.js', 'gas/appsscript.json', 'api.js', 'store.js', 'hachana/hachana.html', 'sochnim/storage-review.md'] },
+    { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'review', files: ['gas/קוד.js', 'gas/appsscript.json', 'api.js', 'store.js', 'hachana/hachana.html', 'sochnim/storage-review.md'] },
     { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'review', files: ['gate.js', 'index.html', 'hachana/anashim.html', 'app.js', 'sochnim/roles-views.md'] },
     { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'todo', files: [] },
     { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'todo', files: ['national.js'] },
@@ -42,10 +42,10 @@ window.BOARD = {
     { id: 'b6', stage: 's1', agent: 'gate', status: 'done', title: 'מקור הרכזים והמנהלים לטעינה מראש' },
     { id: 'b7', stage: 's1', agent: 'super', status: 'done', title: 'מסמך הגדרות משותף: פעולות שרת ושדות' },
 
-    { id: 'c0', stage: 's2', agent: 'server', status: 'doing', title: 'קובץ ונעילה לכל בית ספר, ותיקון תקלות השמירה והתזכורות' },
-    { id: 'c1', stage: 's2', agent: 'server', status: 'doing', title: 'ספירה ארצית ממה שהמערכת מכילה, בלי שמות' },
-    { id: 'c2', stage: 's2', agent: 'server', status: 'doing', title: 'תמונת מצב חודשית, ו"טרם דיווח" במקום 0%' },
-    { id: 'c3', stage: 's2', agent: 'server', status: 'doing', title: 'הרשאות לפי תפקיד בכל פעולת שרת' },
+    { id: 'c0', stage: 's2', agent: 'server', status: 'review', title: 'קובץ ונעילה לכל בית ספר, ותיקון תקלות השמירה והתזכורות' },
+    { id: 'c1', stage: 's2', agent: 'server', status: 'review', title: 'ספירה ארצית ממה שהמערכת מכילה, בלי שמות' },
+    { id: 'c2', stage: 's2', agent: 'server', status: 'review', title: 'תמונת מצב חודשית, ו"טרם דיווח" במקום 0%' },
+    { id: 'c3', stage: 's2', agent: 'server', status: 'review', title: 'הרשאות לפי תפקיד בכל פעולת שרת' },
     { id: 'c4', stage: 's2', agent: 'gate', status: 'review', title: 'כניסה לכל התפקידים' },
     { id: 'c5', stage: 's2', agent: 'gate', status: 'review', title: 'טעינת רכזים ומנהלים מראש, בלי אישור ידני' },
 
