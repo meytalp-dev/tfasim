@@ -119,8 +119,9 @@
           if (/^stu:/.test(key)) { if (!e) return { ok: false, error: 'notencrypted', key: key }; pl = pick(pl, STU_PLAIN); if (Array.isArray(pl.docs)) pl.docs = pl.docs.map(function (x) { return { s: x && x.s || 'miss' }; }); }
           else if (/^att:\d{4}-\d{2}:/.test(key)) { pl = pick(pl, ['a', 't', 'ob', 'sb']); e = ''; }
           else if (/^emp:/.test(key)) pl = pick(pl, EMP_PLAIN);
+          else if (/^lead:/.test(key)) { if (!e) return { ok: false, error: 'notencrypted', key: key }; pl = pick(pl, ['id']); }
           else if (/^mon:\d{4}-\d{2}$/.test(key)) { pl = pick(pl, ['sub', 'off']); e = ''; }
-          else if (key === 'meta') { pl = pick(pl, ['frames', 'remCfg', 'gantt', 'manual', 'contacts']); e = ''; }
+          else if (key === 'meta') { pl = pick(pl, ['frames', 'remCfg', 'gantt', 'manual', 'contacts', 'wiz']); e = ''; }
           else return { ok: false, error: 'badkey', key: key };
           if (r.del) delete sc.recs[key]; else sc.recs[key] = { p: pl, e: e };
         }
@@ -134,6 +135,7 @@
           d.remlog.push({ school: s.school, m: mm[1], sid: mm[3], d: +mm[2], to: mm[4], who: '', at: today() }); n++; });
         d.remq[s.school] = {}; return R({ sent: n });
       }
+      case 'empDb': return { ok: true, rows: root.EMP_DB || [] };
       case 'raw': return { ok: true, raw: sc.recs };   /* בדיקה בלבד: מה רואה מי שפותח את הגיליון */
     }
     return { ok: false, error: 'badaction' };

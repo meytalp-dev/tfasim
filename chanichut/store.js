@@ -32,7 +32,7 @@
     if (!res.ok) throw new Error(res.error || 'load');
     const M = monthInfo(back);
     R = { month: M, school: me.school, me, role: me.role === 'principal' ? 'manager' : me.role, DOCS,
-      EMPS: {}, INS: {}, STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MANUAL: {},
+      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MANUAL: {},
       meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0 };
     for (const r of res.recs) {
       EXIST.add(r.k);
@@ -46,6 +46,8 @@
         s.docs = DOCS.map((_, i) => ({ s: ((p.docs || [])[i] || {}).s || 'miss', n: (pv.docN || [])[i] || '' }));
         R.STU.push(s);
         R.NOTES[p.id] = Object.assign({}, (pv.notes || {})[M.ym]);
+      } else if (r.k.startsWith('lead:')) {
+        try { const pv = await CK.decJSON(key, r.e); if (pv) R.LEADS.push(pv); } catch (e) { R.bad++; }
       } else if (r.k.startsWith('att:' + M.ym + ':')) {
         const id = r.k.split(':')[2];
         R.ATT[id] = p.a || {}; R.TIMES[id] = p.t || {}; R.OFFBAK[id] = p.ob || {}; R.SUSPBAK[id] = p.sb || {};
@@ -59,6 +61,7 @@
       }
     }
     R.STU.sort((a, b) => String(a.created || '').localeCompare(String(b.created || '')) || String(a.name).localeCompare(String(b.name), 'he'));
+    R.LEADS.sort((a, b) => (b.created || 0) - (a.created || 0));
     R.STU.forEach(s => { ['ATT', 'NOTES', 'TIMES', 'OFFBAK', 'SUSPBAK'].forEach(k => { R[k][s.id] = R[k][s.id] || {}; }); R.MANUAL[s.id] = R.MANUAL[s.id] || new Set(); });
     /* תזכורות שכבר יצאו החודש — בלי שם, השם מתווסף כאן מהתיק */
     R.REMLOG = (res.remlog || []).filter(x => x.m === M.ym);
@@ -83,9 +86,10 @@
       if (EXIST.has(ak) || Object.values(a).some(o => Object.keys(o).length)) out[ak] = { p: a };
     });
     Object.entries(R.EMPS).concat(Object.entries(R.INS)).forEach(([id, e]) => { out['emp:' + id] = { p: pick(e, EMP_PLAIN) }; });
+    R.LEADS.forEach(l => { out['lead:' + l.id] = { p: { id: l.id }, priv: l }; });
     out['mon:' + M.ym] = { p: { sub: R.SUBMITTED, off: R.OFF } };
     const manual = {}; Object.entries(R.MANUAL).forEach(([sid, set]) => { if (set && set.size) manual[sid] = [...set]; });
-    out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts } };
+    out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts, wiz: R.meta.wiz } };
     return out;
   }
   const sig = r => JSON.stringify(r);

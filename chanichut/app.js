@@ -184,7 +184,10 @@ window.startApp = function (R) {
   const sPlaced = STU.find(s => PLACE(s.emp) === 'out') || STU[0];
   const sNone = STU.find(s => !s.emp && s.status !== 'עזב') || STU[STU.length - 1];
   const active = () => STU.filter(s => s.status !== 'עזב');
-  const LEADS = Object.values(EMPS).filter(e => e.lead).map(e => ({ name: e.name, st: e.status || 'פניתי', note: e.studsTxt || '', who: e.mentor || '', phone: e.phone || '' }));
+  const newLeadId = () => 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  /* פניות נשמרות מוצפנות (lead:<id>). מעסיק שסומן כפנייה בקובץ נכנס פעם אחת כפנייה */
+  const LEADS = R.LEADS;
+  Object.values(EMPS).filter(e => e.lead && !LEADS.some(l => l.name === e.name)).forEach(e => LEADS.push({ id: newLeadId(), name: e.name, st: e.status || 'פניתי', note: e.studsTxt || '', who: e.mentor || '', phone: e.phone || '' }));
   const LEAVING = /עוזב|עזב|נשר|הפסיק ללמוד/;
 
   /* ================= 64 בתי הספר (schools.js) — המספרים לכל בית ספר מומצאים, קבועים לפי סמל ================= */
@@ -325,10 +328,11 @@ window.startApp = function (R) {
     </section>
 
     <section class="sec" id="employers">
-      <div class="sec-head row-head"><h2>איפה התלמידים עובדים</h2><div class="emp-b edit"><button class="btn primary" data-act="new-emp">${ic('plus')}מעסיק חדש</button></div></div>
-      <div class="tabs" id="empTabs"><button class="tab cur" data-tab="out">${ic('building')}מעסיקים בחוץ</button><button class="tab" data-tab="in">${ic('home')}המסגרות בבית הספר</button></div>
+      <div class="sec-head row-head"><h2>איפה התלמידים עובדים</h2><div class="emp-b edit"><button class="btn primary" data-act="new-emp">${ic('plus')}מעסיק חדש</button><button class="btn" data-act="wiz">${ic('map')}אשף מציאת מעסיקים</button></div></div>
+      <div class="tabs" id="empTabs"><button class="tab cur" data-tab="out">${ic('building')}מעסיקים בחוץ</button><button class="tab" data-tab="in">${ic('home')}המסגרות בבית הספר</button><button class="tab" data-tab="leads">${ic('user')}פניות <span id="leadsN"></span></button></div>
       <div id="panelOut"></div>
       <div id="panelIn" hidden></div>
+      <div id="panelLeads" hidden></div>
     </section>
 
     <section class="sec" id="checklist">
@@ -501,7 +505,7 @@ window.startApp = function (R) {
     const pd = pending().length; if (pd) items.push(`<li><span class="dot"></span><b>${pd} תזכורות על היעדרות</b> יוצאות היום ב-16:00. <a href="#" data-sub="rem">לרשימה</a></li>`);
     const none = L.filter(s => !s.emp);
     if (none.length) items.push(`<li><span class="dot"></span><b>${none.length} בלי מקום עבודה:</b> ${none.map(s => `<a href="#" data-open="${s.id}">${esc(first(s))}</a>`).join(', ')}</li>`);
-    LEADS.filter(l => /פניתי/.test(l.st)).forEach(l => items.push(`<li><span class="dot"></span><b>${esc(l.name)}</b> — ${esc(l.note.slice(0, 70))} <a href="#employers">למעסיקים</a></li>`));
+    openLeads().filter(l => leadDue(l) || (/פניתי/.test(l.st) && leadStale(l))).forEach(l => items.push(`<li><span class="dot"></span><b>${esc(l.name)}</b> — ${esc((leadDue(l) ? l.next : (lastLog(l) || {}).text || l.note || '').slice(0, 70))} <a href="#employers">למעסיקים</a></li>`));
     // תוכנית חניכות מוסתרת כרגע (31.10.26)
     // const unrec = PROG.items.filter(x => x.done && !x.rec).length;
     // if (unrec) items.push(`<li><span class="dot"></span><b>תוכנית חניכות:</b> ${unrec} הוצאות בלי קבלה. <a href="#program">לתוכנית</a></li>`);
@@ -708,7 +712,7 @@ window.startApp = function (R) {
     if (!groups.length) return '<p class="empty">אין עדיין.</p>';
     return groups.map(([mg, l]) => `<details class="grp" open><summary>${esc(mg)}<small>${l.length}</small></summary><div class="rows">${l.map(([id, e]) => { const st = STU.filter(s => s.emp === id && s.status !== 'עזב'); return `<button class="rowbtn" data-emp="${id}">${ic(kind === 'in' ? 'home' : 'building')}<b>${esc(e.name)}</b><span class="rtag">${kind === 'in' ? `<em class="tag">${esc(e.kind || '')}</em>` : masTag(e)}${st.length ? ` <em class="tag">${st.length} תלמידים</em>` : ''}${kind === 'out' && (e.visit === '—' || e.contact > 40) ? ' <em class="tag no">ביקור באיחור</em>' : ''}</span>${chev}<small>${kind === 'in' ? 'מנהל.ת העבודה ' + esc(e.manager || '') : (e.mentor ? 'מנטור.ית ' + esc(e.mentor) : '')}${e.addr ? ' · ' + esc(e.addr) : ''}${st.length ? ' · ' + st.map(first).map(esc).join(', ') : ''}</small></button>`; }).join('')}</div></details>`).join('');
   }
-  function renderEmps() { $('panelOut').innerHTML = empRows(EMPS, 'out'); $('panelIn').innerHTML = empRows(INS, 'in') + `<div class="wiz-cta"><div><h3>${ic('plus')}מסגרת חדשה</h3></div><button class="btn primary edit" data-act="new-ins">${ic('plus')}ספק משנה · עסק בית-ספרי · מספרה קהילתית</button></div>`; }
+  function renderEmps() { $('panelOut').innerHTML = empRows(EMPS, 'out'); $('panelIn').innerHTML = empRows(INS, 'in') + `<div class="wiz-cta"><div><h3>${ic('plus')}מסגרת חדשה</h3></div><button class="btn primary edit" data-act="new-ins">${ic('plus')}ספק משנה · עסק בית-ספרי · מספרה קהילתית</button></div>`; paintLeads(); }
   document.getElementById('employers').addEventListener('click', e => {
     const b = e.target.closest('[data-emp]'); if (b) { openSub(empSpec(b.dataset.emp)); return; }
     if (e.target.closest('[data-act="new-ins"]')) openSub(empEditSpec(newId('I'), { name: '', kind: 'עסק בית-ספרי', manager: '', mg: [], hours: 15, min: 10 }));
@@ -753,10 +757,10 @@ window.startApp = function (R) {
       } };
   }
   document.querySelector('[data-act="new-emp"]').onclick = () => openSub(newEmpSpec());
-  function newEmpSpec() {
+  function newEmpSpec(p = {}) {
     return { dirtyWatch: true, title: 'מעסיק חדש · בדיקה במסננת', html: () => `<div class="sub-card newform">
-        <div class="field-row"><label class="field"><span>שם המעסיק</span><input class="find" id="neName"></label><label class="field"><span>מנטור.ית / חונך.ת</span><input class="find" id="neMentor"></label></div>
-        <div class="field-row"><label class="field"><span>טלפון</span><input class="find" id="nePhone" dir="ltr"></label><label class="field"><span>כתובת</span><input class="find" id="neAddr"></label></div>
+        <div class="field-row"><label class="field"><span>שם המעסיק</span><input class="find" id="neName" value="${esc(p.name || '')}"></label><label class="field"><span>מנטור.ית / חונך.ת</span><input class="find" id="neMentor" value="${esc(p.mentor || '')}"></label></div>
+        <div class="field-row"><label class="field"><span>טלפון</span><input class="find" id="nePhone" dir="ltr" value="${esc(p.phone || '')}"></label><label class="field"><span>כתובת</span><input class="find" id="neAddr" value="${esc(p.addr || '')}"></label></div>
         <div class="field-row"><div class="field"><span>מגמות</span><div class="place-row">${MGS.map(m => `<label class="pl"><input type="checkbox" name="neMg" value="${esc(m)}">${esc(m)}</label>`).join('')}</div></div><label class="field"><span>כמה תקנים</span><input class="find" id="neSlots" dir="ltr" inputmode="numeric" value="1"></label></div>
       </div>
       <div class="sub-card masn"><h3>${ic('filter')}מסננת החניכות · טופס בדיקה בביקור אצל מעסיק <small><a href="${SITE}chanichut-masnenet.html" target="_blank" rel="noopener">המקור</a></small></h3>
@@ -778,23 +782,181 @@ window.startApp = function (R) {
           const slots = $('neSlots').value.trim();
           const id = 'E' + Date.now().toString(36);
           EMPS[id] = { name, mentor: $('neMentor').value.trim(), phone: $('nePhone').value.trim(), addr: $('neAddr').value.trim(), slots: /^\d+$/.test(slots) ? slots : '', mg: mgs.length ? mgs : MGS.slice(0, 1), mail: '', status: '', studsTxt: '', lead: false, mas: dec, recheck: $('msRe').value.trim(), visit: $('msDate').value.trim().replace(/\.\d{4}$/, ''), contact: 0, masNotes: notes };
+          if (p.lead) { p.lead.done = isoToday(); leadsChanged(); }
           spec.dirty = false; renderEmps(); closeSub(); toast(name + ' נוסף · ' + dec);
         };
       } };
   }
-  const WIZ = { 'אוטוטרוניקה': ['מוסך האחים לוי · תלפיות · 1.8 ק"מ', 'אוטו-פיקס · גבעת שאול · 3.1 ק"מ', 'מוסך הגפן · בית שמש · 9.4 ק"מ'], 'תקשוב': ['נט-ליין מחשבים · תלפיות · 2.0 ק"מ', 'מעבדת סלולר הר חוצבים · 4.6 ק"מ'], 'אוטוטק': ['מוסך השרון · ראשון לציון · 2.1 ק"מ', 'אוטו-פיקס · ראשון לציון · 3.4 ק"מ'], 'חשמל': ['אלקטרו פלוס · ראשון לציון · 1.6 ק"מ'], 'עיצוב שיער': ['סטודיו מאיה · ראשון לציון · 1.2 ק"מ'] };
-  /* אשף מציאת מעסיקים — שלב 3 (אוטומציות). הקוד נשאר */
-  function wizSpec(mg, auto) {
-    let res = auto ? (WIZ[mg] || []) : [], cmg = mg;
-    const leadsHtml = () => LEADS.map(l => `<li><b>${esc(l.name)}</b><span class="lead-st ${/חזרו|פגישה/.test(l.st) ? 's3' : 's2'}">${esc(l.st)}</span><span class="hint">${esc(l.note || '')}${l.who ? ' · ' + esc(l.who) : ''}${l.phone ? ' · ' + esc(l.phone) : ''}</span></li>`).join('') || '<li class="hint">אין פניות פתוחות</li>';
+  document.querySelector('[data-act="wiz"]').onclick = () => openSub(wizSpec(WZ.fam ? '' : MGS[0]));
+  /* ---- אשף מציאת מעסיקים: מאגר המעסיקים + עסקים במפה ---- */
+  /* המאגר יורד מהשרת רק כשפותחים את האשף, ולא נשמר בדפדפן: יש בו ניידים אישיים */
+  let DB = [], DB_FAMS = [], DB_STATE = '';
+  async function loadDb() {
+    if (DB_STATE === 'ok' || DB_STATE === 'loading') return;
+    DB_STATE = 'loading';
+    let res = null; try { res = await API.call('empDb'); } catch (e) {}
+    if (res && res.ok) { DB = res.rows.map((x, i) => ({ ...x, id: i })); DB_FAMS = [...new Set(DB.flatMap(x => x.fam))].filter(f => f !== 'כללי').sort((p, q) => p.localeCompare(q, 'he')); DB_STATE = 'ok'; }
+    else DB_STATE = 'err';
+    refreshSub();
+  }
+  const WM = window.WIZMAP;
+  const DB_ST = ['שולבו תלמידים', 'סוכם על המשך שיתוף פעולה', 'סוכם עקרונית על שילוב תלמידים', 'בתהליך חיבור'];
+  const DB_AREAS = ['צפון', 'מרכז', 'ירושלים', 'דרום'];
+  const MG_FAM = [[/אוטו|רכב|צמ"ה/, 'אוטוטרוניקה'], [/קולינר|קונדיט|טבח|אפי/, 'קולינריה וקונדיטוריה'], [/קירור|מיזוג/, 'מיזוג וקירור'], [/חשמל/, 'חשמל'], [/שיער|איפור|קוסמט|טיפוח/, 'טיפוח החן ועיצוב שיער'], [/מדיה|סאונד|צליל|יוצרי|קריא|הפקת|שיווק/, 'מדיה וסאונד'], [/סייבר|הייטק|תכנות|תקשוב|סלולר|אתרים/, 'הייטק ותקשוב'], [/ריתוך|CNC|אלומיניום|ייצור|מערכות תיכון|מכטרוניק/, 'מתכת וייצור'], [/נגר/, 'נגרות'], [/אדריכל/, 'אדריכלות'], [/שיניים/, 'טכנאות שיניים'], [/ספורט/, 'ספורט'], [/ינקות/, 'גיל הרך']];
+  const famOf = mg => (MG_FAM.find(([re]) => re.test(mg)) || [])[1] || '';
+  const SCHOOL_AREA = { 'חיפה': 'צפון', 'תל אביב': 'מרכז', 'ירושלים': 'ירושלים', 'באר שבע': 'דרום' }[((window.SCHOOLS || []).find(x => x.name === SCHOOL) || {}).d] || '';
+  const LEAD_ST = ['לפנות', 'פניתי', 'חזרו אליי', 'נקבעה פגישה', 'לא מתאים'];
+  const ZONE_KM = 0.6;
+  /* מיקום והסתרות נשמרים לבית הספר (meta.wiz) */
+  const WIZ_S = R.meta.wiz = R.meta.wiz || {};
+  const wzGet = k => WIZ_S[k];
+  const wzSet = (k, v) => { WIZ_S[k] = v; };
+  const WZ = { tab: 'db', fam: '', area: SCHOOL_AREA, st: '', q: '', lim: 30, hide: new Set(wzGet('hide') || []), mapMg: MGS[0] || '', radius: 10, loc: wzGet('loc'), locs: null, res: null, busy: '', err: '', hideOsm: new Set(wzGet('hideOsm') || []), zones: wzGet('zones') || [] };
+  const dayMark = () => { const d = new Date(); return d.getDate() + '.' + (d.getMonth() + 1); };
+  const known = name => { const n = WM.norm(name); return openLeads().some(l => WM.norm(l.name) === n) ? 'בפניות' : Object.values(EMPS).some(e => WM.norm(e.name) === n) ? 'ברשימה' : ''; };
+  const openLeads = () => LEADS.filter(l => !l.done);
+  const isoToday = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+  const dm = iso => { const [, m, d] = String(iso || '').split('-'); return d ? +d + '.' + +m : ''; };
+  const lastLog = l => (l.log || [])[0];
+  const leadDue = l => !!(l.next && l.nextAt && l.nextAt <= isoToday() && !/לא מתאים/.test(l.st));
+  /* פנייה שעברו 7 ימים בלי תשובה. בלי תאריך: נחשבת כמחכה */
+  function leadStale(l) {
+    if (lastLog(l)) return (new Date(isoToday()) - new Date(lastLog(l).at)) / 864e5 >= 7;
+    const m = /(\d{1,2})\.(\d{1,2})/.exec(l.st); if (!m) return true;
+    const now = new Date(); let d = new Date(now.getFullYear(), +m[2] - 1, +m[1]);
+    if (d > now) d = new Date(now.getFullYear() - 1, +m[2] - 1, +m[1]);
+    return (now - d) / 864e5 >= 7;
+  }
+  function leadsChanged() { renderToday(); paintLeads(); }
+  const addLead = l => { l.id = newLeadId(); l.created = Date.now(); LEADS.unshift(l); leadsChanged(); toast(l.name + ' נוסף לפניות'); };
+  function paintLeads() { const n = $('leadsN'), box = $('panelLeads'); if (n) n.textContent = openLeads().length; if (box) box.innerHTML = `<ul class="leads wz-leads">${leadRows()}</ul>`; }
+  const leadRows = () => LEADS.map((l, i) => { if (l.done) return ''; const g = lastLog(l); return `<li><button class="wz-lead" data-li="${i}"><b>${esc(l.name)}</b><span class="lead-st ${/חזרו|פגישה/.test(l.st) ? 's3' : 's2'}">${esc(l.st)}</span>${leadDue(l) ? '<em class="tag mid">הגיע הזמן</em>' : ''}<span class="hint wz-lead-t">${g ? esc(dm(g.at) + ' · ' + g.text.slice(0, 90)) : [l.note, l.who, l.phone].filter(Boolean).map(esc).join(' · ')}${l.next ? `<br>הצעד הבא: ${esc(l.next)}${l.nextAt ? ' · ' + dm(l.nextAt) : ''}` : ''}</span></button></li>`; }).join('') || '<li class="hint">אין פניות עדיין</li>';
+
+  const haveTag = (name, have) => have === 'בפניות' ? `<button class="lnk" data-li="${LEADS.findIndex(l => !l.done && WM.norm(l.name) === WM.norm(name))}">כבר בפניות</button>` : `<em class="tag">כבר ${have}</em>`;
+  function dbMatches() {
+    const q = WZ.q.trim();
+    return DB.filter(x => !WZ.hide.has(x.n)
+      && (!WZ.fam || x.fam.includes(WZ.fam) || x.fam.includes('כללי'))
+      && (!WZ.area || x.a.includes(WZ.area) || x.a.includes('ארצי'))
+      && (!WZ.st || x.s === WZ.st)
+      && (!q || [x.n, x.c, x.p, x.f].some(v => v.includes(q))))
+      .sort((a, b) => (DB_ST.indexOf(a.s) + 1 || 9) - (DB_ST.indexOf(b.s) + 1 || 9));
+  }
+  function dbRow(x) {
+    const have = known(x.n);
+    const meta = [x.f, x.p, x.z].filter(Boolean).map(esc).join(' · ');
+    const tel = x.t ? `<a href="tel:${x.t.replace(/\D/g, '')}" dir="ltr">${esc(x.t)}</a>` : x.tx ? `<span class="muted">טלפון לבדיקה: <span dir="ltr">${esc(x.tx)}</span></span>` : '<span class="muted">אין טלפון</span>';
+    const mail = x.m ? `<span dir="ltr">${esc(x.m)}</span>` : x.mx ? `<span class="muted">מייל לבדיקה: <span dir="ltr">${esc(x.mx)}</span></span>` : '';
+    return `<li class="wz-row"><div class="wz-m"><b>${esc(x.n)}</b>${x.s ? `<em class="tag ${x.s === DB_ST[0] ? 'ok' : ''}">${esc(x.s)}</em>` : ''}
+      <div class="hint">${meta}</div><div class="wz-links">${x.c ? `<span>${esc(x.c)}</span>` : ''}${tel}${mail}</div></div>
+      <div class="wz-act">${have ? haveTag(x.n, have) : `<button class="btn edit" data-dbl="${x.id}">${ic('plus')}לפניות</button>`}<button class="lnk edit" data-dbh="${x.id}">לא רלוונטי</button></div></li>`;
+  }
+  function paintDb(el) {
+    const box = el.querySelector('#wzList'); if (!box) return;
+    if (DB_STATE !== 'ok') { box.innerHTML = `<p class="hint">${DB_STATE === 'err' ? 'המאגר לא נטען. אפשר לצאת ולפתוח את האשף שוב' : 'טוען את המאגר…'}</p>`; return; }
+    const all = dbMatches();
+    const hid = WZ.hide.size ? ` · <button class="lnk" data-act="wz-unhide">מוסתרים: ${WZ.hide.size}</button>` : '';
+    box.innerHTML = `<p class="hint wz-n">${all.length} מעסיקים${hid}</p><ul class="wz-list">${all.slice(0, WZ.lim).map(dbRow).join('') || '<li class="hint">לא נמצאו מעסיקים. אפשר לשנות אזור או תחום</li>'}</ul>${all.length > WZ.lim ? `<button class="btn wz-more" data-act="wz-more">הצגת עוד ${Math.min(30, all.length - WZ.lim)}</button>` : ''}`;
+  }
+  const zoneOf = x => WZ.zones.find(z => x.lat && WM.km(z.lat, z.lon, x.lat, x.lon) <= z.r);
+  function mapRows() {
+    if (WZ.busy) return `<p class="hint">${esc(WZ.busy)}</p>`;
+    if (WZ.err) return `<p class="hint">${esc(WZ.err)}</p>`;
+    if (!WZ.res) return '';
+    const vis = WZ.res.filter(x => !WZ.hideOsm.has(x.osm) && !zoneOf(x)), hid = WZ.res.length - vis.length;
+    const unhide = WZ.hideOsm.size || WZ.zones.length ? ` · <button class="lnk" data-act="wz-unmap">מוסתרים: ${hid}</button>` : '';
+    return `<p class="hint wz-n">${vis.length} עסקים עד ${WZ.radius} ק"מ${unhide}</p><ul class="wz-list">${vis.map(x => { const have = known(x.name), i = WZ.res.indexOf(x); return `<li class="wz-row"><div class="wz-m"><b>${esc(x.name)}</b>
+      <div class="hint">${[x.type, x.dist.toFixed(1) + ' ק"מ', x.addr].filter(Boolean).map(esc).join(' · ')}</div>
+      <div class="wz-links">${x.phone ? `<a href="tel:${esc(x.phone.replace(/[^\d+]/g, ''))}" dir="ltr">${esc(x.phone)}</a>` : '<span class="muted">אין טלפון במפה</span>'}${x.web ? `<a href="${esc(/^http/.test(x.web) ? x.web : 'https://' + x.web)}" target="_blank" rel="noopener">אתר</a>` : ''}<a href="https://www.google.com/maps/search/${encodeURIComponent(x.name + ' ' + (x.addr || ''))}/@${x.lat},${x.lon},17z" target="_blank" rel="noopener">במפה</a></div></div>
+      <div class="wz-act">${have ? haveTag(x.name, have) : `<button class="btn edit" data-mpl="${i}">${ic('plus')}לפניות</button>`}<button class="lnk edit" data-mph="${i}">לא רלוונטי</button><button class="lnk edit" data-mpz="${i}">הסתרת האזור</button></div></li>`; }).join('') || '<li class="hint">לא נמצאו עסקים. אפשר להרחיק את הטווח או לבחור מגמה אחרת</li>'}</ul>
+      <p class="hint wz-src">המפה לא מכירה כל עסק, בעיקר עסקים קטנים. מקור: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a></p>`;
+  }
+  function wizSpec(mg) {
+    if (mg) { WZ.fam = famOf(mg); WZ.mapMg = mg; }
+    loadDb();
+    const opt = (v, cur, label) => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(label || v)}</option>`;
+    const dbHtml = () => `<div class="wiz-row wz-filters"><label>תחום <select id="wzFam">${opt('', WZ.fam, 'כל התחומים')}${DB_FAMS.map(f => opt(f, WZ.fam)).join('')}</select></label><label>אזור <select id="wzArea">${opt('', WZ.area, 'כל האזורים')}${DB_AREAS.map(a => opt(a, WZ.area)).join('')}</select></label><label>סטטוס <select id="wzSt">${opt('', WZ.st, 'כל הסטטוסים')}${DB_ST.map(s => opt(s, WZ.st)).join('')}</select></label><label class="wz-q">חיפוש <input class="find" id="wzQ" value="${esc(WZ.q)}" placeholder="שם עסק, איש קשר או מקום"></label></div><div id="wzList"></div>`;
+    const mapHtml = () => (WZ.loc ? `<p class="hint">ליד <b>${esc(WZ.loc.label)}</b> · <button class="lnk" data-act="wz-reloc">שינוי מיקום</button></p>
+        <div class="wiz-row"><label>מגמה <select id="wizMg">${(MGS.length ? MGS : DB_FAMS).map(m => opt(m, WZ.mapMg)).join('')}</select></label><label>טווח <select id="wizR">${[5, 10, 20, 30].map(r => opt(String(r), String(WZ.radius), r + ' ק"מ')).join('')}</select></label><button class="btn primary" id="wizGo" ${WZ.busy ? 'disabled' : ''}>${ic('search')}חיפוש</button></div><div id="wizOut">${mapRows()}</div>`
+      : `<div class="wiz-row"><label class="wz-q">איפה בית הספר? <input class="find" id="wzLocQ" placeholder="עיר, ישוב או כתובת"></label><button class="btn primary" id="wzLocGo">${ic('search')}חיפוש</button></div><div id="wzLocs">${WZ.err ? `<p class="hint">${esc(WZ.err)}</p>` : ''}${(WZ.locs || []).map((x, i) => `<button class="rowbtn wz-loc" data-loc="${i}">${esc(x.label)}</button>`).join('')}${WZ.locs && !WZ.locs.length ? '<p class="hint">לא נמצא. אפשר לנסות שם של עיר</p>' : ''}</div>`);
+    const runMap = async () => {
+      WZ.busy = 'מחפש במפה…'; WZ.err = ''; WZ.res = null; refreshSub();
+      try { WZ.res = await WM.search(WZ.loc, WZ.radius, [WZ.mapMg], m => { WZ.busy = m; refreshSub(); }); }
+      catch (e) { WZ.err = e.message || 'המפה לא זמינה כרגע'; }
+      WZ.busy = ''; refreshSub();
+    };
+    const runLoc = async q => {
+      WZ.err = ''; WZ.locs = null;
+      try { WZ.locs = await WM.geocode(q); } catch (e) { WZ.err = e.message || 'המפה לא זמינה כרגע'; }
+      refreshSub();
+    };
     return { title: 'אשף מציאת מעסיקים', html: () => `<div class="sub-card">
-        <div class="wiz-row"><label>מגמה <select id="wizMg">${[...new Set([...MGS, ...Object.keys(WIZ)])].map(m => `<option ${m === cmg ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label><label>רדיוס <select id="wizR"><option>3 ק"מ</option><option selected>5 ק"מ</option><option>10 ק"מ</option></select></label><button class="btn primary" id="wizGo">${ic('search')}חיפוש</button></div>
-        <ul class="wiz-res" id="wizOut">${res.map((x, i) => `<li><span>${esc(x)}</span><button class="btn edit" data-lead="${i}">${ic('plus')}לפניות</button><button class="lnk edit" data-skip="${i}">לא רלוונטי</button></li>`).join('') || '<li class="hint">לא נמצאו עסקים במרחק הזה</li>'}</ul></div>
-      <div class="sub-card wiz-leads"><h3>פניות למעסיקים חדשים</h3><ul class="leads" id="leads">${leadsHtml()}</ul></div>`,
+        <div class="tabs" id="wzTabs"><button class="tab ${WZ.tab === 'db' ? 'cur' : ''}" data-wt="db">${ic('building')}מאגר מעסיקים</button><button class="tab ${WZ.tab === 'map' ? 'cur' : ''}" data-wt="map">${ic('map')}עסקים במפה</button><button class="tab ${WZ.tab === 'leads' ? 'cur' : ''}" data-wt="leads">${ic('user')}פניות ${openLeads().length}</button></div>
+        ${WZ.tab === 'db' ? dbHtml() : WZ.tab === 'map' ? mapHtml() : `<ul class="leads wz-leads" id="leads">${leadRows()}</ul>`}</div>`,
       bind: el => {
-        $('wizGo').onclick = () => { cmg = $('wizMg').value; res = WIZ[cmg] || []; refreshSub(); };
-        el.querySelector('#wizOut').onclick = e => { const b = e.target.closest('[data-lead],[data-skip]'); if (!b) return; const i = +(b.dataset.lead != null ? b.dataset.lead : b.dataset.skip), x = res[i]; res = res.filter((_, j) => j !== i); if (b.dataset.lead != null) { LEADS.unshift({ name: x.split(' · ')[0], st: 'לפנות', note: x.split(' · ').slice(1).join(' · ') }); renderToday(); toast('נוסף לפניות'); } refreshSub(); };
+        const on = (id, ev, fn) => { const n = el.querySelector('#' + id); if (n) n['on' + ev] = fn; };
+        paintDb(el);
+        const fil = k => e => { WZ[k] = e.target.value; WZ.lim = 30; paintDb(el); };
+        on('wzFam', 'change', fil('fam')); on('wzArea', 'change', fil('area')); on('wzSt', 'change', fil('st')); on('wzQ', 'input', fil('q'));
+        on('wizMg', 'change', e => { WZ.mapMg = e.target.value; });
+        on('wizR', 'change', e => { WZ.radius = +e.target.value; });
+        on('wizGo', 'click', runMap);
+        on('wzLocGo', 'click', () => { const q = el.querySelector('#wzLocQ').value.trim(); if (q) runLoc(q); });
+        on('wzLocQ', 'keydown', e => { if (e.key === 'Enter') el.querySelector('#wzLocGo').click(); });
+        el.onclick = e => {
+          const t = e.target.closest('button'); if (!t) return;
+          const d = t.dataset;
+          if (d.wt) { WZ.tab = d.wt; refreshSub(); return; }
+          if (d.li != null) { openSub(leadSpec(LEADS[+d.li])); return; }
+          if (d.act === 'wz-more') { WZ.lim += 30; paintDb(el); return; }
+          if (d.act === 'wz-unhide') { WZ.hide.clear(); wzSet('hide', []); paintDb(el); return; }
+          if (d.act === 'wz-unmap') { WZ.hideOsm.clear(); WZ.zones = []; wzSet('hideOsm', []); wzSet('zones', []); refreshSub(); return; }
+          if (d.act === 'wz-reloc') { WZ.loc = null; WZ.locs = null; WZ.res = null; WZ.err = ''; wzSet('loc', null); refreshSub(); return; }
+          if (d.loc != null) { WZ.loc = WZ.locs[+d.loc]; WZ.locs = null; wzSet('loc', WZ.loc); runMap(); return; }
+          if (d.dbl != null) { const x = DB[+d.dbl]; addLead({ name: x.n, st: 'לפנות', note: [x.f, x.p].filter(Boolean).join(' · '), who: x.c, phone: x.t || x.tx || '', mail: x.m || x.mx || '', addr: x.p, mg: MGS.find(m => x.fam.includes(famOf(m))) || x.f }); refreshSub(); return; }
+          if (d.dbh != null) { WZ.hide.add(DB[+d.dbh].n); wzSet('hide', [...WZ.hide]); paintDb(el); return; }
+          if (d.mpl != null) { const x = WZ.res[+d.mpl]; addLead({ name: x.name, st: 'לפנות', note: [x.type, x.web].filter(Boolean).join(' · '), who: '', phone: x.phone, mail: x.mail, addr: x.addr, mg: WZ.mapMg }); refreshSub(); return; }
+          if (d.mph != null) { WZ.hideOsm.add(WZ.res[+d.mph].osm); wzSet('hideOsm', [...WZ.hideOsm]); refreshSub(); return; }
+          if (d.mpz != null) { const x = WZ.res[+d.mpz], lbl = (x.addr || x.name).split(',')[0].trim(); if (!confirm(`להסתיר את כל העסקים ברדיוס ${ZONE_KM * 1000} מטר סביב ${lbl}?`)) return; WZ.zones.push({ lat: +x.lat.toFixed(5), lon: +x.lon.toFixed(5), r: ZONE_KM, label: lbl }); wzSet('zones', WZ.zones); refreshSub(); }
+        };
       } };
+  }
+  /* מסך פנייה: פרטים, שלב, תיעוד מה נאמר, הצעד הבא, נוסח פנייה ומעבר ל"מעסיק חדש" עם המסננת */
+  const LOG_WAYS = ['שיחת טלפון', 'מייל', 'הודעה', 'ביקור', 'פגישה'];
+  function leadSpec(l) {
+    const stageNow = () => LEAD_ST.find(s => l.st.startsWith(s)) || '';
+    const text = WM.pitch({ contact: l.who || '', me: (R.me && R.me.name) || '[שם]', school: SCHOOL, mg: l.mg || MGS[0] || '', name: l.name });
+    const spec = { title: () => esc(l.name), html: () => `<div class="sub-card">
+        <p class="hint">${[l.note, l.who].filter(Boolean).map(esc).join(' · ')}</p>
+        <div class="wz-links">${l.phone ? `<a href="tel:${esc(l.phone.replace(/[^\d+]/g, ''))}" dir="ltr">${esc(l.phone)}</a>` : ''}${l.mail ? `<span dir="ltr">${esc(l.mail)}</span>` : ''}</div>
+        <div class="wiz-row wz-stage"><label>שלב <select id="wzStage" class="edit">${stageNow() ? '' : `<option selected>${esc(l.st)}</option>`}${LEAD_ST.map(s => `<option ${s === stageNow() ? 'selected' : ''}>${s}</option>`).join('')}</select></label><button class="btn primary edit" id="wzToEmp">${ic('plus')}הוספה כמעסיק</button></div></div>
+      <div class="sub-card"><h3>תיעוד הפנייה</h3>
+        <div class="newform wz-logform edit">
+          <div class="field-row"><label class="field"><span>תאריך</span><input class="find" type="date" id="logAt" value="${isoToday()}" max="${isoToday()}"></label><label class="field"><span>איך</span><select id="logWay">${LOG_WAYS.map(w => `<option>${w}</option>`).join('')}</select></label></div>
+          <label class="field"><span>מה נאמר</span><textarea class="find wz-pitch" id="logText" rows="4" maxlength="2000"></textarea></label>
+          <div class="field-row"><label class="field"><span>הצעד הבא</span><input class="find" id="logNext" maxlength="300" value="${esc(l.next || '')}"></label><label class="field"><span>עד מתי</span><input class="find" type="date" id="logNextAt" value="${esc(l.nextAt || '')}"></label></div>
+          <button class="btn primary" id="logSave">שמירת התיעוד</button>
+        </div>
+        <ul class="wz-log">${(l.log || []).map((g, i) => `<li><div class="wz-log-h"><b>${esc(dm(g.at))}</b><em class="tag">${esc(g.way)}</em><button class="lnk edit" data-logdel="${i}">מחיקה</button></div><p>${esc(g.text)}</p></li>`).join('') || '<li class="hint">אין עדיין תיעוד</li>'}</ul></div>
+      <details class="sub-card wz-pitch-box"><summary>נוסח פנייה</summary><textarea class="find wz-pitch" id="wzPitch" rows="17">${esc(text)}</textarea><button class="btn" id="wzCopy">העתקת הנוסח</button></details>`,
+      bind: el => {
+        const q = id => el.querySelector('#' + id);
+        q('wzStage').onchange = e => { const v = e.target.value; l.st = v === 'פניתי' ? 'פניתי · ' + dayMark() : v; leadsChanged(); toast('השלב עודכן'); };
+        ['logText', 'logNext', 'logNextAt'].forEach(id => { q(id).oninput = () => { spec.dirty = true; }; });
+        q('logSave').onclick = () => {
+          const t = q('logText').value.trim(), nx = q('logNext').value.trim(), at = q('logAt').value || isoToday();
+          if (!t && !nx) return toast('צריך לכתוב מה נאמר');
+          if (t) { l.log = l.log || []; l.log.unshift({ at, way: q('logWay').value, text: t }); l.log.sort((a, b) => b.at.localeCompare(a.at)); }
+          l.next = nx; l.nextAt = nx ? q('logNextAt').value : '';
+          /* תיעוד ראשון של פנייה שעוד לא יצאה מסמן "פניתי" */
+          if (t && stageNow() === 'לפנות') l.st = 'פניתי · ' + dm(at);
+          spec.dirty = false; leadsChanged(); refreshSub(); toast('התיעוד נשמר');
+        };
+        el.onclick = e => { const b = e.target.closest('[data-logdel]'); if (!b || !confirm('למחוק את התיעוד?')) return; l.log.splice(+b.dataset.logdel, 1); leadsChanged(); refreshSub(); };
+        q('wzCopy').onclick = () => (navigator.clipboard ? navigator.clipboard.writeText(q('wzPitch').value) : Promise.reject()).then(() => toast('הנוסח הועתק'), () => toast('ההעתקה לא הצליחה'));
+        q('wzToEmp').onclick = () => openSub(newEmpSpec({ name: l.name, mentor: l.who, phone: l.phone, addr: l.addr, lead: l }));
+      } };
+    return spec;
   }
 
   /* ================= צ'ק ליסט ================= */
@@ -864,7 +1026,8 @@ window.startApp = function (R) {
       bind: el => { el.querySelectorAll('[data-mf]').forEach(b => b.onclick = () => openSub(formSpec(STU.find(s => s.id === b.dataset.mf), i))); } };
   }
   $('chkTabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; document.querySelectorAll('#chkTabs .tab').forEach(x => x.classList.toggle('cur', x === b)); $('chkStu').hidden = b.dataset.tab !== 'stu'; $('chkCal').hidden = b.dataset.tab !== 'cal'; if (b.dataset.tab === 'cal') { const g = document.querySelector('.gantt'), c = g && g.querySelector('.gm.cur'); if (g && c && g.scrollWidth > g.clientWidth) g.scrollLeft = c.offsetLeft - g.clientWidth / 2 + c.offsetWidth / 2; } };
-  $('empTabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; document.querySelectorAll('#empTabs .tab').forEach(x => x.classList.toggle('cur', x === b)); $('panelOut').hidden = b.dataset.tab !== 'out'; $('panelIn').hidden = b.dataset.tab !== 'in'; };
+  $('empTabs').onclick = e => { const b = e.target.closest('[data-tab]'); if (!b) return; document.querySelectorAll('#empTabs .tab').forEach(x => x.classList.toggle('cur', x === b)); $('panelOut').hidden = b.dataset.tab !== 'out'; $('panelIn').hidden = b.dataset.tab !== 'in'; $('panelLeads').hidden = b.dataset.tab !== 'leads'; };
+  $('panelLeads').onclick = e => { const b = e.target.closest('[data-li]'); if (b) openSub(leadSpec(LEADS[+b.dataset.li])); };
 
   /* ================= תוכנית חניכות ================= */
   function renderProgram() {
@@ -1056,7 +1219,7 @@ window.startApp = function (R) {
       const l = active().filter(s => Object.entries(ATT[s.id]).some(([d, v]) => v === 'a' && +d >= MONTH.today - 6));
       return show(`<p><b>לא הגיעו השבוע:</b></p><ul>${l.map(s => `<li>${esc(s.name)} · ${Object.entries(ATT[s.id]).filter(([d, v]) => v === 'a' && +d >= MONTH.today - 6).map(([d]) => d + '.' + MONTH.m).join(', ')}${Object.entries(NOTES[s.id]).filter(([d]) => +d >= MONTH.today - 6).map(([, n]) => ' · ' + esc(n)).join('')} <a href="#" data-open="${s.id}">לתיק</a></li>`).join('') || '<li>כולם הגיעו</li>'}</ul>`, null);
     }
-    if (/מצא|חפש|מעסיקים ל/.test(t)) { return show('<p>אשף מציאת מעסיקים ייכנס בשלב הבא. בינתיים: <a href="#employers">מעסיק חדש</a>.</p>', null); }
+    if (/מצא|חפש|מעסיקים ל/.test(t)) { const mg = MGS.find(m => t.includes(m)) || MGS[0]; openSub(wizSpec(mg)); return show(`<p>פתחתי את האשף${mg ? ` עם <b>${esc(mg)}</b>` : ''}.</p>`, null); }
     if (/העל|ייבוא|נתוני בית/.test(t)) { return show('<p>ההעלאה נמצאת במסך הניהול. <a href="#admin">לניהול</a></p>', null); }
     if (/אין תעסוקה|בלי תעסוקה|לא עובדים/.test(t)) {
       const d = dateOf(t), cls = classes.find(c => norm(t).includes(norm(c))) || (shown[0] && shown[0].cls);
