@@ -771,8 +771,12 @@
           }).join("");
           if (rows) body += "<h4>" + esc(g[0]) + '</h4><ul class="v2-mats">' + rows + "</ul>";
         });
+        /* 2.11.26: התגובה של מיטל על ההגשה (נכתבת ממסך "הגשות" במבט שלה, נשמרת בלשונית "תגובות") */
+        var rp = d && d.r && d.r[n];
         h += '<div class="v2-card"><p class="v2-eyebrow">פרק ' + n + " · מפגש " + n + "</p><h3>" + esc(c.t) + "</h3>" +
           (body || "<p>עוד לא נכתב כאן. ממלאים בדף המלווה של המפגש.</p>") +
+          (rp && str(rp.text) ? '<div class="v2-tip" style="margin-top:12px"><b>התגובה של מיטל</b>' + (str(rp.at) ? ' · <span translate="no">' + esc(rp.at) + "</span>" : "") +
+            "<br>" + esc(rp.text).replace(/\n/g, "<br>") + "</div>" : "") +
           '<p><a href="' + esc(extPageUrl(Number(n))) + '" target="_blank" rel="noopener">עריכה בדף המלווה</a></p></div>';
       });
       el("tik-ch").innerHTML = h;
