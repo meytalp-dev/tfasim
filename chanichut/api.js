@@ -287,8 +287,10 @@
     if (q.action === 'schoolsAdmin') {
       var all = P;
       return { ok: true, ym: cur, schools: allSchools(d).map(function (n) {
-        var ppl = {}, login = ''; KEYED.forEach(function (r) { ppl[r] = { n: 0, pending: 0, masked: [] }; });
-        all.forEach(function (p) { if (p.school !== n || !ppl[p.role]) return; if (p.active === 'כן') { ppl[p.role].n++; ppl[p.role].masked.push(mask(p.email)); } else if (p.active === 'ממתין') ppl[p.role].pending++; if ((p.last || '') > login) login = p.last; });
+        /* מיילים גלויים של רכז.ת ומנהל.ת פעילים — רק למנהל.ת המערכת (כמו בשרת) */
+        var ppl = {}, login = '', full = s.role === 'system';
+        KEYED.forEach(function (r) { ppl[r] = { n: 0, pending: 0, masked: [] }; if (full && (r === 'rakaz' || r === 'principal')) ppl[r].email = []; });
+        all.forEach(function (p) { if (p.school !== n || !ppl[p.role]) return; if (p.active === 'כן') { ppl[p.role].n++; ppl[p.role].masked.push(mask(p.email)); if (ppl[p.role].email) ppl[p.role].email.push(p.email); } else if (p.active === 'ממתין') ppl[p.role].pending++; if ((p.last || '') > login) login = p.last; });
         var row = natRow(d, { all: true, schools: {} }, n, cur), lr = null;
         if (row.state === 'partial' || row.state === 'done') lr = { ym: cur, state: row.state, upd: today() };
         else if (d.schools[n] && d.schools[n].recovery && !d.schools[n].pending) { var pr = natRow(d, { all: true, schools: {} }, n, ymOf(1)); if (pr.state === 'partial' || pr.state === 'done') lr = { ym: ymOf(1), state: pr.state, upd: '' }; }

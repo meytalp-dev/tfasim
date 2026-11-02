@@ -8,6 +8,7 @@
 <title>חניכות · מערכת רכזי החניכות</title>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="national.css">
 <style>
 /* כיוון ב׳ מעודכן: נייר חם, פטרול במקום שחור, רוביק לכותרות. סקירת בית הספר ראשונה, "היום" והעוזר בעמודה בצד, ניווט עליון. */
 :root{--bg:#F6F2E9;--card:#FFFDF8;--ink:#1D4F5E;--text:#243B42;--muted:#6B7272;--line:#DCD3C2;--accent:#1D4F5E;--on-accent:#fff;--tint:#EEF3F0;
@@ -87,7 +88,7 @@ body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:
 #today .count{background:var(--no);color:#fff;border-radius:999px;padding:.05em .55em;font-weight:700}
 /* מסכים: רק המקטע של המסך הנוכחי מוצג. הריבועים בצד רק בסקירה */
 .content>.sec{display:none}.side{display:none}
-body[data-view=overview] #overview,body[data-view=att] #att,body[data-view=students] #students,body[data-view=employers] #employers,body[data-view=checklist] #checklist,body[data-view=reports] #reports,body[data-view=admin] #admin,body[data-view=national] #national,body[data-view=schools] #schools,body[data-view=program] #program,body[data-view=links] #links,body[data-view=more] #more,body[data-view=sub] #sub{display:block}
+body[data-view=overview] #overview,body[data-view=att] #att,body[data-view=students] #students,body[data-view=employers] #employers,body[data-view=checklist] #checklist,body[data-view=reports] #reports,body[data-view=admin] #admin,body[data-view=program] #program,body[data-view=links] #links,body[data-view=more] #more,body[data-view=sub] #sub{display:block}
 /* צ'ק ליסט */
 .chk-grid{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .chk-row{display:grid;grid-template-columns:1.4fr repeat(4,1fr) 70px;gap:8px;align-items:center;padding:8px 14px;border-top:1px solid var(--line)}
@@ -280,6 +281,13 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 .sub-card.newform{border-color:var(--line)}.sub-card h3{display:flex;align-items:center;gap:.4em;margin-bottom:10px}.sub-card h3 small{font-weight:400;font-size:.75em;margin-inline-start:auto}
 .tik-sub{margin:0 0 12px}
 .masn .mf{padding:10px 0;border-top:1px solid var(--line)}.masn .mf .find{border:1px solid var(--line);border-radius:8px;padding:.45em .8em;font-size:.95rem;background:var(--bg)}
+/* המסננת המפורטת: פרקטיקות לכל עיקרון, פעולות בקרה, החלטה מוצעת */
+.masn .msp .find,.masn #msPlan{border:1px solid var(--line);border-radius:8px;padding:.45em .8em;font-size:.95rem;background:var(--bg);width:100%;font:inherit;color:var(--text)}
+.msp{border-top:1px solid var(--line);padding:10px 0}.msp-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.msp-l{list-style:none;padding:0;margin:6px 0 8px;display:grid;gap:4px}.msp-l label{display:flex;gap:.6em;align-items:flex-start;cursor:pointer;min-height:44px}.msp-l input{width:18px;height:18px;margin-top:2px;accent-color:var(--ok);flex:none}
+.ms-sug:not(:empty){display:flex;gap:10px;align-items:flex-start;background:var(--tint);border-radius:var(--r-card);padding:10px 14px;margin:10px 0}.ms-sug span{display:grid}.ms-sug small{color:var(--muted)}
+/* לוגו המינהל בסרגל העליון */
+.top-minhal{height:34px;width:auto;margin-inline-start:6px;padding-inline-start:12px;border-inline-start:1px solid var(--line)}
 .place-row .pl input[type=checkbox]{margin:0}
 .off-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;border:0;padding:0;background:none}
 .rec-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rec-row .tag{display:inline-flex;align-items:center;gap:.3em}
@@ -320,13 +328,10 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 .mf-b{margin-top:14px;justify-content:flex-start}
 .rem-list{list-style:none;margin:0;padding:0}.rem-list li{padding:6px 0;border-top:1px solid var(--line);font-size:.92em}.rem-list li:first-child{border-top:0}.rem-list small{display:block;color:var(--muted)}.rem-list a{color:var(--ink)}
 .num{width:56px;font:inherit;padding:.2em .4em;border:1px solid var(--line);border-radius:6px;background:var(--bg);text-align:center}
-/* מבט ארצי ובתי ספר */
-.nat-find{margin:0;min-width:260px}
 .grp-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:12px 0}.grp-btn{display:grid;gap:2px;min-height:44px;padding:10px 12px;text-align:right;background:var(--card,#fff);border:1px solid var(--line,#ddd);border-radius:10px;font:inherit;color:inherit;cursor:pointer}.grp-btn b{font-family:Rubik,sans-serif;font-weight:700}.grp-btn small{color:var(--muted)}.grp-btn.on{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .chips.filt{margin-bottom:10px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
 .mg-row .name{text-align:start;font-family:var(--head);font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.mg-row .name:hover{text-decoration-color:var(--ink)}
 .mg-row .name small{display:block;color:var(--muted);font-weight:400;font-family:var(--body);font-size:.8em}
-#national .mg-row,#schools .mg-row{grid-template-columns:1.8fr 1.3fr repeat(5,1fr)}
 @media (max-width:1040px){.page{grid-template-columns:minmax(0,1fr)}.side{position:static;order:-1;grid-template-columns:1fr 1fr}}
 @media (max-width:760px){
   .side{grid-template-columns:1fr}.top{position:static}
@@ -340,7 +345,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   #roster .row{grid-template-columns:1fr;gap:8px}#roster .cells{flex-wrap:wrap;gap:8px}#roster .cell{width:44px;height:44px;font-size:.9em}
   #roster .notes-box{grid-template-columns:1fr}.notes-box label{grid-template-columns:64px 1fr}.notes-box input[type=time]{grid-column:2}
   .tik-grid{grid-template-columns:1fr}
-  .nat-find{min-width:0;width:100%}.row-head .emp-b{width:100%}
+  .row-head .emp-b{width:100%}
   .off-form{grid-template-columns:1fr}
   .nt-head{display:none}.nt-row{grid-template-columns:1fr 1fr;gap:8px;padding:12px}.nt-day{grid-column:1/-1;grid-auto-flow:column;justify-content:start;gap:8px;align-items:baseline}.nt-row>input{grid-column:1/-1}
   .nt-t{display:grid;gap:2px}.nt-t span{display:block;font-size:.8em;color:var(--muted)}
@@ -370,7 +375,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 /* סרגל תחתון — רק בטלפון */
 .tabbar{display:none}
 @media (max-width:760px){
-  .top{flex-wrap:nowrap;padding:10px 16px}.top .nav,#logout{display:none}
+  .top{flex-wrap:nowrap;padding:10px 16px}.top .nav,#logout,.top-minhal{display:none}
   .top .actions .btn.big{font-size:.95em;padding:.55em .9em}.brand small{font-size:.78em}
   .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;bottom:0;inset-inline:0;z-index:8;background:var(--card);border-top:1px solid var(--line);padding:4px 4px calc(4px + env(safe-area-inset-bottom));box-shadow:0 -8px 24px -18px rgba(29,79,94,.6)}
   .tabbar a{display:grid;justify-items:center;align-content:center;gap:2px;min-height:52px;font-size:.74em;font-weight:600;color:var(--muted);text-decoration:none;border-radius:10px}
@@ -381,7 +386,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   /* טבלאות: כרטיס לכל שורה */
   .mg-table.cards{overflow:visible}
   .mg-table.cards .mg-head{display:none}
-  .mg-table.cards .mg-row,.mg-table.cards .mg-row.rep7,#national .mg-table.cards .mg-row,#schools .mg-table.cards .mg-row{grid-template-columns:1fr 1fr;min-width:0;gap:4px 12px;padding:12px 14px}
+  .mg-table.cards .mg-row,.mg-table.cards .mg-row.rep7{grid-template-columns:1fr 1fr;min-width:0;gap:4px 12px;padding:12px 14px}
   .mg-table.cards .mg-row>span:first-child{grid-column:1/-1;font-size:1.05em}
   .mg-table.cards .mg-row>span[data-l]::before{content:attr(data-l) " · ";color:var(--muted);font-size:.85em}
   .mg-table.cards .mg-row>span:empty{display:none}
@@ -389,8 +394,9 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   .gp{font-size:.72em}
 }
 /* כפתורים בגודל אצבע במכשירי מגע */
-@media (pointer:coarse){
-  .note-btn,.lnk.mf-open,.mprog .lnk,.rem-list a,.kv dd a,.off-btn,.day-notes a,.up-l{min-height:44px;display:inline-flex;align-items:center}
+@media (pointer:coarse),(max-width:760px){
+  .lnk,.note-btn,.lnk.mf-open,.mprog .lnk,.rem-list a,.kv dd a,.off-btn,.day-notes a,.up-l,#roster .name,.chk-row .name{min-height:44px;display:inline-flex;align-items:center}
+  .chip,.pl,.st{min-height:44px}
   .sc{min-height:44px;padding-inline:1em}.mf-c{min-height:44px}.chk-items label{min-height:44px}
   .chk-items input,.perm input[type=checkbox],.perm input[type=radio]{width:22px;height:22px}
   .rep select,.wiz select,.rep-row select{min-height:44px}
@@ -518,6 +524,6 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   <footer class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
 </section>
 <div id="app"></div>
-<script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="wizard-map.js"></script><script src="app.js"></script><script src="gate.js"></script>
+<script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="wizard-map.js"></script><script src="app.js"></script><script src="national.js"></script><script src="schools-admin.js"></script><script src="gate.js"></script>
 </body>
 </html>
