@@ -1,0 +1,130 @@
+/* ===================================================================
+   המבט הארצי ומבטי הפיקוח — העיצוב (3.11.26)
+   הבוררים של הארצי מהמוקאפ המאושר (מוקאפ-כיוונים/b2.html, 1.11–2.11.26), ועליהם:
+   מצב "טרם דיווח" (אפור, בלי צבע ברמזור), נקודת הפתיחה החיצונית, רשימת "תלמיד.ה N", הסרגל התחתון של המבט.
+   צבעי חוץ/פנים #0A7EA3 / #C4862A עברו אימות. =================================================================== */
+.top-minhal{height:34px;width:auto;margin-inline-start:6px;padding-inline-start:12px;border-inline-start:1px solid var(--line)}
+.pc{display:inline-block;padding:.08em .6em;border-radius:999px;font-weight:700;font-variant-numeric:tabular-nums}
+.pc.g{background:#DCEEDF;color:#1F6B37}.pc.o{background:#FBE7CC;color:#8F4E00}.pc.r{background:#F7D9D6;color:#A3271C}
+.pc.x{background:var(--tint);color:var(--muted);font-weight:600}
+.kpi b .pc{font-size:1em}
+.pc-leg{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;font-size:.85em}
+.insights{background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--ink);border-radius:var(--r-card);padding:12px 16px;margin:12px 0}
+.insights summary{display:flex;align-items:center;gap:.4em;font-family:var(--head);font-weight:700;font-size:1.05em;color:var(--ink);cursor:pointer;min-height:32px}.insights summary small{font-weight:400;color:var(--muted);font-size:.85em}.insights ul{margin:8px 0 0;padding-inline-start:1.2em;display:grid;gap:4px}
+.natv .mg-row,.mg-table.nat9 .mg-row,#pikuah .mg-row{grid-template-columns:1.8fr 1.2fr repeat(var(--c,7),1fr)}
+.name small{display:block;font-weight:400;color:var(--muted);font-size:.8em}
+.natv .kpis{grid-template-columns:repeat(8,1fr)}#pikuah .kpis{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.nat-sch-head a.btn{text-decoration:none}.nat-sch-head{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-bottom:10px}.nat-sch-head .hint{margin:0}
+.filt-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:10px}.filt-row .nat-find{flex:0 1 260px;min-width:200px}.filt-row .chips.filt{margin:0}
+.nat-find{margin:0;min-width:260px}
+.chips.filt{margin-bottom:10px}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.mg-row .name{text-align:start;font-family:var(--head);font-weight:700;color:var(--ink);text-decoration:underline;text-decoration-color:transparent;text-underline-offset:3px}.mg-row .name:hover{text-decoration-color:var(--ink)}
+.mg-row .name small{display:block;color:var(--muted);font-weight:400;font-family:var(--body);font-size:.8em}
+.print-only{display:none}
+.mgc{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:12px 14px;margin-bottom:14px;display:grid;gap:2px}
+.mgc-leg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.82em;color:var(--muted);margin-bottom:6px}.mgc-leg span{display:inline-flex;align-items:center;gap:4px}
+.mgc-w{display:inline-block;width:18px;height:10px;border-radius:3px;background:#E6E1D6}.pc-dot{display:inline-block;width:10px;height:10px;border-radius:50%}.pc-dot.g{background:#2E9A55}.pc-dot.o{background:#E49A1E}.pc-dot.r{background:#D2402F}.pc-dot.x{background:#B9B4A6}
+.mgc-r{display:grid;grid-template-columns:minmax(120px,240px) 1fr 130px;align-items:center;gap:12px;background:transparent;border:0;padding:5px 4px;border-radius:6px;cursor:pointer;text-align:start;font:inherit;color:var(--text);min-height:32px}
+.mgc-r:hover{background:var(--tint)}.mgc-l{font-size:.9em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mgc-t{display:block;min-width:0}.mgc-b{display:block;height:14px;background:#E6E1D6;border-radius:4px;overflow:hidden}.mgc-f{display:block;height:100%;border-radius:4px}
+.mgc-f.g{background:#2E9A55}.mgc-f.o{background:#E49A1E}.mgc-f.r{background:#D2402F}.mgc-f.x{background:#B9B4A6}
+.mgc-v{font-size:.85em;color:var(--muted);white-space:nowrap}.mgc-v b{color:var(--text)}
+.iobar{display:flex;gap:2px;width:100%;max-width:150px;height:10px}.iobar i{display:block;height:100%;border-radius:3px;min-width:3px}
+.nat-months{display:flex;flex-wrap:wrap;align-items:center;gap:10px 22px;margin-bottom:14px}.nm{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.nm>b{font-size:.9em;color:var(--ink);margin-inline-end:2px}
+.nat-months .chip small{font-size:.74em;font-weight:400;opacity:.8}.nat-months .chip{min-height:38px}
+.kd{display:block;margin-top:3px;font-size:.86em;color:var(--text)}.dl{white-space:nowrap}
+.nat-sch-mon{margin:0 0 10px;font-weight:600;color:var(--ink)}
+.mgc-h{margin:0 0 4px;font-size:1em;color:var(--ink)}
+.mgc-l small{color:var(--muted);font-size:.84em}
+.nc .mgc-r{grid-template-columns:minmax(120px,210px) 1fr 250px}
+.nc .mgc-r.cur{background:var(--tint)}.nc .mgc-r.cur .mgc-l{font-weight:700}
+.nc-t{display:grid;gap:2px;min-width:0}
+.nb{height:12px;border-radius:4px;min-width:0}
+.nb-p{display:block;height:5px;border-radius:3px;background:#A9A597}.nb-key{display:inline-block;width:18px}
+.ios{display:flex;gap:2px;height:14px;min-width:3px}.ios i{display:block;height:100%;border-radius:4px;min-width:3px}
+.io-o{background:#0A7EA3}.io-i{background:#C4862A}.io-key{display:inline-block;width:12px;height:12px;border-radius:3px}
+.mgc-b{position:relative}.mgc-c{position:absolute;top:0;bottom:0;width:2px;background:#22343A}.mgc-ck{display:inline-block;width:2px;height:12px;background:#22343A}
+/* המסך הראשי של הארצי */
+.nh-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;margin-bottom:8px}
+.nh-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0;text-align:start;font:inherit;color:var(--text)}
+.nh-card h3{margin:0;font-size:1em;color:var(--ink)}.nh-card p{margin:0}
+.nh-big{font-family:var(--head);line-height:1;margin:6px 0}.nh-big .pc{font-size:3em;padding:.08em .3em}
+.nh-cols{display:flex;align-items:flex-end;gap:14px;flex:1 0 auto}
+.nh-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;gap:4px;background:transparent;border:0;padding:0 2px;cursor:pointer;font:inherit;color:var(--text);min-width:0}
+.nh-col i{display:block;background:#0A7EA3;border-radius:4px 4px 0 0}
+.nh-col.none i{background:repeating-linear-gradient(135deg,#D8D3C6 0 3px,#EEE9DE 3px 6px)}
+.nh-col>b{font-family:var(--head);font-size:1.05em;color:var(--ink)}.nh-col>span{font-size:.85em;color:var(--muted);line-height:1.2;min-height:34px}.nh-col>span small{display:block;font-size:.84em}
+.nh-col.cur>span{color:var(--ink);font-weight:700}.nh-col:hover>span{color:var(--ink)}
+.nh-tl .tl{flex:1;align-content:center;padding:10px;gap:8px;border-radius:16px}.nh-tl .tl-l{grid-template-columns:44px 1fr;gap:10px}.nh-tl .tl-l b{width:44px;height:44px;font-size:1.15em}.nh-tl .tl-l span{font-size:.85em}
+.nh-cov{font-size:.88em;color:var(--muted);margin:0}
+/* נקודת הפתיחה: דיווח חיצוני, בנפרד מהקו */
+.nh-base{border-style:dashed;margin-bottom:8px}.nh-base .nh-big .pc{font-size:1.9em}.nh-base h3{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.nc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px;margin-bottom:12px}
+.nc-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px;display:flex;flex-direction:column;gap:10px;cursor:pointer;text-align:start;font:inherit;color:var(--text);min-width:0}
+.nc-card:hover{border-color:var(--ink)}
+.nc-h{display:flex;align-items:center;gap:8px;color:var(--ink)}.nc-h b{font-family:var(--head);font-size:1.08em}.nc-h small{color:var(--muted);font-size:.84em;margin-inline-end:auto}.nc-h svg{flex:none}
+.nc-mini{display:grid;gap:6px;min-height:72px;align-content:center}.nc-mini>.ios{height:16px}
+.nc-bands{display:flex;gap:2px;height:16px}.nc-bands i{height:100%;border-radius:4px;min-width:3px}
+.nc-m{display:grid;grid-template-columns:minmax(0,1.15fr) 1fr 38px;align-items:center;gap:8px;font-size:.85em}.nc-ml{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nc-mt{display:block}.nc-mt i{height:9px}.nc-m b{text-align:start}
+.nc-line{font-size:.86em;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mgc-r.still{cursor:default}
+.kpi-btn{font:inherit;color:inherit;cursor:pointer;display:block;width:100%}.kpi-btn:hover{border-color:var(--ink)}.kpi-go{display:block;margin-top:3px;font-size:.8em;color:var(--ink);font-weight:600}.kpi-go .arr{display:none}
+#natcat .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}.kpi b.kt{font-size:1.12em;line-height:1.25;margin-bottom:2px;overflow-wrap:anywhere}
+#natcat .filt-row{margin-top:6px}.cmp-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:10px}.nat-sort{margin-inline-start:auto}.nh-cmp{border-top:1px solid var(--line);padding-top:8px;margin-top:2px}.nh-cmp .nm>b{font-size:.85em}.nh-cmp .chip,.cmp-row .chip{min-height:36px}.nat-sort[hidden]{display:none}.nat-top{margin-bottom:14px}#natcat #natChart{margin-top:0}#natcat .sub-head h2{flex:1}#natChart{margin-top:12px}
+.nat-k{grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-bottom:12px}
+.nc-h b,.nc-h small{white-space:nowrap}
+.ntip{position:fixed;z-index:60;max-width:340px;padding:6px 10px;border-radius:6px;background:#22343A;color:#fff;font-size:.82em;line-height:1.35;pointer-events:none}.ntip[hidden]{display:none}
+/* הרמזור בצד (במחשב), למעלה ובשורה (בטלפון). "טרם דיווח" אפור, לא צבע ברמזור */
+.nat-grid{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;align-items:start}
+.lights{position:sticky;top:96px;background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px;display:grid;gap:12px}
+.lights h3{margin:0;font-size:1.05em;color:var(--ink);display:flex;justify-content:space-between;align-items:baseline}.lights h3 small{font-weight:400;color:var(--muted);font-size:.8em}
+.tl{background:#22343A;border-radius:22px;padding:14px 12px;display:grid;gap:12px}
+.tl-l{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:12px;background:transparent;border:0;color:#fff;cursor:pointer;text-align:start;padding:0;font:inherit}
+.tl-l b{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-family:var(--head);font-size:1.5em;color:#fff;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.tl-l.g b{background:#2E9A55}.tl-l.o b{background:#E49A1E}.tl-l.r b{background:#D2402F}.tl-l.x b{background:#5F6B6E;color:#E8E4DA}
+.tl-l span{font-weight:600;font-size:.95em}
+.tl-l.on b{outline:4px solid #fff;outline-offset:3px}.tl-l.dim{opacity:.45}
+.tl-l:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:14px}
+.tl-x{border-top:1px solid rgba(255,255,255,.18);padding-top:8px}
+.tl-list{border-top:1px solid var(--line);padding-top:8px}.tl-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.tl-list ul{list-style:none;margin:0;padding:0;max-height:46vh;overflow:auto;display:grid;gap:2px}
+.tl-s{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px 6px;border-radius:8px;background:transparent;border:0;cursor:pointer;text-align:start;font:inherit;color:var(--text);min-height:40px}
+.tl-s:hover{background:var(--tint)}
+.tl-tip{margin:0;font-size:.85em}
+.natv .kpis{grid-template-columns:repeat(7,1fr)}
+/* מצבי בית ספר: טרם דיווח / לא הופעל / אין מרחב */
+.tag.x{background:var(--tint);color:var(--muted)}.tag.part{background:#F3E6CF;color:var(--warn)}
+.mg-row.unrep>span:not(:first-child){color:var(--muted)}
+.cov{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin:0 0 10px;font-size:.9em;color:var(--muted)}.cov b{color:var(--ink)}
+.mb-load{padding:40px 0;text-align:center;color:var(--muted)}
+.stu-l details.grp summary small{margin-inline-start:6px}
+.emp-contact{display:grid;gap:2px;font-size:.88em;color:var(--muted)}.emp-contact b{color:var(--text);font-weight:600}.emp-contact span[dir=ltr]{display:inline-block}
+/* סרגל המבט: תפריט עליון במחשב, סרגל תחתון בטלפון */
+.tabbar.mb{grid-template-columns:repeat(auto-fit,minmax(0,1fr))}
+.tabbar.mb button{display:grid;justify-items:center;align-content:center;gap:2px;min-height:52px;font-size:.74em;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:10px;font-family:inherit;cursor:pointer}
+.tabbar.mb button .i{width:22px;height:22px}
+.content>.sec.mb-cur{display:block}
+body[data-view=national] main.page,body[data-view=natcat] main.page,body[data-view=pikuah] main.page{max-width:1440px}
+@media (max-width:1180px){.nh-grid{grid-template-columns:1fr 1fr}.nh-tl{grid-column:1/-1}}
+@media (max-width:1100px){.nh-tl .tl-l{grid-template-columns:1fr}}
+@media (max-width:760px){#natcat .sub-head{flex-wrap:wrap}#natcat .sub-head h2{order:3;flex:1 1 100%}.nh-grid{grid-template-columns:1fr}.nc-grid{grid-template-columns:1fr;gap:8px}.nc-mini{display:none}.nc-card{padding:12px 14px;gap:4px;min-height:44px}
+  .nc .mgc-r{grid-template-columns:1fr;gap:3px}.nc .mgc-t,.nc .nc-t{grid-row:auto;grid-column:auto}.nc .mgc-l{white-space:normal}.nm{width:100%}.iobar{max-width:none}
+  .top-minhal{display:none}.nat-find{min-width:0;width:100%}.row-head .emp-b{width:100%}
+  .natv .kpis,#pikuah .kpis{grid-template-columns:repeat(2,1fr)}
+  .mg-table.cards .mg-row.mg-row,#pikuah .mg-table.cards .mg-row,.mg-table.nat9.cards .mg-row{grid-template-columns:1fr 1fr}
+  .tl-l b{width:54px;height:54px;font-size:1.3em}.tl-l span{font-size:.82em}.tl{padding:12px 8px;gap:8px}
+  .nat-months .chip,.nh-cmp .chip,.cmp-row .chip,.chips.filt .chip,.nat-sort{min-height:44px}}
+@media (max-width:760px){.mgc-r{grid-template-columns:1fr auto;gap:2px 10px}.mgc-t{grid-column:1/-1;grid-row:2}.filt-row .nat-find{flex:1 1 100%}}
+@media (max-width:1100px){.nat-grid{grid-template-columns:1fr}.nat-grid .lights{order:-1;position:static}.tl{grid-template-columns:repeat(4,1fr)}.tl-l{grid-template-columns:1fr;justify-items:center;text-align:center;gap:6px}.tl-x{border-top:0;padding-top:0}}
+@media (max-width:1100px){.natv .kpis,#pikuah .kpis{grid-template-columns:repeat(4,1fr)}}
+@media (pointer:coarse),(max-width:760px){.mgc-r,.tl-s,.nh-col,.kpi-btn,.nc-card,.insights summary,.grp summary,.natv .btn,#sub .btn,.natv .chip,#sub .chip,.nat-find .find{min-height:44px}.mg-row .name,.lights .lnk,#sub .lnk,#pikuah .lnk{min-height:44px;display:inline-flex;align-items:center;flex-wrap:wrap}.mg-row .name small{flex-basis:100%}}
+@page{size:A4 landscape;margin:12mm}
+@media print{
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .print-only{display:block}#natPrintMeta{font-weight:600;margin:8px 0}
+  .tabs,.filt-row,.lights .tl-tip,.lnk[data-band],[data-act="print"],.nat-months,.nh-cmp,.cmp-row{display:none!important}
+  .nat-grid{display:block!important}.lights{position:static!important;margin:10px 0;break-inside:avoid;max-width:560px}.tl{grid-template-columns:repeat(4,1fr)!important}.tl-l{grid-template-columns:auto 1fr!important}
+  .tl-list ul{max-height:none;overflow:visible}
+  .mg-row,.mgc-r,.kpi,.nc-card,.nh-card{break-inside:avoid}.insights{break-inside:avoid}
+  body[data-view=national] main.page,body[data-view=natcat] main.page,body[data-view=pikuah] main.page,body[data-view=sub] main.page{max-width:none}
+}
