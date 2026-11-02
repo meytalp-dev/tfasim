@@ -8,6 +8,7 @@
   'use strict';
   const DOCS = ['תעודת זהות', 'חשבון בנק', 'אישור רפואי', 'טופס מוכנות ליציאה (חתום)', 'הסכם התקשרות עם המעסיק'];
   const MN = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
+  /* statusSrc: 'list' (מרשימת הלומדים) | 'manual' (עודכן ידנית) | 'list-missing' (לא ברשימה המעודכנת · לבדיקה) */
   const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
   const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor'];
   const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
@@ -38,10 +39,15 @@
     if (!res.ok) throw new Error(res.error || 'load');
     R = { month: M, school: me.school, me, role: me.role === 'principal' ? 'manager' : me.role, DOCS,
       EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, CONF: null, MANUAL: {},
-      meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0 };
+      meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0,
+      /* רשימה מעודכנת ממתינה (רק לרכז.ת): הרשומות upd: מוצפנות במפתח חד-פעמי אחר, ולכן עוברות כמו שהן.
+         מסך התלמידים פותח אותן עם הקוד מהמייל: CK.unwrapRecovery(code, update.wrap) ואז פענוח של כל e */
+      update: null };
+    const upd = [];
     for (const r of res.recs) {
-      EXIST.add(r.k);
       const p = r.p || {};
+      if (r.k.startsWith('upd:')) { upd.push({ k: r.k, p, e: r.e || '' }); continue; }
+      EXIST.add(r.k);
       if (r.k.startsWith('stu:')) {
         let pv = {};
         try { pv = (await CK.decJSON(key, r.e)) || {}; } catch (e) { R.bad++; continue; }   /* לא נפתח במפתח הזה — לא מציגים */
@@ -73,6 +79,7 @@
     /* תזכורות שכבר יצאו החודש — בלי שם, השם מתווסף כאן מהתיק */
     R.REMLOG = (res.remlog || []).filter(x => x.m === M.ym);
     R.remqKeys = (res.remq || []).slice().sort();
+    if (res.update && res.update.wrap && upd.length) R.update = { wrap: res.update.wrap, at: res.update.at || '', recs: upd };
     return R;
   }
 

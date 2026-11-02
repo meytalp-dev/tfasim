@@ -38,10 +38,11 @@
     keysInit: ['rakaz'], keysActivate: ['rakaz'], grant: ['rakaz'], put: ['rakaz'], remqSet: ['rakaz'], remSend: ['rakaz'], monConf: ['rakaz'], raw: ['rakaz'],
     rakazAdd: ['principal'],
     preload: ['system'], preloadStatus: ['system'], activationSend: ['system'], schoolsAdmin: ['system'], permsLoad: ['system'], baselineLoad: ['system'], stateRefresh: ['system'],
+    schoolDelete: ['system'], updateLoad: ['system'], updateSend: ['system'], updateDone: ['rakaz'],
     natStats: NAT, natBaseline: NAT, schoolAnon: NAT, schoolEmps: ['system', 'ped', 'pro']
   };
-  var WRITE = ['keysInit', 'keysActivate', 'grant', 'put', 'remqSet', 'remSend', 'monConf'];
-  function blank() { return { perms: [], schools: {}, codes: {}, sessions: {}, remq: {}, remlog: [], outbox: [], base: null, seeded: 0 }; }
+  var WRITE = ['keysInit', 'keysActivate', 'grant', 'put', 'remqSet', 'remSend', 'monConf', 'updateDone'];
+  function blank() { return { perms: [], schools: {}, codes: {}, sessions: {}, remq: {}, remlog: [], outbox: [], base: null, seeded: 0, mcount: {} }; }
   function db() { var d; try { d = JSON.parse(localStorage.getItem(DBK) || 'null'); } catch (e) { d = null; } return Object.assign(blank(), d || {}); }
   function save(d) { try { localStorage.setItem(DBK, JSON.stringify(d)); } catch (e) { throw new Error('המקום בדפדפן נגמר (מצב בדיקה)'); } }
   function hash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0; return h; }
@@ -210,9 +211,99 @@
     return L.length;
   }
 
+  /* ---------- הקישור למנטור.ית (sochnim/mentor-api.md, c9): אותן רשומות ml:/mp:/mf: כמו ב-gas/מנטור.js ---------- */
+  var MENTOR_CAP = 400, LOCK_DAY = 10;
+  function mTok(k) { return /^[A-Za-z0-9_-]{20,40}$/.test(String(k || '')); }
+  function mId(v) { return /^[A-Za-z0-9]{2,24}$/.test(String(v || '')); }
+  function mLink(p) { return { emp: String(p.emp || ''), ids: Array.isArray(p.ids) ? p.ids.map(String) : [], created: String(p.created || ''), revoked: String(p.revoked || ''), wrap: String(p.wrap || '') }; }
+  /* ההקשר של קישור: בית הספר, המעסיק, התלמידים המותרים (גלוי בלבד, בלי e של stu:) */
+  function mCtx(d, k) {
+    var school = Object.keys(d.schools).filter(function (n) { return d.schools[n].recs['ml:' + k]; })[0];
+    if (!school) return null;
+    var recs = d.schools[school].recs, ml = recs['ml:' + k], L = mLink(ml.p);
+    if (L.revoked) return null;
+    var mon = {}; Object.keys(recs).forEach(function (key) { if (key.indexOf('mon:') === 0) mon[key.slice(4)] = recs[key].p || {}; });
+    var mine = [];
+    L.ids.forEach(function (id) {
+      var s = (recs['stu:' + id] || {}).p; if (!s || String(s.emp || '') !== L.emp || s.status === 'עזב') return;
+      var locked = {}; Object.keys(mon).forEach(function (ym) { if ((mon[ym].sub || {})[s.mg]) locked[ym] = true; });
+      mine.push({ id: id, days: Array.isArray(s.days) ? s.days : [], mg: s.mg || '', cls: s.cls || '', locked: locked });
+    });
+    return { k: k, school: school, recs: recs, emp: L.emp, employer: String(((recs['emp:' + L.emp] || {}).p || {}).name || ''), roster: ml.e || '', mine: mine,
+      has: function (sid) { return mine.filter(function (x) { return x.id === sid; })[0] || null; } };
+  }
+  function mentorOpen(d, q) {
+    if (q.action !== 'mentorGet' && q.action !== 'mentorPut') return null;
+    if (!mTok(q.k)) return { ok: false, error: 'badlink' };
+    var ck = q.k + ':' + today(), n = +(d.mcount[ck] || 0);
+    if (n >= MENTOR_CAP) return { ok: false, error: 'cap' };
+    d.mcount[ck] = n + 1; save(d);
+    var M = mCtx(d, q.k); if (!M) return { ok: false, error: 'badlink' };
+    if (q.action === 'mentorGet') {
+      var att = {}, fb = {};
+      [ymOf(1), ymOf(0)].forEach(function (ym) { var r = M.recs['mp:' + q.k + ':' + ym]; if (r && r.p && r.p.a) att[ym] = r.p.a; });
+      Object.keys(M.recs).forEach(function (key) {
+        var t = key.split(':'); if (t[0] !== 'mf' || t[1] !== q.k || t.length !== 4 || !M.has(t[3])) return;
+        fb[t[3] + '|' + t[2]] = { scores: M.recs[key].p.scores || [], at: M.recs[key].p.at || '', e: M.recs[key].e || '' };
+      });
+      return { ok: true, school: M.school, employer: M.employer, today: today(), lockDay: LOCK_DAY, roster: M.roster, students: M.mine, att: att, fb: fb };
+    }
+    var st = M.has(String(q.sid || '')); if (!st) return { ok: false, error: 'notmine' };
+    if (q.what === 'fb') {
+      var period = String(q.period || ''), scores = q.scores, e = String(q.e || '');
+      if ((period !== 'fb1' && period !== 'fb2') || !Array.isArray(scores) || scores.length !== 18 || !okCipher(e)) return { ok: false, error: 'bad' };
+      scores = scores.map(function (v) { return Math.round(+v); });
+      if (!scores.every(function (v) { return v >= 1 && v <= 4; })) return { ok: false, error: 'bad' };
+      var atF = today();
+      M.recs['mf:' + q.k + ':' + period + ':' + st.id] = { p: { sid: st.id, period: period, scores: scores, at: atF }, e: e }; save(d);
+      return { ok: true, at: atF };
+    }
+    var date = String(q.date || ''), v = String(q.v || ''), td = today(), day = +td.slice(8, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date > td || (v && ['p', 'a', 'x'].indexOf(v) < 0)) return { ok: false, error: 'bad' };
+    var ym = date.slice(0, 7), dd = +date.slice(8, 10);
+    if (!(ym === ymOf(0) || (ym === ymOf(1) && day <= LOCK_DAY))) return { ok: false, error: 'bad' };
+    if (st.locked[ym]) return { ok: false, error: 'locked' };
+    var key = 'mp:' + q.k + ':' + ym, a = ((M.recs[key] || {}).p || {}).a || {};
+    if (v) (a[st.id] = a[st.id] || {})[dd] = v; else if (a[st.id]) { delete a[st.id][dd]; if (!Object.keys(a[st.id]).length) delete a[st.id]; }
+    M.recs[key] = { p: { a: a, at: nowS() }, e: '' }; save(d);
+    return { ok: true, ym: ym, d: dd };
+  }
+  function mentorRakaz(d, s, q) {
+    if (['mentorCreate', 'mentorRevoke', 'mentorPull'].indexOf(q.action) < 0) return { ok: false, error: 'badaction' };
+    if (s.role !== 'rakaz') return { ok: false, error: KEYED.indexOf(s.role) >= 0 ? 'readonly' : 'forbidden' };
+    var t = d.schools[s.school] = d.schools[s.school] || { keys: {}, recovery: null, recs: {} }, recs = t.recs, day = today();
+    var links = function () { return Object.keys(recs).filter(function (key) { return key.indexOf('ml:') === 0; }).map(function (key) { var L = mLink(recs[key].p); L.k = key.slice(3); return L; }); };
+    var revoke = function (L) { recs['ml:' + L.k] = { p: { emp: L.emp, ids: L.ids, created: L.created, revoked: day, wrap: L.wrap }, e: recs['ml:' + L.k].e }; };
+    if (q.action === 'mentorCreate') {
+      var emp = String(q.emp || ''), k = String(q.k || ''), ids = Array.isArray(q.ids) ? q.ids.map(String) : [], roster = String(q.roster || ''), wrap = String(q.wrap || '');
+      if (!mId(emp) || !mTok(k) || !ids.length || ids.length > 200 || !ids.every(mId) || !roster || !okCipher(roster) || !wrap || !okCipher(wrap)) return { ok: false, error: 'bad' };
+      if (!recs['emp:' + emp]) return { ok: false, error: 'noemp' };
+      if (recs['ml:' + k]) return { ok: false, error: 'bad' };
+      var replaced = 0; links().forEach(function (L) { if (L.emp === emp && !L.revoked) { revoke(L); replaced++; } });
+      recs['ml:' + k] = { p: { emp: emp, ids: ids, created: day, revoked: '', wrap: wrap }, e: roster }; save(d);
+      return { ok: true, k: k, replaced: replaced };
+    }
+    if (q.action === 'mentorRevoke') {
+      var em = String(q.emp || ''), kk = String(q.k || ''), nr = 0;
+      if (!mId(em) && !mTok(kk)) return { ok: false, error: 'bad' };
+      links().forEach(function (L) { if (!L.revoked && ((em && L.emp === em) || (kk && L.k === kk))) { revoke(L); nr++; } }); save(d);
+      return { ok: true, n: nr };
+    }
+    var ym = /^\d{4}-\d{2}$/.test(q.ym || '') ? q.ym : ymOf(0), byTok = {}, marks = [], fb = [], ls = links();
+    ls.forEach(function (L) { byTok[L.k] = L; });
+    Object.keys(recs).forEach(function (key) {
+      var tt = key.split(':'), L = byTok[tt[1]]; if (!L || (tt[0] !== 'mp' && tt[0] !== 'mf')) return;
+      var p = recs[key].p || {};
+      if (tt[0] === 'mp' && tt[2] === ym) Object.keys(p.a || {}).forEach(function (sid) { if (L.ids.indexOf(sid) < 0) return; Object.keys(p.a[sid]).forEach(function (dd) { marks.push({ k: L.k, emp: L.emp, sid: sid, ym: ym, d: +dd, v: p.a[sid][dd], at: p.at || '' }); }); });
+      else if (tt[0] === 'mf' && tt.length === 4 && L.ids.indexOf(tt[3]) >= 0) fb.push({ k: L.k, emp: L.emp, sid: tt[3], period: tt[2], scores: p.scores || [], at: p.at || '', e: recs[key].e || '' });
+    });
+    return { ok: true, ym: ym, links: ls, marks: marks, fb: fb };
+  }
+
   function mock(q) {
     var d = db(), P = perms(d);
     var active = function () { return P.filter(function (p) { return p.active === 'כן'; }); };
+    if (/^mentor/.test(String(q.action || ''))) { var mo = mentorOpen(d, q); if (mo) return mo; }
     if (q.action === 'people') return { ok: true, people: active().filter(function (p) { return p.school === nn(q.school); }).map(function (p) { return { pid: pid(p), role: p.role, masked: mask(p.email) }; }) };
     if (q.action === 'register') {
       if (!q.school || !q.name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(q.email || '')) return { ok: false, error: 'bad' };
@@ -242,18 +333,47 @@
     var ss = d.sessions[q.token], me = ss && active().filter(function (x) { return x.email === ss.email && x.school === ss.school && (!ss.role || x.role === ss.role); })[0];
     if (!me) return { ok: false, error: 'badsession' };
     var s = { email: me.email, name: me.name, role: me.role, school: me.school, active: me.active }, priv = { supOf: me.supOf, codes: me.codes };
+    if (/^mentor/.test(String(q.action || ''))) return mentorRakaz(d, s, q);
     if (!ALLOW[q.action]) return { ok: false, error: 'badaction' };
     if (ALLOW[q.action].indexOf(s.role) < 0) return { ok: false, error: KEYED.indexOf(s.role) >= 0 && WRITE.indexOf(q.action) >= 0 ? 'readonly' : 'forbidden' };
     var R = function (o) { save(d); return Object.assign({ ok: true }, o || {}); };
     var sc0 = Object.assign({}, s, priv), cur = ymOf(0);
 
     /* ---------- מנהל.ת המערכת ---------- */
-    if (['preload', 'preloadStatus', 'activationSend'].indexOf(q.action) >= 0) {
-      if (q.action === 'preloadStatus') { var st = {}; (q.schools || []).forEach(function (n) { var x = d.schools[n]; st[n] = { state: recState(x), n: x ? Object.keys(x.recs).length : 0 }; }); return { ok: true, status: st }; }
+    /* c7: מחיקת בית ספר בדוי (לא ברשימת 64 ולא מרחב תפקיד) */
+    if (q.action === 'schoolDelete') {
+      var del = nn(q.school);
+      if (!del) return { ok: false, error: 'bad' };
+      if (semelOf(del) || del === PIKUAH || del === 'מטה' || del === 'המרחב הפדגוגי' || del.indexOf(NETP) === 0) return { ok: false, error: 'forbidden' };
+      var had = !!d.schools[del], np = d.perms.length;
+      delete d.schools[del]; delete d.remq[del];
+      d.perms = d.perms.filter(function (p) { return nn(p.school) !== del; });
+      d.remlog = d.remlog.filter(function (r) { return r.school !== del; });
+      Object.keys(d.sessions).forEach(function (k) { if (d.sessions[k].school === del) delete d.sessions[k]; });
+      return R({ school: del, perms: np - d.perms.length, files: had ? 1 : 0, trashed: had });
+    }
+    if (['preload', 'preloadStatus', 'activationSend', 'updateLoad', 'updateSend'].indexOf(q.action) >= 0) {
+      if (q.action === 'preloadStatus') { var st = {}; (q.schools || []).forEach(function (n) { var x = d.schools[n]; st[n] = { state: recState(x), n: x ? Object.keys(x.recs).length : 0, update: x && x.update ? 'pending' : '' }; }); return { ok: true, status: st }; }
       var t = d.schools[q.school] = d.schools[q.school] || { keys: {}, recovery: null, recs: {} };
       if (q.action === 'activationSend') {
         if (!t.recovery || !t.pending) return { ok: false, error: 'notpending' };
         d.outbox.push({ to: q.to, subj: 'קוד הפעלה · ' + q.school, code: q.code, at: new Date().toISOString() }); return R();
+      }
+      /* c8: רשימה מעודכנת, מוצפנת במפתח חד-פעמי חדש. העלאה חוזרת מחליפה את הקודמת */
+      if (q.action === 'updateLoad') {
+        if (!q.recovery || !q.recovery.ct || !(q.recs || []).length || q.recs.length > 600) return { ok: false, error: 'bad' };
+        if (!t.recovery || t.pending) return { ok: false, error: 'notactive' };
+        for (var ui = 0; ui < q.recs.length; ui++) if (!/^upd:[A-Za-z0-9]{2,24}$/.test(q.recs[ui].k) || !q.recs[ui].e || !okCipher(q.recs[ui].e)) return { ok: false, error: 'notencrypted', key: q.recs[ui].k };
+        Object.keys(t.recs).forEach(function (k) { if (/^upd:/.test(k)) delete t.recs[k]; });
+        q.recs.forEach(function (x) { var pp = pick(x.p, STU_PLAIN); pp.id = x.k.slice(4); t.recs[x.k] = { p: pp, e: x.e }; });
+        t.update = { wrap: q.recovery, at: nowS(), n: q.recs.length }; return R({ n: q.recs.length });
+      }
+      if (q.action === 'updateSend') {
+        if (!/^[A-Z0-9-]{20,30}$/.test(String(q.code || ''))) return { ok: false, error: 'bad' };
+        if (!t.update) return { ok: false, error: 'notpending' };
+        var rk = active().filter(function (p) { return p.school === q.school && p.role === 'rakaz' && p.email === String(q.to || '').toLowerCase(); })[0];
+        if (!rk) return { ok: false, error: 'norakaz' };
+        d.outbox.push({ to: rk.email, subj: 'רשימה מעודכנת · ' + q.school, code: q.code, at: new Date().toISOString() }); return R();
       }
       if (t.recovery && !t.pending) return { ok: false, error: 'active' };
       if (!t.recovery && Object.keys(t.recs).length) return { ok: false, error: 'hasdata' };
@@ -294,7 +414,7 @@
         var row = natRow(d, { all: true, schools: {} }, n, cur), lr = null;
         if (row.state === 'partial' || row.state === 'done') lr = { ym: cur, state: row.state, upd: today() };
         else if (d.schools[n] && d.schools[n].recovery && !d.schools[n].pending) { var pr = natRow(d, { all: true, schools: {} }, n, ymOf(1)); if (pr.state === 'partial' || pr.state === 'done') lr = { ym: ymOf(1), state: pr.state, upd: '' }; }
-        return { school: n, semel: semelOf(n), activation: recState(d.schools[n]), people: ppl, state: row.state, calcAt: row.calcAt, lastReport: lr, lastLogin: login };
+        return { school: n, semel: semelOf(n), activation: recState(d.schools[n]), people: ppl, state: row.state, calcAt: row.calcAt, lastReport: lr, lastLogin: login, update: d.schools[n] && d.schools[n].update ? 'pending' : '' };
       }) };
     }
     if (q.action === 'permsLoad') {
@@ -355,10 +475,13 @@
       case 'keysSet': sc1.keys[s.email] = { pub: q.pub, encPriv: q.encPriv, wrapped: q.wrapped || null, at: today() }; return R();
       case 'grant': { var k = sc1.keys[String(q.email).toLowerCase()]; if (!k || !q.wrapped) return { ok: false, error: 'nokeys' }; k.wrapped = q.wrapped; k.at = today(); return R(); }
       case 'load': {
-        var y = /^\d{4}-\d{2}$/.test(q.ym || '') ? q.ym : '';
-        return { ok: true, me: s, recs: Object.keys(sc1.recs).filter(function (k) { return !y || k.indexOf('att:') !== 0 || k.indexOf('att:' + y + ':') === 0; }).map(function (k) { return { k: k, p: sc1.recs[k].p, e: sc1.recs[k].e }; }),
+        var y = /^\d{4}-\d{2}$/.test(q.ym || '') ? q.ym : '', rz = s.role === 'rakaz';
+        var ld = { ok: true, me: s, recs: Object.keys(sc1.recs).filter(function (k) { return (!y || k.indexOf('att:') !== 0 || k.indexOf('att:' + y + ':') === 0) && (rz || k.indexOf('upd:') !== 0); }).map(function (k) { return { k: k, p: sc1.recs[k].p, e: sc1.recs[k].e }; }),
           remlog: d.remlog.filter(function (r) { return r.school === s.school && (!y || r.m === y); }), remq: Object.keys(d.remq[s.school] || {}) };
+        if (rz) ld.update = sc1.update ? { wrap: sc1.update.wrap, at: sc1.update.at } : null;   /* רשימה מעודכנת ממתינה: רק לרכז.ת */
+        return ld;
       }
+      case 'updateDone': { var nu = 0; Object.keys(sc1.recs).forEach(function (k) { if (/^upd:/.test(k)) { delete sc1.recs[k]; nu++; } }); delete sc1.update; return R({ n: nu }); }
       case 'put': {
         if ((q.recs || []).length > 600) return { ok: false, error: 'toomany', max: 600 };
         for (var i = 0; i < (q.recs || []).length; i++) {

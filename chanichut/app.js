@@ -1,6 +1,14 @@
 /* מערכת רכזי החניכות v2 (1.11.26) — נבנתה מהמוקאפ שאושר (מוקאפ-כיוונים\mock2.js).
    הנתונים מגיעים מ-store.js אחרי הכניסה והפענוח (R), וכל שינוי נשמר לבד (Store.watch).
    מבנה: מסכים ראשיים בניווט; כל לחיצה פותחת מסך משנה נפרד (#sub) שנרשם בהיסטוריה — "חזרה" של הטלפון חוזרת מסך אחד. */
+/* הקישור למנטור.ית (mentor.js) צריך את מפתח בית הספר כדי לעטוף את מפתח הקישור. המפתח נשאר ב-gate.js ולא מגיע ל-startApp,
+   ולכן עוטפים כאן את Store.load: המפתח עובר ל-Mentor.setKey ברגע הטעינה, בלי לגעת ב-gate.js או ב-store.js */
+(function () {
+  if (!window.Store || !window.Mentor || Store.load.mentorWrapped) return;
+  const load = Store.load;
+  Store.load = function (key) { try { Mentor.setKey(key); } catch (e) {} return load.apply(this, arguments); };
+  Store.load.mentorWrapped = true;
+})();
 window.startApp = function (R) {
   'use strict';
   const I = {
@@ -314,6 +322,7 @@ window.startApp = function (R) {
           <button class="chip" data-cmd="סמן ש${esc(first(sPlaced))} הגיע היום">סמן ש${esc(first(sPlaced))} הגיע היום</button>
           <button class="chip" data-cmd="מי לא הגיע השבוע">מי לא הגיע השבוע</button>
           <button class="chip" data-cmd="הגש את הנוכחות של ${esc(MGS[0])}">הגש את הנוכחות של ${esc(MGS[0])}</button>
+          <button class="chip" data-cmd="מצא מעסיקים ל${esc(MGS[0])}">מצא מעסיקים ל${esc(MGS[0])}</button>
           <button class="chip" data-cmd="מה חסר ל${esc(first(sNone))}">מה חסר ל${esc(first(sNone))}</button>
           <button class="chip" data-cmd="אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}, פורים">אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}</button>
         </div>
@@ -334,12 +343,14 @@ window.startApp = function (R) {
     <section class="sec att" id="att">
       <div class="sec-head att-head"><h2>דיווח נוכחות · <select class="mon-pick" id="monPick" aria-label="חודש">${[0, 1].map(b => { const m = Store.monthInfo(b); return `<option value="${b}" ${MONTH.back === !!b ? 'selected' : ''}>${esc(m.label)}</option>`; }).join('')}</select></h2><button class="btn quiet" data-act="att-close">${ic('back')}חזרה</button></div>
       <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="find" class="find big" placeholder="כיתה או מספר פעולה" autocomplete="off"></div>
+      <div class="emp-b edit att-pull"><button class="btn" data-act="mentor-pull">${ic('download')}משיכת סימוני המנטור.ית</button><span class="hint">מה שהמנטורים סימנו בקישור שלהם · רק ימים שלא סומנו כאן</span></div>
       <div id="grpList" class="grp-list" hidden></div>
       <div id="roster" class="roster" hidden></div>
     </section>
 
     <section class="sec" id="students">
       <div class="sec-head row-head"><h2>התלמידים שלי</h2><button class="btn primary edit" data-act="new-stu">${ic('plus')}תלמיד.ה חדש.ה</button></div>
+      <div class="confirm edit" id="updBar" hidden></div>
       <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="stuFind" class="find" placeholder="שם, כיתה או מספר פעולה" autocomplete="off"></div>
       <div id="stuHits"></div>
       <div id="stuList"></div>
@@ -399,6 +410,7 @@ window.startApp = function (R) {
   <div class="toast" id="toast" hidden></div>`;
 
   let toastT; function toast(m) { const t = $('toast'); t.textContent = m; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+  const copyTxt = (t, m) => (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => toast(m || 'הועתק'), () => toast('ההעתקה לא הצליחה'));
 
   /* ================= ניווט, תפקידים, מסכי משנה והיסטוריה ================= */
   const VIEWS = ['overview', 'att', 'students', 'employers', 'checklist', 'links', 'reports', 'admin', 'more', 'sub'];
@@ -527,7 +539,9 @@ window.startApp = function (R) {
   const stLbl = (s, d) => { const v = ATT[s.id][d]; return v === 'a' ? 'לא הגיע.ה' : v === 'x' ? 'היעדרות באישור' : v === 'n' ? (offWhy(s, d) || (suspended(s, d) ? 'השעיה' : 'לא בעבודה')) : v ? 'הגיע.ה' : 'לא סומן'; };
   const cellHtml = (s, d, btn) => { const v = ATT[s.id][d], note = NOTES[s.id][d], t = TIMES[s.id][d], lbl = stLbl(s, d); const tt = t && (t.i || t.o) ? ` · ${t.i || ''}–${t.o || ''}` : ''; const lock = btn && v === 'n' && (offWhy(s, d) || suspended(s, d)); return `<${btn ? 'button' : 'span'} class="cell ${v || ''} ${note ? 'has-note' : ''}" data-d="${d}" ${lock ? 'disabled' : ''} title="${esc(lbl + tt + (note ? ' · ' + note : ''))}" aria-label="${wd(d)} ${d}.${MONTH.m} · ${esc(lbl + tt + (note ? ' · הערה: ' + note : ''))}"><small>${wd(d)}</small><span>${d}</span></${btn ? 'button' : 'span'}>`; };
   function dayLines(s) { const ds = [...new Set([...Object.keys(NOTES[s.id]), ...Object.keys(TIMES[s.id]).filter(d => TIMES[s.id][d].i || TIMES[s.id][d].o)])].map(Number).sort((a, b) => a - b); return ds.length ? `<ul class="day-notes">${ds.map(d => `<li><b>${d}.${MONTH.m}</b> ${tmTxt(TIMES[s.id][d])} ${esc(NOTES[s.id][d] || '')}</li>`).join('')}</ul>` : ''; }
-  const statusTag = s => s.status === 'עזב' ? ' <em class="tag no">עזב.ה</em>' : s.status === 'מושעה' ? ` <em class="tag susp">מושעה.ת${s.susp && s.susp.to ? ' עד ' + esc(s.susp.to) : ''}</em>` : '';
+  /* "לא ברשימה · לבדיקה": מי שלא הופיע.ה ברשימה המעודכנת (d7). נשאר.ת עד שהרכז.ת מעדכנ.ת מצב או שהרשימה הבאה כוללת אותו.ה */
+  const missTag = s => s.statusSrc === 'list-missing' ? ' <em class="tag no">לא ברשימה · לבדיקה</em>' : '';
+  const statusTag = s => (s.status === 'עזב' ? ' <em class="tag no">עזב.ה</em>' : s.status === 'מושעה' ? ` <em class="tag susp">מושעה.ת${s.susp && s.susp.to ? ' עד ' + esc(s.susp.to) : ''}</em>` : '') + missTag(s);
   const LEGEND = `<div class="att-legend" aria-label="מקרא"><span><i class="cell p"></i>הגיע.ה</span><span><i class="cell a"></i>לא הגיע.ה</span><span><i class="cell x"></i>באישור</span><span><i class="cell n"></i>לא בעבודה</span><span><i class="cell"></i>לא סומן</span><span><i class="cell has-note"></i>יש הערה</span></div>`;
   function renderRoster() {
     renderGroups();
@@ -549,6 +563,25 @@ window.startApp = function (R) {
   }
   /* אחרי כל שינוי נוכחות — מכל מסלול — השלב בפירמידה מחושב מחדש */
   const afterAtt = () => { STU.forEach(s => { s.stage = stageOf(s); }); renderStuList(); renderRoster(); renderOverview(); renderChkStu(); refreshSub(); };
+  /* משיכת מה שהמנטורים סימנו בקישור שלהם (Mentor.pull): נוכחות רק לימים שלא סומנו כאן ולמגמה שלא הוגשה; משוב המעסיק לטופס 5/6 אם עוד לא מולא */
+  const dOf = at => { const m = String(at || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? +m[3] + '.' + +m[2] : TODAY; };
+  async function mentorPull(b) {
+    if (!window.Mentor) return toast('הקישור למנטור.ית לא זמין');
+    if (b) b.disabled = true;
+    try {
+      const r = await Mentor.pull(MONTH.ym), marks = r.marks || r.att || [];
+      let n = 0, kept = 0, locked = 0, nf = 0;
+      marks.forEach(m => { const s = STU.find(x => x.id === m.sid), d = +m.d; if (!s || !['p', 'a', 'x'].includes(m.v) || !(d >= 1 && d <= MONTH.last)) return; if (SUBMITTED[s.mg]) { locked++; return; } if (ATT[s.id][d]) { kept++; return; } ATT[s.id][d] = m.v; n++; });
+      (r.fb || []).forEach(f => { const s = STU.find(x => x.id === f.sid), i = f.period === 'fb2' ? 6 : 5; if (!s || hasForm(s, i)) return;
+        const a = {}; (f.scores || []).forEach((v, j) => { if (j < NISPACH_A.length && v >= 1 && v <= 4) a['q' + j] = String(v); }); const o = f.open || {};
+        if (o.work) a.q18 = String(o.work); if (o.add) a.q19 = String(o.add); if (o.improve) a.q20 = String(o.improve);
+        if (!Object.keys(a).length) return; s.forms[i] = { d: dOf(f.at), a, st: 'done' }; s.log.unshift({ d: TODAY, t: MILES[i][0] + ' · מולא בקישור המנטור.ית' + (o.mentor ? ' · ' + o.mentor : ''), form: true }); nf++; });
+      afterAtt(); renderChkCal();
+      toast(`נמשכו ${n} סימונים${kept ? ` · ${kept} כבר היו מסומנים כאן` : ''}${locked ? ` · ${locked} במגמה שהוגשה` : ''}${nf ? ` · ${nf} משובי מעסיק` : ''}`);
+    } catch (err) { toast('המשיכה לא הצליחה (' + (err.message || err) + ')'); }
+    if (b) b.disabled = false;
+  }
+  document.querySelector('[data-act="mentor-pull"]').onclick = ev => mentorPull(ev.currentTarget);
   $('roster').onclick = e => {
     const c = e.target.closest('.cell'); if (c && !canEdit()) return; if (c && !c.disabled && c.tagName === 'BUTTON') { const sid = c.closest('.row').dataset.sid, d = +c.dataset.d, cv = ATT[sid][d]; ATT[sid][d] = cv === 'p' || cv === 's' ? 'a' : cv === 'a' ? 'x' : cv === 'x' ? '' : 'p'; if (!ATT[sid][d]) delete ATT[sid][d]; const s = STU.find(x => x.id === sid); s.stage = stageOf(s); afterAtt(); return; }
     const nb = e.target.closest('[data-notes]'); if (nb) { openSub(notesSpec(STU.find(s => s.id === nb.dataset.notes))); return; }
@@ -595,11 +628,69 @@ window.startApp = function (R) {
   document.querySelector('[data-act="new-stu"]').onclick = () => openSub(newStuSpec());
   /* מזהה אקראי — לא נגזר מהשם */
   const newId = p => p + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
-  function addStu(v) {
-    const s = { id: newId('T'), name: v.name, mg: v.mg, cls: v.cls, act: v.act || '', emp: '', days: v.days || [], phone: v.phone || '', docs: mkDocs(0), start: '', note: '', status: 'לומד', statusSrc: 'manual', stage: 0, stageManual: null, track: '', mentor: '', log: [], hist: [], susp: null, forms: {}, created: new Date().toISOString() };
+  /* הוספה ידנית (statusSrc 'manual') או מרשימה מעודכנת ('list', עם ת"ז, קוד מגמה ושאר השדות של הקובץ). quiet = בלי ציור, כשמוסיפים הרבה */
+  function addStu(v, quiet) {
+    const s = { id: newId('T'), name: v.name, mg: v.mg, cls: v.cls, act: v.act || '', emp: '', days: v.days || [], phone: v.phone || '', phone2: v.phone2 || '', tz: v.tz || '', birth: v.birth || '', sex: v.sex || '', docs: mkDocs(0), start: '', note: '', status: 'לומד', statusSrc: v.statusSrc || 'manual', stage: 0, stageManual: null, track: v.track || '', mentor: '', log: [], hist: [], susp: null, forms: {}, created: new Date().toISOString() };
+    if (v.mgc) s.mgc = v.mgc;
     STU.push(s); ATT[s.id] = {}; NOTES[s.id] = {}; TIMES[s.id] = {}; OFFBAK[s.id] = {}; SUSPBAK[s.id] = {}; MANUAL[s.id] = new Set();
-    syncGroups(); renderMain();
+    if (!quiet) { syncGroups(); renderMain(); }
     return s;
+  }
+
+  /* ---- רשימה מעודכנת ממתינה (d7): upd: מוצפנים במפתח חד-פעמי; הקוד מהמייל פותח אותם כאן, בדפדפן בלבד ---- */
+  const normName = n => String(n || '').replace(/["'״׳\-\s]/g, '');
+  function renderUpd() { const b = $('updBar'); if (!b) return; const u = R.update; b.hidden = !(u && u.recs && u.recs.length && canEdit()); if (b.hidden) { b.innerHTML = ''; return; } b.innerHTML = `<p><b>רשימת תלמידים מעודכנת ממתינה</b> · ${u.recs.length} תלמידים${u.at ? ' · הועלתה ' + esc(String(u.at).slice(0, 10)) : ''}. הקוד שהגיע במייל פותח אותה. מי שכבר ברשימה נשאר.ת כפי שמילאת; חדשים נוספים; מי שלא ברשימה מסומנ.ת לבדיקה ולא נמחק.ת.</p><div class="confirm-b"><button class="btn primary" data-act="upd-open">${ic('lock')}פתיחה עם הקוד</button></div>`; b.querySelector('[data-act="upd-open"]').onclick = () => openSub(updSpec()); }
+  /* השוואה: ת"ז קודם; בלי ת"ז (הוספה ידנית) — לפי השם. מי שעזב.ה לא נחשב.ת "לא ברשימה" */
+  function updDiff(list) {
+    const used = new Set(), news = [], olds = [];
+    list.forEach(x => {
+      const pv = x.pv, tz = String(pv.tz || '').trim();
+      let s = tz ? STU.find(y => !used.has(y.id) && String(y.tz || '').trim() === tz) : null;
+      if (!s && pv.name) s = STU.find(y => !used.has(y.id) && !y.tz && normName(y.name) === normName(pv.name));
+      if (s) { used.add(s.id); olds.push({ s, x }); } else news.push(x);
+    });
+    return { news, olds, miss: STU.filter(s => !used.has(s.id) && s.status !== 'עזב') };
+  }
+  function updApply(d) {
+    d.news.forEach(({ p, pv }) => addStu({ name: pv.name, phone: pv.phone, phone2: pv.phone2, tz: pv.tz, birth: pv.birth, sex: pv.sex, act: pv.act, mg: p.mg || '', mgc: p.mgc, cls: p.cls || '', track: p.track, statusSrc: 'list' }, true));
+    d.olds.forEach(({ s, x }) => { const { p, pv } = x;
+      ['phone', 'phone2', 'birth', 'tz'].forEach(k => { if (!s[k] && pv[k]) s[k] = pv[k]; });
+      if (!s.cls && p.cls) s.cls = p.cls; if (!s.mgc && p.mgc) s.mgc = p.mgc;
+      if (s.statusSrc === 'list-missing') s.statusSrc = 'list'; });
+    d.miss.forEach(s => { s.statusSrc = 'list-missing'; });
+    syncGroups(); renderMain();
+  }
+  function updSpec() {
+    let diff = null;
+    const names = l => l.map(n => `<li>${esc(n)}</li>`).join('') || '<li class="hint">אין</li>';
+    return { title: 'רשימה מעודכנת · הקוד מהמייל', html: () => diff ? `<div class="sub-card"><h3>${ic('user')}מה ישתנה</h3><ul class="chk-items"><li><b>${diff.news.length} חדשים</b> ייתווספו</li><li><b>${diff.olds.length} קיימים</b> יישארו כפי שמילאת (רק טלפון, שנת לידה וקבוצה ריקים יושלמו)</li><li><b>${diff.miss.length} לא ברשימה</b> יסומנו "לא ברשימה · לבדיקה" ולא יימחקו</li></ul>
+        <details class="hist"><summary>חדשים<small>${diff.news.length}</small></summary><ul class="chk-items">${names(diff.news.map(x => x.pv.name + ' · ' + (x.p.cls || '')))}</ul></details>
+        <details class="hist"><summary>לא ברשימה<small>${diff.miss.length}</small></summary><ul class="chk-items">${names(diff.miss.map(s => s.name + ' · ' + s.cls))}</ul></details>
+        <div class="emp-b mf-b"><button class="btn primary" id="updGo">${ic('check')}אישור ומיזוג</button><button class="btn quiet" id="updNo">ביטול</button></div></div>`
+      : `<div class="sub-card newform"><p class="hint">הרשימה המעודכנת מוצפנת בקוד חד-פעמי ששלח המרחב הפדגוגי במייל. הקוד פותח אותה כאן בדפדפן בלבד, ואחרי המיזוג הוא לא נחוץ עוד.</p>
+        <label class="field"><span>הקוד מהמייל</span><input class="find" id="updCode" dir="ltr" autocomplete="off" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX"></label>
+        <p class="hint" id="updMsg"></p><div class="emp-b mf-b"><button class="btn primary" id="updOpen">${ic('lock')}פתיחה</button></div></div>`,
+      bind: el => {
+        const go = el.querySelector('#updGo'), open = el.querySelector('#updOpen');
+        if (open) open.onclick = async () => {
+          const u = R.update, code = $('updCode').value.trim(); if (!u) return closeSub(); if (!code) return toast('צריך את הקוד מהמייל');
+          open.disabled = true; $('updMsg').textContent = 'פותח…';
+          try {
+            const key = await CK.unwrapRecovery(code, u.wrap), list = [];
+            for (const r of u.recs) { const pv = await CK.decJSON(key, r.e); if (pv) list.push({ p: r.p || {}, pv }); }
+            if (!list.length) throw new Error('empty');
+            diff = updDiff(list); refreshSub();
+          } catch (e) { open.disabled = false; $('updMsg').textContent = 'הקוד לא נכון. כדאי לבדוק אותו מול המייל'; toast('הקוד לא נכון'); }
+        };
+        if (el.querySelector('#updNo')) el.querySelector('#updNo').onclick = closeSub;
+        if (go) go.onclick = async () => {
+          const n = { a: diff.news.length, o: diff.olds.length, m: diff.miss.length };
+          go.disabled = true; updApply(diff); diff = null;
+          const r = await API.call('updateDone');
+          if (r.ok) { R.update = null; renderUpd(); closeSub(); toast(`הרשימה מוזגה: ${n.a} נוספו, ${n.o} נשארו, ${n.m} לבדיקה`); }
+          else { renderUpd(); closeSub(); toast('התלמידים עודכנו, אבל הרשימה הממתינה לא נסגרה בשרת (' + (r.error || '') + ')'); }
+        };
+      } };
   }
   function newStuSpec() {
     return { dirtyWatch: true, title: 'תלמיד.ה חדש.ה', html: () => `<div class="sub-card newform">
@@ -629,7 +720,7 @@ window.startApp = function (R) {
           <select id="plSel" ${!pl ? 'hidden' : ''}>${pl === 'in' ? opts(INS, s.emp) : opts(EMPS, s.emp)}</select>
           ${!pl ? `<select id="plWhy" aria-label="סיבת אי-העסקה"><option value="">סיבת אי-העסקה</option>${WHY_NONE.map(w => `<option ${s.why === w ? 'selected' : ''}>${w}</option>`).join('')}</select>` : ''}</div>
           <details class="hist"><summary>${ic('cal')}היסטוריית שיבוץ<small>${s.hist.length}</small></summary><ul class="chk-items">${s.hist.map(h => `<li><span><b>${esc(h.d)}</b> מ${esc(empName(h.from))} ל${esc(empName(h.to))}${h.why ? ' · ' + esc(h.why) : ''}</span></li>`).join('') || '<li class="hint">אין שינויים</li>'}</ul></details></div>
-        <div class="tik-card" id="statusCard"><h3>${ic('user')}מצב התלמיד.ה</h3><div class="place-row"><select id="stSel">${['לומד', 'מושעה', 'עזב', 'לא ידוע'].map(v => `<option value="${v}" ${s.status === v ? 'selected' : ''}>${v === 'לומד' ? 'לומד.ת' : v === 'מושעה' ? 'מושעה.ת' : v === 'עזב' ? 'עזב.ה' : 'לא ידוע'}</option>`).join('')}</select><em class="tag ${s.statusSrc === 'list' ? '' : 'mid'}">${s.statusSrc === 'list' ? 'מרשימת הלומדים' : 'עודכן ידנית'}</em></div>
+        <div class="tik-card" id="statusCard"><h3>${ic('user')}מצב התלמיד.ה</h3><div class="place-row"><select id="stSel">${['לומד', 'מושעה', 'עזב', 'לא ידוע'].map(v => `<option value="${v}" ${s.status === v ? 'selected' : ''}>${v === 'לומד' ? 'לומד.ת' : v === 'מושעה' ? 'מושעה.ת' : v === 'עזב' ? 'עזב.ה' : 'לא ידוע'}</option>`).join('')}</select><em class="tag ${s.statusSrc === 'list' ? '' : s.statusSrc === 'list-missing' ? 'no' : 'mid'}">${s.statusSrc === 'list' ? 'מרשימת הלומדים' : s.statusSrc === 'list-missing' ? 'לא ברשימה · לבדיקה' : 'עודכן ידנית'}</em></div>
           ${s.status === 'מושעה' ? `<div class="place-row susp-row"><label>מ-<input class="find" id="spFrom" value="${esc((s.susp || {}).from || '')}" placeholder="10.${MONTH.m}"></label><label>עד <input class="find" id="spTo" value="${esc((s.susp || {}).to || '')}" placeholder="20.${MONTH.m}"></label><input class="find why" id="spWhy" value="${esc((s.susp || {}).why || '')}" placeholder="סיבה"></div>` : ''}</div>
         <div class="tik-card pyr-card"><h3>${ic('layers')}שלב בפירמידה <em class="tag ${s.stageManual != null ? 'mid' : ''}">${s.stageManual != null ? 'עודכן ידנית' : 'אוטומטי'}</em></h3><div class="stage-row">${STAGES.map((st, i) => `<button class="st ${i === s.stage ? 'cur' : i < s.stage ? 'done' : ''}" data-stage="${i}" ${(!s.emp && i > 0) || (s.emp && i === 0) ? 'disabled' : ''}>${st}</button>`).join('')}</div><dl class="kv"><dt>מה חסם את המעבר</dt><dd>${esc(s.note || 'אין חסם')}</dd><dt>הפעולה הבאה</dt><dd>${!s.emp ? 'איתור מקום עבודה' : docsOf(s) < DOCS.length ? 'השלמת מסמכים' : 'שיחה אישית'}</dd><dt>אחראי.ת · מועד</dt><dd>רכז.ת החניכות · החודש</dd></dl></div>
         <div class="tik-card"><h3>${ic('cal')}אבני הדרך של השנה <small>מהטפסים ומהיומן</small></h3><ul class="talks miles">${MILE_ORDER.map(i => { const [m, when] = MILES[i]; return `<li class="${miles[i] ? 'ok' : ''}">${ic(miles[i] ? 'check' : 'chat')}<span>${m}</span><small>${hasForm(s, i) ? 'מולא ' + esc(s.forms[i].d) : isDraft(s, i) ? '<em class="tag mid">טיוטה</em>' : sentOf(s, i) && !miles[i] ? '<em class="tag mid">הקישור נשלח</em>' : when}</small><button class="lnk mf-open" data-form="${i}">${hasForm(s, i) ? 'צפייה' : isDraft(s, i) ? 'המשך' : 'מילוי'}</button></li>`; }).join('')}</ul></div>
@@ -680,7 +771,7 @@ window.startApp = function (R) {
         if (k === 'check') return `<label class="mf-c"><input type="checkbox" data-q="${id}" ${v ? 'checked' : ''}>${t}</label>`;
         const opts = k === 'scale5' ? SC5 : ['1', '2', '3', '4'];
         return `<div class="mf"><span>${t}</span><div class="scale">${opts.map((o, j) => `<label class="sc ${v == j + 1 ? 'on' : ''}"><input type="radio" name="${s ? s.id : 'blank'}-${id}" data-q="${id}" value="${j + 1}" ${v == j + 1 ? 'checked' : ''}>${o}</label>`).join('')}</div></div>`; }).join('')}
-      <div class="emp-b mf-b edit">${/* הקישור למנטור.ית — שלב 3 */ ''}<button class="btn primary" data-act="form-save">${ic('check')}שמירה</button></div></div>`; },
+      <div class="emp-b mf-b edit"><button class="btn primary" data-act="form-save">${ic('check')}שמירה</button></div></div>`; },
       bind: (el, spec) => {
         el.addEventListener('change', e => { if (e.target.type === 'radio') e.target.closest('.scale').querySelectorAll('.sc').forEach(l => l.classList.toggle('on', l.querySelector('input').checked)); });
         const save = el.querySelector('[data-act="form-save"]'); if (save) save.onclick = () => { const a = {}; el.querySelectorAll('[data-q]').forEach(x => { if (x.type === 'checkbox') { if (x.checked) a[x.dataset.q] = true; } else if (x.type === 'radio') { if (x.checked) a[x.dataset.q] = x.value; } else if (x.value.trim()) a[x.dataset.q] = x.value.trim(); });
@@ -693,7 +784,6 @@ window.startApp = function (R) {
           if (done && !was) s.log.unshift({ d: TODAY, t: MILES[i][0] + ' · הטופס מולא', form: true });
           spec.dirty = false; renderChkStu(); renderChkCal(); renderStuList(); closeSub();
           toast(done ? 'הטופס הושלם' : 'נשמר כטיוטה · ' + [scMiss ? `חסרות ${scMiss} שאלות דירוג` : '', txtOk ? '' : 'חסרה תשובה פתוחה'].filter(Boolean).join(' · ')); };
-        const lnk = el.querySelector('[data-act="form-link"]'); if (lnk) lnk.onclick = () => { const e = EMPS[s.emp]; s.log.unshift({ d: TODAY, t: MILES[i][0] + ' · הקישור נשלח למנטור.ית', sent: true, mi: i }); lnk.lastChild.textContent = 'הקישור נשלח · שליחה שוב'; toast('הקישור לטופס נשלח ל' + ((e && e.mentor) || 'מנטור.ית')); };
       } };
   }
 
@@ -719,6 +809,7 @@ window.startApp = function (R) {
       return `<div class="tik-grid">
         <div class="tik-card"><h3>${ic('user')}${inn ? 'מנהל.ת העבודה' : 'מנטור.ית'}</h3><dl class="kv">${inn ? `<dt>שם</dt><dd>${esc(e.manager || '—')}</dd>` : `<dt>שם</dt><dd>${esc(e.mentor || '—')}</dd>`}${e.phone ? `<dt>טלפון</dt><dd dir="ltr">${esc(e.phone)}</dd>` : ''}${e.mail ? `<dt>מייל</dt><dd dir="ltr">${esc(e.mail)}</dd>` : ''}${e.addr ? `<dt>כתובת</dt><dd>${esc(e.addr)}</dd>` : ''}<dt>מגמות</dt><dd>${(e.mg || []).map(esc).join(' · ') || '—'}</dd>${inn ? '' : `<dt>תקנים</dt><dd>${e.slots ? esc(e.slots) : 'לא ידוע'}${e.slotsRaw ? ` <em class="tag no">בקובץ: ${esc(e.slotsRaw)}</em>` : ''}</dd>`}</dl></div>
         <div class="tik-card"><h3>${ic('user')}תלמידים <small>${l.length}</small></h3><ul class="docs-l">${l.map(s => `<li class="ok">${ic('user')}<span><a href="#" data-open="${s.id}">${esc(s.name)}</a> · ${esc(s.cls)}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</span></li>`).join('') || '<li class="hint">אין תלמידים משובצים</li>'}${inn && e.min ? `<li class="${l.length < e.min ? '' : 'ok'}"><span class="${l.length < e.min ? 'warn' : ''}">${l.length} מתוך ${e.min} לפחות</span></li>` : ''}</ul></div>
+        ${inn ? '' : `<div class="tik-card edit" id="mlCard"><h3>${ic('link')}קישור למנטור.ית</h3><p class="hint">הקישור פותח את שמות התלמידים שאצל המעסיק. לשלוח רק למנטור.ית. המנטור.ית מסמנ.ת בו נוכחות וממלא.ת את משוב המעסיק, ואת הסימונים מושכים במסך הנוכחות.</p><div id="mlBox"><p class="hint">בודק אם יש קישור פעיל…</p></div><div class="emp-b"><button class="btn primary" data-act="mentor-link" ${l.length ? '' : 'disabled'}>${ic('link')}קישור למנטור.ית</button><button class="btn quiet" data-act="mentor-revoke">${ic('x')}ביטול הקישור</button></div></div>`}
         ${inn ? `<div class="tik-card"><h3>${ic('wallet')}סעיף 117</h3><dl class="kv"><dt>היקף</dt><dd>${e.hours} ש"ש · 100 שעות חניכות לתלמיד.ה בשנה</dd>${e.client ? `<dt>לקוח</dt><dd>${esc(e.client)}</dd>` : ''}</dl></div>`
           : `<div class="tik-card"><h3>${ic('filter')}המסננת</h3><dl class="kv"><dt>ההחלטה</dt><dd>${e.mas ? masTag(e) : '<span class="hint">לא נבדק</span>'}</dd>${e.recheck ? `<dt>בדיקה חוזרת</dt><dd>${esc(e.recheck)}</dd>` : ''}${e.masNotes ? `<dt>הערות</dt><dd>${esc(e.masNotes)}</dd>` : ''}</dl></div>
           <div class="tik-card"><h3>${ic('clock')}קשר</h3><dl class="kv"><dt>קשר אחרון</dt><dd>${esc(e.talk || '—')}</dd><dt>ביקור אחרון</dt><dd class="${e.visit === '—' || e.contact > 40 ? 'warn' : ''}">${esc(e.visit || '—')}${e.contact > 40 ? ' · באיחור' : ''}</dd>${e.status ? `<dt>סטטוס</dt><dd>${esc(e.status)}</dd>` : ''}${e.studsTxt && !l.length ? `<dt>הערה</dt><dd>${esc(e.studsTxt)}</dd>` : ''}</dl><div class="emp-b edit"><button class="btn" data-act="talked">${ic('chat')}דיברתי איתם היום</button><button class="btn" data-act="visited">${ic('check')}ביקרתי שם היום</button></div></div>`}
@@ -727,6 +818,24 @@ window.startApp = function (R) {
         const t = el.querySelector('[data-act="talked"]'); if (t) t.onclick = () => { e.talk = TODAY; renderEmps(); refreshSub(); toast('נרשם: שיחה עם ' + e.name + ' היום'); };
         const v = el.querySelector('[data-act="visited"]'); if (v) v.onclick = () => { e.visit = TODAY; e.talk = TODAY; e.contact = 0; renderEmps(); renderChkStu(); refreshSub(); toast('נרשם: ביקור אצל ' + e.name + ' היום'); };
         el.querySelector('[data-act="emp-edit"]').onclick = () => openSub(empEditSpec(id));
+        /* הקישור למנטור.ית (mentor.js): קישור אחד למעסיק, המפתח אחרי # לא מגיע לשרת. יצירה מחדש מחליפה את הקודם */
+        const ml = el.querySelector('#mlBox');
+        if (ml && canEdit()) {
+          const showLink = (url, created) => { ml.innerHTML = url ? `<div class="ml-row"><input class="find" id="mlUrl" readonly dir="ltr" value="${esc(url)}" aria-label="הקישור למנטור.ית"><button class="btn" data-act="ml-copy">${ic('file')}העתקה</button>${created ? `<small class="hint">נוצר ${esc(created)}</small>` : ''}</div>` : '<p class="hint">אין קישור פעיל</p>'; const c = ml.querySelector('[data-act="ml-copy"]'); if (c) c.onclick = () => { $('mlUrl').select(); copyTxt(url, 'הקישור הועתק · לשלוח רק למנטור.ית'); }; };
+          if (!window.Mentor) showLink(''); else Mentor.links().then(ls => { const L = ls.find(x => x.emp === id); if (el.isConnected) showLink(L ? L.url : '', L && L.created); }).catch(() => { if (el.isConnected) showLink(''); });
+          el.querySelector('[data-act="mentor-link"]').onclick = async ev => {
+            const b = ev.currentTarget, l = STU.filter(s => s.emp === id && s.status !== 'עזב');
+            if (!window.Mentor) return toast('הקישור למנטור.ית לא זמין'); if (!l.length) return toast('אין תלמידים משובצים אצל המעסיק');
+            b.disabled = true;
+            try { await Store.flush(); const url = await Mentor.createLink(id, l.map(s => ({ id: s.id, name: s.name, cls: s.cls, mg: s.mg }))); showLink(url, TODAY); toast('הקישור נוצר · לשלוח רק למנטור.ית'); }
+            catch (err) { toast('הקישור לא נוצר (' + (err.message || err) + ')'); }
+            b.disabled = false;
+          };
+          el.querySelector('[data-act="mentor-revoke"]').onclick = async () => {
+            if (!window.Mentor || !confirm('לבטל את הקישור של המנטור.ית? מה שכבר סומן נשאר')) return;
+            try { const n = await Mentor.revoke(id); showLink(''); toast(n ? 'הקישור בוטל' : 'לא היה קישור פעיל'); } catch (err) { toast('הביטול לא הצליח (' + (err.message || err) + ')'); }
+          };
+        }
       } };
   }
   /* עריכת פרטים של מעסיק (ומנטור.ית) או עסק בית-ספרי קיימים */
@@ -1224,7 +1333,7 @@ window.startApp = function (R) {
       return show(`<p>לסמן ש<b>${esc(who.name)}</b> <b>${abs ? 'לא הגיע.ה' : 'הגיע.ה'}</b> ב-<b>${d}.${MONTH.m}</b>${who.emp ? ' ל' + esc(empName(who.emp)) : ''}?${ok ? '' : ' <span class="warn">זה לא יום עבודה קבוע שלו.ה, יירשם כיום נוסף.</span>'}</p>`,
         () => { ATT[who.id][d] = abs ? 'a' : 'p'; if (!shown.some(s => s.id === who.id)) { $('find').value = who.cls; find(who.cls); } afterAtt(); return `סומן: ${who.name}, ${d}.${MONTH.m}${abs && REM_CFG.teacher ? ' · תזכורת למחנך.ת תצא ב-16:00' : ''}`; });
     }
-    show(`<p>לא הבנתי. אפשר: "סמן ש${esc(first(sPlaced))} הגיע היום", "מי לא הגיע השבוע", "הגש את הנוכחות של ${esc(MGS[0])}", "מה חסר ל${esc(first(sNone))}", "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}".</p>`, null);
+    show(`<p>לא הבנתי. אפשר: "סמן ש${esc(first(sPlaced))} הגיע היום", "מי לא הגיע השבוע", "הגש את הנוכחות של ${esc(MGS[0])}", "מצא מעסיקים ל${esc(MGS[0])}", "מה חסר ל${esc(first(sNone))}", "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}".</p>`, null);
   }
   function show(html, apply) {
     out.hidden = false;
@@ -1239,7 +1348,7 @@ window.startApp = function (R) {
   /* ================= התחלה ================= */
   try { history.scrollRestoration = 'manual'; } catch (e) {}
   renderStuList(); renderEmps(); renderChkStu(); renderChkCal(); renderOverview(); renderRoster(); renderProgram(); renderLinks(); renderReports(); renderAdmin();
-  setRole(R.role);
+  setRole(R.role); renderUpd();
   /* לשמירה (store.js): תור תזכורות 16:00 והודעות */
   R.hooks.mails = mails; R.hooks.toast = toast;
   if (R.bad) toast(R.bad + ' רשומות לא נפתחו במפתח הזה');
