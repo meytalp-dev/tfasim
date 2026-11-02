@@ -1,0 +1,1 @@
+window.REPORT('map', { at: '2026-11-02T20:15:00+02:00', status: 'review', now: 'מסמך הפערים מוכן לבדיקה', note: 'לא הורץ שום דף. הכול מקריאת קוד', tasks: { b3: 'review' }, touched: ['sochnim/gaps.md'], blockers: [] });
