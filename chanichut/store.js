@@ -8,9 +8,13 @@
   'use strict';
   const DOCS = ['תעודת זהות', 'חשבון בנק', 'אישור רפואי', 'טופס מוכנות ליציאה (חתום)', 'הסכם התקשרות עם המעסיק'];
   const MN = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
-  const STU_PLAIN = ['id', 'mg', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
+  const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
   const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor'];
-  const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'masNotes', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'studsTxt', 'kind', 'client', 'hours', 'min'];
+  const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
+  /* טקסט חופשי של מעסיק — עלול לכלול שמות, ולכן מוצפן */
+  const EMP_PRIV = ['studsTxt', 'masNotes'];
+  /* ריכוז שמירות: ממתינים 2.5 שניות אחרי הפעולה האחרונה. אחרי כשל — המתנה גוברת עם פיזור */
+  const DEBOUNCE = 2500, MAX_BATCH = 300, BEACON_BYTES = 48000;
   const pick = (o, ks) => { const r = {}; ks.forEach(k => { if (o[k] !== undefined) r[k] = o[k]; }); return r; };
   const ymOf = (y, m) => y + '-' + String(m).padStart(2, '0');
 
@@ -24,15 +28,16 @@
   let leaving = false;
   /* יציאה או החלפת חודש: שומרים הכול ואז עוזבים בלי אזהרה */
   async function leave() { clearTimeout(timer); timer = 0; await flush(); leaving = true; }
-  let KEY = null, R = null, SNAP = {}, PRIV = {}, EXIST = new Set(), QSNAP = '', busy = false, again = false, timer = 0, failT = 0;
+  let KEY = null, R = null, SNAP = {}, PRIV = {}, EXIST = new Set(), QSNAP = '', busy = false, again = false, timer = 0, failT = 0, fails = 0;
 
   async function load(key, me, back) {
     KEY = key;
-    const res = await API.call('load');
-    if (!res.ok) throw new Error(res.error || 'load');
     const M = monthInfo(back);
+    /* רק הנוכחות של החודש המוצג */
+    const res = await API.call('load', { ym: M.ym });
+    if (!res.ok) throw new Error(res.error || 'load');
     R = { month: M, school: me.school, me, role: me.role === 'principal' ? 'manager' : me.role, DOCS,
-      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MANUAL: {},
+      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, CONF: null, MANUAL: {},
       meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0 };
     for (const r of res.recs) {
       EXIST.add(r.k);
@@ -52,9 +57,11 @@
         const id = r.k.split(':')[2];
         R.ATT[id] = p.a || {}; R.TIMES[id] = p.t || {}; R.OFFBAK[id] = p.ob || {}; R.SUSPBAK[id] = p.sb || {};
       } else if (r.k.startsWith('emp:')) {
-        const id = r.k.slice(4); (id[0] === 'I' ? R.INS : R.EMPS)[id] = p;
+        const id = r.k.slice(4); let pv = {};
+        if (r.e) { try { pv = (await CK.decJSON(key, r.e)) || {}; } catch (e) { R.bad++; } }
+        (id[0] === 'I' ? R.INS : R.EMPS)[id] = Object.assign({}, p, pick(pv, EMP_PRIV));
       } else if (r.k === 'mon:' + M.ym) {
-        R.SUBMITTED = p.sub || {}; R.OFF = p.off || {};
+        R.SUBMITTED = p.sub || {}; R.OFF = p.off || {}; R.CONF = p.conf || null;
       } else if (r.k === 'meta') {
         Object.assign(R.meta, p); R.meta.contacts = Object.assign({ cls: {}, grade: {} }, p.contacts);
         Object.entries(p.manual || {}).forEach(([sid, l]) => R.MANUAL[sid] = new Set(l));
@@ -85,9 +92,9 @@
       const ak = 'att:' + M.ym + ':' + s.id;
       if (EXIST.has(ak) || Object.values(a).some(o => Object.keys(o).length)) out[ak] = { p: a };
     });
-    Object.entries(R.EMPS).concat(Object.entries(R.INS)).forEach(([id, e]) => { out['emp:' + id] = { p: pick(e, EMP_PLAIN) }; });
+    Object.entries(R.EMPS).concat(Object.entries(R.INS)).forEach(([id, e]) => { const pv = pick(e, EMP_PRIV); out['emp:' + id] = Object.keys(pv).length ? { p: pick(e, EMP_PLAIN), priv: pv } : { p: pick(e, EMP_PLAIN) }; });
     R.LEADS.forEach(l => { out['lead:' + l.id] = { p: { id: l.id }, priv: l }; });
-    out['mon:' + M.ym] = { p: { sub: R.SUBMITTED, off: R.OFF } };
+    out['mon:' + M.ym] = { p: R.CONF ? { sub: R.SUBMITTED, off: R.OFF, conf: R.CONF } : { sub: R.SUBMITTED, off: R.OFF } };
     const manual = {}; Object.entries(R.MANUAL).forEach(([sid, set]) => { if (set && set.size) manual[sid] = [...set]; });
     out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts, wiz: R.meta.wiz } };
     return out;
@@ -98,7 +105,7 @@
     Object.entries(records()).forEach(([k, r]) => { SNAP[k] = sig(r); });
     QSNAP = JSON.stringify(R.remqKeys);
     if (R.role !== 'rakaz') return;
-    const kick = () => schedule(350);
+    const kick = () => { if (!failT) schedule(DEBOUNCE); };
     ['click', 'change', 'input', 'keyup'].forEach(t => document.addEventListener(t, kick));
     window.addEventListener('popstate', kick);
     document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flush(true); });
@@ -122,22 +129,35 @@
     const qs = JSON.stringify(items.map(x => x.k).sort().concat(items.map(x => x.to + '|' + x.html)));
     if (!send.length && qs === QSNAP) return;
     busy = true; status('שומר…');
+    clearTimeout(failT); failT = 0;
+    let busyErr = false;
     try {
-      if (send.length) {
-        const res = await API.call('put', { recs: send.map(({ k, p, e }) => ({ k, p, e })), keepalive: !!beacon });
-        if (!res.ok) throw new Error(res.error === 'readonly' ? 'צפייה בלבד' : res.error === 'badsession' ? 'החיבור פג. צריך להיכנס שוב' : 'השמירה לא הצליחה (' + (res.error || '') + ')');
-        send.forEach(x => { SNAP[x.k] = x.g; EXIST.add(x.k); });
+      /* מנות: עד 300 רשומות, וביציאה מהדף עד 48KB לבקשה (מגבלת keepalive) */
+      const batches = []; let cur = [], size = 0;
+      for (const x of send) {
+        const n = JSON.stringify(x.p).length + x.e.length + x.k.length + 20;
+        if (cur.length && (cur.length >= MAX_BATCH || (beacon && size + n > BEACON_BYTES))) { batches.push(cur); cur = []; size = 0; }
+        cur.push(x); size += n;
+      }
+      if (cur.length) batches.push(cur);
+      for (const b of batches) {
+        const res = await API.call('put', { recs: b.map(({ k, p, e }) => ({ k, p, e })), keepalive: !!beacon });
+        if (!res.ok) { busyErr = res.error === 'busy'; throw new Error(res.error === 'readonly' ? 'צפייה בלבד' : res.error === 'badsession' ? 'החיבור פג. צריך להיכנס שוב' : busyErr ? 'השרת עמוס, מנסה שוב' : 'השמירה לא הצליחה (' + (res.error || '') + ')'); }
+        b.forEach(x => { SNAP[x.k] = x.g; EXIST.add(x.k); });
       }
       if (qs !== QSNAP) {
         const res = await API.call('remqSet', { items, keepalive: !!beacon });
-        if (!res.ok) throw new Error('התזכורות לא נשמרו');
+        if (!res.ok) { busyErr = res.error === 'busy'; throw new Error('התזכורות לא נשמרו'); }
         QSNAP = qs;
       }
-      status('נשמר', 'ok'); clearTimeout(failT);
+      status('נשמר', 'ok'); fails = 0;
     } catch (err) {
       status('לא נשמר · מנסה שוב', 'bad');
-      if (R.hooks && R.hooks.toast) R.hooks.toast(String(err.message || err));
-      clearTimeout(failT); failT = setTimeout(() => flush(), 8000);
+      if (R.hooks && R.hooks.toast && fails < 2) R.hooks.toast(String(err.message || err));
+      /* המתנה גוברת עם פיזור, כדי שכל הרכזים לא ינסו שוב באותה שנייה: 8, 16, 32, 60 שניות */
+      fails++;
+      const wait = Math.min(60000, 8000 * Math.pow(2, fails - 1) * (busyErr ? 1.5 : 1)) + Math.floor(Math.random() * 4000);
+      failT = setTimeout(() => { failT = 0; flush(); }, wait);
     } finally {
       busy = false;
       if (again) { again = false; schedule(50); }

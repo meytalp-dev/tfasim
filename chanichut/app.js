@@ -169,8 +169,8 @@ window.startApp = function (R) {
   const remCount = sid => REM.filter(r => r.sid === sid).length + pending().filter(r => r.sid === sid).length;
 
   const SUBMITTED = R.SUBMITTED;
-  /* מנהל.ת ומנהל.ת המערכת — צפייה בלבד, גם במקלדת */
-  const canEdit = () => !['manager', 'system'].includes(document.body.dataset.role);
+  /* רשימת מותרים: רק רכז.ת החניכות עורכ.ת. כל תפקיד אחר צפייה בלבד, גם במקלדת */
+  const canEdit = () => document.body.dataset.role === 'rakaz';
   const MGS = [], classes = [];
   /* המגמות והכיתות נגזרות מהתלמידים, ומתעדכנות כשנוסף.ה תלמיד.ה */
   const syncGroups = () => { MGS.splice(0, MGS.length, ...new Set(STU.map(s => s.mg).filter(Boolean))); classes.splice(0, classes.length, ...new Set(STU.map(s => s.cls).filter(Boolean))); };
@@ -404,7 +404,7 @@ window.startApp = function (R) {
   /* ================= ניווט, תפקידים, מסכי משנה והיסטוריה ================= */
   const VIEWS = ['overview', 'att', 'students', 'employers', 'checklist', 'links', 'reports', 'admin', 'more', 'national', 'schools', 'sub'];
   let ROLE = 'rakaz';
-  const ROLE_LBL = { rakaz: 'רכז.ת החניכות', manager: 'מנהל.ת בית הספר', system: 'מנהל.ת המערכת · המרחב הפדגוגי' };
+  const ROLE_LBL = { rakaz: 'רכז.ת החניכות', manager: 'מנהל.ת בית הספר', pedco: 'רכז.ת פדגוגי.ת', system: 'מנהל.ת המערכת · המרחב הפדגוגי', staff: 'מטה', ped: 'מפקח.ת פדגוגי.ת', pro: 'מפקח.ת מקצועי.ת', net: 'מנהל.ת רשת' };
   function setRole(r) { ROLE = r; document.body.dataset.role = r; $('roleLbl').textContent = (r === 'system' ? '' : SCHOOL + ' · ') + ROLE_LBL[r]; $('ovTitle').textContent = 'החניכות ב' + SCHOOL; }
   function enterSchool(name) { $('ovTitle').textContent = 'החניכות ב' + name; $('roleLbl').textContent = name + ' · ' + ROLE_LBL.system; go('overview'); }
   const SUBS = []; let subParent = 'overview'; const SCROLL = {};
@@ -1124,7 +1124,7 @@ window.startApp = function (R) {
       .map(c => ({ name: c[0], cls: c[1] || '', mg: c[2] || '', phone: c[3] || '', act: c[4] || '' }));
   }
   let USERS = null;
-  const ROLE_HE = { rakaz: 'רכז.ת החניכות', principal: 'מנהל.ת בית הספר' };
+  const ROLE_HE = { rakaz: 'רכז.ת החניכות', principal: 'מנהל.ת בית הספר', pedco: 'רכז.ת פדגוגי.ת' };
   function admSpec(k) {
     const A0 = ADMIN.find(a => a[0] === k);
     const specs = {
