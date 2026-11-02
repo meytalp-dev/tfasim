@@ -1,6 +1,6 @@
 /* לוח סוכן העל. רק סוכן העל כותב כאן. כל סוכן כותב רק ל-reports/<id>.js שלו. בלי נתונים אישיים. */
 window.BOARD = {
-  updated: '2026-11-02T23:55:00+02:00',
+  updated: '2026-11-03T00:10:00+02:00',
   waiting: [
     'להריץ בעורך setupChanichut ואז createTriggers (אחרי הפריסה של @4).',
     'רמת דוד: האם יש רכז.ת? לפי הנספח המשרה לא מאוישת.',
@@ -15,13 +15,13 @@ window.BOARD = {
     { id: 's5', name: '5 · בדיקה מלאה, פריסה ופיילוט' }
   ],
   agents: [
-    { id: 'super', name: 'סוכן העל', role: 'מחלק משימות, בודק עבודה, מעדכן את הלוח ופורס אחרי אישור', status: 'doing', now: 'גל 1 נפרס (@4). מכין את גל 2: מסכים, ארצי וניהול', files: ['sochnim/board.js', 'sochnim/index.html', 'sochnim/CONTRACT.md', 'sochnim/publish.cjs'] },
+    { id: 'super', name: 'סוכן העל', role: 'מחלק משימות, בודק עבודה, מעדכן את הלוח ופורס אחרי אישור', status: 'doing', now: 'מרכז את גל 2: מסכים, ארצי וניהול', files: ['sochnim/board.js', 'sochnim/index.html', 'sochnim/CONTRACT.md', 'sochnim/publish.cjs'] },
     { id: 'map', name: 'מיפוי', role: 'רשימת הפערים בין המוקאפ ל-v2 (קריאה בלבד)', status: 'done', files: ['sochnim/gaps.md'] },
-    { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'done', files: ['gas/קוד.js', 'gas/appsscript.json', 'api.js', 'store.js', 'hachana/hachana.html', 'sochnim/storage-review.md'] },
-    { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'done', files: ['gate.js', 'index.html', 'hachana/anashim.html', 'app.js', 'sochnim/roles-views.md'] },
-    { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'todo', files: [] },
-    { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'todo', files: ['national.js'] },
-    { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'todo', files: ['schools-admin.js'] },
+    { id: 'server', name: 'שרת ונתונים', role: 'פעולות שרת, ספירה ארצית בלי שמות, אחסון ועומס', status: 'done', files: ['gas/קוד.js', 'gas/היקף.js', 'gas/appsscript.json', 'api.js', 'store.js', 'hachana/hachana.html', 'tests/server/', 'sochnim/storage-review.md'] },
+    { id: 'gate', name: 'כניסות', role: 'כל התפקידים, טעינת הרשאות מראש ומבטים כמו במנור', status: 'done', files: ['gate.js', 'hachana/anashim.html', 'tests/gate/', 'sochnim/roles-views.md'] },
+    { id: 'school', name: 'מסכי בית ספר', role: 'השלמת הפערים מול המוקאפ במסכי בית הספר', status: 'doing', files: ['app.js', 'index.html', 'tests/school/'] },
+    { id: 'national', name: 'מבט ארצי ומבטי פיקוח', role: 'מסך ראשי, קטגוריות, חודשים, מבט מפקח.ת פדגוגי.ת ומקצועי.ת', status: 'doing', files: ['national.js', 'national.css', 'megamot.js', 'tests/national/'] },
+    { id: 'admin', name: 'ניהול בתי ספר', role: 'מי רשום, מי הופעל, מי דיווח, הזמנות', status: 'doing', files: ['schools-admin.js', 'tests/admin/'] },
     { id: 'files', name: 'טעינת קבצים', role: 'כלי ההכנה לכל בתי הספר, נקודת פתיחה מספטמבר, עדכון במהלך השנה', status: 'todo', files: ['hachana/megamot-codes.js'] },
     { id: 'auto', name: 'אוטומציות', role: 'קישור למנטור.ית והעוזר', status: 'todo', files: ['mentor.html', 'assistant.js'] },
     { id: 'qa', name: 'בדיקות ואבטחה', role: 'בדיקות קצה, נייד, דליפת שמות ועומס. לא עורך קוד מערכת', status: 'todo', files: ['tests/'] }
@@ -48,12 +48,12 @@ window.BOARD = {
     { id: 'c4', stage: 's2', agent: 'gate', status: 'done', title: 'כניסה לכל התפקידים' },
     { id: 'c5', stage: 's2', agent: 'gate', status: 'done', title: 'טעינת רכזים ומנהלים מראש, בלי אישור ידני' },
 
-    { id: 'd1', stage: 's3', agent: 'school', status: 'todo', title: 'השלמת פערים במסכי בית הספר' },
-    { id: 'd2', stage: 's3', agent: 'national', status: 'todo', title: 'מבט ארצי: מסך ראשי, קטגוריות וחודשים' },
-    { id: 'd3', stage: 's3', agent: 'national', status: 'todo', title: 'מבט מפקח.ת פדגוגי.ת' },
-    { id: 'd4', stage: 's3', agent: 'national', status: 'todo', title: 'מבט מפקח.ת מקצועי.ת' },
-    { id: 'd5', stage: 's3', agent: 'admin', status: 'todo', title: 'מסך ניהול בתי הספר: מי רשום, הופעל ודיווח' },
-    { id: 'd6', stage: 's3', agent: 'admin', status: 'todo', title: 'רשימת "מי טרם" עם העתקה ומייל' },
+    { id: 'd1', stage: 's3', agent: 'school', status: 'doing', title: 'השלמת פערים במסכי בית הספר' },
+    { id: 'd2', stage: 's3', agent: 'national', status: 'doing', title: 'מבט ארצי: מסך ראשי, קטגוריות וחודשים' },
+    { id: 'd3', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת פדגוגי.ת' },
+    { id: 'd4', stage: 's3', agent: 'national', status: 'doing', title: 'מבט מפקח.ת מקצועי.ת' },
+    { id: 'd5', stage: 's3', agent: 'admin', status: 'doing', title: 'מסך ניהול בתי הספר: מי רשום, הופעל ודיווח' },
+    { id: 'd6', stage: 's3', agent: 'admin', status: 'doing', title: 'רשימת "מי טרם" עם העתקה ומייל' },
 
     { id: 'e1', stage: 's4', agent: 'files', status: 'todo', title: 'כלי ההכנה לכל 61 בתי הספר' },
     { id: 'e2', stage: 's4', agent: 'files', status: 'todo', title: 'מסוכמי ספטמבר כנקודת פתיחה' },
