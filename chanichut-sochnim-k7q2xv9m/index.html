@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ניהול הסוכנים</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F6F1E7;--card:#FFFEFA;--ink:#1D4F5E;--text:#23302F;--muted:#5F6B69;--line:#DDD6C8;--amber:#C4862A;--amber-bg:#FBF0D9;--amber-t:#7A5410;--ok:#22704F;--ok-bg:#DFF1E7;--bad:#A63A2B;--bad-bg:#F8E3DF;--doing:#0A7EA3;--doing-bg:#DDF0F6;--todo-bg:#EDE7DA}
+*{box-sizing:border-box}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--paper);color:var(--text);font:16px/1.55 Assistant,Arial,sans-serif}
+main{max-width:1120px;margin:0 auto;padding:24px 16px 12px}
+h1{font:800 clamp(26px,5vw,36px)/1.15 Rubik,Arial,sans-serif;color:var(--ink);margin:0}
+h2{font:700 19px/1.3 Rubik,Arial,sans-serif;color:var(--ink);margin:0 0 12px}
+h3{font:700 16px/1.3 Rubik,Arial,sans-serif;margin:0}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:14px}
+.upd{color:var(--muted);font-size:14px}
+section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.hero b.pct{font:800 clamp(38px,8vw,54px)/1 Rubik,Arial,sans-serif;color:var(--ink)}
+.bar{height:12px;background:var(--todo-bg);border-radius:6px;overflow:hidden}.bar i{display:block;height:100%;background:var(--ink);border-radius:6px}
+.hero small{color:var(--muted);display:block;margin-top:6px}
+.wait{border-color:var(--amber);background:var(--amber-bg)}.wait h2{color:var(--amber-t)}
+.wait ul{margin:0;padding:0 18px 0 0}.wait li{margin-bottom:6px}
+.ok-line{color:var(--ok);font-weight:700;margin:0}.bad-line{color:var(--bad);font-weight:700;margin:0 0 6px}
+.agents{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.ag{border:1px solid var(--line);border-radius:10px;padding:12px;background:#fff;display:grid;gap:6px;align-content:start;min-width:0}
+.ag-h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.ag p{margin:0;font-size:15px}.ag .role{color:var(--muted);font-size:14px}.ag .now b{font-weight:700}
+.ag .files{font-size:13px;color:var(--muted);overflow-wrap:anywhere}
+.ag .note{font-size:14px;background:var(--paper);border-radius:6px;padding:6px 8px;overflow-wrap:anywhere}
+.mini{height:6px;background:var(--todo-bg);border-radius:3px;overflow:hidden}.mini i{display:block;height:100%;background:var(--ink)}
+.tag{flex:none;display:inline-block;font-size:13px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.t-todo{background:var(--todo-bg);color:var(--muted)}.t-doing{background:var(--doing-bg);color:#07596F}.t-review{background:var(--amber-bg);color:var(--amber-t)}.t-blocked{background:var(--bad-bg);color:var(--bad)}.t-done{background:var(--ok-bg);color:var(--ok)}.t-idle{background:var(--todo-bg);color:var(--muted)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+select{font:inherit;min-height:44px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--text);max-width:100%}
+details.stage{border-top:1px solid var(--line);padding:10px 0}details.stage:first-of-type{border-top:0}
+summary{cursor:pointer;font:700 16px/1.4 Rubik,Arial,sans-serif;color:var(--ink);min-height:32px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+summary small{font:400 14px Assistant,Arial,sans-serif;color:var(--muted)}
+.task{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:9px 0;border-top:1px dashed var(--line)}
+.task small{grid-column:1/-1;color:var(--muted)}
+.foot{color:var(--muted);font-size:14px;text-align:center;padding:10px 0 20px}.foot a{color:var(--ink)}
+@media (max-width:560px){.hero{grid-template-columns:1fr;gap:8px}.agents{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<main>
+  <div class="top"><h1>ניהול הסוכנים</h1><span class="upd" id="upd"></span></div>
+  <section><div class="hero"><b class="pct" id="pct">0%</b><div><div class="bar"><i id="bar" style="width:0"></i></div><small id="sum"></small></div></div></section>
+  <section class="wait" id="waitS" hidden><h2>ממתין לך</h2><ul id="wait"></ul></section>
+  <section><h2>התנגשויות</h2><div id="conf"></div></section>
+  <section><h2>הסוכנים</h2><div class="agents" id="agents"></div></section>
+  <section><h2>כל המשימות</h2>
+    <div class="filters"><select id="fA" aria-label="סינון לפי סוכן"></select><select id="fS" aria-label="סינון לפי מצב"></select></div>
+    <div id="tasks"></div>
+  </section>
+  <p class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</p>
+</main>
+<div id="scripts"></div>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const ST = { todo: 'טרם התחיל', doing: 'בעבודה', review: 'בבדיקת סוכן העל', blocked: 'חסום', done: 'הושלם' };
+  const tag = s => `<span class="tag t-${s}">${ST[s] || s}</span>`;
+  const when = t => { if (!t) return ''; const d = new Date(t); return isNaN(d) ? esc(t) : d.toLocaleString('he-IL', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' }); };
+  let REPORTS = {}, open = {};
+  window.REPORT = (id, r) => { REPORTS[id] = r; };
+  /* טעינה בתגי script, כדי שהדף יעבוד גם מקובץ מקומי */
+  function load(src) { return new Promise(res => { const s = document.createElement('script'); s.src = src + '?t=' + Date.now(); s.onload = s.onerror = () => { s.remove(); res(); }; $('scripts').appendChild(s); }); }
+  async function tick() {
+    await load('board.js');
+    const B = window.BOARD; if (!B) return;
+    REPORTS = {};
+    await Promise.all(B.agents.map(a => load('reports/' + a.id + '.js')));
+    render(B);
+  }
+  function merged(B) {
+    const tasks = B.tasks.map(t => { const r = REPORTS[t.agent], s = r && r.tasks && r.tasks[t.id]; return Object.assign({}, t, s ? { status: s } : {}); });
+    return tasks;
+  }
+  function render(B) {
+    const tasks = merged(B), done = tasks.filter(t => t.status === 'done').length, pc = Math.round(done / tasks.length * 100);
+    $('pct').textContent = pc + '%'; $('bar').style.width = pc + '%';
+    const c = k => tasks.filter(t => t.status === k).length;
+    $('sum').textContent = `${done} מתוך ${tasks.length} משימות · ${c('doing')} בעבודה · ${c('review')} בבדיקה · ${c('blocked')} חסומות`;
+    const lastR = Object.values(REPORTS).map(r => r.at).filter(Boolean).sort().pop(), last = [B.updated, lastR].filter(Boolean).sort().pop();
+    $('upd').textContent = 'עדכון אחרון: ' + when(last);
+    $('waitS').hidden = !B.waiting.length; $('wait').innerHTML = B.waiting.map(w => `<li>${esc(w)}</li>`).join('');
+    /* התנגשויות: קובץ של שני סוכנים, או סוכן שדיווח על קובץ שלא בבעלותו */
+    const own = {}, bad = [];
+    B.agents.forEach(a => (a.files || []).forEach(f => { (own[f] = own[f] || []).push(a); }));
+    Object.entries(own).forEach(([f, l]) => { if (l.length > 1) bad.push(`${f}: בבעלות ${l.map(a => a.name).join(' וגם ')}`); });
+    B.agents.forEach(a => { const r = REPORTS[a.id]; ((r && r.touched) || []).forEach(f => { if (!(a.files || []).includes(f)) bad.push(`${a.name} נגע.ה ב-${f}, שלא בבעלותו`); }); });
+    $('conf').innerHTML = bad.length ? bad.map(x => `<p class="bad-line">${esc(x)}</p>`).join('') : `<p class="ok-line">אין התנגשויות · לכל קובץ בעל אחד</p>`;
+    $('agents').innerHTML = B.agents.map(a => {
+      const r = REPORTS[a.id] || {}, l = tasks.filter(t => t.agent === a.id), d = l.filter(t => t.status === 'done').length, st = r.status || a.status || 'todo';
+      return `<article class="ag"><div class="ag-h"><h3>${esc(a.name)}</h3>${tag(st)}</div><p class="role">${esc(a.role)}</p>
+        <div class="mini"><i style="width:${l.length ? Math.round(d / l.length * 100) : 0}%"></i></div><p class="role">${d} מתוך ${l.length} משימות</p>
+        ${r.now || a.now ? `<p class="now"><b>עכשיו:</b> ${esc(r.now || a.now)}</p>` : ''}
+        ${r.note ? `<p class="note">${esc(r.note)}</p>` : ''}${(r.blockers || []).map(x => `<p class="note" style="color:var(--bad)">חסימה: ${esc(x)}</p>`).join('')}
+        ${r.at ? `<p class="role">דיווח אחרון: ${when(r.at)}</p>` : ''}
+        ${(a.files || []).length ? `<p class="files" dir="ltr">${a.files.map(esc).join(' · ')}</p>` : ''}</article>`;
+    }).join('');
+    const fa = $('fA'), fs = $('fS'), va = fa.value, vs = fs.value;
+    fa.innerHTML = '<option value="">כל הסוכנים</option>' + B.agents.map(a => `<option value="${a.id}">${esc(a.name)}</option>`).join(''); fa.value = va;
+    fs.innerHTML = '<option value="">כל המצבים</option>' + Object.entries(ST).map(([k, v]) => `<option value="${k}">${v}</option>`).join(''); fs.value = vs;
+    const name = id => (B.agents.find(a => a.id === id) || {}).name || id;
+    const show = tasks.filter(t => (!fa.value || t.agent === fa.value) && (!fs.value || t.status === fs.value));
+    $('tasks').innerHTML = B.stages.map(s => {
+      const l = show.filter(t => t.stage === s.id), all = tasks.filter(t => t.stage === s.id); if (!l.length) return '';
+      const isOpen = s.id in open ? open[s.id] : all.some(t => t.status !== 'done') && all.some(t => t.status !== 'todo');
+      return `<details class="stage" data-s="${s.id}" ${isOpen ? 'open' : ''}><summary>${esc(s.name)} <small>${all.filter(t => t.status === 'done').length} מתוך ${all.length}</small></summary>
+        ${l.map(t => `<div class="task"><span>${esc(t.title)}</span>${tag(t.status)}<small>${esc(name(t.agent))}${t.note ? ' · ' + esc(t.note) : ''}</small></div>`).join('')}</details>`;
+    }).join('') || '<p>אין משימות בסינון הזה.</p>';
+    document.querySelectorAll('details.stage').forEach(d => d.addEventListener('toggle', () => { open[d.dataset.s] = d.open; }));
+  }
+  $('fA').onchange = $('fS').onchange = () => { if (window.BOARD) render(window.BOARD); };
+  tick(); setInterval(tick, 20000);
+})();
+</script>
+</body>
+</html>
