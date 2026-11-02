@@ -174,7 +174,7 @@ body[data-view=att] .page{max-width:900px}
 .tabs{display:flex;gap:6px;margin-bottom:14px;border-bottom:1px solid var(--line)}
 .tab{display:inline-flex;align-items:center;gap:.4em;padding:.6em 1em;font-family:var(--head);font-weight:600;color:var(--muted);border-bottom:3px solid transparent;margin-bottom:-1px}
 .tab.cur{color:var(--ink);border-bottom-color:var(--ink)}
-body[data-frames=out] #empTabs,body[data-frames=in] #empTabs{display:none}
+body[data-frames=out] #empTabs [data-tab=in],body[data-frames=in] #empTabs [data-tab=out]{display:none}
 .place-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .pl{display:inline-flex;align-items:center;gap:.4em;padding:.45em .9em;border-radius:999px;border:1.5px solid var(--line);cursor:pointer;font-weight:600;color:var(--muted)}
 .pl input{margin:0}.pl.on{background:var(--ink);border-color:var(--ink);color:#fff}
@@ -215,6 +215,18 @@ body[data-frames=out] #empTabs,body[data-frames=in] #empTabs{display:none}
 .wiz select,.rep select{font:inherit;padding:.5em .8em;border:1px solid var(--line);border-radius:var(--r-btn);background:var(--bg)}
 .wiz-res{list-style:none;margin:0;padding:0}.wiz-res li{display:flex;gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.wiz-res li span{flex:1}
 .wiz-leads{margin-top:14px;padding-top:12px;border-top:2px solid var(--ink)}.wiz-leads h3{margin-bottom:6px}
+.wz-filters{margin-bottom:12px}.wz-filters select,.wiz-row select{font:inherit;padding:.5em .8em;border:1px solid var(--line);border-radius:var(--r-btn);background:var(--bg);max-width:100%}
+.wz-q{flex:1 1 220px}.wz-q .find{width:100%}.wz-n{margin:0 0 4px}
+.wz-list{list-style:none;margin:0;padding:0}.wz-row{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid var(--line)}
+.wz-m{flex:1;min-width:0}.wz-m>b{margin-inline-end:8px}.wz-m .hint{margin:2px 0}
+.wz-links{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.92em;overflow-wrap:anywhere}
+.wz-act{display:flex;align-items:center;gap:6px 12px;flex-wrap:wrap;justify-content:flex-end;flex:0 0 auto;max-width:48%}
+.wz-more{margin-top:10px;width:100%}.wz-src{margin-top:10px}.wz-loc{display:block;width:100%;text-align:right}
+.wz-lead{all:unset;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;width:100%;padding:8px 0;min-height:44px;cursor:pointer}.wz-lead:hover b{text-decoration:underline}.wz-lead:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.leads.wz-leads li{display:block;padding:0}
+.wz-lead-t{flex:1 0 100%}.wz-logform{border-width:1px;box-shadow:none;margin:8px 0 12px}.wz-log{list-style:none;margin:0;padding:0}.wz-log li{padding:10px 0;border-top:1px solid var(--line)}.wz-log-h{display:flex;align-items:center;gap:10px}.wz-log-h .lnk{margin-inline-start:auto}.wz-log p{margin:4px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}.wz-pitch-box summary{cursor:pointer;font-family:var(--head);font-weight:600;color:var(--ink);min-height:32px}
+.wz-stage{margin-top:12px;margin-bottom:0}.wz-pitch{width:100%;box-sizing:border-box;font:inherit;line-height:1.55;margin:8px 0;resize:vertical}
+@media(max-width:700px){.wz-row{flex-direction:column;align-items:stretch}.wz-act{max-width:none;justify-content:flex-start}.wz-act .btn,.wz-act .lnk{min-height:44px}.wz-filters{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}.wz-filters .wz-q,.wz-filters label:nth-child(3){grid-column:1/-1}.wz-filters label{min-width:0}.wz-filters select,.wiz-row select{width:100%;min-height:44px}.wz-links a{display:inline-flex;align-items:center;min-height:44px}#wzTabs .tab,#empTabs .tab{white-space:nowrap;padding-inline:.55em}#wzTabs .i,#empTabs .i{display:none}.wz-log .lnk{min-height:44px}.wz-pitch-box summary{min-height:44px;display:flex;align-items:center}}
 .leads{list-style:none;margin:0;padding:0}.leads li{display:grid;grid-template-columns:auto auto 1fr;gap:4px 12px;align-items:center;padding:6px 0}
 .lead-st{font-size:.82em;padding:.1em .6em;border-radius:999px;background:var(--tint)}.lead-st.s3{background:#E3E9DC;color:var(--ok)}
 /* דוחות */
@@ -486,6 +498,6 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   <footer class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
 </section>
 <div id="app"></div>
-<script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="app.js"></script><script src="gate.js"></script>
+<script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="wizard-map.js"></script><script src="app.js"></script><script src="gate.js"></script>
 </body>
 </html>
