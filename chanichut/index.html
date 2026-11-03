@@ -135,15 +135,26 @@ body[data-view=att] .page{max-width:900px}
 .finder-ic{inset-inline-start:.4em;top:.9em}
 .roster{padding:0}
 .roster-head{display:flex;align-items:center;gap:10px;padding:14px 0 6px}.roster-head b{font-family:var(--head);font-size:1.15em;color:var(--ink)}
-#roster .row{display:grid;grid-template-columns:170px 1fr 60px;align-items:center;gap:16px;min-height:58px;border-top:1px solid var(--line);padding:8px 0}
+#roster .row{display:grid;grid-template-columns:170px minmax(0,1fr) auto;align-items:center;gap:16px;min-height:58px;border-top:1px solid var(--line);padding:8px 0}
 .who small{font-size:.82em}
-#roster .cells{gap:8px;flex-wrap:nowrap}
-#roster .cell{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:.85em;display:grid;place-items:center;padding:0;cursor:pointer;box-shadow:none}
-#roster .cell small{display:none}#roster .cell span{font-weight:500;font-size:1em}
-#roster .cell.p,#roster .cell.s{background:var(--ink);border-color:var(--ink);color:#fff}
-#roster .cell.a{border-color:var(--no);color:var(--no);text-decoration:none;background:transparent}
-#roster .cell::after{display:none}
+#roster .cells{gap:8px;flex-wrap:wrap;min-width:0}
+/* תא יום בדיווח (3.11.26): יום בשבוע, תאריך, וסימן ✓/✗ בתוך התא */
+#roster .cell{width:46px;height:54px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:.82em;display:grid;grid-template-rows:auto auto 14px;align-content:center;justify-items:center;gap:1px;padding:3px 0;cursor:pointer;box-shadow:none;line-height:1.1}
+#roster .cell small{display:block;font-size:.72em;opacity:.85}#roster .cell span{font-weight:700;font-size:1.05em}
+#roster .cell::after{display:block;content:'';font-size:.9em;font-weight:700;line-height:14px;height:14px}
+#roster .cell.p,#roster .cell.s{background:var(--ink);border-color:var(--ink);color:#fff}#roster .cell.p::after,#roster .cell.s::after{content:'✓'}
+#roster .cell.a{border-color:var(--no);color:var(--no);text-decoration:none;background:#fff}#roster .cell.a::after{content:'✗'}
+#roster .cell.x::after{content:'✗'}#roster .cell.n::after{content:'–'}
+#roster .cell.today{outline:2px solid var(--ink);outline-offset:2px}
+#roster .cell.future{opacity:.4;cursor:default}
 #roster .cell:disabled{cursor:default}
+.att-how{font-size:.9em;color:var(--muted);margin:0 0 6px;line-height:1.5}.att-how b{color:var(--ink)}
+/* רשימה מקובץ: תצוגה מקדימה */
+.lf-kpis{margin:10px 0}.lf-table{display:grid;gap:0}.lf-row{display:grid;grid-template-columns:1.2fr .8fr 1.4fr;gap:10px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:.92em}.lf-head{color:var(--muted);font-size:.85em;border-top:0}
+input[type=file].find{padding:.5em}
+@media (max-width:760px){.lf-row{grid-template-columns:1fr 1fr}.lf-row span:last-child{grid-column:1/-1}}
+.att-legend .cell.today{outline:2px solid var(--ink);outline-offset:1px;border-color:transparent}.att-legend .cell.future{opacity:.4;border:1px solid var(--ink)}
+.nt-sel{font:inherit;font-size:.92rem;padding:.4em .6em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);min-width:0;width:100%}.nt-sel.a{color:var(--no)}.nt-sel.p,.nt-sel.s{color:var(--ok)}.nt-sel.x{color:var(--warn)}
 #roster .sum{font-size:.82em}
 .roster-foot{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:16px 0 0;margin-top:4px}
 .daypick{display:flex;gap:6px;margin:4px 0 6px}
@@ -307,7 +318,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 .rec-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rec-row .tag{display:inline-flex;align-items:center;gap:.3em}
 /* הערות ושעות — שורה לכל יום */
 .nt-list{display:grid;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden;margin-top:8px}
-.nt-row{display:grid;grid-template-columns:110px minmax(0,1fr) 120px 120px;gap:12px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
+.nt-row{display:grid;grid-template-columns:96px 150px minmax(0,1fr) 110px 110px;gap:10px;align-items:center;padding:8px 12px;border-top:1px solid var(--line)}
 .nt-row:first-child{border-top:0}.nt-head{background:var(--tint);font-size:.85em;color:var(--muted)}
 .nt-day{font-family:var(--head);color:var(--ink);display:grid}.nt-st{font-family:var(--body);font-weight:400;font-size:.78em;color:var(--muted)}.nt-st.a{color:var(--no)}.nt-st.p,.nt-st.s{color:var(--ok)}
 .nt-row input{font:inherit;font-size:.95rem;width:100%;min-width:0;padding:.4em .7em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text)}
@@ -357,12 +368,12 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   .content .sec h2{font-size:1.4em}.roster{padding:0 12px}
   .field-row{grid-template-columns:1fr}.gate-form{padding:18px 16px}
   #att{padding:16px}.fold-rep .row{grid-template-columns:1fr}
-  #roster .row{grid-template-columns:1fr;gap:8px}#roster .cells{flex-wrap:wrap;gap:8px}#roster .cell{width:44px;height:44px;font-size:.9em}
+  #roster .row{grid-template-columns:1fr;gap:8px}#roster .cells{flex-wrap:wrap;gap:8px}#roster .cell{width:46px;height:54px;font-size:.9em}
   #roster .notes-box{grid-template-columns:1fr}.notes-box label{grid-template-columns:64px 1fr}.notes-box input[type=time]{grid-column:2}
   .tik-grid{grid-template-columns:1fr}
   .row-head .emp-b{width:100%}
   .off-form{grid-template-columns:1fr}
-  .nt-head{display:none}.nt-row{grid-template-columns:1fr 1fr;gap:8px;padding:12px}.nt-day{grid-column:1/-1;grid-auto-flow:column;justify-content:start;gap:8px;align-items:baseline}.nt-row>input{grid-column:1/-1}
+  .nt-head{display:none}.nt-row{grid-template-columns:1fr 1fr;gap:8px;padding:12px}.nt-day{grid-column:1;grid-auto-flow:column;justify-content:start;gap:8px;align-items:baseline}.nt-row>.nt-sel{grid-column:2;min-height:44px}.nt-row>input{grid-column:1/-1}
   .nt-t{display:grid;gap:2px}.nt-t span{display:block;font-size:.8em;color:var(--muted)}
   .prog-kpis{grid-template-columns:repeat(2,1fr)}.beats{grid-template-columns:1fr}.pd-kv{grid-template-columns:auto 1fr}
   .rowbtn{grid-template-columns:auto 1fr 14px}.rowbtn .rtag{grid-column:2;grid-row:2;justify-content:flex-start}.rowbtn small{grid-column:2;grid-row:3}.arr{grid-column:3}
