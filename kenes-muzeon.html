@@ -234,7 +234,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         <input type="radio" name="muzeon" id="mz2" value="לא"><label for="mz2"><span class="box"><svg viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>לא</label>
       </div>
       <div class="err" id="e_muzeon">נא לבחור כן או לא.</div>
-      <p class="hint cond" id="laterNote" style="margin:12px 0 0">תודה! פרטים נוספים יישלחו אליכם בנפרד.</p>
+      <p class="hint cond" id="laterNote" style="margin:12px 0 0">תודה! טופס המיצג יישלח אליכם במייל מיד אחרי ההרשמה.</p>
     </div>
     </div>
 
@@ -401,8 +401,9 @@ function submit(){
   var d = collect(); if (!validate(d)) return;
   saveDraft();
   var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שומר…"; show("");
-  var cid = newCid();
-  var body = { action:"save", cid:cid, token:token, p:d.p, ex:null, website:$("website").value };
+  var cid = newCid(), xid = newCid();   /* 3.11: xid = the exhibit-form mail for a principal who chose the museum */
+  var body = { action:"save", cid:cid, xid:xid, token:token, p:d.p, ex:null, website:$("website").value };
+  var wantsEx = d.p.attendance !== "לא" && d.p.muzeon === "כן";
   /* 26.10: no Google cookies — a browser signed in to Google got an error page instead of the reply (the save itself went through).
      If the reply still does not arrive, ask the server whether it was saved (e-mail + phone). */
   /* 26.10: up to 3 tries, a few seconds apart, before the error is shown (a busy server, a moment offline).
@@ -429,16 +430,19 @@ function submit(){
         token = r.token || token;
         /* confirmation mail: the merhav relay pulls it from the server and sends it (26.10) */
         if (r.mail && d.p.attendance !== "לא") relayMail(r.mail);
+        /* 3.11: the exhibit form, the same way (the server queues it once per registration) */
+        if (r.exMail && wantsEx) setTimeout(function(){ relayMail(r.exMail); }, 900);
         $("okBox").classList.remove("nolink");
         try{ localStorage.setItem(TOKEN_KEY, token); localStorage.removeItem(DRAFT_KEY); }catch(e){}
         $("okTitle").textContent = d.p.attendance === "לא" ? "תשובתך נשמרה" : (r.updated ? "העדכון נשמר" : "נרשמת לכנס");
-        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.attendance === "לא" ? "רשמנו שלא תגיעו לכנס. אפשר לחזור לטופס ולעדכן את התשובה בכל שלב." : d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. פרטים נוספים יישלחו בנפרד." : "נתראה ב-23.11.");
+        $("okText").textContent = "תודה, " + d.p.name.split(" ")[0] + ". " + (d.p.attendance === "לא" ? "רשמנו שלא תגיעו לכנס. אפשר לחזור לטופס ולעדכן את התשובה בכל שלב." : d.p.muzeon === "כן" ? "בית הספר רשום גם למוזיאון החדשנות. טופס המיצג נשלח אליך במייל, ואפשר למלא אותו בהמשך." : "נתראה ב-23.11.");
         $("myLink").value = linkFor(token);
         show("ok"); $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
       } else if (r && r.unreadable){
         /* 26.10: the ministry network blocks the domain Google replies from. The save reached the server,
            so the relay sends the confirmation (by our own cid) and the page says so honestly. */
         if (d.p.attendance !== "לא") setTimeout(function(){ relayMail(cid); }, 1200);
+        if (wantsEx) setTimeout(function(){ relayMail(xid); }, 2400);
         try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
         $("okTitle").textContent = "התשובה נשלחה";
         $("okText").textContent = d.p.attendance === "לא" ? "התשובה נשלחה. אם לא תתקבל הודעת שמירה, אפשר לנסות שוב או לפנות אלינו בכפתור שבתחתית הדף." : "תודה, " + d.p.name.split(" ")[0] + ". בדקות הקרובות יגיע אלייך מייל אישור. אם לא יגיע תוך רבע שעה, כתבו לנו בכפתור שבתחתית הדף.";
