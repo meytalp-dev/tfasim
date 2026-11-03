@@ -517,7 +517,7 @@ window.startApp = function (R) {
     const lab = cols.filter(keep);
     $('mgTable').innerHTML = `<div class="mg-row mg-head">${lab.map(c => `<span>${c}</span>`).join('')}</div>` +
       MGS.map(m => { const l = L.filter(s => s.mg === m), o = l.filter(s => PLACE(s.emp) === 'out').length, n = l.filter(s => PLACE(s.emp) === 'in').length, p = attPct(l), none = l.length - o - n;
-        return `<div class="mg-row">${cellsRow([`<b>${esc(m)}</b>`, l.length, o, n, `<span class="${none ? 'warn' : ''}">${none}</span>`, `<i class="pbar"><i style="width:${p}%"></i></i>${p}%`, SUBMITTED[m] ? '<em class="tag ok">הוגש</em>' : '<em class="tag no">טרם</em>'].filter(keep), lab)}</div>`; }).join('');
+        return `<div class="mg-row">${cellsRow([`<button class="lnk mg-open" data-mg="${esc(m)}" title="לתלמידי המגמה"><b>${esc(m)}</b></button>`, l.length, o, n, `<span class="${none ? 'warn' : ''}">${none}</span>`, `<i class="pbar"><i style="width:${p}%"></i></i>${p}%`, SUBMITTED[m] ? '<em class="tag ok">הוגש</em>' : '<em class="tag no">טרם</em>'].filter(keep), lab)}</div>`; }).join('');
     $('mgTable').classList.toggle('six', !both);
     const cnt = STAGES.map((_, i) => L.filter(s => s.stage === i).length);
     $('pyr').innerHTML = `<div class="pyr-bar">${STAGES.map((st2, i) => cnt[i] ? `<span class="pyr-seg s${i}" style="flex:${cnt[i]}" title="${st2}">${cnt[i]}</span>` : '').join('')}</div><div class="pyr-leg">${STAGES.map((st2, i) => `<span><i class="s${i}"></i>${st2} · ${cnt[i]}</span>`).join('')}</div>`;
@@ -671,6 +671,8 @@ window.startApp = function (R) {
   $('stuFind').oninput = e => { STU_F.q = e.target.value.trim(); renderStuList(); };
   $('stuCls').onchange = e => { STU_F.cls = e.target.value; renderStuList(); };
   $('stuMg').onchange = e => { STU_F.mg = e.target.value; renderStuList(); };
+  /* סקירה: לחיצה על מגמה פותחת את התלמידים שלה (מסונן; "כל המגמות" מחזיר) */
+  $('mgTable').addEventListener('click', e => { const b = e.target.closest('[data-mg]'); if (!b) return; STU_F.mg = b.dataset.mg; STU_F.cls = STU_F.q = ''; $('stuFind').value = ''; $('stuCls').value = ''; $('stuMg').value = STU_F.mg; renderStuList(); go('students'); });
   $('stuList').addEventListener('click', e => { if (e.target.closest('[data-act="stu-clear"]')) { STU_F.cls = STU_F.mg = STU_F.q = ''; $('stuFind').value = ''; $('stuCls').value = ''; $('stuMg').value = ''; renderStuList(); } });
   /* שיבוץ: מקום אחד לכל השינויים (רשימה, מסך המעסיק). התיק משתמש באותם כללים */
   function setEmp(s, v, quiet) {

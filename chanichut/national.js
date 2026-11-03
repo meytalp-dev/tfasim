@@ -57,7 +57,7 @@
 
   /* ================= חישובים: אחוז רק על מי שדיווחו, null במקום 0 ================= */
   const sum = (l, k) => l.reduce((a, x) => a + (+x[k] || 0), 0);
-  const empPct = x => x && x.w != null && x.n ? Math.round(x.w / x.n * 100) : null;
+  const empPct = x => { const d = x && (x.nRep != null ? x.nRep : x.n); return x && x.w != null && d ? Math.round(x.w / d * 100) : null; };   /* בסיכום (agg): רק מהמדווחים (מאסטרו F-074) */
   const lvl = p => p == null ? 'x' : p > 70 ? 'g' : p >= 40 ? 'o' : 'r';
   const pc = p => p == null ? '<span class="pc x">—</span>' : `<span class="pc ${lvl(p)}">${p}%</span>`;
   const BANDS = [['g', 'מעל 70%'], ['o', '40%–70%'], ['r', 'מתחת ל-40%']];
