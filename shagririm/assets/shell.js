@@ -749,6 +749,32 @@
   };
   /* פרק 2 קיים רק בהובלה: הכלים עבדו במפגש 2 בדף אחר, בלי תיק */
   var TIK_TRACK = { 2: "h" };
+  /* 3.11.26: הרפלקציה לקראת המפגש הבא. ארבע שאלות, מתחת לפרק של היחידה שהוגשה. kind:'reflect' בשרת המפגשים */
+  var REF_Q = [["done", "מה בוצע מתוך שלוש הפעולות שכתבתי"], ["success", "הצלחה אחת"], ["challenge", "אתגר אחד"], ["next", "איך ממשיכים, כדי שזה לא יישאר חד-פעמי"]];
+  function renderRef(n, rf) {
+    return '<div class="ref-box" id="ref-' + n + '"><div class="v2-tip"><b>רפלקציה לקראת המפגש הבא</b>' +
+      (rf && str(rf.at) ? ' · נשמר <span translate="no">' + esc(rf.at) + "</span>" : "") +
+      "<br>ארבע שאלות קצרות על מה שקרה מאז ההגשה. מיטל רואה את התשובות לפני המפגש, ואפשר לעדכן כל פעם.</div>" +
+      REF_Q.map(function (q) {
+        return '<label class="ref-f"><span>' + esc(q[1]) + '</span><textarea rows="2" maxlength="2000" data-q="' + q[0] + '">' + esc(rf ? str(rf[q[0]]) : "") + "</textarea></label>";
+      }).join("") +
+      '<p class="ref-row"><button type="button" class="v2-btn primary" data-ref="' + n + '">שמירת הרפלקציה</button><span class="ref-msg" id="ref-msg-' + n + '"></span></p></div>';
+  }
+  function saveRef(n, btn, tk) {
+    var box = el("ref-" + n), msg = el("ref-msg-" + n), val = {};
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll("textarea[data-q]"), function (t) { val[t.getAttribute("data-q")] = str(t.value); });
+    if (!Object.keys(val).some(function (k) { return val[k]; })) { if (msg) msg.textContent = "כדאי לכתוב לפחות תשובה אחת."; return; }
+    btn.disabled = true; if (msg) msg.textContent = "שומרים…";
+    var body = { kind: "reflect", track: str(S.me.track) === "הובלה" ? "h" : "k", s: Number(n), k: tk, name: str(S.me.name), school: str(S.me.school), value: val };
+    fetch(TIK_API.split("?")[0], { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json(); })
+      .then(function (r) {
+        btn.disabled = false;
+        if (msg) msg.textContent = r && r.ok ? "נשמר. אפשר לחזור ולעדכן." : "לא נשמר (" + ((r && r.error) || "שגיאה") + "). לנסות שוב.";
+      })
+      .catch(function () { btn.disabled = false; if (msg) msg.textContent = "אין חיבור לשרת. לנסות שוב בעוד רגע."; });
+  }
   function renderTik() {
     var box = el("v2-other"), tk = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
     var hov = str(S.me.track) === "הובלה";
@@ -773,13 +799,20 @@
         });
         /* 2.11.26: התגובה של מיטל על ההגשה (נכתבת ממסך "הגשות" במבט שלה, נשמרת בלשונית "תגובות") */
         var rp = d && d.r && d.r[n];
+        /* 3.11.26: רפלקציה לקראת המפגש הבא, אחרי שהוגש: ארבע שאלות, נשמרות בשרת המפגשים ומיטל רואה במסך ההגשות */
+        var rf = d && d.ref && d.ref[n];
         h += '<div class="v2-card"><p class="v2-eyebrow">פרק ' + n + " · מפגש " + n + "</p><h3>" + esc(c.t) + "</h3>" +
           (body || "<p>עוד לא נכתב כאן. ממלאים בדף המלווה של המפגש.</p>") +
           (rp && str(rp.text) ? '<div class="v2-tip" style="margin-top:12px"><b>התגובה של מיטל</b>' + (str(rp.at) ? ' · <span translate="no">' + esc(rp.at) + "</span>" : "") +
             "<br>" + esc(rp.text).replace(/\n/g, "<br>") + "</div>" : "") +
-          '<p><a href="' + esc(extPageUrl(Number(n))) + '" target="_blank" rel="noopener">עריכה בדף המלווה</a></p></div>';
+          '<p><a href="' + esc(extPageUrl(Number(n))) + '" target="_blank" rel="noopener">עריכה בדף המלווה</a></p>' +
+          (str(v.submitted) ? renderRef(n, rf) : "") + "</div>";
       });
       el("tik-ch").innerHTML = h;
+      el("tik-ch").onclick = function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest("button[data-ref]") : null;
+        if (b && !b.disabled) saveRef(b.getAttribute("data-ref"), b, tk);
+      };
     }).catch(function () { el("tik-ch").innerHTML = ch1 + '<div class="v2-card"><p>התיק לא נטען כרגע. נסו לרענן בעוד רגע.</p></div>'; });
   }
 

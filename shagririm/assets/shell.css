@@ -288,3 +288,10 @@ a.nw-ses:hover { color: var(--orange); }
 /* 28.10.26: תיק ההטמעה הבית ספרי */
 #tik-ch h4 { margin: 14px 0 4px; font-size: 15px; color: var(--ink, #10344F); }
 #tik-ch .v2-mats li { font-size: 15px; line-height: 1.5; padding: 2px 0; }
+/* 3.11.26: רפלקציה לקראת המפגש הבא, בתיק ההטמעה */
+#tik-ch .ref-box { margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 12px; }
+#tik-ch .ref-f { display: block; margin: 10px 0 0; }
+#tik-ch .ref-f span { display: block; font-weight: 700; font-size: 14.5px; margin: 0 0 4px; }
+#tik-ch .ref-f textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; line-height: 1.5; border: 1px solid var(--line); border-radius: 12px; padding: 8px 10px; resize: vertical; }
+#tik-ch .ref-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 12px 0 0; }
+#tik-ch .ref-msg { font-size: 14px; color: var(--muted); }

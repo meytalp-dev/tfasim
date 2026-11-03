@@ -292,3 +292,5 @@ body.t-viewer .adm .a-elnet #e-admin-tools { display: none !important; }
   .adm .a-sub dt { margin-top: 8px; }
 }
 .adm .a-subtools .v2-n { font-size: 11px; background: #FDEBD7; color: #8A4707; border-radius: 99px; padding: 1px 7px; margin-inline-start: 4px; }
+.adm .a-reflect { background: var(--paper); border-color: var(--line); }
+.adm .a-reflect dl { margin: 6px 0 0; }

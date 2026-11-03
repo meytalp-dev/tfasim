@@ -974,6 +974,15 @@
     var stuck = (it.stuck || []).map(function (s) { return "<li>" + (s.step ? "<b>" + esc(s.step) + ":</b> " : "") + esc(s.msg) + ' <small class="a-meta" translate="no">· ' + esc(s.at) + "</small></li>"; }).join("");
     var done = it.reply ? '<div class="a-reply-done"><b>התגובה שלך</b> · <span translate="no">' + esc(it.reply.at) + "</span>" +
       (it.reply.mail ? " · מייל: " + esc(it.reply.mail) : "") + "<br>" + esc(it.reply.text) + "</div>" : "";
+    /* 3.11.26: הרפלקציה שהרכז/ת כתב/ה בתיק לקראת המפגש הבא */
+    var rf = it.reflect;
+    if (rf) {
+      tags += '<span class="a-tag ok">רפלקציה</span>';
+      done += '<div class="a-reply-done a-reflect"><b>רפלקציה לקראת המפגש</b> · <span translate="no">' + esc(rf.at) + "</span><dl>" +
+        [["done", "מה בוצע"], ["success", "הצלחה"], ["challenge", "אתגר"], ["next", "איך ממשיכים"]].map(function (q) {
+          return str(rf[q[0]]) ? "<dt>" + q[1] + "</dt><dd>" + esc(rf[q[0]]) + "</dd>" : "";
+        }).join("") + "</dl></div>";
+    }
     var form = viewer() ? "" : '<div class="a-reply a-admin-only"><label for="sr-' + esc(it.sid) + '"><b>' + (it.reply ? "תגובה נוספת" : "תגובה שלי") + "</b> · משפט או שניים, יגיעו במייל ולתיק ההטמעה</label>" +
       '<textarea id="sr-' + esc(it.sid) + '" maxlength="1500" placeholder="מה עבד יפה, ומה כדאי לחדד"></textarea>' +
       '<div class="a-reply-row"><button type="button" class="v2-btn" data-send="' + esc(it.sid) + '">שלח' + (it.state === "השלים" ? "" : " ואשר את היחידה") + "</button>" +
