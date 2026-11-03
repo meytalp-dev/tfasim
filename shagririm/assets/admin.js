@@ -966,7 +966,9 @@
     }).filter(String).join("");
     dl += "<dt>3 הפעולות</dt><dd>" + (acts ? '<ol class="a-acts">' + acts + "</ol>" : '<span class="a-empty">לא מולאו</span>') + "</dd>";
     var nb = str(f[V.nb[0]]);
-    dl += "<dt>" + esc(V.nb[1]) + "</dt><dd>" + (nb ? subVal(nb, true) : '<span class="a-miss">אין קישור</span>') + "</dd>";
+    /* 3.11.26: קישור עריכה (notebook.google.com/notebook/...) לרוב לא פתוח לשיתוף; קישור שיתוף הוא notebooklm.link.google */
+    var nbWarn = nb && /^https?:\/\//.test(nb) && !/notebooklm\.link\.google/.test(nb) ? ' <span class="a-tag warn" title="קישור עריכה. אם לא נפתח: לבקש שיתוף לכל מי שיש לו את הקישור">לבדוק שיתוף</span>' : "";
+    dl += "<dt>" + esc(V.nb[1]) + "</dt><dd>" + (nb ? subVal(nb, true) + nbWarn : '<span class="a-miss">אין קישור</span>') + "</dd>";
     var more = V.more.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + subVal(v, m[2] === "link") + "</dd>" : ""; }).join("");
     var fb = V.fb.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + esc(v) + "</dd>" : ""; }).join("");
     var stuck = (it.stuck || []).map(function (s) { return "<li>" + (s.step ? "<b>" + esc(s.step) + ":</b> " : "") + esc(s.msg) + ' <small class="a-meta" translate="no">· ' + esc(s.at) + "</small></li>"; }).join("");
