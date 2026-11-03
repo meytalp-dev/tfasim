@@ -120,7 +120,7 @@
     window.addEventListener('beforeunload', e => { if (!leaving && (busy || dirtyCount())) { flush(true); e.preventDefault(); e.returnValue = ''; } });
     schedule(50);   /* תור התזכורות מתעדכן גם בלי פעולה, למשל אחרי שינוי שם */
   }
-  function dirtyCount() { if (!R || R.role !== 'rakaz') return 0; let n = 0; Object.entries(records()).forEach(([k, r]) => { if (SNAP[k] !== sig(r)) n++; }); return n; }
+  function dirtyCount() { if (!R || R.role !== 'rakaz') return 0; let n = 0; const cur = records(); Object.entries(cur).forEach(([k, r]) => { if (SNAP[k] !== sig(r)) n++; }); Object.keys(SNAP).forEach(k => { if (!(k in cur)) n++; }); return n; }
   function schedule(ms) { clearTimeout(timer); timer = setTimeout(() => { timer = 0; flush(); }, ms); }
   function status(t, cls) { const el = document.getElementById('saveSt'); if (el) { el.textContent = t; el.className = 'save-st ' + (cls || ''); } }
 
@@ -132,6 +132,8 @@
       const g = sig(r); if (SNAP[k] === g) continue;
       send.push({ k, p: r.p, e: r.priv ? await CK.encJSON(KEY, r.priv) : '', g });
     }
+    /* מחיקות: רשומה שהייתה בשמירה הקודמת ואיננה יותר (תלמיד.ה שנמחק.ה מהרשימה). השרת דורש הצפנה לא ריקה ל-stu:/lead: */
+    for (const k of Object.keys(SNAP)) if (!(k in cur)) send.push({ k, p: {}, e: /^(stu|lead):/.test(k) ? await CK.encJSON(KEY, {}) : '', del: true, g: '' });
     const items = R.hooks && R.hooks.mails ? R.hooks.mails() : [];
     const qs = JSON.stringify(items.map(x => x.k).sort().concat(items.map(x => x.to + '|' + x.html)));
     if (!send.length && qs === QSNAP) return;
@@ -148,9 +150,9 @@
       }
       if (cur.length) batches.push(cur);
       for (const b of batches) {
-        const res = await API.call('put', { recs: b.map(({ k, p, e }) => ({ k, p, e })), keepalive: !!beacon });
+        const res = await API.call('put', { recs: b.map(({ k, p, e, del }) => del ? { k, p, e, del: true } : { k, p, e }), keepalive: !!beacon });
         if (!res.ok) { busyErr = res.error === 'busy'; throw new Error(res.error === 'readonly' ? 'צפייה בלבד' : res.error === 'badsession' ? 'החיבור פג. צריך להיכנס שוב' : busyErr ? 'השרת עמוס, מנסה שוב' : 'השמירה לא הצליחה (' + (res.error || '') + ')'); }
-        b.forEach(x => { SNAP[x.k] = x.g; EXIST.add(x.k); });
+        b.forEach(x => { if (x.del) { delete SNAP[x.k]; EXIST.delete(x.k); } else { SNAP[x.k] = x.g; EXIST.add(x.k); } });
       }
       if (qs !== QSNAP) {
         const res = await API.call('remqSet', { items, keepalive: !!beacon });

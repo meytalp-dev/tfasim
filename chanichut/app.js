@@ -41,7 +41,8 @@ window.startApp = function (R) {
     gantt: '<path d="M4 6h8M8 12h10M6 18h7"/><path d="M3 3v18"/>',
     dots: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
     out: '<path d="M10 4H5v16h5"/><path d="M14 8l-4 4 4 4"/><path d="M10 12h10"/>',
-    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
+    trash: '<path d="M4 7h16"/><path d="M10 11v6M14 11v6"/><path d="M6 7l1 13h10l1-13"/><path d="M9 7V4h6v3"/>'
   };
   const ic = n => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -623,9 +624,51 @@ window.startApp = function (R) {
   }
 
   /* ================= תלמידים ================= */
-  const stuBtn = s => `<button class="stu ${s.status === 'עזב' ? 'left' : ''}" data-open="${s.id}"><b>${esc(s.name)}${statusTag(s)}</b><span>${esc(s.cls)} · ${esc(empName(s.emp))}${s.note ? ' · ' + esc(s.note) : ''}</span><span class="stage s${s.stage}">${STAGES[s.stage]}</span><span class="docs ${docsOf(s) === DOCS.length ? 'ok' : ''}">${docsOf(s)}/${DOCS.length} מסמכים</span></button>`;
-  function renderStuList() { const open = new Set([...document.querySelectorAll('#stuList details[open]')].map(d => d.dataset.mg)); const groups = {}; STU.forEach(s => (groups[s.mg] = groups[s.mg] || []).push(s)); $('stuList').innerHTML = Object.entries(groups).map(([mg, l]) => `<details class="grp" data-mg="${esc(mg)}" ${open.has(mg) ? 'open' : ''}><summary>${esc(mg)}<small>${l.length}</small></summary>${l.map(stuBtn).join('')}</details>`).join(''); }
-  $('stuFind').oninput = e => { const q = e.target.value.trim(), n = norm(q); const hits = n ? STU.filter(s => s.name.includes(q) || norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n))) : []; $('stuHits').innerHTML = hits.map(stuBtn).join('') || (q ? '<p class="empty">לא נמצא.</p>' : ''); $('stuList').hidden = !!q; };
+  /* שורת תלמיד.ה ברשימה (3.11.26, מהפיילוט): שם (פותח תיק), שיבוץ בתיבת בחירה אחת, עיפרון לעריכה ומחיקה */
+  const plOptions = s => { const cur = s.emp || ''; const grp = (map, lab) => { const l = Object.entries(map).filter(([id, e]) => id === cur || canPlace(e)); return l.length ? `<optgroup label="${lab}">${l.map(([id, e]) => `<option value="${id}" ${id === cur ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>` : ''; };
+    return `<option value="" ${!cur ? 'selected' : ''}>לא מועסק.ת</option>${grp(EMPS, 'מעסיקים')}${grp(INS, 'עסק בית-ספרי')}`; };
+  const stuRow = s => `<div class="stu-row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><button class="stu-name" data-open="${s.id}"><b>${esc(s.name)}${statusTag(s)}</b><span>${esc(s.mg)}${s.note ? ' · ' + esc(s.note) : ''}</span></button>${canEdit() ? `<select class="stu-pl" data-pl-sel="${s.id}" aria-label="שיבוץ של ${esc(s.name)}">${plOptions(s)}</select>` : `<span class="stu-emp">${esc(empName(s.emp))}</span>`}<span class="stage s${s.stage}">${STAGES[s.stage]}</span><button class="stu-edit edit" data-edit="${s.id}" aria-label="עריכת הפרטים של ${esc(s.name)}" title="עריכה ומחיקה">${ic('pen')}</button></div>`;
+  const clsSort = (a, b) => a.localeCompare(b, 'he', { numeric: true });
+  /* הרשימה לפי קבוצה (יא · קבוצה 1 … ואז יב), בכותרת מספר הפעולה והמגמות */
+  function renderStuList() {
+    const open = new Set([...document.querySelectorAll('#stuList details[open]')].map(d => d.dataset.cls)), groups = {};
+    STU.forEach(s => { const c = s.cls || 'בלי קבוצה'; (groups[c] = groups[c] || []).push(s); });
+    const names = Object.keys(groups).sort(clsSort);
+    $('stuList').innerHTML = names.map(c => { const l = groups[c], mgs = [...new Set(l.map(s => s.mg).filter(Boolean))], act = l.map(s => s.act).find(Boolean); return `<details class="grp" data-cls="${esc(c)}" ${open.has(c) || names.length === 1 ? 'open' : ''}><summary>${esc(c)}<small>${l.length} תלמידים${act ? ' · מספר פעולה ' + esc(act) : ''}${mgs.length ? ' · ' + mgs.map(esc).join(', ') : ''}</small></summary>${l.map(stuRow).join('')}</details>`; }).join('') || '<p class="empty">אין תלמידים עדיין.</p>';
+  }
+  $('stuFind').oninput = e => { const q = e.target.value.trim(), n = norm(q); const hits = n ? STU.filter(s => s.name.includes(q) || norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n))) : []; $('stuHits').innerHTML = hits.map(stuRow).join('') || (q ? '<p class="empty">לא נמצא.</p>' : ''); $('stuList').hidden = !!q; };
+  /* שיבוץ: מקום אחד לכל השינויים (רשימה, מסך המעסיק). התיק משתמש באותם כללים */
+  function setEmp(s, v) {
+    v = v || '';
+    if (v && !EMPS[v] && !INS[v]) return false;
+    if (EMPS[v] && !canPlace(EMPS[v])) { toast('אי אפשר לשבץ אצל מעסיק שלא אושר במסננת'); return false; }
+    const prev = s.emp || ''; if (prev === v) return true;
+    s.emp = v; s.hist.unshift({ d: `${TODAY}.${MONTH.y}`, from: prev, to: v, why: '' }); if (!v) s.stageManual = null; else s.why = '';
+    s.stage = stageOf(s); renderStuList(); renderOverview(); renderChkStu(); renderRoster(); renderEmps(); return true;
+  }
+  $('students').addEventListener('change', e => { const sel = e.target.closest('[data-pl-sel]'); if (!sel) return; const s = STU.find(x => x.id === sel.dataset.plSel); if (!s) return; if (!setEmp(s, sel.value)) { sel.value = s.emp || ''; return; } toast(s.name + ': ' + (s.emp ? empName(s.emp) : 'לא מועסק.ת')); });
+  $('students').addEventListener('click', e => { const b = e.target.closest('[data-edit]'); if (!b) return; const s = STU.find(x => x.id === b.dataset.edit); if (s) openSub(editStuSpec(s)); });
+  /* עריכת הפרטים ומחיקה — מהרשימה ומהתיק */
+  function editStuSpec(s) {
+    const f = (id, l, v, extra = '') => `<label class="field"><span>${l}</span><input class="find" id="${id}" value="${esc(v || '')}"${extra}></label>`;
+    return { dirtyWatch: true, title: () => 'עריכת הפרטים · ' + esc(s.name), html: () => `<div class="sub-card newform">
+        <div class="field-row">${f('esName', 'שם מלא', s.name)}${f('esCls', 'קבוצה / כיתה', s.cls, ' list="esClsL"')}<datalist id="esClsL">${classes.map(c => `<option value="${esc(c)}">`).join('')}</datalist></div>
+        <div class="field-row">${f('esMg', 'מגמה', s.mg, ' list="esMgL"')}<datalist id="esMgL">${MGS.map(m => `<option value="${esc(m)}">`).join('')}</datalist>${f('esAct', 'מספר פעולה', s.act, ' dir="ltr"')}</div>
+        <div class="field-row">${f('esPhone', 'טלפון', s.phone, ' dir="ltr"')}${f('esPhone2', 'טלפון נוסף', s.phone2, ' dir="ltr"')}</div>
+        <div class="field-row">${f('esTz', 'תעודת זהות', s.tz, ' dir="ltr"')}${f('esBirth', 'שנת לידה', s.birth, ' dir="ltr" inputmode="numeric"')}</div>
+        <div class="emp-b mf-b"><button class="btn primary" id="esSave">${ic('check')}שמירה</button><button class="btn quiet" id="esDel">${ic('trash')}מחיקה מהרשימה</button></div></div>`,
+      bind: (el, spec) => {
+        if (matchMedia('(pointer:fine)').matches) $('esName').focus();
+        $('esSave').onclick = () => {
+          const name = $('esName').value.trim(), cls = $('esCls').value.trim(), mg = $('esMg').value.trim(), b = $('esBirth').value.trim();
+          if (!name) return toast('צריך שם'); if (!cls || !mg) return toast('צריך קבוצה ומגמה'); if (b && !/^\d{4}$/.test(b)) return toast('שנת לידה: 4 ספרות');
+          Object.assign(s, { name, cls, mg, act: $('esAct').value.trim(), phone: $('esPhone').value.trim(), phone2: $('esPhone2').value.trim(), tz: $('esTz').value.trim(), birth: b ? +b : '' });
+          syncGroups(); spec.dirty = false; renderMain(); closeSub(); toast('הפרטים של ' + name + ' עודכנו');
+        };
+        $('esDel').onclick = () => { if (!confirm(`למחוק את ${s.name} מהרשימה? גם הנוכחות וההערות יימחקו. אי אפשר לבטל`)) return; const n = s.name; deleteStu(s); spec.dirty = false; go('students'); toast(n + ' נמחק.ה מהרשימה'); };
+      } };
+  }
+  function deleteStu(s) { const i = STU.indexOf(s); if (i >= 0) STU.splice(i, 1); [ATT, NOTES, TIMES, OFFBAK, SUSPBAK, MANUAL].forEach(o => { delete o[s.id]; }); syncGroups(); renderMain(); }
   document.querySelector('[data-act="new-stu"]').onclick = () => openSub(newStuSpec());
   /* מזהה אקראי — לא נגזר מהשם */
   const newId = p => p + Array.from(crypto.getRandomValues(new Uint8Array(6)), b => 'abcdefghijkmnpqrstuvwxyz23456789'[b % 32]).join('');
@@ -713,6 +756,7 @@ window.startApp = function (R) {
     const miles = milesOf(s);
     const rems = [...pending().filter(r => r.sid === s.id).map(r => ({ ...r, p: true })), ...REM.filter(r => r.sid === s.id)];
     return `<p class="hint tik-sub">${esc(s.mg)}${s.track ? ' · מסלול ' + esc(s.track) : ''} · ${esc(s.cls)}${s.act ? ' · מספר פעולה ' + esc(s.act) : ''} · ${esc(empName(s.emp))}${who}${s.start ? ' · מ-' + esc(s.start) : ''}${s.birth ? ` · שנת לידה ${esc(s.birth)} (גיל ${MONTH.y - s.birth} בערך)` : ''}${s.phone ? ` · <a href="tel:${esc(s.phone)}" dir="ltr">${esc(s.phone)}</a>` : ''}${s.phone2 ? ` · <a href="tel:${esc(s.phone2)}" dir="ltr">${esc(s.phone2)}</a>` : ''}</p>${s.note ? `<p class="snote big">${ic('pen')}${esc(s.note)}</p>` : ''}
+      <div class="emp-b edit tik-tools"><button class="btn" data-act="stu-edit">${ic('pen')}עריכת הפרטים</button></div>
       <div class="tik-grid">
         <div class="tik-card wide place" id="placeCard"><h3>${ic('building')}איפה עובד.ת</h3><div class="place-row">
           <label class="pl ${pl === 'out' ? 'on' : ''}"><input type="radio" name="pl" value="out" ${pl === 'out' ? 'checked' : ''}>מעסיק בחוץ</label>
@@ -734,6 +778,7 @@ window.startApp = function (R) {
   function tikBind(el, s) {
     const redo = () => { s.stage = stageOf(s); refreshSub(); renderStuList(); renderOverview(); renderChkStu(); renderRoster(); renderEmps(); };
     el.querySelectorAll('[data-form]').forEach(b => b.onclick = () => openSub(formSpec(s, +b.dataset.form)));
+    const ed = el.querySelector('[data-act="stu-edit"]'); if (ed) ed.onclick = () => openSub(editStuSpec(s));
     $('logAdd').onclick = () => { const v = $('logIn').value.trim(); if (!v) return; s.log.unshift({ d: TODAY, t: v }); redo(); };
     $('logIn').onkeydown = e => { if (e.key === 'Enter') $('logAdd').click(); };
     el.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => { s.docs[+b.dataset.doc] = { s: 'ok', n: '' }; redo(); toast('סומן שהתקבל'); });
@@ -789,7 +834,7 @@ window.startApp = function (R) {
   }
 
   /* ================= מעסיקים — רשימה לפי מגמה, פרטים במסך נפרד ================= */
-  const masTag = e => e.mas ? `<em class="tag ${e.mas === 'מאושר' ? 'ok' : e.mas === 'לא מאושר' ? 'no' : 'mid'}">${esc(e.mas)}</em>` : '';
+  const masTag = e => e.mas ? `<em class="tag ${e.mas === 'מאושר' ? 'ok' : e.mas === 'לא מאושר' ? 'no' : 'mid'}">${esc(e.mas)}</em>` : '<em class="tag">טרם נבדק במסננת</em>';
   function empRows(map, kind) {
     const mgs = [...new Set([...MGS, ...Object.values(map).flatMap(e => e.mg || [])])];
     const used = new Set();
@@ -808,8 +853,8 @@ window.startApp = function (R) {
     const e = EMPS[id] || INS[id], inn = !!INS[id];
     return { title: () => `${esc(e.name)} ${inn ? `<em class="tag">${esc(e.kind || '')}</em>` : masTag(e)}`, html: () => { const l = STU.filter(s => s.emp === id && s.status !== 'עזב');
       return `<div class="tik-grid">
-        <div class="tik-card"><h3>${ic('user')}${inn ? 'מנהל.ת העבודה' : 'מנטור.ית'}</h3><dl class="kv">${inn ? `<dt>שם</dt><dd>${esc(e.manager || '—')}</dd>` : `<dt>שם</dt><dd>${esc(e.mentor || '—')}</dd>`}${e.phone ? `<dt>טלפון</dt><dd dir="ltr">${esc(e.phone)}</dd>` : ''}${e.mail ? `<dt>מייל</dt><dd dir="ltr">${esc(e.mail)}</dd>` : ''}${e.addr ? `<dt>כתובת</dt><dd>${esc(e.addr)}</dd>` : ''}<dt>מגמות</dt><dd>${(e.mg || []).map(esc).join(' · ') || '—'}</dd>${inn ? '' : `<dt>תקנים</dt><dd>${e.slots ? esc(e.slots) : 'לא ידוע'}${e.slotsRaw ? ` <em class="tag no">בקובץ: ${esc(e.slotsRaw)}</em>` : ''}</dd>`}</dl></div>
-        <div class="tik-card"><h3>${ic('user')}תלמידים <small>${l.length}</small></h3><ul class="docs-l">${l.map(s => `<li class="ok">${ic('user')}<span><a href="#" data-open="${s.id}">${esc(s.name)}</a> · ${esc(s.cls)}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</span></li>`).join('') || '<li class="hint">אין תלמידים משובצים</li>'}${inn && e.min ? `<li class="${l.length < e.min ? '' : 'ok'}"><span class="${l.length < e.min ? 'warn' : ''}">${l.length} מתוך ${e.min} לפחות</span></li>` : ''}</ul></div>
+        <div class="tik-card"><h3>${ic('user')}${inn ? 'מנהל.ת העבודה' : 'מנטור.ית'}</h3><dl class="kv">${inn ? `<dt>שם</dt><dd>${esc(e.manager || '—')}</dd>` : `<dt>איש.אשת קשר</dt><dd>${esc(e.manager || '—')}</dd><dt>מנטור.ית</dt><dd>${esc(e.mentor || '—')}</dd>`}${e.phone ? `<dt>טלפון</dt><dd dir="ltr">${esc(e.phone)}</dd>` : ''}${e.mail ? `<dt>מייל</dt><dd dir="ltr">${esc(e.mail)}</dd>` : ''}${e.addr ? `<dt>כתובת</dt><dd>${esc(e.addr)}</dd>` : ''}<dt>מגמות</dt><dd>${(e.mg || []).map(esc).join(' · ') || '—'}</dd>${inn ? '' : `<dt>תקנים</dt><dd>${e.slots ? esc(e.slots) : 'לא ידוע'}${e.slotsRaw ? ` <em class="tag no">בקובץ: ${esc(e.slotsRaw)}</em>` : ''}</dd>`}</dl></div>
+        <div class="tik-card"><h3>${ic('user')}תלמידים <small>${l.length}</small></h3><ul class="docs-l">${l.map(s => `<li class="ok">${ic('user')}<span><a href="#" data-open="${s.id}">${esc(s.name)}</a> · ${esc(s.cls)}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</span></li>`).join('') || '<li class="hint">אין תלמידים משובצים</li>'}${inn && e.min ? `<li class="${l.length < e.min ? '' : 'ok'}"><span class="${l.length < e.min ? 'warn' : ''}">${l.length} מתוך ${e.min} לפחות</span></li>` : ''}</ul><div class="emp-b edit"><button class="btn" data-act="emp-assign">${ic('user')}שיוך תלמידים</button></div></div>
         ${inn ? '' : `<div class="tik-card edit" id="mlCard"><h3>${ic('link')}קישור למנטור.ית</h3><p class="hint">הקישור פותח את שמות התלמידים שאצל המעסיק. לשלוח רק למנטור.ית. המנטור.ית מסמנ.ת בו נוכחות וממלא.ת את משוב המעסיק, ואת הסימונים מושכים במסך הנוכחות.</p><div id="mlBox"><p class="hint">בודק אם יש קישור פעיל…</p></div><div class="emp-b"><button class="btn primary" data-act="mentor-link" ${l.length ? '' : 'disabled'}>${ic('link')}קישור למנטור.ית</button><button class="btn quiet" data-act="mentor-revoke">${ic('x')}ביטול הקישור</button></div></div>`}
         ${inn ? `<div class="tik-card"><h3>${ic('wallet')}סעיף 117</h3><dl class="kv"><dt>היקף</dt><dd>${e.hours} ש"ש · 100 שעות חניכות לתלמיד.ה בשנה</dd>${e.client ? `<dt>לקוח</dt><dd>${esc(e.client)}</dd>` : ''}</dl></div>`
           : `<div class="tik-card"><h3>${ic('filter')}המסננת</h3><dl class="kv"><dt>ההחלטה</dt><dd>${e.mas ? masTag(e) : '<span class="hint">לא נבדק</span>'}</dd>${e.recheck ? `<dt>בדיקה חוזרת</dt><dd>${esc(e.recheck)}</dd>` : ''}${e.masNotes ? `<dt>הערות</dt><dd>${esc(e.masNotes)}</dd>` : ''}</dl></div>
@@ -819,6 +864,7 @@ window.startApp = function (R) {
         const t = el.querySelector('[data-act="talked"]'); if (t) t.onclick = () => { e.talk = TODAY; renderEmps(); refreshSub(); toast('נרשם: שיחה עם ' + e.name + ' היום'); };
         const v = el.querySelector('[data-act="visited"]'); if (v) v.onclick = () => { e.visit = TODAY; e.talk = TODAY; e.contact = 0; renderEmps(); renderChkStu(); refreshSub(); toast('נרשם: ביקור אצל ' + e.name + ' היום'); };
         el.querySelector('[data-act="emp-edit"]').onclick = () => openSub(empEditSpec(id));
+        const as = el.querySelector('[data-act="emp-assign"]'); if (as) as.onclick = () => openSub(assignSpec(id));
         /* הקישור למנטור.ית (mentor.js): קישור אחד למעסיק, המפתח אחרי # לא מגיע לשרת. יצירה מחדש מחליפה את הקודם */
         const ml = el.querySelector('#mlBox');
         if (ml && canEdit()) {
@@ -839,13 +885,22 @@ window.startApp = function (R) {
         }
       } };
   }
+  /* שיוך תלמידים ממסך המעסיק: רשימת סימון לפי קבוצה. מסומן = אצל המעסיק הזה, הסרת סימון = הסרה */
+  function assignSpec(id) {
+    const e = EMPS[id] || INS[id];
+    return { title: () => 'שיוך תלמידים · ' + esc(e.name), html: () => { const groups = {}; active().forEach(s => { const c = s.cls || 'בלי קבוצה'; (groups[c] = groups[c] || []).push(s); }); const names = Object.keys(groups).sort(clsSort);
+      return `<div class="sub-card"><p class="hint">מסמנים את מי שעובד.ת אצל ${esc(e.name)} ולוחצים "שמירה". הסרת סימון מסירה מהמעסיק.</p>${names.map(c => `<details class="grp" open><summary>${esc(c)}<small>${groups[c].filter(s => s.emp === id).length} מתוך ${groups[c].length}</small></summary><ul class="chk-items asg">${groups[c].map(s => `<li><label><input type="checkbox" data-asg="${s.id}" ${s.emp === id ? 'checked' : ''}>${esc(s.name)}${s.emp && s.emp !== id ? ` <small class="hint">אצל ${esc(empName(s.emp))}</small>` : ''}</label></li>`).join('')}</ul></details>`).join('') || '<p class="empty">אין תלמידים.</p>'}
+        <div class="emp-b mf-b edit"><button class="btn primary" id="asgSave">${ic('check')}שמירה</button></div></div>`; },
+      bind: el => { $('asgSave').onclick = () => { let n = 0; el.querySelectorAll('[data-asg]').forEach(c => { const s = STU.find(x => x.id === c.dataset.asg); if (!s) return; if (c.checked && s.emp !== id) { if (setEmp(s, id)) n++; } else if (!c.checked && s.emp === id) { setEmp(s, ''); n++; } }); closeSub(); toast(n ? `השיבוץ אצל ${e.name} עודכן · ${n} תלמידים` : 'אין שינוי'); }; } };
+  }
   /* עריכת פרטים של מעסיק (ומנטור.ית) או עסק בית-ספרי קיימים */
   /* draft = עסק בית-ספרי חדש: נוצר רק בשמירה. הסוג תמיד "עסק בית-ספרי" (מיטל, 1.11.26) — אין בחירה */
   function empEditSpec(id, draft) {
     const e = draft || EMPS[id] || INS[id], inn = !!draft || !!INS[id];
     const fld = (k, l, ltr) => `<label class="field"><span>${l}</span><input class="find" data-ee="${k}" value="${esc(e[k] || '')}"${ltr ? ' dir="ltr"' : ''}></label>`;
     return { dirtyWatch: true, title: () => draft ? 'עסק בית-ספרי חדש' : 'עריכת הפרטים · ' + esc(e.name), html: () => `<div class="sub-card newform">
-        <div class="field-row">${fld('name', inn ? 'שם העסק הבית-ספרי' : 'שם המעסיק')}${inn ? fld('manager', 'מנהל.ת העבודה') : fld('mentor', 'מנטור.ית / חונך.ת')}</div>
+        <div class="field-row">${fld('name', inn ? 'שם העסק הבית-ספרי' : 'שם המעסיק')}${inn ? fld('manager', 'מנהל.ת העבודה') : fld('manager', 'איש.אשת קשר')}</div>
+        ${inn ? '' : `<div class="field-row">${fld('mentor', 'מנטור.ית / חונך.ת')}</div>`}
         ${inn ? `<div class="field-row">${fld('client', 'לקוח')}</div>` : ''}
         ${inn ? '' :`<div class="field-row">${fld('phone', 'טלפון', true)}${fld('mail', 'מייל', true)}</div><div class="field-row">${fld('addr', 'כתובת')}${fld('slots', 'כמה תקנים', true)}</div>`}
         <div class="field"><span>מגמות</span><div class="place-row">${[...new Set([...MGS, ...(e.mg || [])])].map(m => `<label class="pl ${(e.mg || []).includes(m) ? 'on' : ''}"><input type="checkbox" name="eeMg" value="${esc(m)}" ${(e.mg || []).includes(m) ? 'checked' : ''}>${esc(m)}</label>`).join('')}</div></div>
@@ -864,12 +919,15 @@ window.startApp = function (R) {
   }
   document.querySelector('[data-act="new-emp"]').onclick = () => openSub(newEmpSpec());
   function newEmpSpec(p = {}) {
-    return { dirtyWatch: true, title: 'מעסיק חדש · בדיקה במסננת', html: () => `<div class="sub-card newform">
-        <div class="field-row"><label class="field"><span>שם המעסיק</span><input class="find" id="neName" value="${esc(p.name || '')}"></label><label class="field"><span>מנטור.ית / חונך.ת</span><input class="find" id="neMentor" value="${esc(p.mentor || '')}"></label></div>
+    /* 3.11.26 (מהפיילוט): רק פרטי המעסיק בראש הטופס. שם חובה; איש.אשת קשר, טלפון וכתובת חשובים (שאלה אם חסר). המסננת מקופלת ולא חובה */
+    return { dirtyWatch: true, title: 'מעסיק חדש', html: () => `<div class="sub-card newform">
+        <div class="field-row"><label class="field"><span>שם המעסיק</span><input class="find" id="neName" value="${esc(p.name || '')}"></label><label class="field"><span>איש.אשת קשר</span><input class="find" id="neContact" value="${esc(p.manager || p.who || '')}"></label></div>
         <div class="field-row"><label class="field"><span>טלפון</span><input class="find" id="nePhone" dir="ltr" value="${esc(p.phone || '')}"></label><label class="field"><span>כתובת</span><input class="find" id="neAddr" value="${esc(p.addr || '')}"></label></div>
+        <div class="field-row"><label class="field"><span>מנטור.ית / חונך.ת</span><input class="find" id="neMentor" value="${esc(p.mentor || '')}"></label><label class="field"><span>מייל</span><input class="find" id="neMail" dir="ltr" value="${esc(p.mail || '')}"></label></div>
         <div class="field-row"><div class="field"><span>מגמות</span><div class="place-row">${MGS.map(m => `<label class="pl"><input type="checkbox" name="neMg" value="${esc(m)}">${esc(m)}</label>`).join('')}</div></div><label class="field"><span>כמה תקנים</span><input class="find" id="neSlots" dir="ltr" inputmode="numeric" value="1"></label></div>
+        <div class="emp-b mf-b edit"><button class="btn primary" id="neSave">${ic('check')}שמירה</button></div>
       </div>
-      <div class="sub-card masn"><h3>${ic('filter')}מסננת החניכות · טופס בדיקה בביקור אצל מעסיק <small><a href="${SITE}chanichut-masnenet.html" target="_blank" rel="noopener">המקור</a></small></h3>
+      <details class="sub-card masn fold"><summary>${ic('filter')}מסננת החניכות <small>אפשר למלא עכשיו או אחרי הביקור אצל המעסיק · <a href="${SITE}chanichut-masnenet.html" target="_blank" rel="noopener">המקור</a></small></summary>
         <h4 class="mf-h">בקרה בכניסה</h4>
         <ul class="msp-l">${MAS_CTRL.map((c, j) => `<li><label><input type="checkbox" data-ctrl="${j}"><span>${c}</span></label></li>`).join('')}</ul>
         ${MASNENET.map(([p, pr], i) => `<div class="msp"><div class="msp-h"><b>${i + 1}. ${p}</b><em class="tag" id="msSt${i}">טרם סומן</em></div><ul class="msp-l">${pr.map(([t, must], j) => `<li><label><input type="checkbox" data-pi="${i}" data-pj="${j}"><span>${t}${must ? ' <em class="tag mid">חובה</em>' : ''}</span></label></li>`).join('')}</ul><input class="find" data-msn="${i}" placeholder="מה נצפה, מה סוכם ועד מתי"></div>`).join('')}
@@ -878,7 +936,7 @@ window.startApp = function (R) {
         <div class="field-row"><label class="field"><span>תאריך הביקור</span><input class="find" id="msDate" value="${TODAY}.${MONTH.y}"></label><label class="field"><span>תאריך בדיקה חוזרת</span><input class="find" id="msRe" placeholder="למשל פברואר"></label></div>
         <div class="mf"><span>ההחלטה</span><div class="scale" id="msDec">${['מאושר', 'מאושר בליווי', 'לא מאושר'].map(o => `<label class="sc"><input type="radio" name="msDec" value="${o}">${o}</label>`).join('')}</div></div>
         <label class="field" id="msPlanF" hidden><span>תוכנית השלמה עם המעסיק · מה יושלם, מי אחראי בעסק, עד מתי</span><textarea class="find" id="msPlan" rows="3"></textarea></label>
-        <div class="emp-b mf-b edit"><button class="btn primary" id="neSave">${ic('check')}שמירה</button></div></div>`,
+        <p class="hint">אחרי שממלאים את המסננת, לוחצים "שמירה" למעלה.</p></details>`,
       bind: (el, spec) => {
         /* המסננת מחשבת לבד: מצב כל עיקרון מהפרקטיקות שסומנו, והחלטה מוצעת. אפשר לבחור אחרת, בגבולות תנאי הסף */
         let decManual = false;
@@ -902,18 +960,27 @@ window.startApp = function (R) {
         if (matchMedia('(pointer:fine)').matches) $('neName').focus();
         $('neSave').onclick = () => {
           const name = $('neName').value.trim(); if (!name) return toast('צריך שם מעסיק');
-          const dec = (el.querySelector('input[name="msDec"]:checked') || {}).value; if (!dec) return toast('חסרה ההחלטה של המסננת');
-          /* אישור (גם "בליווי") רק כשתנאי הסף ופעולות הבקרה מתקיימים. שאר העקרונות אפשר להשלים בליווי */
-          if (dec !== 'לא מאושר' && (mustMiss().length || ctrlMiss().length)) return toast('כדי לאשר: ' + [...mustMiss(), ...ctrlMiss()][0]);
-          if (dec === 'מאושר' && suggest().dec !== 'מאושר') return toast('לא כל העקרונות מתקיימים: "מאושר בליווי" עם תוכנית השלמה');
-          if (dec === 'מאושר בליווי' && (!$('msPlan').value.trim() || !$('msRe').value.trim())) return toast('מאושר בליווי: צריך תוכנית השלמה ותאריך בדיקה חוזרת');
+          const who = $('neContact').value.trim(), phone = $('nePhone').value.trim(), addr = $('neAddr').value.trim();
+          const missing = [!who && 'איש.אשת קשר', !phone && 'טלפון', !addr && 'כתובת'].filter(Boolean);
+          if (missing.length && !confirm('חסר: ' + missing.join(', ') + '. לשמור בכל זאת?')) return;
+          /* המסננת רק אם נגעו בה. בלי מסננת המעסיק "טרם נבדק" ואפשר לשבץ אליו */
+          const touched = chk('[data-pi],[data-ctrl]').some(x => x.checked) || !!el.querySelector('input[name="msDec"]:checked');
+          const dec = touched ? (el.querySelector('input[name="msDec"]:checked') || {}).value : '';
+          if (touched) {
+            if (!dec) return toast('חסרה ההחלטה של המסננת');
+            /* אישור (גם "בליווי") רק כשתנאי הסף ופעולות הבקרה מתקיימים. שאר העקרונות אפשר להשלים בליווי */
+            if (dec !== 'לא מאושר' && (mustMiss().length || ctrlMiss().length)) return toast('כדי לאשר: ' + [...mustMiss(), ...ctrlMiss()][0]);
+            if (dec === 'מאושר' && suggest().dec !== 'מאושר') return toast('לא כל העקרונות מתקיימים: "מאושר בליווי" עם תוכנית השלמה');
+            if (dec === 'מאושר בליווי' && (!$('msPlan').value.trim() || !$('msRe').value.trim())) return toast('מאושר בליווי: צריך תוכנית השלמה ותאריך בדיקה חוזרת');
+          }
           const mgs = [...el.querySelectorAll('input[name="neMg"]:checked')].map(x => x.value);
-          const notes = MASNENET.map(([p, pr], i) => { const n = el.querySelector(`[data-msn="${i}"]`).value.trim(), c = chk(`[data-pi="${i}"]`).filter(x => x.checked).length; return `${p}: ${stOf(i)} (${c}/${pr.length})${n ? ' · ' + n : ''}`; }).join(' · ') + ($('msPlan').value.trim() && dec === 'מאושר בליווי' ? ' · תוכנית השלמה: ' + $('msPlan').value.trim() : '');
+          const notes = !touched ? '' : MASNENET.map(([p, pr], i) => { const n = el.querySelector(`[data-msn="${i}"]`).value.trim(), c = chk(`[data-pi="${i}"]`).filter(x => x.checked).length; return `${p}: ${stOf(i)} (${c}/${pr.length})${n ? ' · ' + n : ''}`; }).join(' · ') + ($('msPlan').value.trim() && dec === 'מאושר בליווי' ? ' · תוכנית השלמה: ' + $('msPlan').value.trim() : '');
           const slots = $('neSlots').value.trim();
           const id = 'E' + Date.now().toString(36);
-          EMPS[id] = { name, mentor: $('neMentor').value.trim(), phone: $('nePhone').value.trim(), addr: $('neAddr').value.trim(), slots: /^\d+$/.test(slots) ? slots : '', mg: mgs.length ? mgs : MGS.slice(0, 1), mail: '', status: '', studsTxt: '', lead: false, mas: dec, recheck: $('msRe').value.trim(), visit: $('msDate').value.trim().replace(/\.\d{4}$/, ''), contact: 0, masNotes: notes };
+          /* manager = איש.אשת הקשר אצל מעסיק חיצוני (אצל עסק בית-ספרי: מנהל.ת העבודה). contact = ימים מהקשר האחרון */
+          EMPS[id] = { name, manager: who, mentor: $('neMentor').value.trim(), phone, addr, mail: $('neMail').value.trim(), slots: /^\d+$/.test(slots) ? slots : '', mg: mgs.length ? mgs : MGS.slice(0, 1), status: '', studsTxt: '', lead: false, mas: dec, recheck: touched ? $('msRe').value.trim() : '', visit: touched ? $('msDate').value.trim().replace(/\.\d{4}$/, '') : '', contact: 0, masNotes: notes };
           if (p.lead) { p.lead.done = isoToday(); leadsChanged(); }
-          spec.dirty = false; renderEmps(); closeSub(); toast(name + ' נוסף · ' + dec);
+          spec.dirty = false; renderEmps(); renderStuList(); closeSub(); toast(name + ' נוסף · ' + (dec || 'טרם נבדק במסננת'));
         };
       } };
   }

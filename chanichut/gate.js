@@ -153,7 +153,23 @@
     SKEY = sk; EXTRACT = true;
     $('iRec').textContent = REC; $('iStep1').hidden = true; $('iStep2').hidden = false;
   };
-  $('iPrint').onclick = () => { const w = window.open('', '_blank'); if (!w) return; w.document.write(`<html dir="rtl" lang="he"><meta charset="utf-8"><title>קוד שחזור</title><body style="font-family:Arial;padding:40px;text-align:right"><h2>מערכת רכזי החניכות · קוד שחזור</h2><p>${esc(ME.school)}</p><p style="font-size:26px;letter-spacing:3px;font-weight:bold" dir="ltr">${esc(REC)}</p><p>הקוד פותח את כל המידע של בית הספר אם הסיסמה נשכחה. לשמור במקום נעול. לא לשלוח במייל או בוואטסאפ.</p></body></html>`); w.document.close(); w.print(); };
+  /* הדפסה מתוך הדף (3.11.26): חלון חדש נחסם בדפדפנים. בהדפסה מוצג רק #printRec */
+  $('iPrint').onclick = () => {
+    $('printRec').innerHTML = `<h2>מערכת רכזי החניכות · קוד שחזור</h2><p>${esc(ME.school)}</p><p style="font-size:26px;letter-spacing:3px;font-weight:bold" dir="ltr">${esc(REC)}</p><p>הקוד פותח את כל המידע של בית הספר אם הסיסמה נשכחה. לשמור במקום נעול. לא לשלוח במייל או בוואטסאפ.</p>`;
+    document.body.classList.add('printing');
+    const done = () => { document.body.classList.remove('printing'); $('printRec').innerHTML = ''; window.removeEventListener('afterprint', done); };
+    window.addEventListener('afterprint', done); setTimeout(done, 60000);
+    window.print();
+  };
+  $('iCopy').onclick = () => { const t = REC; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => msg('mInit', 'הקוד הועתק. להדביק במקום בטוח, לא במייל ולא בוואטסאפ'), () => { const r = document.createRange(); r.selectNodeContents($('iRec')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); msg('mInit', 'הקוד מסומן. להעתיק עם Ctrl+C או לחיצה ארוכה'); }); };
+  /* עין לסיסמה: כפתור בכל שדה סיסמה במסך הכניסה */
+  document.querySelectorAll('#gate input[type="password"]').forEach(inp => {
+    const w = document.createElement('span'); w.className = 'pw'; inp.parentNode.insertBefore(w, inp); w.appendChild(inp);
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'eye'; b.setAttribute('aria-label', 'הצגת הסיסמה'); b.tabIndex = -1;
+    const EYE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>', OFF = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 4l16 16"/></svg>';
+    b.innerHTML = EYE; w.appendChild(b);
+    b.onclick = () => { const show = inp.type === 'password'; inp.type = show ? 'text' : 'password'; b.innerHTML = show ? OFF : EYE; b.setAttribute('aria-label', show ? 'הסתרת הסיסמה' : 'הצגת הסיסמה'); inp.focus(); };
+  });
   $('iSaved').onchange = () => { $('iGo').disabled = !$('iSaved').checked; };
   $('iGo').onclick = () => enter();
   /* רשימה שנטענה מראש: הקוד שהגיע למנהל.ת פותח את מפתח בית הספר, ומיד מוחלף בקוד שחזור חדש */

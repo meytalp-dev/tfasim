@@ -76,6 +76,19 @@ body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:
 .gate-msg{margin:0;font-size:.92em;color:var(--muted);min-height:0}.gate-msg:empty{display:none}.gate-msg.bad{color:var(--warn);font-weight:600}
 .gate-check{display:flex;gap:.5em;align-items:center;font-size:.92em;color:var(--text)}.gate-check input{width:20px;height:20px}
 .rec-code{font-family:var(--head);font-size:1.35em;letter-spacing:.12em;text-align:center;background:var(--bg);border:1px dashed var(--ink);border-radius:8px;padding:.6em;color:var(--ink);word-break:break-all}
+.rec-b{display:flex;gap:8px;flex-wrap:wrap}.rec-b .btn{min-height:44px;flex:1 1 120px}
+/* עין לסיסמה */
+.pw{position:relative;display:block}.pw input{padding-inline-end:2.8em!important}.pw .eye{position:absolute;inset-inline-end:2px;top:50%;transform:translateY(-50%);width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:0;background:none;color:var(--muted);cursor:pointer;padding:0}.pw .eye svg{width:20px;height:20px}
+/* הדפסת קוד השחזור מתוך הדף */
+#printRec{display:none}
+@media print{body.printing>*:not(#printRec){display:none!important}body.printing #printRec{display:block!important;font-family:Arial,sans-serif;padding:40px;text-align:right}}
+/* רשימת התלמידים: שם · שיבוץ · שלב · עריכה */
+.stu-row{display:grid;grid-template-columns:1.3fr 1fr auto 44px;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}.stu-row.left{opacity:.6}
+.stu-name{display:grid;text-align:start;gap:2px;min-height:44px;padding:0;background:none;border:0;color:var(--text);font:inherit;cursor:pointer}.stu-name span{color:var(--muted);font-size:.9em}
+.stu-pl{font:inherit;font-size:.95rem;padding:.45em .6em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);max-width:100%;min-height:44px}.stu-emp{color:var(--muted);font-size:.9em}
+.stu-edit{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);cursor:pointer;padding:0}.stu-edit .i{width:18px;height:18px}
+.tik-tools{margin:-4px 0 10px}
+.masn.fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-family:var(--head);font-weight:700;color:var(--ink);min-height:44px}.masn.fold>summary::-webkit-details-marker{display:none}.masn.fold>summary small{font-family:var(--body);font-weight:400;color:var(--muted)}
 .fp{font-family:var(--head);font-size:1.8em;letter-spacing:.15em;text-align:center;color:var(--ink)}
 .save-st{font-size:.82em;color:var(--muted);white-space:nowrap}.save-st.bad{color:var(--warn);font-weight:700}.save-st:empty{display:none}
 .mon-pick{font:inherit;font-size:.95em;padding:.35em .6em;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
@@ -339,6 +352,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   .kpis{grid-template-columns:repeat(3,1fr)}
   .emp-grid,.rep-grid{grid-template-columns:1fr}
   .stu{grid-template-columns:1fr 1fr}
+  .stu-row{grid-template-columns:1fr 44px}.stu-row .stu-name{grid-column:1;grid-row:1}.stu-row .stu-edit{grid-column:2;grid-row:1}.stu-row .stu-pl,.stu-row .stu-emp{grid-column:1/-1;grid-row:2}.stu-row .stage{display:none}
   .wiz-cta{flex-direction:column;align-items:stretch}
   .content .sec h2{font-size:1.4em}.roster{padding:0 12px}
   .field-row{grid-template-columns:1fr}.gate-form{padding:18px 16px}
@@ -462,7 +476,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
         <h2 class="gate-h">קוד השחזור</h2>
         <p class="gate-msg">אם הסיסמה תישכח, רק הקוד הזה פותח את המידע. להדפיס ולשמור במקום נעול. לא לשלוח במייל או בוואטסאפ.</p>
         <div class="rec-code" id="iRec" dir="ltr"></div>
-        <button class="btn" id="iPrint">הדפסה</button>
+        <div class="rec-b"><button class="btn" id="iPrint">הדפסה</button><button class="btn" id="iCopy">העתקה</button></div>
         <label class="gate-check"><input type="checkbox" id="iSaved">שמרתי את הקוד</label>
         <button class="btn primary big gate-btn" id="iGo" disabled>כניסה למערכת</button>
       </div>
@@ -523,6 +537,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
     <div class="gate-form" id="gBusy" hidden><p class="gate-msg">פותח את הנתונים…</p></div>
   </div>
   <footer class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
+  <div id="printRec" dir="rtl" aria-hidden="true"></div>
 </section>
 <div id="app"></div>
 <script src="schools.js"></script><script src="crypto.js"></script><script src="api.js"></script><script src="store.js"></script><script src="mentor.js"></script><script src="wizard-map.js"></script><script src="app.js"></script><script src="national.js"></script><script src="schools-admin.js"></script><script src="gate.js"></script>
