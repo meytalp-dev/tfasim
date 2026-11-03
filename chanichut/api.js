@@ -8,7 +8,7 @@
   'use strict';
   /* הסקריפט בחשבון merhav: "מערכת רכזי החניכות v2" (1KpZdMOa4QJFqOhPLETFuSiMrzbYFywLc1IH3bpqyjyRcpxLBoFCgPnUf).
      ?mock בכתובת הדף = שרת מדומה לבדיקות */
-  var EXEC = /[?&]mock\b/.test(location.search) ? '' : 'https://script.google.com/macros/s/AKfycbxMJyp_D7-HLLCjDcZLU2CfG1I83wCpjyd40uc8Ov8SpJ1agnLlUHJWg-es6IK6gOqQsQ/exec';
+  var EXEC = /[?&]mock\b/.test(location.search) ? '' : 'https://script.google.com/macros/s/AKfycbymUw3faCO9Pd2AgxI74EoXBRgZWkhZ5n4j-U_esdyQAtWfe5R2qlexaeT64KKwmR_G/exec';
   var MOCK = !EXEC;
   var TOKEN_KEY = 'chanichut2-session';
 
