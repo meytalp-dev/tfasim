@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>מעקב נתוני ביטחון — תשפ"ז</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z'/><path d='M9 12l2 2 4-4'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- מעקב ריכוז נתוני ביטחון תשפ"ז (3.11.26). סטטוס: bitachon-gas ?mode=list (בלי טלפונים ות"ז).
+     ייצוא לאקסל והדפסה לפי בית ספר — דורשים את מפתח הנתונים המלאים בכתובת (?k=...), שלא שמור בדף. -->
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5; --bg:#f6f8fd; --mint:#12b39f; --mint-soft:#eafaf6; --danger:#d64550;
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+.strip{height:6px;background:linear-gradient(90deg,var(--navy),var(--blue) 38%,var(--sky) 68%,var(--navy))}
+.site{padding:24px 0 4px}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;display:block}
+@media (max-width:480px){.logo{height:46px}}
+.hero{text-align:center;padding:18px 0 0}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(25px,6vw,36px);line-height:1.2;margin:8px 0 10px;font-weight:700;color:var(--navy)}
+.hero p{font-size:17px;color:#3d4a70;max-width:60ch;margin:0 auto}
+.tools{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1.5px solid #c9d5ee;background:#fff;color:var(--navy);border-radius:12px;
+  padding:9px 16px;font-family:inherit;font-size:15.5px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{border-color:var(--blue)}
+.btn:disabled{opacity:.6;cursor:default}
+.btn svg,.copy svg,.pr svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn.main{background:linear-gradient(100deg,var(--navy),var(--blue) 70%);color:#fff;border-color:transparent}
+.upd{text-align:center;color:var(--muted);font-size:14.5px;margin-top:8px}
+.keybox{display:none;max-width:520px;margin:14px auto 0;background:#fff4e0;border:1px solid #f1d29c;border-radius:14px;padding:12px 14px;font-size:15px;color:#6b4300;text-align:center}
+.keybox.on{display:block}
+.keybox input{width:100%;margin-top:8px;font:inherit;font-size:16px;padding:8px 12px;border:2px solid #f1d29c;border-radius:10px;direction:ltr;text-align:center}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:22px 26px;margin-top:22px}
+@media (max-width:560px){.card{padding:18px 16px}}
+.sec{font-family:'Rubik',sans-serif;font-size:21px;color:var(--navy);margin:30px 4px 12px;font-weight:700;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.sec .copy{font-size:14px}
+.meter .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.meter b{font-family:'Rubik',sans-serif;font-weight:600;font-size:18px}
+.meter .v{color:var(--muted);font-size:15.5px}
+.bar{height:12px;border-radius:99px;background:#e9eef9;margin-top:8px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--navy),var(--blue))}
+.sup{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-s);padding:16px 18px;margin-bottom:12px}
+.sup-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sup-h h3{font-family:'Rubik',sans-serif;font-size:18px;margin:0;font-weight:600;flex:1 1 auto}
+.sup-h .n{color:var(--muted);font-size:15px}
+.sup.full .n{color:var(--mint);font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.chip{background:#fdecec;color:#a11d1d;border:1px solid #f3bcbc;border-radius:999px;padding:3px 12px;font-size:15px;font-weight:600}
+.copy,.pr{display:inline-flex;align-items:center;gap:6px;border:1.5px solid #c9d5ee;background:#fff;color:var(--navy);border-radius:12px;
+  padding:6px 12px;font-family:inherit;font-size:14.5px;font-weight:600;cursor:pointer}
+.copy.done{color:var(--mint);border-color:#b9ebe1}
+.pr:disabled{opacity:.6;cursor:default}
+.row{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1.4fr) auto auto;gap:4px 14px;align-items:center;padding:11px 2px;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .nm{font-weight:700}
+.row .nm small{display:block;color:var(--muted);font-size:13.5px;font-weight:400}
+.row .wh{font-size:15.5px;color:#3d4a70;overflow-wrap:anywhere}
+.row .at{color:var(--muted);font-size:14px;white-space:nowrap;direction:ltr;text-align:left}
+@media (max-width:700px){
+  .row{grid-template-columns:1fr auto}
+  .row .wh{grid-column:1 / -1}
+  .row .at{grid-row:1;grid-column:2}
+  .row .pr{grid-column:1 / -1;justify-self:start}
+}
+.msg{text-align:center;color:var(--muted);padding:30px 10px}
+.msg.err{color:var(--danger)}
+footer{text-align:center;color:var(--muted);font-size:14.5px;padding:34px 16px 30px}
+footer .credit{margin-top:6px;font-size:13.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+#printArea{display:none}
+@media print{
+  body{background:#fff}
+  body > *{display:none!important}
+  #printArea{display:block!important}
+}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header class="site"><div class="wrap">
+  <img class="logo" src="https://pedagogiamh.co.il/logo.png" alt="משרד העבודה — המנהל להכשרה מקצועית" onerror="this.style.display='none'">
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>מעקב ריכוז נתוני ביטחון וחירום</h1>
+    <p>מי מבתי הספר מילא את הטופס לתשפ"ז ומי עוד לא. הנתונים מתעדכנים מהטופס בכל טעינה.</p>
+    <div class="tools">
+      <button class="btn main" id="exportBtn" type="button"><svg viewBox="0 0 24 24"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>ייצוא לאקסל</button>
+      <a class="btn" id="sheetLink" href="https://docs.google.com/spreadsheets/d/__BITACHON_SHEET__/edit" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>הגיליון המלא</a>
+      <button class="btn" id="reload" type="button"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>רענון</button>
+      <a class="btn" href="bitachon.html" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4"/></svg>הטופס</a>
+    </div>
+    <div class="upd" id="upd"></div>
+    <div class="keybox" id="keybox">לייצוא ולהדפסה של נתונים מלאים (טלפונים, ת"ז) צריך את מפתח הגישה. הוא נשמר במכשיר הזה אחרי הזנה אחת.
+      <input type="text" id="keyIn" placeholder="מפתח הגישה" autocomplete="off"></div>
+  </section>
+
+  <div id="out"><div class="msg">טוען…</div></div>
+</main>
+
+<footer>
+  <div>המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<div id="printArea"></div>
+
+<script src="bitachon-fields.js"></script>
+<script>
+(function () {
+  'use strict';
+  var EXEC = 'https://script.google.com/macros/s/__BITACHON_DEPLOYMENT__/exec';
+  var LIST_KEY = 'bt7k2m9qpw4xz6ravc3hjn8e';
+  var XLSX_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  var B = window.BITACHON;
+  var SCHOOLS = B.SCHOOLS;
+  var $ = function (id) { return document.getElementById(id); };
+  var esc = B.esc;
+  var rows = [];
+  var ICON_COPY = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+  var ICON_PRINT = '<svg viewBox="0 0 24 24"><path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/></svg>';
+
+  /* מפתח הנתונים המלאים: מהכתובת (?k=) או מהמכשיר */
+  var fullKey = '';
+  try {
+    var m = location.search.match(/[?&]k=([A-Za-z0-9]+)/);
+    if (m) { fullKey = m[1]; localStorage.setItem('bitachon.k', fullKey); }
+    else fullKey = localStorage.getItem('bitachon.k') || '';
+  } catch (e) {}
+  var pendingAction = null;
+  function needKey(then) {
+    if (fullKey) { then(); return; }
+    pendingAction = then;
+    $('keybox').classList.add('on');
+    $('keyIn').focus();
+  }
+  $('keyIn').addEventListener('change', function () {
+    var v = this.value.trim();
+    if (!/^[A-Za-z0-9]{8,}$/.test(v)) return;
+    fullKey = v;
+    try { localStorage.setItem('bitachon.k', v); } catch (e) {}
+    $('keybox').classList.remove('on');
+    if (pendingAction) { var a = pendingAction; pendingAction = null; a(); }
+  });
+  function badKey() {
+    fullKey = '';
+    try { localStorage.removeItem('bitachon.k'); } catch (e) {}
+    $('keybox').classList.add('on');
+    $('keybox').firstChild.textContent = 'המפתח לא התקבל. נא להזין שוב את מפתח הגישה.';
+  }
+
+  function load() {
+    $('out').innerHTML = '<div class="msg">טוען…</div>';
+    fetch(EXEC + '?mode=list&key=' + LIST_KEY + '&t=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.error || 'error');
+        rows = res.rows || [];
+        $('upd').textContent = 'עודכן ' + new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+        render();
+      })
+      .catch(function () { $('out').innerHTML = '<div class="msg err">לא הצלחנו לטעון את הנתונים. נסו לרענן.</div>'; });
+  }
+
+  function meter(label, n, total) {
+    var pct = total ? Math.round(n / total * 100) : 0;
+    return '<div class="meter"><div class="top"><b>' + esc(label) + '</b><span class="v">' + n + ' מתוך ' + total + ' · ' + pct + '%</span></div>' +
+      '<div class="bar"><i style="width:' + pct + '%"></i></div></div>';
+  }
+
+  function render() {
+    var filled = {};
+    rows.forEach(function (r) { filled[r.school] = r; });
+    var missing = SCHOOLS.filter(function (s) { return !filled[s[1]]; });
+    var done = SCHOOLS.filter(function (s) { return filled[s[1]]; });
+    var h = '';
+
+    h += '<div class="card">' + meter('בתי ספר שמילאו את הטופס', done.length, SCHOOLS.length) + '</div>';
+
+    // טרם מילאו — כולם, ואז לפי מפקח.ת
+    var by = {};
+    SCHOOLS.forEach(function (s) { s[3].forEach(function (p) { (by[p] = by[p] || { all: 0, miss: [] }).all++; if (!filled[s[1]]) by[p].miss.push(s[1]); }); });
+    h += '<h2 class="sec">טרם מילאו · ' + missing.length + ' מתוך ' + SCHOOLS.length +
+      (missing.length ? '<button class="copy" type="button" data-copy="all">' + ICON_COPY + 'העתקה</button>' : '') + '</h2>';
+    h += '<div class="card">' + (missing.length ? '<div class="chips">' + missing.map(function (s) { return '<span class="chip">' + esc(s[1]) + '</span>'; }).join('') + '</div>'
+      : '<div class="msg">כל בתי הספר מילאו.</div>') + '</div>';
+
+    h += '<h2 class="sec">טרם מילאו — לפי מפקח.ת</h2>';
+    Object.keys(by).sort(function (a, b) { return by[b].miss.length - by[a].miss.length || a.localeCompare(b, 'he'); }).forEach(function (p) {
+      var g = by[p];
+      h += '<div class="sup' + (g.miss.length ? '' : ' full') + '"><div class="sup-h"><h3>' + esc(p) + '</h3>' +
+        '<span class="n">' + (g.miss.length ? 'טרם מילאו ' + g.miss.length + ' מתוך ' + g.all : 'כולם מילאו · ' + g.all) + '</span>' +
+        (g.miss.length ? '<button class="copy" type="button" data-copy="' + esc(p) + '">' + ICON_COPY + 'העתקה</button>' : '') + '</div>' +
+        (g.miss.length ? '<div class="chips">' + g.miss.map(function (n) { return '<span class="chip">' + esc(n) + '</span>'; }).join('') + '</div>' : '') + '</div>';
+    });
+
+    // מילאו
+    h += '<h2 class="sec">מילאו · ' + done.length + '</h2><div class="card">';
+    if (!done.length) h += '<div class="msg">עדיין אין מילויים.</div>';
+    else {
+      rows.slice().sort(function (a, b) { return a.school.localeCompare(b.school, 'he'); }).forEach(function (r) {
+        var s = B.school(r.school);
+        h += '<div class="row"><div class="nm">' + esc(r.school) + '<small>' + esc(s ? s[2] + ' · ' + s[3].join(', ') : '') + '</small></div>' +
+          '<div class="wh">' + esc(r.submitter || '') + (r.role ? ' · ' + esc(r.role) : '') + '</div>' +
+          '<div class="at">' + esc(r.at) + '</div>' +
+          '<button class="pr" type="button" data-print="' + esc(r.school) + '">' + ICON_PRINT + 'הדפסה</button></div>';
+      });
+    }
+    h += '</div>';
+    $('out').innerHTML = h;
+
+    $('out').querySelectorAll('[data-copy]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var k = b.getAttribute('data-copy');
+        var list = k === 'all' ? missing.map(function (s) { return s[1]; }) : by[k].miss;
+        var txt = (k === 'all' ? 'טרם מילאו את ריכוז נתוני הביטחון תשפ"ז' : 'טרם מילאו את ריכוז נתוני הביטחון תשפ"ז — ' + k) + ' (' + list.length + '):\n' +
+          list.map(function (n) { return '• ' + n; }).join('\n') + '\nהטופס: https://tfasim.pedagogiamh.co.il/bitachon.html';
+        copyText(txt, b);
+      });
+    });
+    $('out').querySelectorAll('[data-print]').forEach(function (b) {
+      b.addEventListener('click', function () { needKey(function () { printSchool(b.getAttribute('data-print'), b); }); });
+    });
+  }
+
+  function copyText(txt, btn) {
+    function done() { var old = btn.innerHTML; btn.classList.add('done'); btn.innerHTML = ICON_COPY + 'הועתק'; setTimeout(function () { btn.classList.remove('done'); btn.innerHTML = old; }, 1600); }
+    if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(txt).then(done, function () { legacy(); }); }
+    else legacy();
+    function legacy() {
+      var t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select(); try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(t); done();
+    }
+  }
+
+  /* הדפסה של בית ספר — כמו הקובץ המקורי */
+  var css = document.createElement('style'); css.textContent = B.PRINT_CSS; document.head.appendChild(css);
+  function printSchool(school, btn) {
+    btn.disabled = true;
+    fetch(EXEC + '?mode=get&key=' + fullKey + '&school=' + encodeURIComponent(school) + '&t=' + Date.now())
+      .then(function (r) { return r.json(); })
+      .then(function (res) {
+        btn.disabled = false;
+        if (!res.ok) { if (res.error === 'key') badKey(); else alert('לא נמצאו נתונים לבית הספר.'); return; }
+        $('printArea').innerHTML = B.renderPrint(res.row);
+        window.print();
+      })
+      .catch(function () { btn.disabled = false; alert('לא הצלחנו לטעון את הנתונים. נסו שוב.'); });
+  }
+
+  /* ייצוא לאקסל — כל העמודות, שורה לבית ספר */
+  var xlsxLoading = null;
+  function loadXLSX() {
+    if (window.XLSX) return Promise.resolve();
+    if (!xlsxLoading) xlsxLoading = new Promise(function (res, rej) {
+      var s = document.createElement('script'); s.src = XLSX_SRC; s.onload = res; s.onerror = function () { xlsxLoading = null; rej(new Error('xlsx')); };
+      document.head.appendChild(s);
+    });
+    return xlsxLoading;
+  }
+  $('exportBtn').addEventListener('click', function () {
+    needKey(function () {
+      var btn = $('exportBtn'); btn.disabled = true;
+      Promise.all([loadXLSX(), fetch(EXEC + '?mode=export&key=' + fullKey + '&t=' + Date.now()).then(function (r) { return r.json(); })])
+        .then(function (a) {
+          var res = a[1];
+          btn.disabled = false;
+          if (!res.ok) { if (res.error === 'key') badKey(); else alert('הייצוא לא הצליח.'); return; }
+          var aoa = [res.head].concat(res.rows);
+          var ws = XLSX.utils.aoa_to_sheet(aoa);
+          ws['!cols'] = res.head.map(function (hd, i) { return { wch: i === 0 ? 16 : Math.min(40, Math.max(12, String(hd).length)) }; });
+          var wb = XLSX.utils.book_new();
+          wb.Workbook = { Views: [{ RTL: true }] };
+          XLSX.utils.book_append_sheet(wb, ws, 'נתוני ביטחון');
+          XLSX.writeFile(wb, 'ריכוז נתוני ביטחון מוסדות חינוך תשפז.xlsx');
+        })
+        .catch(function () { btn.disabled = false; alert('הייצוא לא הצליח. בדקו את החיבור ונסו שוב.'); });
+    });
+  });
+
+  $('reload').addEventListener('click', load);
+  load();
+})();
+</script>
+</body>
+</html>
