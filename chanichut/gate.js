@@ -215,7 +215,7 @@
   /* ---------- 4. כניסה למערכת ---------- */
   async function enter() {
     show('gBusy');
-    let back = false; try { back = localStorage.getItem(BACK_KEY) === '1'; } catch (e) {}
+    let back = 0; try { back = Math.max(0, +(localStorage.getItem(BACK_KEY) || 0) || 0); } catch (e) {}   /* כמה חודשים אחורה (3.11.26) */
     try {
       const R = await Store.load(SKEY, ME, back);
       R.canGrant = EXTRACT;
@@ -234,7 +234,7 @@
     show('gSoon');
   }
   $('sOut').onclick = () => logout();
-  function setBack(on) { try { localStorage.setItem(BACK_KEY, on ? '1' : '0'); } catch (e) {} Store.leave().then(() => location.reload()); }
+  function setBack(n) { try { localStorage.setItem(BACK_KEY, String(Math.max(0, +n || 0))); } catch (e) {} Store.leave().then(() => location.reload()); }
   async function logout() {
     if (ME && !noKey(ME)) { try { await Store.leave(); } catch (e) {} await CK.forget(rid()); }
     try { await API.call('logout'); } catch (e) {}

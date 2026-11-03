@@ -10,21 +10,26 @@
   const MN = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
   /* statusSrc: 'list' (מרשימת הלומדים) | 'manual' (עודכן ידנית) | 'list-missing' (לא ברשימה המעודכנת · לבדיקה) */
   const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
-  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor'];
+  /* hrs = שעות ביום עבודה, hrsMan = {חודש: סה"כ ידני} (3.11.26) — מוצפנים בתיק, בלי שינוי בשרת */
+  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor', 'hrs', 'hrsMan'];
   const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
   /* טקסט חופשי של מעסיק — עלול לכלול שמות, ולכן מוצפן */
-  const EMP_PRIV = ['studsTxt', 'masNotes'];
+  const EMP_PRIV = ['studsTxt', 'masNotes', 'hpd'];   /* hpd = שעות ביום עבודה, ברירת מחדל לתלמידים אצל המעסיק */
   /* ריכוז שמירות: ממתינים 2.5 שניות אחרי הפעולה האחרונה. אחרי כשל — המתנה גוברת עם פיזור */
   const DEBOUNCE = 2500, MAX_BATCH = 300, BEACON_BYTES = 48000;
   const pick = (o, ks) => { const r = {}; ks.forEach(k => { if (o[k] !== undefined) r[k] = o[k]; }); return r; };
   const ymOf = (y, m) => y + '-' + String(m).padStart(2, '0');
 
   /* החודש המוצג: החודש הנוכחי, או החודש הקודם אם נבחר (להגשה בתחילת חודש) */
+  /* back = כמה חודשים אחורה (0 = החודש הנוכחי). 3.11.26: כל חודש מתחילת שנת הלימודים, לא רק הקודם */
   function monthInfo(back) {
-    const now = new Date(), d = new Date(now.getFullYear(), now.getMonth() - (back ? 1 : 0), 1);
+    back = Math.max(0, +back || 0);
+    const now = new Date(), d = new Date(now.getFullYear(), now.getMonth() - back, 1);
     const y = d.getFullYear(), m = d.getMonth() + 1, last = new Date(y, m, 0).getDate();
-    return { y, m, name: MN[m - 1], label: MN[m - 1] + ' ' + y, last, today: back ? last : now.getDate(), ym: ymOf(y, m), back: !!back };
+    return { y, m, name: MN[m - 1], label: MN[m - 1] + ' ' + y, last, today: back ? last : now.getDate(), ym: ymOf(y, m), back };
   }
+  /* תחילת שנת הלימודים: ספטמבר. כמה חודשים אחורה יש לדווח */
+  function monthsBack() { const now = new Date(), y = now.getMonth() < 8 ? now.getFullYear() - 1 : now.getFullYear(); return (now.getFullYear() - y) * 12 + now.getMonth() - 8; }
 
   let leaving = false;
   /* יציאה או החלפת חודש: שומרים הכול ואז עוזבים בלי אזהרה */
@@ -38,7 +43,7 @@
     const res = await API.call('load', { ym: M.ym });
     if (!res.ok) throw new Error(res.error || 'load');
     R = { month: M, school: me.school, me, role: me.role === 'principal' ? 'manager' : me.role, DOCS,
-      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, CONF: null, MANUAL: {},
+      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MONS: {}, CONF: null, MANUAL: {},
       meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0,
       /* רשימה מעודכנת ממתינה (רק לרכז.ת): הרשומות upd: מוצפנות במפתח חד-פעמי אחר, ולכן עוברות כמו שהן.
          מסך התלמידים פותח אותן עם הקוד מהמייל: CK.unwrapRecovery(code, update.wrap) ואז פענוח של כל e */
@@ -66,7 +71,9 @@
         const id = r.k.slice(4); let pv = {};
         if (r.e) { try { pv = (await CK.decJSON(key, r.e)) || {}; } catch (e) { R.bad++; } }
         (id[0] === 'I' ? R.INS : R.EMPS)[id] = Object.assign({}, p, pick(pv, EMP_PRIV));
-      } else if (r.k === 'mon:' + M.ym) {
+      } else if (r.k.startsWith('mon:')) {
+        R.MONS[r.k.slice(4)] = p.sub || {};   /* הגשות של כל החודשים — לתזכורת "החודש הקודם עוד לא הוגש" */
+        if (r.k !== 'mon:' + M.ym) continue;
         R.SUBMITTED = p.sub || {}; R.OFF = p.off || {}; R.CONF = p.conf || null;
       } else if (r.k === 'meta') {
         Object.assign(R.meta, p); R.meta.contacts = Object.assign({ cls: {}, grade: {} }, p.contacts);
@@ -173,5 +180,5 @@
     }
   }
 
-  root.Store = { load, watch, flush, leave, monthInfo, dirtyCount, DOCS };
+  root.Store = { load, watch, flush, leave, monthInfo, monthsBack, dirtyCount, DOCS };
 })(window);
