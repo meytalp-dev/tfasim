@@ -68,9 +68,10 @@ body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px
 label.ql{display:block;font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;margin-bottom:8px}
 label.ql .req{color:var(--blue)}
 .hint{color:var(--muted);font-size:15px;margin:-4px 0 10px;line-height:1.5}
-input[type=text],input[type=email],textarea,select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+input[type=text],input[type=email],input[type=tel],input[type=date],textarea,select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
   font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
-input[type=email]{direction:ltr;text-align:right}
+input[type=email],input[type=tel]{direction:ltr;text-align:right}
+input[type=date]{-webkit-appearance:none;appearance:none;min-height:50px;direction:ltr;text-align:right}
 select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
@@ -81,7 +82,7 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);ba
 .err.on{display:block}
 .other{display:none;margin-top:10px}
 .other.on{display:block}
-#f_files{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%)}
+#f_files,#f_list{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%)}
 .pick{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border:2px dashed #b9c6e6;border-radius:14px;background:#fbfcff;
   color:var(--navy);font-family:'Rubik',sans-serif;font-weight:600;font-size:16px;cursor:pointer}
 .pick svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -92,6 +93,42 @@ input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);ba
 .flist li em{font-style:normal;color:var(--muted);font-size:14px}
 .flist li button{flex:none;border:0;background:none;color:var(--danger);font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;padding:4px}
 #form input.hp{position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+
+/* מורים להעברה למשרד החינוך (3.11.26): מופיע כשהתקלה היא מייל לא רשום / בלי הרשאה */
+#teachersQ{display:none;margin-top:22px;padding:18px 16px 16px;border:2px solid #c9d6f2;border-radius:18px;background:#f8faff}
+#teachersQ.on{display:block}
+#teachersQ h3{font-family:'Rubik',sans-serif;font-size:18.5px;color:var(--navy);margin:0 0 6px}
+#teachersQ .q{margin-top:14px}
+#teachersQ label.ql{font-size:16.5px}
+#semelHint{margin:6px 0 0}
+.trow{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px 12px 4px;margin-top:10px;position:relative}
+.trow .num{font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);font-size:15px;margin-bottom:8px}
+.trow .g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media (max-width:520px){.trow .g{grid-template-columns:1fr}}
+.trow .f{margin-bottom:10px}
+.trow .f.wide{grid-column:1/-1}
+.trow .f label{display:block;font-size:14px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.trow input{padding:10px 12px;font-size:16px;border-radius:12px;min-height:46px}
+.trow .rm{position:absolute;top:10px;left:10px;border:0;background:none;color:var(--danger);font-family:inherit;font-weight:600;font-size:14.5px;cursor:pointer;padding:2px 4px}
+.tadd{margin-top:10px;background:#fff;border:2px dashed #b9c6e6;border-radius:14px;padding:10px 16px;color:var(--navy);font-family:'Rubik',sans-serif;font-weight:600;font-size:15.5px;cursor:pointer}
+.tadd:hover{border-color:var(--blue)}
+.tsplit{display:flex;align-items:center;gap:12px;margin:18px 0 12px;color:var(--muted);font-size:14.5px;font-weight:600}
+.tsplit::before,.tsplit::after{content:"";flex:1;border-top:1px solid #d5deef}
+.tfile{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.tlink{background:none;border:0;color:var(--blue);font-family:inherit;font-size:15px;font-weight:600;text-decoration:underline;cursor:pointer;padding:0}
+.twrap{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#fff;-webkit-overflow-scrolling:touch}
+.tt{border-collapse:collapse;width:100%;min-width:620px;font-size:14.5px}
+.tt th,.tt td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.tt tr:last-child td{border-bottom:0}
+.tt th{background:var(--blue-soft);color:var(--navy);font-weight:600;font-family:'Rubik',sans-serif;font-size:14px}
+.tt td.ltr{direction:ltr;text-align:right}
+.tt tr.warn td{background:#fff9ee}
+.tt td.note{color:#b4651a;font-weight:600;white-space:normal;min-width:130px}
+.tsum{margin-top:10px;font-size:15px;color:#2c3860;display:flex;gap:6px 12px;align-items:center;flex-wrap:wrap}
+.tsum b{color:var(--navy)}
+.tsum .rm{border:0;background:none;color:var(--danger);font-family:inherit;font-weight:600;font-size:14.5px;cursor:pointer;padding:0}
+.chk{display:flex;align-items:flex-start;gap:10px;margin-top:16px;font-size:15px;color:#2c3860;cursor:pointer}
+.chk input{width:20px;height:20px;margin:2px 0 0;flex:none;accent-color:var(--navy)}
 .actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
 .btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
   background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26);transition:transform .16s var(--ease)}
@@ -237,6 +274,33 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         <div class="err" id="e_email">נא לכתוב כתובת מייל תקינה</div>
       </div>
       <div id="extra"></div>
+
+      <!-- מורים להעברה למשרד החינוך: מופיע רק כשהתקלה היא "המייל שלי לא רשום" או "מורים או תלמידים בלי הרשאה".
+           השורות נשמרות בגיליון בשרת google-edu-gas (action: teachers), ומיטל מורידה אותו כאקסל ומעבירה. -->
+      <div class="q" id="teachersQ">
+        <h3>פרטי המורים להעברה למשרד החינוך</h3>
+        <div class="hint">כדי שמשרד החינוך יפתח או יעדכן חשבון, צריך לכל מורה: סמל מוסד, ת"ז, טלפון, מייל ותאריך לידה. אפשר למלא כאן, או להעלות קובץ אקסל עם רשימה של כמה מורים.</div>
+        <div class="q">
+          <label class="ql" for="f_semel">סמל מוסד של משרד החינוך <span class="req">*</span></label>
+          <input type="text" id="f_semel" inputmode="numeric" maxlength="8" dir="ltr" autocomplete="off">
+          <div class="hint" id="semelHint" hidden>מולא לפי בית הספר שבחרתם. אם סמל המוסד במשרד החינוך שונה, תקנו כאן.</div>
+          <div class="err" id="e_semel">נא לכתוב סמל מוסד (מספר)</div>
+        </div>
+        <div id="trows"></div>
+        <button type="button" class="tadd" id="tadd">+ עוד מורה</button>
+
+        <div class="tsplit">או קובץ עם רשימה של כמה מורים</div>
+        <div class="tfile">
+          <label class="pick" for="f_list"><svg viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h8"/></svg>העלאת קובץ אקסל</label>
+          <input type="file" id="f_list" accept=".xlsx,.xls,.csv">
+          <button type="button" class="tlink" id="tmpl">הורדת תבנית למילוי</button>
+        </div>
+        <div class="hint" style="margin-top:8px">בשורת הכותרת: שם, ת"ז, טלפון, מייל, תאריך לידה (ואם יש, גם סמל מוסד). הקובץ המקורי יצורף לפנייה.</div>
+        <div id="tprev"></div>
+        <label class="chk"><input type="checkbox" id="f_nolist"><span>אין לי פרטי מורים להעברה (למשל פנייה על תלמידים). את הרשימה אצרף ב"צירוף קבצים" למטה.</span></label>
+        <div class="err" id="e_teachers"></div>
+      </div>
+
       <div class="q" id="filesQ">
         <label class="ql" for="f_files">צירוף קבצים</label>
         <div class="hint">למשל רשימת מורים או תלמידים בלי הרשאה או בלי מייל ארגוני (אקסל), או צילום מסך של השגיאה. עד 3 קבצים, עד 10MB כל אחד.</div>
@@ -285,6 +349,13 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   var picked = [];
   var $ = function (id) { return document.getElementById(id); };
   var FORM = null, PICK = '', loading = false;
+  /* מורים להעברה למשרד החינוך (3.11.26) */
+  var TEACHER_ISSUES = ['המייל שלי לא רשום במערכת', 'מורים או תלמידים בלי הרשאה או בלי מייל ארגוני'];
+  var MOSDOT = 'https://pedagogiamh.co.il/data/mosdot.json';   /* סמל מוסד לכל בית ספר, מפריסת הפיקוח */
+  var XLSX_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  var MAX_ROWS = 300;
+  var SEMEL = null, semelLoading = null, xlsxLoading = null;
+  var rowSeq = 0, fileRows = [], fileLabel = '', teachersSent = null;
 
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -337,6 +408,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     if (sel.value !== PICK) sel.selectedIndex = 0;
     var o = $('f_issue_other'); if (o) o.classList.toggle('on', sel.value === 'אחר');
     mark('issue', false, sel);
+    toggleTeachers();
   }
 
   function load(tries) {
@@ -377,6 +449,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         });
       }
     });
+    if ($('f_issue')) $('f_issue').addEventListener('change', toggleTeachers);
+    $('f_school').addEventListener('change', fillSemel);
+    addRow();
     $('loading').hidden = true;
     $('form').hidden = false;
   }
@@ -410,7 +485,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       var el = f.type === 'select' && f.other && $('f_' + f.k).value === 'אחר' ? $('f_' + f.k + '_other') : $('f_' + f.k);
       chk(f.k, !!f.req && !v, el);
     });
+    /* מורים להעברה: רק כשהמקטע מוצג */
+    var teachers = teachersOn() ? collectTeachers() : null;
+    if (teachers && teachers.firstBad && !first) first = teachers.firstBad;
     if (first) { first.focus(); first.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    var rows = teachers ? teachers.rows : [];
 
     var btn = $('send');
     btn.disabled = true; btn.textContent = picked.length ? 'מעלה קבצים…' : 'שולח…';
@@ -418,13 +497,19 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     uploadAll(data).then(function (urls) {
       /* הקישורים לקבצים נכנסים לפירוט — כך הם מופיעים בפנייה בתובה */
       if (urls.length) data.details = (data.details ? data.details + '\n\n' : '') + 'קבצים מצורפים:\n' + urls.join('\n');
+      btn.textContent = rows.length ? 'שומר את רשימת המורים…' : 'שולח…';
+      return sendTeachers(data, rows, teachers && teachers.semel);
+    }).then(function (t) {
+      if (t) data.details = (data.details ? data.details + '\n\n' : '') + 'מורים להעברה למשרד החינוך: ' + t.n + ' · סמל מוסד ' + teachers.semel + '\nבגיליון: ' + t.url;
+      data.teachers = t ? t.n : 0;
       btn.textContent = 'שולח…';
       return fetchJson(API, { method: 'POST', body: JSON.stringify({ action: 'submit', id: ID, data: data }) }, 45000);
     }).then(function (d) {
       if (!d.ok) throw new Error(d.error || 'fail');
       /* התראה במייל לתיבת המרחב — לא מחכים לה; הפנייה כבר נשמרה */
-      fetch(FILES_API, { method: 'POST', body: JSON.stringify({ action: 'notify', school: data.school, name: data.name, email: data.email, issue: data.issue, details: data.details }) }).catch(function () {});
+      fetch(FILES_API, { method: 'POST', body: JSON.stringify({ action: 'notify', school: data.school, name: data.name, email: data.email, issue: data.issue, details: data.details, teachers: data.teachers }) }).catch(function () {});
       picked = []; showFiles();
+      resetTeachers();
       $('form').hidden = true;
       $('okMsg').classList.add('on');
       $('formArea').scrollIntoView({ block: 'start', behavior: 'smooth' });
@@ -432,6 +517,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       var m = String(err && err.message);
       $('failText').textContent = m === 'closed' ? 'הטופס נסגר בינתיים ולא מקבל עוד פניות.'
         : m.indexOf('file:') === 0 ? 'הקובץ "' + m.slice(5) + '" לא עלה. נסו שוב, או הסירו אותו ושלחו בלעדיו.'
+        : m === 'teachers' ? 'רשימת המורים לא נשמרה. נסו לשלוח שוב בעוד רגע.'
         : 'ייתכן שיש תקלה רגעית בחיבור. הפרטים שמילאתם נשמרו בטופס — נסו לשלוח שוב.';
       $('failMsg').classList.add('on');
     }).then(function () { btn.disabled = false; btn.textContent = 'שליחה'; });
@@ -487,6 +573,312 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     }, Promise.resolve()).then(function () { return urls; });
   }
 
+  /* ===== מורים להעברה למשרד החינוך ===== */
+  function teachersOn() { return $('teachersQ').classList.contains('on'); }
+  function toggleTeachers() {
+    var sel = $('f_issue');
+    var on = !!sel && TEACHER_ISSUES.indexOf(sel.value) > -1;
+    $('teachersQ').classList.toggle('on', on);
+    if (!on) return;
+    fillSemel();
+    /* פנייה על עצמי: השם והמייל שלמעלה נכנסים לשורה הראשונה, אפשר לשנות */
+    if (sel.value === TEACHER_ISSUES[0]) {
+      var r = $('trows').querySelector('.trow');
+      if (r) {
+        var n = r.querySelector('[data-k=name]'), m = r.querySelector('[data-k=email]');
+        if (n && !n.value) n.value = $('f_name').value.trim();
+        if (m && !m.value) m.value = $('f_email').value.trim();
+      }
+    }
+  }
+
+  /* סמל מוסד לפי בית הספר, מפריסת הפיקוח; נטען פעם אחת כשצריך */
+  function loadSemel() {
+    if (SEMEL) return Promise.resolve(SEMEL);
+    if (!semelLoading) {
+      semelLoading = fetchJson(MOSDOT, {}, 20000).then(function (d) {
+        SEMEL = {};
+        (d.schools || []).forEach(function (s) { if (s.name && s.semel) SEMEL[s.name] = String(s.semel); });
+        return SEMEL;
+      }).catch(function () { semelLoading = null; return null; });
+    }
+    return semelLoading;
+  }
+  function fillSemel() {
+    if (!teachersOn()) return;
+    var el = $('f_semel'), school = $('f_school').value;
+    if (el.value && el.getAttribute('data-auto') !== '1') return;   /* נכתב ידנית — לא דורסים */
+    loadSemel().then(function (map) {
+      var s = map && school ? map[school] : '';
+      if (!s && el.getAttribute('data-auto') !== '1') return;
+      el.value = s || '';
+      el.setAttribute('data-auto', s ? '1' : '0');
+      $('semelHint').hidden = !s;
+      if (s) mark('semel', false, el);
+    });
+  }
+  $('f_semel').addEventListener('input', function () { this.setAttribute('data-auto', '0'); $('semelHint').hidden = true; });
+
+  /* שורות ידניות */
+  var FIELDS = [
+    { k: 'name', label: 'שם מלא', type: 'text', attrs: 'autocomplete="off" maxlength="80"' },
+    { k: 'id', label: 'ת"ז (9 ספרות)', type: 'text', attrs: 'inputmode="numeric" maxlength="12" dir="ltr" autocomplete="off"' },
+    { k: 'phone', label: 'טלפון נייד', type: 'tel', attrs: 'inputmode="tel" maxlength="20" autocomplete="off"' },
+    { k: 'email', label: 'מייל', type: 'email', attrs: 'inputmode="email" maxlength="120" autocomplete="off"' },
+    { k: 'dob', label: 'תאריך לידה', type: 'date', attrs: 'max="' + new Date().toISOString().slice(0, 10) + '"', wide: true }
+  ];
+  function addRow() {
+    rowSeq++;
+    var i = $('trows').children.length + 1;
+    var h = '<div class="trow" data-row="' + rowSeq + '"><div class="num">מורה ' + i + '</div>' +
+      (i > 1 ? '<button type="button" class="rm">הסרה</button>' : '') + '<div class="g">' +
+      FIELDS.map(function (f) {
+        var id = 't' + rowSeq + '_' + f.k;
+        return '<div class="f' + (f.wide ? ' wide' : '') + '"><label for="' + id + '">' + f.label + '</label>' +
+          '<input type="' + f.type + '" id="' + id + '" data-k="' + f.k + '" ' + f.attrs + '></div>';
+      }).join('') + '</div></div>';
+    $('trows').insertAdjacentHTML('beforeend', h);
+  }
+  function renumber() {
+    Array.prototype.forEach.call($('trows').children, function (r, i) { r.querySelector('.num').textContent = 'מורה ' + (i + 1); });
+  }
+  $('tadd').addEventListener('click', function () {
+    addRow();
+    var last = $('trows').lastElementChild;
+    last.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    last.querySelector('input').focus({ preventScroll: true });
+  });
+  $('trows').addEventListener('click', function (e) {
+    var b = e.target.closest('.rm');
+    if (!b) return;
+    b.closest('.trow').remove();
+    renumber();
+  });
+  $('f_nolist').addEventListener('change', function () { $('e_teachers').classList.remove('on'); });
+
+  /* נרמול ובדיקה — לא ממציאים נתונים, רק מסדרים: אפסים מובילים בת"ז, קידומת 0 בטלפון, תאריך כ-יום.חודש.שנה */
+  function normId(v) {
+    var d = String(v == null ? '' : v).replace(/\D/g, '');
+    if (d.length >= 5 && d.length < 9) d = ('000000000' + d).slice(-9);
+    return d;
+  }
+  function validId(s) {
+    if (!/^\d{9}$/.test(s)) return false;
+    var sum = 0;
+    for (var i = 0; i < 9; i++) { var n = (+s[i]) * ((i % 2) + 1); if (n > 9) n -= 9; sum += n; }
+    return sum % 10 === 0;
+  }
+  function normPhone(v) {
+    var d = String(v == null ? '' : v).replace(/\D/g, '');
+    if (d.indexOf('972') === 0 && d.length >= 11) d = '0' + d.slice(3);
+    if (d.length === 9 && d[0] !== '0') d = '0' + d;
+    if (d.length === 10) return d.slice(0, 3) + '-' + d.slice(3);
+    if (d.length === 9) return d.slice(0, 2) + '-' + d.slice(2);
+    return d;
+  }
+  function validPhone(s) { return /^0\d{1,2}-\d{7}$/.test(s); }
+  function validEmail(s) { return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s); }
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+  function normDate(v) {
+    if (v == null || v === '') return '';
+    if (v instanceof Date) return isNaN(v) ? '' : pad2(v.getDate()) + '.' + pad2(v.getMonth() + 1) + '.' + v.getFullYear();
+    if (typeof v === 'number' && window.XLSX && XLSX.SSF) {   /* מספר סידורי של אקסל */
+      var p = XLSX.SSF.parse_date_code(v);
+      return p ? pad2(p.d) + '.' + pad2(p.m) + '.' + p.y : String(v);
+    }
+    var s = String(v).trim(), m;
+    if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return pad2(+m[3]) + '.' + pad2(+m[2]) + '.' + m[1];
+    if ((m = s.match(/^(\d{1,2})[./\-](\d{1,2})[./\-](\d{2,4})$/))) {
+      var y = m[3].length === 2 ? (+m[3] > 30 ? '19' : '20') + m[3] : m[3];
+      return pad2(+m[1]) + '.' + pad2(+m[2]) + '.' + y;
+    }
+    return s;
+  }
+
+  /* אוסף את השורות הידניות + שורות הקובץ. ידני: כל חמשת הפרטים חובה. קובץ: חוסרים מסומנים בהערה, לא חוסמים. */
+  function collectTeachers() {
+    var rows = [], firstBad = null, anyFilled = false;
+    var bad = function (el) { el.classList.add('bad'); if (!firstBad) firstBad = el; };
+    var semel = $('f_semel').value.replace(/\D/g, '');
+    Array.prototype.forEach.call($('trows').children, function (r) {
+      var v = {};
+      FIELDS.forEach(function (f) { v[f.k] = (r.querySelector('[data-k=' + f.k + ']').value || '').trim(); });
+      if (!v.name && !v.id && !v.phone && !v.email && !v.dob) return;   /* שורה ריקה — מתעלמים */
+      anyFilled = true;
+      var id = normId(v.id), phone = normPhone(v.phone);
+      if (v.name.length < 2) bad(r.querySelector('[data-k=name]'));
+      if (!validId(id)) bad(r.querySelector('[data-k=id]'));
+      if (!validPhone(phone)) bad(r.querySelector('[data-k=phone]'));
+      if (!validEmail(v.email)) bad(r.querySelector('[data-k=email]'));
+      if (!v.dob) bad(r.querySelector('[data-k=dob]'));
+      rows.push({ name: v.name, id: id, phone: phone, email: v.email, dob: normDate(v.dob), note: '', source: 'טופס' });
+    });
+    fileRows.forEach(function (fr) { rows.push(fr); });
+    var skip = $('f_nolist').checked;
+    var msg = '';
+    if (!skip) {
+      if (!semel) { bad($('f_semel')); mark('semel', true); }
+      if (!rows.length) msg = 'נא למלא לפחות מורה אחד או להעלות קובץ עם רשימה. אם אין פרטי מורים להעברה, סמנו את התיבה.';
+    } else if (anyFilled || fileRows.length) {
+      msg = 'סימנתם שאין פרטי מורים, אבל יש פרטים ממולאים. הסירו אותם או בטלו את הסימון.';
+    }
+    if (firstBad && !msg) msg = 'נא להשלים או לתקן את הפרטים המסומנים באדום.';
+    $('e_teachers').textContent = msg;
+    $('e_teachers').classList.toggle('on', !!msg);
+    if (msg && !firstBad) firstBad = $('e_teachers');
+    return { rows: skip ? [] : rows, semel: semel, firstBad: firstBad };
+  }
+  function sendTeachers(data, rows, semel) {
+    if (!rows.length) return Promise.resolve(null);
+    if (teachersSent) return Promise.resolve(teachersSent);   /* כבר נשמרו בניסיון קודם — לא כופלים */
+    var body = { action: 'teachers', school: data.school, name: data.name, email: data.email, issue: data.issue, semel: semel, rows: rows.slice(0, MAX_ROWS) };
+    return fetchJson(FILES_API, { method: 'POST', body: JSON.stringify(body) }, 90000).then(function (d) {
+      if (!d.ok || !d.n) throw new Error('teachers');
+      teachersSent = { n: d.n, url: d.url || '' };
+      return teachersSent;
+    }, function () { throw new Error('teachers'); });
+  }
+  function resetTeachers() {
+    $('trows').innerHTML = '';
+    addRow();
+    fileRows = []; fileLabel = ''; teachersSent = null;
+    picked = picked.filter(function (f) { return !f._list; }); showFiles();
+    $('tprev').innerHTML = '';
+    $('f_nolist').checked = false;
+    $('e_teachers').classList.remove('on');
+    $('f_semel').value = ''; $('f_semel').setAttribute('data-auto', '1'); $('semelHint').hidden = true;
+  }
+
+  /* קובץ אקסל עם רשימה: נקרא בדפדפן (SheetJS), הכותרות מזוהות לבד, והשורות מוצגות לפני השליחה */
+  function loadXLSX() {
+    if (window.XLSX) return Promise.resolve();
+    if (!xlsxLoading) {
+      xlsxLoading = new Promise(function (res, rej) {
+        var s = document.createElement('script');
+        s.src = XLSX_SRC; s.onload = res; s.onerror = function () { xlsxLoading = null; rej(new Error('xlsx')); };
+        document.head.appendChild(s);
+      });
+    }
+    return xlsxLoading;
+  }
+  var HEADS = [
+    ['semel', /סמל/],
+    ['dob', /לידה|birth|dob/],
+    ['email', /מייל|דוא|אימייל|mail/],
+    ['phone', /טלפון|נייד|פלאפון|סלול|phone|mobile|cell/],
+    ['id', /^(ת"?ז|תז|תעודת ?זהות|מס'? ?זהות|מספר ?זהות|זהות|מזהה|id|id ?number|תעודת זיהוי)$|זהות/],
+    ['last', /משפחה|last ?name|surname/],
+    ['name', /^שם|^name$|full ?name|first ?name|פרטי/]
+  ];
+  function headKey(h) {
+    var s = String(h == null ? '' : h).toLowerCase().replace(/[׳״'"`.:()\-_]/g, '').replace(/\s+/g, ' ').trim();
+    if (!s || /משתמש|בית ספר|מוסד$/.test(s) && !/סמל/.test(s)) return '';
+    for (var i = 0; i < HEADS.length; i++) if (HEADS[i][1].test(s)) return HEADS[i][0];
+    return '';
+  }
+  function parseList(file) {
+    return loadXLSX().then(function () { return file.arrayBuffer(); }).then(function (buf) {
+      var wb;
+      if (/\.csv$/i.test(file.name)) {
+        var txt;
+        try { txt = new TextDecoder('utf-8', { fatal: true }).decode(buf); }
+        catch (e) { txt = new TextDecoder('windows-1255').decode(buf); }
+        wb = XLSX.read(txt, { type: 'string', raw: true });   /* כטקסט: שומר אפסים מובילים, ותאריך 12/03 נשאר יום.חודש */
+      } else {
+        wb = XLSX.read(buf, { type: 'array' });   /* תאריכים נשארים מספר סידורי ומומרים ב-normDate, בלי הסטת אזור זמן */
+      }
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var grid = XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: '' });
+      var hdr = -1, map = null;
+      for (var i = 0; i < Math.min(grid.length, 25) && hdr < 0; i++) {
+        var keys = (grid[i] || []).map(headKey), found = {};
+        keys.forEach(function (k, c) { if (k && found[k] == null) found[k] = c; });
+        if (found.id != null || (found.name != null && Object.keys(found).length >= 2)) { hdr = i; map = found; }
+      }
+      if (hdr < 0) throw new Error('head');
+      var out = [];
+      for (var r = hdr + 1; r < grid.length && out.length < MAX_ROWS; r++) {
+        var row = grid[r] || [];
+        var g = function (k) { return map[k] == null ? '' : row[map[k]]; };
+        var name = String(g('name') == null ? '' : g('name')).trim();
+        if (map.last != null) name = (name + ' ' + String(g('last') || '').trim()).trim();
+        var id = normId(g('id')), phone = normPhone(g('phone')), email = String(g('email') || '').trim(), dob = normDate(g('dob'));
+        var semel = String(g('semel') || '').replace(/\D/g, '');
+        if (!name && !id && !phone && !email && !dob) continue;
+        var miss = [];
+        if (!name) miss.push('שם');
+        if (!id) miss.push('ת"ז'); else if (!validId(id)) miss.push('ת"ז לא תקינה');
+        if (!phone) miss.push('טלפון'); else if (!validPhone(phone)) miss.push('טלפון לא תקין');
+        if (!email) miss.push('מייל'); else if (!validEmail(email)) miss.push('מייל לא תקין');
+        if (!dob) miss.push('תאריך לידה');
+        out.push({ name: name, id: id, phone: phone, email: email, dob: dob, semel: semel, note: miss.length ? 'חסר: ' + miss.join(', ') : '', source: 'קובץ: ' + file.name });
+      }
+      if (!out.length) throw new Error('empty');
+      return { rows: out, hasSemel: map.semel != null };
+    });
+  }
+  function showList() {
+    if (!fileRows.length) { $('tprev').innerHTML = ''; return; }
+    var hasSemel = fileRows.some(function (r) { return r.semel; });
+    var warn = fileRows.filter(function (r) { return r.note; }).length;
+    var h = '<div class="tsum"><span><b>' + fileRows.length + '</b> מורים מהקובץ <span dir="ltr">' + esc(fileLabel) + '</span></span>' +
+      (warn ? '<span>· <b>' + warn + '</b> עם פרטים חסרים (מסומנים)</span>' : '') +
+      '<button type="button" class="rm" id="tclear">הסרת הקובץ</button></div>' +
+      '<div class="twrap"><table class="tt"><thead><tr><th>#</th><th>שם</th><th>ת"ז</th><th>טלפון</th><th>מייל</th><th>תאריך לידה</th>' +
+      (hasSemel ? '<th>סמל מוסד</th>' : '') + '<th>הערה</th></tr></thead><tbody>' +
+      fileRows.map(function (r, i) {
+        return '<tr' + (r.note ? ' class="warn"' : '') + '><td>' + (i + 1) + '</td><td>' + esc(r.name) + '</td><td class="ltr">' + esc(r.id) + '</td><td class="ltr">' + esc(r.phone) +
+          '</td><td class="ltr">' + esc(r.email) + '</td><td class="ltr">' + esc(r.dob) + '</td>' + (hasSemel ? '<td class="ltr">' + esc(r.semel) + '</td>' : '') +
+          '<td class="note">' + esc(r.note) + '</td></tr>';
+      }).join('') + '</tbody></table></div>';
+    $('tprev').innerHTML = h;
+    $('tclear').addEventListener('click', function () {
+      fileRows = []; fileLabel = '';
+      picked = picked.filter(function (f) { return !f._list; }); showFiles();
+      showList();
+    });
+  }
+  $('f_list').addEventListener('change', function () {
+    var f = this.files && this.files[0];
+    this.value = '';
+    if (!f) return;
+    var err = $('e_teachers');
+    err.classList.remove('on');
+    if (f.size > MAX_BYTES) { err.textContent = 'הקובץ גדול מ-10MB.'; err.classList.add('on'); return; }
+    $('tprev').innerHTML = '<div class="loading">קורא את הקובץ…</div>';
+    parseList(f).then(function (res) {
+      fileRows = res.rows; fileLabel = f.name;
+      /* הקובץ המקורי מצורף לפנייה (אם יש מקום) */
+      picked = picked.filter(function (p) { return !p._list; });
+      if (picked.length < MAX_FILES) { f._list = true; picked.push(f); showFiles(); }
+      showList();
+      $('f_nolist').checked = false;
+    }).catch(function (e) {
+      fileRows = []; fileLabel = ''; $('tprev').innerHTML = '';
+      var m = String(e && e.message);
+      err.textContent = m === 'head' ? 'לא זיהינו את שורת הכותרת בקובץ. ודאו שיש בה עמודות כמו "שם", "ת"ז", "טלפון", "מייל", "תאריך לידה", או הורידו את התבנית ומלאו אותה.'
+        : m === 'empty' ? 'הקובץ נקרא, אבל לא נמצאו בו שורות עם פרטים.'
+        : m === 'xlsx' ? 'לא הצלחנו לטעון את קורא האקסל. בדקו את החיבור ונסו שוב.'
+        : 'לא הצלחנו לקרוא את הקובץ. נסו לשמור אותו כ-xlsx ולהעלות שוב.';
+      err.classList.add('on');
+    });
+  });
+  /* תבנית למילוי: שורת כותרת בלבד, מימין לשמאל */
+  $('tmpl').addEventListener('click', function () {
+    var b = this; b.disabled = true;
+    loadXLSX().then(function () {
+      var ws = XLSX.utils.aoa_to_sheet([['שם מלא', 'ת"ז', 'טלפון', 'מייל', 'תאריך לידה', 'סמל מוסד']]);
+      ws['!cols'] = [{ wch: 24 }, { wch: 14 }, { wch: 16 }, { wch: 30 }, { wch: 14 }, { wch: 12 }];
+      var wb = XLSX.utils.book_new();
+      wb.Workbook = { Views: [{ RTL: true }] };
+      XLSX.utils.book_append_sheet(wb, ws, 'מורים');
+      XLSX.writeFile(wb, 'מורים להעברה למשרד החינוך.xlsx');
+    }).catch(function () {
+      $('e_teachers').textContent = 'לא הצלחנו להכין את התבנית. בדקו את החיבור ונסו שוב.';
+      $('e_teachers').classList.add('on');
+    }).then(function () { b.disabled = false; });
+  });
+
   /* פנייה נוספת — אותו בית ספר, שם ומייל; התוכן מתאפס */
   $('another').addEventListener('click', function () {
     (FORM.fields || []).forEach(function (f) {
@@ -495,6 +887,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       if (f.type === 'select') el.selectedIndex = 0;
       var o = $('f_' + f.k + '_other'); if (o) { o.value = ''; o.classList.remove('on'); }
     });
+    toggleTeachers();
     $('okMsg').classList.remove('on');
     $('form').hidden = false;
   });
@@ -503,6 +896,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var id = e.target.id || '';
     var k = id.replace(/^f_/, '').replace(/_other$/, '');
     if ($('e_' + k)) mark(k, false, e.target);
+    if (e.target.closest('.trow')) { e.target.classList.remove('bad'); $('e_teachers').classList.remove('on'); }
   });
 })();
 </script>
