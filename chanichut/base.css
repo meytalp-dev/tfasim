@@ -89,6 +89,7 @@ details.fold[open] summary::after{transform:rotate(135deg)}
 .log li{padding:6px 0;border-top:1px solid var(--line)}.log li small{display:block;color:var(--muted)}
 .log-add{display:flex;gap:8px;margin-top:8px}
 .foot{text-align:center;color:var(--muted);font-size:.82em;padding:28px 16px 40px}
+.foot .btn{min-height:44px;margin-bottom:14px;font-size:1.05em}
 .toast{position:fixed;bottom:20px;inset-inline-start:50%;transform:translateX(50%);background:var(--ink);color:var(--bg);padding:.7em 1.2em;border-radius:999px;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:9}
 @media (max-width:760px){
   .row{grid-template-columns:1fr;gap:6px}.sum{white-space:normal}

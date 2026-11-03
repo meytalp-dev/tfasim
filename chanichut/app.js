@@ -40,7 +40,8 @@ window.startApp = function (R) {
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     gantt: '<path d="M4 6h8M8 12h10M6 18h7"/><path d="M3 3v18"/>',
     dots: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
-    out: '<path d="M10 4H5v16h5"/><path d="M14 8l-4 4 4 4"/><path d="M10 12h10"/>'
+    out: '<path d="M10 4H5v16h5"/><path d="M14 8l-4 4 4 4"/><path d="M10 12h10"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>'
   };
   const ic = n => `<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
   const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -405,7 +406,7 @@ window.startApp = function (R) {
     </section>
     </div>
   </main>
-  <footer class="foot">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
+  <footer class="foot"><a class="btn quiet" id="helpLink" href="mailto:merhav@pedagogiamh.co.il?subject=${encodeURIComponent('מערכת רכזי החניכות · ' + SCHOOL + ' · תקלה')}&amp;body=${encodeURIComponent('שלום,\nנתקלתי בבעיה במערכת רכזי החניכות.\n\nבית הספר: ' + SCHOOL + '\nבאיזה מסך: \nמה קרה: \n')}">${ic('mail')}נתקלתם בבעיה?</a><br>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
   <nav class="tabbar" id="tabbar">${TABS.map(v => { const [, i, l] = NAV.find(n => n[0] === v); return `<a href="#${v}" data-tab="${v}">${ic(i)}<span>${l}</span></a>`; }).join('')}<a href="#more" data-tab="more">${ic('dots')}<span>עוד</span></a></nav>
   <div class="toast" id="toast" hidden></div>`;
 
