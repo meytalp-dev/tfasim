@@ -1530,7 +1530,41 @@ window.startApp = function (R) {
   /* ================= העוזר ================= */
   const out = $('agentOut');
   /* יום בחודש הפעיל. תאריך בחודש אחר או יום שלא קיים → 0, והעוזר מבקש תיקון */
-  function dateOf(t) { if (/אתמול/.test(t)) return MONTH.today - 1; if (/היום/.test(t)) return MONTH.today; const m = t.match(/(\d{1,2})[./](\d{1,2})/); if (!m) return MONTH.today; return +m[2] === MONTH.m && +m[1] >= 1 && +m[1] <= MONTH.last ? +m[1] : 0; }
+  const CMD_MONTHS = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'], CMD_DAYS = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
+  function dateOf(t) {
+    const inMonth = d => d >= 1 && d <= MONTH.last ? d : 0;
+    if (/שלשום/.test(t)) return inMonth(MONTH.today - 2);
+    if (/אתמול/.test(t)) return inMonth(MONTH.today - 1);
+    if (/מחרתיים/.test(t)) return inMonth(MONTH.today + 2);
+    if (/מחר/.test(t)) return inMonth(MONTH.today + 1);
+    if (/היום/.test(t)) return MONTH.today;
+    /* 3.11, 3/11, 3.11.26. מספר שני מעל 12 הוא שעה (8.30), לא תאריך */
+    const num = [...t.matchAll(/(\d{1,2})[./](\d{1,2})/g)].find(m => +m[2] >= 1 && +m[2] <= 12);
+    if (num) return +num[2] === MONTH.m ? inMonth(+num[1]) : 0;
+    const named = t.match(new RegExp('(\\d{1,2})\\s*[בל]?(' + CMD_MONTHS.join('|') + ')'));
+    if (named) return CMD_MONTHS.indexOf(named[2]) + 1 === MONTH.m ? inMonth(+named[1]) : 0;
+    const day = t.match(/(\d{1,2})\s*לחודש/) || t.match(/(?:^|[^֐-ת\d])ב-?(\d{1,2})(?![\d.:/])/);
+    if (day) return inMonth(+day[1]);
+    /* ביום ראשון, בראשון, יום א': היום האחרון שחל בו */
+    const wd = t.match(new RegExp('(?:יום\\s+|(?:^|[^\\u0590-\\u05EA])ב)(' + CMD_DAYS.join('|') + ')(?=$|[^\\u0590-\\u05EA])|יום\\s+([א-ו])[\'׳’]'));
+    if (wd) return inMonth(MONTH.today - (wdOf(MONTH.today) - (wd[1] ? CMD_DAYS.indexOf(wd[1]) : 'אבגדהו'.indexOf(wd[2])) + 7) % 7);
+    return MONTH.today;
+  }
+  /* מה המשפט אומר על הנוכחות: 'a' לא הגיע.ה, 'x' באישור, 'p' הגיע.ה, 'mix' גם וגם, '' לא ברור. שם בלי פועל ברור לא מסמן כלום */
+  const CMD_END = '(?=$|[^\\u0590-\\u05EA])', CMD_START = '(^|[^\\u0590-\\u05EA])ו?';
+  const CMD_NEG = new RegExp(CMD_START + '(לא\\s+(הגיע|הגיעה|הגיעו|נכח|נכחה|נכחו|היה|הייתה|היתה|היו|בא|באה|באו|עבד|עבדה|עבדו|הופיע|הופיעה|הופיעו)|חיסור|חיסר|חיסרה|החסיר|החסירה|נעדר|נעדרה|נעדרו|חולה)' + CMD_END + '|' + CMD_START + 'חסר(ה)?(?=\\s*$|\\s*[.,!]|\\s+(היום|אתמול|שלשום|ב))', 'g');
+  const CMD_POS = new RegExp(CMD_START + '(הגיע|הגיעה|הגיעו|נכח|נכחה|נכחו|נוכח|נוכחת|נוכחות|בא|באה|באו|היה|הייתה|היתה|היו|עבד|עבדה|עבדו|עובד|עובדת|איחר|איחרה|איחרו|הופיע|הופיעה|הופיעו)' + CMD_END);
+  function cmdStatus(t) {
+    const t2 = t.replace(/לא\s+הביא[֐-ת]*(\s+אישור)?/g, ' ');
+    if (/(?<!לא\s)באישור|אישור\s+(מחלה|רפואי)|הביא[֐-ת]*\s.*אישור/.test(t2)) return 'x';
+    const rest = t2.replace(CMD_NEG, ' '), neg = rest !== t2, pos = CMD_POS.test(rest);
+    return neg && pos ? 'mix' : neg ? 'a' : pos ? 'p' : '';
+  }
+  const cmdQ = t => /[?؟]|^(האם|מתי|כמה|למה|איך)\s|^מה\s+עם\s/.test(t);
+  /* מגמה: ההתאמה הארוכה (תקשורת דיגיטלית לפני תקשורת). כיתה: בלי להיתפס על יא1 בתוך יא10 */
+  const mgIn = t => MGS.filter(m => t.includes(m)).sort((a, b) => b.length - a.length)[0];
+  const clsKey = s => norm(s).replace(/[·.\-–]/g, '');
+  const clsIn = t => { const n = clsKey(t); return classes.filter(c => { const k = clsKey(c), i = k ? n.indexOf(k) : -1; return i >= 0 && !/\d/.test(n.charAt(i + k.length)); }).sort((a, b) => clsKey(b).length - clsKey(a).length)[0]; };
   const badDate = () => show(`<p>אפשר לרשום כאן רק ימים ב${esc(MONTH.name)} (1.${MONTH.m} עד ${MONTH.last}.${MONTH.m}). כדאי לבדוק את התאריך.</p>`, null);
   const lockedMsg = mgs => show(`<p>הנוכחות של <b>${mgs.map(esc).join(', ')}</b> ל${esc(MONTH.name)} כבר הוגשה. כדי לשנות: "פתיחה לתיקון" במסך הנוכחות.</p>`, null);
   /* זיהוי תלמיד.ה בטקסט: מילים שלמות מהשם (אפשר עם ש/ל/ב/ה/ו/מ/כ בתחילת המילה). הכי הרבה מילים מתאימות מנצח; תיקו = שואלים, לא מנחשים */
@@ -1549,32 +1583,45 @@ window.startApp = function (R) {
       const l = active().filter(s => Object.entries(ATT[s.id]).some(([d, v]) => v === 'a' && +d >= MONTH.today - 6));
       return show(`<p><b>לא הגיעו השבוע:</b></p><ul>${l.map(s => `<li>${esc(s.name)} · ${Object.entries(ATT[s.id]).filter(([d, v]) => v === 'a' && +d >= MONTH.today - 6).map(([d]) => d + '.' + MONTH.m).join(', ')}${Object.entries(NOTES[s.id]).filter(([d]) => +d >= MONTH.today - 6).map(([, n]) => ' · ' + esc(n)).join('')} <a href="#" data-open="${s.id}">לתיק</a></li>`).join('') || '<li>כולם הגיעו</li>'}</ul>`, null);
     }
-    if (/מצא|חפש|מעסיקים ל/.test(t)) { const mg = MGS.find(m => t.includes(m)) || MGS[0]; openSub(wizSpec(mg)); return show(`<p>פתחתי את האשף${mg ? ` עם <b>${esc(mg)}</b>` : ''}.</p>`, null); }
+    if (/מצא|חפש|מעסיקים ל/.test(t)) { const mg = mgIn(t) || MGS[0]; openSub(wizSpec(mg)); return show(`<p>פתחתי את האשף${mg ? ` עם <b>${esc(mg)}</b>` : ''}.</p>`, null); }
     if (/העל|ייבוא|נתוני בית/.test(t)) { return show('<p>ההעלאה נמצאת במסך הניהול. <a href="#admin">לניהול</a></p>', null); }
     if (/אין תעסוקה|בלי תעסוקה|לא עובדים/.test(t)) {
-      const d = dateOf(t), cls = classes.find(c => norm(t).includes(norm(c))) || (shown[0] && shown[0].cls);
+      if (hits.length) return show(`<p>יום בלי תעסוקה נרשם לכיתה שלמה. לכל הכיתה: "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(hits[0].cls)}". לתלמיד.ה אחד.ת: "${esc(first(hits[0]))} לא הגיע".</p>`, null);
+      const d = dateOf(t), cls = clsIn(t);
       if (!cls) return show(`<p>לאיזו כיתה? למשל: אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}, פורים.</p>`, null);
       if (!d) return badDate();
       const lk = [...new Set(STU.filter(s => s.cls === cls && SUBMITTED[s.mg]).map(s => s.mg))]; if (lk.length) return lockedMsg(lk);
       const why = (t.match(/(פורים|פסח|חנוכה|סוכות|מרתון[^,.]*|טיול[^,.]*)/) || [])[1] || 'יום בלי תעסוקה';
       return show(`<p>לסמן את <b>${wd(d)} ${d}.${MONTH.m}</b> כיום בלי תעסוקה לכל <b>${esc(cls)}</b> · ${esc(why)}?</p>`, () => { applyOff(cls, d, why.trim()); if (!shown.length || shown[0].cls !== cls) { $('find').value = cls; find(cls); } afterAtt(); return `${cls}: ${d}.${MONTH.m} בלי תעסוקה`; });
     }
+    if (hits.length && !forced && !/הגש/.test(t) && !cmdQ(t) && cmdStatus(t) === 'mix') return show('<p>במשפט הזה יש גם "הגיע" וגם "לא הגיע". כדי לא לרשום בטעות, כדאי לכתוב כל תלמיד.ה וכל יום בנפרד.</p>', null);
     if (hits.length > 1 && !/הגש/.test(t)) return show(`<p>יש כמה תלמידים שמתאימים למה שכתבת. למי התכוונת?</p><div class="confirm-b">${hits.map(s => `<button class="btn" data-pick="${s.id}">${esc(s.name)} · ${esc(s.cls || '')}${s.mg ? ' · ' + esc(s.mg) : ''}</button>`).join('')}</div>`, null);
     if (!hits.length && !/הגש/.test(t)) { const gone = cmdMatch(t, STU.filter(s => s.status === 'עזב')); if (gone.length) return show(`<p><b>${gone.map(s => esc(s.name)).join(', ')}</b> מסומן.ת כמי שעזב.ה, ולכן אי אפשר לסמן כאן. <a href="#" data-open="${gone[0].id}">לתיק</a></p>`, null); }
     if (/נוכחות|דיווח/.test(t) && !who && !/הגש/.test(t)) { return show(`<p>לדיווח נוכחות: <a href="#att">למסך הדיווח</a>. אפשר גם לכתוב כאן, למשל "סמן ש${esc(first(sPlaced))} הגיע היום".</p>`, null); }
-    if (/מה חסר/.test(t) && who) { const miss = DOCS.filter((_, i) => who.docs[i] && who.docs[i].s !== 'ok' && who.docs[i].s !== 'na'); return show(`<p><b>${esc(who.name)}</b>${who.emp ? '' : ' · בלי מקום עבודה'}${who.note ? ' · ' + esc(who.note) : ''}</p><ul>${miss.map(d => `<li>מסמך: ${d}</li>`).join('') || '<li>כל המסמכים התקבלו</li>'}</ul><p><a href="#" data-open="${who.id}">לתיק</a></p>`, null); }
+    if ((/מה חסר/.test(t) || (/חסר ל/.test(t) && !cmdStatus(t))) && who) { const miss = DOCS.filter((_, i) => who.docs[i] && who.docs[i].s !== 'ok' && who.docs[i].s !== 'na'); return show(`<p><b>${esc(who.name)}</b>${who.emp ? '' : ' · בלי מקום עבודה'}${who.note ? ' · ' + esc(who.note) : ''}</p><ul>${miss.map(d => `<li>מסמך: ${d}</li>`).join('') || '<li>כל המסמכים התקבלו</li>'}</ul><p><a href="#" data-open="${who.id}">לתיק</a></p>`, null); }
     if (/הגש/.test(t)) {
-      const mg = MGS.find(m => t.includes(m));
+      const mg = mgIn(t);
+      if (cmdQ(t) || /הגשתי|הגשנו/.test(t)) return show(mg ? `<p><b>${esc(mg)}</b> ${SUBMITTED[mg] ? 'כבר הוגשה' : 'עדיין לא הוגשה'} ל${esc(MONTH.name)}.</p>` : `<p>עדיין לא הוגשו ל${esc(MONTH.name)}: ${MGS.filter(m => !SUBMITTED[m]).map(esc).join(', ') || 'אין, הכול הוגש'}.</p>`, null);
       if (!mg) return show(`<p>איזו מגמה להגיש? למשל: הגש את הנוכחות של ${esc(MGS[0])}.</p>`, null);
       if (SUBMITTED[mg]) return show(`<p>${esc(mg)} כבר הוגשה ל${esc(MONTH.name)}.</p>`, null);
       const l = active().filter(s => s.mg === mg), miss = l.reduce((n, s) => n + dates(s).filter(d => d <= MONTH.today && !ATT[s.id][d]).length, 0);
       return show(`<p>להגיש את נוכחות <b>${esc(mg)}</b> ל${esc(MONTH.name)}? ${l.length} תלמידים${miss ? `, <b>${miss} ימים עדיין לא סומנו</b>` : ', הכול מסומן'}. אחרי ההגשה החודש נעול.</p>`, () => { SUBMITTED[mg] = true; afterAtt(); return 'נוכחות ' + mg + ' הוגשה'; });
     }
     if (who) {
-      const d = dateOf(t); if (!d) return badDate(); if (SUBMITTED[who.mg]) return lockedMsg([who.mg]);
-      const abs = /לא הגיע|חיסור|חסר|נעדר/.test(t), ok = dates(who).includes(d);
-      return show(`<p>לסמן ש<b>${esc(who.name)}</b> <b>${abs ? 'לא הגיע.ה' : 'הגיע.ה'}</b> ב-<b>${d}.${MONTH.m}</b>${who.emp ? ' ל' + esc(empName(who.emp)) : ''}?${ok ? '' : ' <span class="warn">זה לא יום עבודה קבוע שלו.ה, יירשם כיום נוסף.</span>'}</p>`,
-        () => { ATT[who.id][d] = abs ? 'a' : 'p'; if (!shown.some(s => s.id === who.id)) { $('find').value = who.cls; find(who.cls); } afterAtt(); return `סומן: ${who.name}, ${d}.${MONTH.m}${abs && REM_CFG.teacher ? ' · תזכורת למחנך.ת תצא ב-16:00' : ''}`; });
+      const tik = `<a href="#" data-open="${who.id}">לתיק</a>`;
+      if (/(^|\s)אל\s+(תסמן|תסמני|תסמנו|תרשום|תרשמי|תרשמו)|לא\s+לסמן|אין\s+לסמן/.test(t)) return show('<p>בסדר, לא סימנתי כלום.</p>', null);
+      const d = dateOf(t); if (!d) return badDate();
+      if (cmdQ(t)) return show(`<p><b>${esc(who.name)}</b> ב-${d}.${MONTH.m}: ${esc(stLbl(who, d))}. ${tik}</p>`, null);
+      const st = cmdStatus(t);
+      if (!st || st === 'mix') return show(`<p>לא הבנתי אם <b>${esc(who.name)}</b> הגיע.ה, ולכן לא סימנתי. אפשר לכתוב: "${esc(first(who))} הגיע" או "${esc(first(who))} לא הגיע". ${tik}</p>`, null);
+      if (d > MONTH.today) return show(`<p>${d}.${MONTH.m} עוד לא הגיע, ולכן אי אפשר לסמן נוכחות ליום הזה.</p>`, null);
+      if (SUBMITTED[who.mg]) return lockedMsg([who.mg]);
+      if (suspended(who, d)) return show(`<p><b>${esc(who.name)}</b> בהשעיה ב-${d}.${MONTH.m}, ולכן אי אפשר לסמן כאן. ${tik}</p>`, null);
+      const cur = ATT[who.id][d], off = offWhy(who, d), lbl = { a: 'לא הגיע.ה', x: 'היעדרות באישור', p: 'הגיע.ה' }[st], ok = dates(who).includes(d);
+      if (cur === st) return show(`<p>כבר מסומן: <b>${esc(who.name)}</b>, ${lbl}, ${d}.${MONTH.m}.</p>`, null);
+      const warn = off ? `${d}.${MONTH.m} מסומן כיום בלי תעסוקה (${esc(off)}). הסימון יחליף אותו אצל התלמיד.ה הזה.ה.` : cur && cur !== 'n' ? `כבר מסומן: ${esc(stLbl(who, d))}. הסימון הקודם יוחלף.` : ok ? '' : 'זה לא יום עבודה קבוע שלו.ה, יירשם כיום נוסף.';
+      return show(`<p>לסמן ${st === 'x' ? 'ל' : 'ש'}<b>${esc(who.name)}</b> <b>${lbl}</b> ב-<b>${d}.${MONTH.m}</b>${who.emp ? ' ל' + esc(empName(who.emp)) : ''}?${warn ? ` <span class="warn">${warn}</span>` : ''}</p>`,
+        () => { ATT[who.id][d] = st; if (!shown.some(s => s.id === who.id)) { $('find').value = who.cls; find(who.cls); } afterAtt(); return `סומן: ${who.name}, ${lbl}, ${d}.${MONTH.m}${st === 'a' && REM_CFG.teacher ? ' · תזכורת למחנך.ת תצא ב-16:00' : ''}`; });
     }
     show(`<p>לא הבנתי. אפשר: "סמן ש${esc(first(sPlaced))} הגיע היום", "מי לא הגיע השבוע", "הגש את הנוכחות של ${esc(MGS[0])}", "מצא מעסיקים ל${esc(MGS[0])}", "מה חסר ל${esc(first(sNone))}", "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}".</p>`, null);
   }
