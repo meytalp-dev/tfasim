@@ -351,6 +351,7 @@ window.startApp = function (R) {
     <section class="sec att" id="att">
       <div class="sec-head att-head"><h2>דיווח נוכחות</h2><label class="mon-lbl">חודש הדיווח <select class="mon-pick" id="monPick" aria-label="חודש הדיווח">${(() => { const N = Store.monthsBack(), opt = b => { const m = Store.monthInfo(b); return `<option value="${b}" ${MONTH.back === b ? 'selected' : ''}>${esc(m.label)}</option>`; }; const open = [0, 1].filter(b => b <= N).map(opt).join(''), old = []; for (let b = 2; b <= N; b++) old.push(opt(b)); return open + (old.length ? `<optgroup label="חודשים קודמים">${old.join('')}</optgroup>` : ''); })()}</select></label><button class="btn quiet" data-act="att-close">${ic('back')}חזרה</button></div>
       <div class="confirm" id="prevBar" hidden></div>
+      <div class="stu-filters"><label class="mon-lbl">קבוצה <select class="mon-pick stu-sel" id="attCls"><option value="">בחירת קבוצה</option></select></label><label class="mon-lbl">מגמה <select class="mon-pick stu-sel" id="attMg"><option value="">בחירת מגמה</option></select></label></div>
       <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="find" class="find big" placeholder="כיתה או מספר פעולה" autocomplete="off"></div>
       <div class="emp-b edit att-pull"><button class="btn" data-act="mentor-pull">${ic('download')}משיכת סימוני המנטור.ית</button><span class="hint">מה שהמנטורים סימנו בקישור שלהם · רק ימים שלא סומנו כאן</span></div>
       <div id="grpList" class="grp-list" hidden></div>
@@ -542,7 +543,16 @@ window.startApp = function (R) {
   /* ================= נוכחות ================= */
   const norm = s => String(s || '').replace(/["'״׳\s]/g, '');
   let shown = [];
-  function find(q) { const n = norm(q), ex = active().filter(s => norm(s.cls) === n); shown = !n ? [] : ex.length ? ex : active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || s.name.includes(q.trim())); renderRoster(); }
+  /* בחירה לפי קבוצה ו/או מגמה (3.11.26). חיפוש בטקסט מנקה את הבחירה, ובחירה מנקה את החיפוש */
+  const ATT_F = { cls: '', mg: '' };
+  function attFilterOpts() {
+    const fill = (id, vals, all, cur) => { const sel = $(id); if (!sel) return; sel.innerHTML = `<option value="">${all}</option>` + vals.map(v => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join(''); };
+    const L = active();
+    fill('attCls', [...new Set(L.map(s => s.cls).filter(Boolean))].sort(clsSort), 'בחירת קבוצה', ATT_F.cls);
+    fill('attMg', [...new Set(L.map(s => s.mg).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he')), 'בחירת מגמה', ATT_F.mg);
+  }
+  function attPick() { $('find').value = ''; shown = ATT_F.cls || ATT_F.mg ? active().filter(s => (!ATT_F.cls || s.cls === ATT_F.cls) && (!ATT_F.mg || s.mg === ATT_F.mg)).sort((a, b) => clsSort(a.cls, b.cls)) : []; renderRoster(); }
+  function find(q) { ATT_F.cls = ATT_F.mg = ''; const n = norm(q), ex = active().filter(s => norm(s.cls) === n); shown = !n ? [] : ex.length ? ex : active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || s.name.includes(q.trim())); renderRoster(); }
   /* רשימה שנטענה מראש: אין מספר כיתה, אז בוחרים קבוצה. המספור לפי סדר מספרי הפעולה */
   function renderGroups() {
     const box = $('grpList'); if (!box) return;
@@ -552,6 +562,8 @@ window.startApp = function (R) {
     box.innerHTML = names.map(c => { const g = L.filter(s => s.cls === c); return `<button class="grp-btn ${c === cur ? 'on' : ''}" data-grp="${esc(c)}"><b>${esc(c)} · ${g.length} תלמידים</b><small>מספר פעולה ${esc(g[0].act)}</small><small>${[...new Set(g.map(s => s.mg))].map(esc).join(', ')}</small></button>`; }).join('');
   }
   $('find').oninput = e => find(e.target.value);
+  $('attCls').onchange = e => { ATT_F.cls = e.target.value; attPick(); };
+  $('attMg').onchange = e => { ATT_F.mg = e.target.value; attPick(); };
   $('grpList').onclick = e => { const b = e.target.closest('[data-grp]'); if (b) { $('find').value = b.dataset.grp; find(b.dataset.grp); } };
   const tmTxt = t => t && (t.i || t.o) ? `<span class="tm">${esc(t.i || '')}–${esc(t.o || '')}</span>` : '';
   const offWhy = (s, d) => OFF[s.cls] && OFF[s.cls][d];
@@ -568,18 +580,20 @@ window.startApp = function (R) {
   function renderRoster() {
     renderGroups();
     const r = $('roster');
-    if (!shown.length) { r.innerHTML = $('find').value ? '<p class="empty">לא נמצא.</p>' : ''; r.hidden = !$('find').value; return; }
+    attFilterOpts();
+    const asked = !!($('find').value || ATT_F.cls || ATT_F.mg);
+    if (!shown.length) { r.innerHTML = asked ? '<p class="empty">לא נמצא.</p>' : ''; r.hidden = !asked; return; }
     shown = shown.filter(s => STU.includes(s));
     r.hidden = false;
     /* ההגשה היא של המגמה כולה, לא של מי שמופיע בחיפוש */
-    const mg = shown[0].mg, cls = shown[0].cls, offs = Object.entries(OFF[cls] || {}).sort((a, b) => a[0] - b[0]);
+    const mg = shown[0].mg, cls = shown[0].cls, oneCls = shown.every(s => s.cls === cls), oneMg = shown.every(s => s.mg === mg), offs = oneCls ? Object.entries(OFF[cls] || {}).sort((a, b) => a[0] - b[0]) : [];   /* יום בלי תעסוקה שייך לקבוצה אחת: לא מציעים אותו במבט של כמה קבוצות */
     const gmgs = [...new Set(shown.map(s => s.mg))], open = gmgs.filter(m => !SUBMITTED[m]), sub = !open.length, ed = canEdit();
     const grp = active().filter(s => open.includes(s.mg)), left = grp.reduce((n, s) => n + dates(s).filter(d => d <= MONTH.today && !ATT[s.id][d]).length, 0);
-    r.innerHTML = `<div class="roster-head"><b>${esc(cls)}${shown.every(s => s.mg === mg) ? ' · ' + esc(mg) : ''}</b>${gmgs.some(m => SUBMITTED[m]) ? `<span class="tag ok">הוגש${open.length ? ': ' + gmgs.filter(m => SUBMITTED[m]).map(esc).join(', ') : ''}</span><button class="lnk off-btn edit" data-act="reopen">${ic('pen')}פתיחה לתיקון</button>` : ''}${sub ? '' : `<button class="lnk off-btn edit" data-act="off-open">${ic('cal')}יום בלי תעסוקה</button>`}</div>
+    r.innerHTML = `<div class="roster-head"><b>${[oneCls ? esc(cls) : '', oneMg ? esc(mg) : ''].filter(Boolean).join(' · ') || shown.length + ' תלמידים'}</b>${gmgs.some(m => SUBMITTED[m]) ? `<span class="tag ok">הוגש${open.length ? ': ' + gmgs.filter(m => SUBMITTED[m]).map(esc).join(', ') : ''}</span><button class="lnk off-btn edit" data-act="reopen">${ic('pen')}פתיחה לתיקון</button>` : ''}${sub || !oneCls ? '' : `<button class="lnk off-btn edit" data-act="off-open">${ic('cal')}יום בלי תעסוקה</button>`}</div>
       ${LEGEND}
       ${offs.length ? `<div class="off-list">${offs.map(([d, w]) => `<span class="off-chip">${wd(+d)} ${d}.${MONTH.m} · ${esc(w)}${sub ? '' : `<button class="edit" data-off-del="${d}" aria-label="ביטול">×</button>`}</span>`).join('')}</div>` : ''}
       ${shown.map(s => { const ds = dates(s), a = ATT[s.id], p = ds.filter(d => present(a[d])).length, nn = Object.keys(NOTES[s.id]).length + Object.values(TIMES[s.id]).filter(t => t.i || t.o).length, rc = remCount(s.id);
-        return `<div class="row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><div class="who"><button class="name" data-open="${s.id}">${esc(s.name)}</button>${statusTag(s)}<small>${esc(empName(s.emp))}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</small>${s.note ? `<small class="snote">${esc(s.note)}</small>` : ''}</div>
+        return `<div class="row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><div class="who"><button class="name" data-open="${s.id}">${esc(s.name)}</button>${statusTag(s)}<small>${oneCls ? '' : esc(s.cls) + ' · '}${oneMg ? '' : esc(s.mg) + ' · '}${esc(empName(s.emp))}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</small>${s.note ? `<small class="snote">${esc(s.note)}</small>` : ''}</div>
         <div class="cells">${ds.map(d => cellHtml(s, d, ed && !SUBMITTED[s.mg])).join('')}${ds.length ? '' : '<span class="hint">אין ימי עבודה</span>'}</div><div class="sum"><span>${p} מתוך ${MONTH.back ? ds.length : ds.filter(d => d <= MONTH.today).length}${MONTH.back ? '' : ' עד היום'}${hoursTxt(s)}</span><button class="lnk note-btn" data-notes="${s.id}">${ic('pen')}${nn ? 'הערות ושעות · ' + nn : 'הערה או שעות'}</button>${rc ? `<button class="lnk note-btn" data-open="${s.id}">${ic('bell')}תזכורות · ${rc}</button>` : ''}</div></div>`; }).join('')}
       <div class="roster-foot edit"><button class="btn primary big" data-act="submit" ${sub ? 'disabled' : ''}>${ic('send')}${sub ? 'הוגש' : 'שליחת הדיווח · ' + open.map(esc).join(', ') + ' · ' + esc(MONTH.name)}</button>${sub ? '' : `<span class="hint">כל המגמה: ${grp.length} תלמידים${left ? ` · ${left} ימים עוד לא סומנו` : ''}</span>`}<span class="hint">סה"כ שעות ${esc(MONTH.name)}: <b>${fmtH(shown.reduce((n, s) => n + hoursOf(s).h, 0))}</b></span></div>`;
   }
@@ -1516,12 +1530,21 @@ window.startApp = function (R) {
   /* ================= העוזר ================= */
   const out = $('agentOut');
   /* יום בחודש הפעיל. תאריך בחודש אחר או יום שלא קיים → 0, והעוזר מבקש תיקון */
-  function dateOf(t) { if (/אתמול/.test(t)) return MONTH.today - 1; if (/היום/.test(t)) return MONTH.today; const m = t.match(/(\d{1,2})\.(\d{1,2})/); if (!m) return MONTH.today; return +m[2] === MONTH.m && +m[1] >= 1 && +m[1] <= MONTH.last ? +m[1] : 0; }
+  function dateOf(t) { if (/אתמול/.test(t)) return MONTH.today - 1; if (/היום/.test(t)) return MONTH.today; const m = t.match(/(\d{1,2})[./](\d{1,2})/); if (!m) return MONTH.today; return +m[2] === MONTH.m && +m[1] >= 1 && +m[1] <= MONTH.last ? +m[1] : 0; }
   const badDate = () => show(`<p>אפשר לרשום כאן רק ימים ב${esc(MONTH.name)} (1.${MONTH.m} עד ${MONTH.last}.${MONTH.m}). כדאי לבדוק את התאריך.</p>`, null);
   const lockedMsg = mgs => show(`<p>הנוכחות של <b>${mgs.map(esc).join(', ')}</b> ל${esc(MONTH.name)} כבר הוגשה. כדי לשנות: "פתיחה לתיקון" במסך הנוכחות.</p>`, null);
-  function run(text) {
+  /* זיהוי תלמיד.ה בטקסט: מילים שלמות מהשם (אפשר עם ש/ל/ב/ה/ו/מ/כ בתחילת המילה). הכי הרבה מילים מתאימות מנצח; תיקו = שואלים, לא מנחשים */
+  const cmdGeresh = s => String(s || '').replace(/[׳’`]/g, "'");
+  const cmdWord = (w, t) => new RegExp('(^|[^\\u0590-\\u05EAa-zA-Z\'])[שלבהומכ]{0,2}' + cmdGeresh(w).replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=$|[^\\u0590-\\u05EAa-zA-Z\'])').test(t);
+  function cmdMatch(t, list) {
+    const T = cmdGeresh(t), hits = list.map(s => ({ s, n: String(s.name || '').split(/\s+/).filter(w => w && cmdWord(w, T)).length })).filter(x => x.n), top = Math.max(0, ...hits.map(x => x.n));
+    return hits.filter(x => x.n === top).map(x => x.s);
+  }
+  let lastCmd = '';
+  function run(text, forced) {
     const t = text.trim(); if (!t) return;
-    const who = STU.find(s => t.includes(first(s)));
+    lastCmd = t;
+    const hits = forced ? [forced] : cmdMatch(t, active()), who = hits.length === 1 ? hits[0] : null;
     if (/מי לא הגיע/.test(t)) {
       const l = active().filter(s => Object.entries(ATT[s.id]).some(([d, v]) => v === 'a' && +d >= MONTH.today - 6));
       return show(`<p><b>לא הגיעו השבוע:</b></p><ul>${l.map(s => `<li>${esc(s.name)} · ${Object.entries(ATT[s.id]).filter(([d, v]) => v === 'a' && +d >= MONTH.today - 6).map(([d]) => d + '.' + MONTH.m).join(', ')}${Object.entries(NOTES[s.id]).filter(([d]) => +d >= MONTH.today - 6).map(([, n]) => ' · ' + esc(n)).join('')} <a href="#" data-open="${s.id}">לתיק</a></li>`).join('') || '<li>כולם הגיעו</li>'}</ul>`, null);
@@ -1536,6 +1559,8 @@ window.startApp = function (R) {
       const why = (t.match(/(פורים|פסח|חנוכה|סוכות|מרתון[^,.]*|טיול[^,.]*)/) || [])[1] || 'יום בלי תעסוקה';
       return show(`<p>לסמן את <b>${wd(d)} ${d}.${MONTH.m}</b> כיום בלי תעסוקה לכל <b>${esc(cls)}</b> · ${esc(why)}?</p>`, () => { applyOff(cls, d, why.trim()); if (!shown.length || shown[0].cls !== cls) { $('find').value = cls; find(cls); } afterAtt(); return `${cls}: ${d}.${MONTH.m} בלי תעסוקה`; });
     }
+    if (hits.length > 1 && !/הגש/.test(t)) return show(`<p>יש כמה תלמידים שמתאימים למה שכתבת. למי התכוונת?</p><div class="confirm-b">${hits.map(s => `<button class="btn" data-pick="${s.id}">${esc(s.name)} · ${esc(s.cls || '')}${s.mg ? ' · ' + esc(s.mg) : ''}</button>`).join('')}</div>`, null);
+    if (!hits.length && !/הגש/.test(t)) { const gone = cmdMatch(t, STU.filter(s => s.status === 'עזב')); if (gone.length) return show(`<p><b>${gone.map(s => esc(s.name)).join(', ')}</b> מסומן.ת כמי שעזב.ה, ולכן אי אפשר לסמן כאן. <a href="#" data-open="${gone[0].id}">לתיק</a></p>`, null); }
     if (/נוכחות|דיווח/.test(t) && !who && !/הגש/.test(t)) { return show(`<p>לדיווח נוכחות: <a href="#att">למסך הדיווח</a>. אפשר גם לכתוב כאן, למשל "סמן ש${esc(first(sPlaced))} הגיע היום".</p>`, null); }
     if (/מה חסר/.test(t) && who) { const miss = DOCS.filter((_, i) => who.docs[i] && who.docs[i].s !== 'ok' && who.docs[i].s !== 'na'); return show(`<p><b>${esc(who.name)}</b>${who.emp ? '' : ' · בלי מקום עבודה'}${who.note ? ' · ' + esc(who.note) : ''}</p><ul>${miss.map(d => `<li>מסמך: ${d}</li>`).join('') || '<li>כל המסמכים התקבלו</li>'}</ul><p><a href="#" data-open="${who.id}">לתיק</a></p>`, null); }
     if (/הגש/.test(t)) {
@@ -1559,6 +1584,7 @@ window.startApp = function (R) {
     $('aNo').onclick = () => { out.hidden = true; };
     if (apply) $('aYes').onclick = () => { const m = apply(); out.innerHTML = `<div class="confirm done">${ic('check')}${esc(m)} <button class="lnk" id="aNo">סגירה</button></div>`; $('aNo').onclick = () => { out.hidden = true; }; toast(m); $('cmd').value = ''; };
   }
+  out.addEventListener('click', e => { const b = e.target.closest('[data-pick]'); if (!b) return; const s = STU.find(x => x.id === b.dataset.pick); if (s) run(lastCmd, s); });
   $('cmdGo').onclick = () => run($('cmd').value);
   $('cmd').onkeydown = e => { if (e.key === 'Enter') run($('cmd').value); };
   $('chips').onclick = e => { const b = e.target.closest('[data-cmd]'); if (!b) return; $('cmd').value = b.dataset.cmd; run(b.dataset.cmd); };
