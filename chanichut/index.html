@@ -53,7 +53,7 @@ h1,h2,h3{color:var(--ink)}
 /* נוכחות — היומן */
 .btn.big{font-size:1.08em;padding:.7em 1.3em}
 /* הכניסה: הלוגו בגדול, ומתחתיו טופס אחד */
-#gate{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px 0}
+#gate{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:flex-start;padding:20px 16px 0}
 body[data-view=gate] #gate{display:flex}
 body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:not(#gate .foot){display:none}
 .gate-card{width:100%;max-width:440px;display:grid;justify-items:center;gap:6px}
@@ -71,7 +71,16 @@ body[data-view=gate] .top,body[data-view=gate] .page,body[data-view=gate] .foot:
 .gate-sent{margin:0;color:var(--muted)}
 .gate-code{font-size:1.8rem!important;letter-spacing:.4em;text-align:center;font-family:var(--head)}
 #gCodeS .lnk,#gPass .lnk,#gRec .lnk{justify-self:center}
-.gate-minhal{width:min(260px,70vw);height:auto;margin-bottom:10px}
+.gate-head{width:100%;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px 18px;margin-bottom:14px}
+.gate-minhal{width:136px;height:auto}
+.gate-brand{display:flex;align-items:center;gap:8px;color:var(--ink);font-family:var(--head)}.gate-head .gate-logo{width:34px;margin:0}
+.gate-name{display:grid;line-height:1.1}.gate-name b{font-size:1.5rem;font-weight:800}.gate-name small{font-size:.72rem;font-weight:500}
+.gate-hold{position:absolute;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
+.gate-hits{display:grid;gap:2px;max-height:230px;overflow-y:auto;margin-top:-8px;padding:4px;border:1px solid var(--line);border-radius:8px;background:var(--card)}.gate-hits[hidden]{display:none}
+.gate-hit{font:inherit;color:var(--text);text-align:start;min-height:44px;padding:.4em .7em;border:0;border-radius:6px;background:transparent;cursor:pointer}.gate-hit:hover,.gate-hit.on{background:var(--tint)}
+.gate-none{margin:0;padding:.6em .7em;font-size:.92em;color:var(--muted)}
+.gate-to{overflow-wrap:anywhere}.gate-to b{color:var(--text);unicode-bidi:isolate}
+.gate-links{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px}.gate-links .lnk{min-height:44px;padding:0 8px;font-size:.9em;color:var(--muted)}
 .gate-form>.lnk,.gate-alt .lnk{min-height:44px;padding:0 12px}.gate-minor{justify-self:center;font-size:.9em;color:var(--muted)}
 .gate-msg{margin:0;font-size:.92em;color:var(--muted);min-height:0}.gate-msg:empty{display:none}.gate-msg.bad{color:var(--warn);font-weight:600}
 .gate-check{display:flex;gap:.5em;align-items:center;font-size:.92em;color:var(--text)}.gate-check input{width:20px;height:20px}
@@ -437,16 +446,23 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 <body data-view="gate">
 <section class="gate" id="gate">
   <div class="gate-card">
+    <div class="gate-head">
     <img class="gate-minhal" src="logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית">
+    <div class="gate-brand">
     <svg class="gate-logo" viewBox="0 0 320 350" aria-hidden="true"><path d="M74 300 V118 C74 72 102 44 148 44 H160" fill="none" stroke="#1D4F5E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 6 H226 A60 60 0 0 1 286 66 V74 C262 78 246 94 238 116 L222 82 H166 Z" fill="#C4862A"/><rect x="206" y="22" width="80" height="312" rx="40" fill="#7F9A8E" stroke="#F6F2E9" stroke-width="9" paint-order="stroke"/></svg>
-    <svg class="gate-word" viewBox="0 0 360 120" role="img" aria-label="חניכות · נוכחות · קשר · צמיחה"><text x="180" y="78" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="800" font-size="86" fill="#1D4F5E">חניכות</text><text x="180" y="112" text-anchor="middle" font-family="Rubik, sans-serif" font-weight="500" font-size="22" fill="#1D4F5E">נוכחות · קשר · צמיחה</text></svg>
+    <div class="gate-name"><b>חניכות</b><small>נוכחות · קשר · צמיחה</small></div>
+    </div>
+    </div>
 
     <div class="gate-form" id="gLogin" hidden>
-      <label class="field"><span>בית ספר, פיקוח, מטה או רשת</span><select id="gSchool"></select></label>
-      <label class="field"><span>מי נכנס.ת</span><select id="gWho"></select></label>
+      <label class="field"><span id="gFindL">בית הספר</span><input class="find" id="gFind" autocomplete="off" enterkeyhint="search" role="combobox" aria-controls="gHits" aria-expanded="false" placeholder="הקלידו חלק משם בית הספר"></label>
+      <div class="gate-hits" id="gHits" role="listbox" hidden></div>
+      <select id="gSchool" class="gate-hold" tabindex="-1" aria-hidden="true"></select>
+      <label class="field gate-hold" id="gWhoF"><span>מי נכנס.ת</span><select id="gWho" tabindex="-1"></select></label>
+      <p class="gate-msg gate-to" id="gOne"></p>
       <p class="gate-msg" id="mLogin"></p>
       <button class="btn primary big gate-btn" id="gSend" disabled>שליחת קוד למייל</button>
-      <button class="lnk gate-minor" id="gToReg">לא מצאתי את עצמי</button>
+      <div class="gate-links"><button class="lnk" id="gToReg">לא מצאתי את עצמי</button><button class="lnk" id="gToStaff">כניסת פיקוח ומטה</button></div>
     </div>
 
     <div class="gate-form" id="gReg" hidden>

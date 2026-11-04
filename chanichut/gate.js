@@ -35,22 +35,65 @@
   $('rSchool').innerHTML = '<option value="">בחירה מתוך 64 בתי הספר</option>' + opts(SCH);
   const PLACES = TOP.concat(NETS, [SYS], SCH);
   try { const last = localStorage.getItem('chanichut2-school'); if (last && PLACES.includes(last)) $('gSchool').value = last; } catch (e) {}
+  /* חיפוש במקום רשימה: בחיפוש רק בתי ספר, ו"כניסת פיקוח ומטה" מחליפה לרשימה הקצרה. #gSchool המוסתר נשאר הערך */
+  const OTHERS = TOP.concat(NETS, [SYS]);
+  const norm = s => String(s).replace(/["'׳״`]/g, '').replace(/[-־–().,]/g, ' ').replace(/\s+/g, ' ').trim();
+  let STAFF = false, HITS = [], HIT = -1;
+  function setMode(staff) {
+    STAFF = staff;
+    $('gFindL').textContent = staff ? 'פיקוח, מטה או רשת' : 'בית הספר';
+    $('gFind').placeholder = staff ? 'בחירה מהרשימה או חיפוש' : 'הקלידו חלק משם בית הספר';
+    $('gToStaff').textContent = staff ? 'כניסת בית ספר' : 'כניסת פיקוח ומטה';
+  }
+  function closeHits() { $('gHits').hidden = true; $('gFind').setAttribute('aria-expanded', 'false'); }
+  function markHit() { [...$('gHits').querySelectorAll('.gate-hit')].forEach((b, i) => { b.classList.toggle('on', i === HIT); if (i === HIT) b.scrollIntoView({ block: 'nearest' }); }); }
+  function drawHits() {
+    if ($('gFind').value && $('gFind').value === $('gSchool').value) return closeHits();
+    const q = norm($('gFind').value).split(' ').filter(Boolean), pool = STAFF ? OTHERS : SCH;
+    HITS = !q.length ? (STAFF ? OTHERS : []) : pool.filter(n => { const t = norm(n); return q.every(w => t.includes(w)); });
+    HIT = HITS.length === 1 ? 0 : -1;
+    $('gHits').innerHTML = HITS.map(n => `<button type="button" class="gate-hit" role="option" data-v="${esc(n)}">${esc(n)}</button>`).join('') || (q.length ? '<p class="gate-none">לא נמצא. אפשר לנסות מילה אחרת, או "לא מצאתי את עצמי"</p>' : '');
+    $('gHits').hidden = !$('gHits').innerHTML; $('gFind').setAttribute('aria-expanded', String(!$('gHits').hidden)); markHit();
+  }
+  function pick(n) { $('gSchool').value = n; $('gSchool').onchange(); }
+  $('gFind').onfocus = () => { $('gFind').select(); drawHits(); };
+  $('gFind').oninput = () => { if ($('gSchool').value) { $('gSchool').value = ''; $('gSchool').onchange(true); } drawHits(); };
+  $('gFind').onkeydown = e => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (HITS.length && !$('gHits').hidden) { HIT = (HIT + (e.key === 'ArrowDown' ? 1 : HITS.length - 1 + (HIT < 0 ? 1 : 0))) % HITS.length; markHit(); } }
+    else if (e.key === 'Enter') { if (HITS[HIT] && !$('gHits').hidden) pick(HITS[HIT]); }
+    else if (e.key === 'Escape') closeHits();
+  };
+  $('gHits').onclick = e => { const b = e.target.closest('.gate-hit'); if (b) pick(b.dataset.v); };
+  document.addEventListener('click', e => { if (!e.target.closest('#gFind,#gHits,#gToStaff')) closeHits(); });
+  $('gToStaff').onclick = () => { setMode(!STAFF); $('gFind').value = ''; if ($('gSchool').value) { $('gSchool').value = ''; $('gSchool').onchange(); } msg('mLogin'); drawHits(); $('gFind').focus(); };
+  if ($('gSchool').value) { setMode(OTHERS.includes($('gSchool').value)); $('gFind').value = $('gSchool').value; }
   let peopleFor = '';
   async function loadPeople() {
     const school = $('gSchool').value; if (school === peopleFor) return; peopleFor = school;
-    $('gWho').innerHTML = ''; $('gSend').disabled = true;
+    $('gWho').innerHTML = ''; $('gSend').disabled = true; whoShow(false); $('gOne').textContent = '';
     if (!school) return;
-    $('gWho').innerHTML = '<option>טוען…</option>';
+    $('gWho').innerHTML = '<option>טוען…</option>'; $('gOne').textContent = 'טוען…';
     const r = await API.call('people', { school });
     if (school !== peopleFor) return;   /* בינתיים נבחר מקום אחר */
+    $('gOne').textContent = '';
     if (!r.ok) { $('gWho').innerHTML = ''; peopleFor = ''; return msg('mLogin', err(r), true); }
     /* בלי שם: תפקיד ומייל ממוסך. תפקיד לא מוכר לא מוצג */
     const L = r.people.filter(p => ROLE[p.role]).sort((a, b) => ROLES.indexOf(a.role) - ROLES.indexOf(b.role));
     $('gWho').innerHTML = L.map(p => `<option value="${esc(p.pid)}">${ROLE[p.role]} · ⁦${esc(p.masked)}⁩</option>`).join('') || '<option value="">אין עדיין משתמשים מאושרים</option>';
     $('gSend').disabled = !L.length;
+    /* אדם אחד: בלי שדה בחירה, רק לאן הקוד יישלח */
+    whoShow(L.length > 1);
+    if (L.length === 1) $('gOne').innerHTML = `${ROLE[L[0].role]} · הקוד יישלח אל <b dir="ltr">${esc(L[0].masked)}</b>`;
     msg('mLogin', L.length ? '' : 'אין כאן עדיין משתמשים מאושרים. אפשר לפנות דרך "לא מצאתי את עצמי"');
   }
-  $('gSchool').onchange = () => { try { localStorage.setItem('chanichut2-school', $('gSchool').value); } catch (e) {} msg('mLogin'); loadPeople(); };
+  function whoShow(on) { $('gWhoF').classList.toggle('gate-hold', !on); $('gWho').tabIndex = on ? 0 : -1; }
+  /* typing: המשתמש.ת באמצע הקלדה, ולכן לא נוגעים בטקסט שבשדה */
+  $('gSchool').onchange = typing => {
+    const v = $('gSchool').value;
+    try { localStorage.setItem('chanichut2-school', v); } catch (e) {}
+    if (typing !== true) { if (v) setMode(OTHERS.includes(v)); $('gFind').value = v; closeHits(); }
+    msg('mLogin'); loadPeople();
+  };
   $('gSend').onclick = async () => {
     const b = $('gSend'); busy(b, true, 'שולח…');
     const pid = $('gWho').value;
