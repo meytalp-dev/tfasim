@@ -324,7 +324,7 @@ window.startApp = function (R) {
         <ul class="todo" id="todoList"></ul>
       </details>
       <details class="sec agent" id="agent">
-        <summary>${ic('spark')}<h2>לכתוב במקום ללחוץ</h2></summary>
+        <summary>${ic('spark')}<h2>חניכי - העוזר המושלם</h2></summary>
         <div class="agent-row"><input id="cmd" class="cmd" placeholder="למשל: סמן ש${esc(first(sPlaced))} הגיע היום" autocomplete="off"><button class="btn primary" id="cmdGo" aria-label="ביצוע">${ic('send')}</button></div>
         <div class="chips" id="chips">
           <button class="chip" data-cmd="סמן ש${esc(first(sPlaced))} הגיע היום">סמן ש${esc(first(sPlaced))} הגיע היום</button>
