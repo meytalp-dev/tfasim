@@ -68,9 +68,9 @@
     const R = l.filter(x => x.rep), io = R.length > 0 && R.every(x => x.out != null), T = sum(R, 'attT');
     return { cnt: l.length, rep: R.length, n: l.some(x => x.n != null) ? sum(l.filter(x => x.n != null), 'n') : null, nRep: R.length ? sum(R, 'n') : null,
       w: R.length ? sum(R, 'w') : null, out: io ? sum(R, 'out') : null, inn: io ? sum(R, 'inn') : null, none: R.length ? sum(R, 'none') : null, noData: R.length ? sum(R, 'noData') : null,
-      places: R.length && R.some(x => x.places != null) ? sum(R, 'places') : null, att: T ? Math.round(sum(R, 'attP') / T * 100) : null, attT: T, attP: sum(R, 'attP'), rep1: R.length > 0 };
+      places: R.length && R.some(x => x.places != null) ? sum(R, 'places') : null, att: T ? Math.round(sum(R, 'attP') / T * 100) : null, attT: T, attP: sum(R, 'attP'), attS: R.filter(x => x.attT).length, rep1: R.length > 0 };
   }
-  const covTxt = A => A.cnt === A.rep ? `דיווחו כל ${A.cnt} בתי הספר` : `דיווחו ${A.rep} מתוך ${A.cnt} בתי ספר` + (A.n != null && A.nRep != null ? ` · ${heb(A.nRep)} מתוך ${heb(A.n)} תלמידים` : '');
+  const covTxt = A => (A.cnt === A.rep ? `דיווחו כל ${A.cnt} בתי הספר` : `דיווחו ${A.rep} מתוך ${A.cnt} בתי ספר` + (A.n != null && A.nRep != null ? ` · ${heb(A.nRep)} מתוך ${heb(A.n)} תלמידים` : '')) + (A.rep ? ` · ${A.attS} סימנו נוכחות` : '');
   const dl = (now, was, u = '') => { if (now == null || was == null) return '<span class="dl">—</span>'; const d = now - was; return `<span class="dl">${d ? (d > 0 ? '▲' : '▼') + ' ' + Math.abs(d) + u : 'ללא שינוי'}</span>`; };
   const ioSeg = (out, inn) => (out ? `<i class="io-o" style="flex:${out} 1 0"></i>` : '') + (inn ? `<i class="io-i" style="flex:${inn} 1 0"></i>` : '');
   const monName = ym => { const p = String(ym || '').split('-'); const N = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר']; return N[+p[1] - 1] || ym; };

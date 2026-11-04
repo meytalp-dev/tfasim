@@ -144,7 +144,7 @@
     all.allMg = names.length; all.subMg = names.filter(function (k) { return mg[k].sub; }).length; all.marked = marked; all.conf = mon.conf || null; all.mg = mg;
     return all;
   }
-  function stateOf(rs, st) { if (rs !== 'active') return rs; if (st.conf || (st.allMg && st.subMg === st.allMg)) return 'done'; return st.marked || st.subMg ? 'partial' : 'silent'; }
+  function stateOf(rs, st) { if (rs !== 'active') return rs; if (st.conf || (st.allMg && st.subMg === st.allMg)) return 'done'; return st.marked || st.subMg || st.out || st.in ? 'partial' : 'silent'; }
   function filterMg(st, sc, school) {
     if (!st || !sc.mg) return st;
     var o = zero(), mg = {}, sub = 0, all = 0;
@@ -185,7 +185,7 @@
       if (i % 2 === 0 && !mgs.some(function (m) { return PRO_CODES.indexOf(m[0]) >= 0; })) mgs.push(FALLBACK_MG[0]);
       var count = 15 + Math.floor(r() * 25);
       for (var j = 0; j < count; j++) {
-        var mg = mgs[j % mgs.length], id = 'Q' + i + 'x' + j, placed = kind !== 4 && r() < 0.5, inner = placed && r() < 0.15;
+        var mg = mgs[j % mgs.length], id = 'Q' + i + 'x' + j, placed = kind !== 4 && kind !== 1 && r() < 0.5, inner = placed && r() < 0.15;
         var emp = placed ? (inner ? 'I' : 'E') + (1 + Math.floor(r() * 6)) : '';
         var p = { id: id, mg: mg[1], mgc: mg[0], cls: (j % 2 ? 'יב' : 'יא') + ' · קבוצה ' + (1 + j % 3), track: '', emp: emp, days: placed ? [0, 2, 4].slice(0, 1 + Math.floor(r() * 3)) : [], status: r() < 0.04 ? 'עזב' : 'לומד', statusSrc: 'list',
           stage: placed ? 1 + Math.floor(r() * 3) : 0, why: !placed && r() < 0.6 ? WHY[Math.floor(r() * 4)] : '', docs: [{ s: 'ok' }, { s: r() < 0.5 ? 'ok' : 'miss' }], created: '2026-09-0' + (1 + j % 9) };
