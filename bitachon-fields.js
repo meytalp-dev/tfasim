@@ -111,7 +111,7 @@ var BITACHON = (function () {
     { key: 'kabatEscort', sec: 'b', label: 'ליווי קב"ט הרשות', type: 'has', req: true },
     { key: 'notesB', sec: 'b', label: 'הערות לנתונים', type: 'note' },
     // ג. מוכנות ואמצעים
-    { key: 'dataFile', sec: 'c', group: 'מאפייני חירום', label: 'תיק נתונים ושטח / ביטחון וחירום מוסדי', type: 'yn', req: true },
+    { key: 'dataFile', sec: 'c', group: 'מאפייני חירום', label: 'קיום תיק ביטחון ושטח מתוקפים לשנת הלימודים', type: 'yn', req: true },
     { key: 'absorption', sec: 'c', group: 'מאפייני חירום', label: 'מוגדר כמתקן קליטה', type: 'yn', req: true },
     { key: 'firstAidKit', sec: 'c', group: 'עזרה ראשונה', label: 'תיק עזרה ראשונה ע"פ תקן', type: 'yn', req: true },
     { key: 'stretcher', sec: 'c', group: 'עזרה ראשונה', label: 'אלונקה לפי תקן', type: 'yn', req: true },
@@ -120,7 +120,7 @@ var BITACHON = (function () {
     { key: 'epipen', sec: 'c', group: 'עזרה ראשונה', label: 'מזרק אפיפן מרכיב חובה', type: 'yn', req: true },
     { key: 'rescueCabinet', sec: 'c', group: 'עזרה ראשונה', label: 'ארון חילוץ מחלץ קל', type: 'yn', req: true },
     { key: 'quakeAlert', sec: 'c', group: 'רעידת אדמה', label: 'האם קיימת מערכת התרעה לרעידת אדמה', type: 'yn', req: true },
-    { key: 'evacPlan', sec: 'c', group: 'פינוי חירום', label: 'האם קיימת תוכנית מוסדרת לפינוי המוסד', type: 'yn', req: true },
+    { key: 'evacPlan', sec: 'c', group: 'פינוי חירום', label: 'תוכנית לפינוי המוסד במצב חירום', type: 'yn', req: true },
     // ד. מיגון
     { key: 'mamadCount', sec: 'd', label: 'מרחב מוגן מוסדי – לציין מספר מרחבים מוגנים', short: 'מרחב מוגן מוסדי – מספר מרחבים', type: 'num', req: true },
     { key: 'mamadArea', sec: 'd', label: 'מרחב מוגן מוסדי – לציין מ"ר של כלל המרחבים המוגנים המוסדיים ביחד', short: 'מרחב מוגן מוסדי – מ"ר (כל המרחבים ביחד)', type: 'num', req: true },

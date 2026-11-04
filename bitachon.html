@@ -272,7 +272,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var d = data();
     B.FIELDS.forEach(function (f) {
       if (!f.when) return;
-      var on = B.active(f, d);
+      // גלוי מההתחלה; נעלם רק אחרי סימון "אין" / "לא"
+      var on = !d[f.when[0]] || B.active(f, d);
       $('q_' + f.key).hidden = !on;
     });
     var calc = B.compute(d);
