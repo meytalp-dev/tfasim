@@ -169,7 +169,7 @@
   function natRow(d, sc, school, ym) {
     var t = d.schools[school], rs = recState(t), cur = ymOf(0), day = +today().slice(8, 10);
     var st = t ? countStats(t.recs, ym) : null, state = rs === 'active' ? stateOf(rs, st) : rs;
-    var locked = ym >= cur ? false : ym === ymOf(1) ? (day > 10 ? 'all' : 'emp') : 'all';
+    var locked = ym >= cur ? false : ym === ymOf(1) ? (day > 15 ? 'all' : 'emp') : 'all';
     return { school: school, semel: semelOf(school), state: state, locked: locked, calcAt: t ? nowS() : '', stats: view(filterMg(st, sc, school), state) };
   }
 
@@ -212,7 +212,7 @@
   }
 
   /* ---------- הקישור למנטור.ית (sochnim/mentor-api.md, c9): אותן רשומות ml:/mp:/mf: כמו ב-gas/מנטור.js ---------- */
-  var MENTOR_CAP = 400, LOCK_DAY = 10;
+  var MENTOR_CAP = 400, LOCK_DAY = 15;
   function mTok(k) { return /^[A-Za-z0-9_-]{20,40}$/.test(String(k || '')); }
   function mId(v) { return /^[A-Za-z0-9]{2,24}$/.test(String(v || '')); }
   function mLink(p) { return { emp: String(p.emp || ''), ids: Array.isArray(p.ids) ? p.ids.map(String) : [], created: String(p.created || ''), revoked: String(p.revoked || ''), wrap: String(p.wrap || '') }; }
