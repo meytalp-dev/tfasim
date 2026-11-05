@@ -139,8 +139,9 @@ window.startApp = function (R) {
   Object.values(NOTES).forEach(o => Object.keys(o).forEach(d => { const v = String(o[d]).replace(/^\s*(לא\s*)?הגיע\.?ה?\s*[-–:,.]*\s*/, '').trim(); if (v) o[d] = v; else delete o[d]; }));
   const TIMES = R.TIMES, OFF = R.OFF;
   const wdOf = d => new Date(MONTH.y, MONTH.m - 1, d).getDay();
-  /* ימי העבודה של החודש: לפני שינוי מערכת הימים — הימים הקודמים (dayHist), ויום שכבר דווח נשאר תמיד (גם "יום נוסף") */
-  function dates(s) { const out = [], a = ATT[s.id] || {}; for (let d = 1; d <= MONTH.last; d++) { const w = s.dayHist && d < s.dayHist.from ? s.dayHist.days : s.days; if (w.includes(wdOf(d)) || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
+  /* ימי העבודה של החודש: לפני שינוי מערכת הימים — הימים הקודמים (dayHist), ויום שכבר דווח נשאר תמיד (גם "יום נוסף").
+     ימים קודמים ריקים = לא היו ימים לשמר, ולכן הם לא מעלימים כלום. ym = חודש השינוי; רשומה ישנה בלי ym: לפי מספר היום בלבד */
+  function dates(s) { const out = [], a = ATT[s.id] || {}, h = s.dayHist && s.dayHist.days && s.dayHist.days.length ? s.dayHist : null; for (let d = 1; d <= MONTH.last; d++) { const w = h && (h.ym ? MONTH.ym < h.ym || (MONTH.ym === h.ym && d < h.from) : d < h.from) ? h.days : s.days; if (w.includes(wdOf(d)) || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
   const wd = d => 'אבגדהוש'[wdOf(d)] + '׳';
   /* יום בלי תעסוקה לכל הכיתה, והשעיה של תלמיד.ה — נרשמים כ"לא בעבודה" בימי העבודה. הסימון שהיה נשמר (OFFBAK) וחוזר בביטול */
   /* הסימון המקורי של יום נשמר פעם אחת בלבד — ב-OFFBAK (יום בלי תעסוקה) או ב-SUSPBAK (השעיה) — וחוזר כששניהם הוסרו */
@@ -858,7 +859,7 @@ window.startApp = function (R) {
       else return;
       redo(); toast('המצב של ' + s.name + ' עודכן');
     };
-    $('dayPick').onclick = e => { const b = e.target.closest('[data-day]'); if (!b || b.disabled) return; const i = +b.dataset.day; if (!s.dayHist) s.dayHist = { from: MONTH.today, days: [...s.days] }; s.days = s.days.includes(i) ? s.days.filter(x => x !== i) : [...s.days, i].sort(); redo(); toast('ימי העבודה של ' + s.name + ' עודכנו'); };
+    $('dayPick').onclick = e => { const b = e.target.closest('[data-day]'); if (!b || b.disabled) return; const i = +b.dataset.day; if (!s.dayHist) s.dayHist = { from: MONTH.back ? 1 : MONTH.today, ym: MONTH.ym, days: [...s.days] }; s.days = s.days.includes(i) ? s.days.filter(x => x !== i) : [...s.days, i].sort(); redo(); toast('ימי העבודה של ' + s.name + ' עודכנו'); };
   }
   function openTik(id, o) { const s = STU.find(x => x.id === id); if (!s) return; const t = topSub(); if (t && t.key === 'tik' && t.id === id && cur() === 'sub') { refreshSub(); return; } openSub({ key: 'tik', id, title: () => `${esc(s.name)}${statusTag(s)}`, html: () => tikHtml(s), bind: el => tikBind(el, s) }, o); }
   document.addEventListener('click', e => {

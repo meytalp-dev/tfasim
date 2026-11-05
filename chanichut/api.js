@@ -119,7 +119,7 @@
   /* ---------- ספירה (כמו countStats_ בשרת) ---------- */
   function wdOf(ym, d) { var p = ym.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, d)).getUTCDay(); }
   function lastDay(ym) { var p = ym.split('-'); return new Date(Date.UTC(+p[0], +p[1], 0)).getUTCDate(); }
-  function workDays(s, a, ym, upto) { var out = [], days = Array.isArray(s.days) ? s.days : [], h = s.dayHist && Array.isArray(s.dayHist.days) ? s.dayHist : null; for (var d = 1; d <= upto; d++) { var w = h && d < +h.from ? h.days : days; if (w.indexOf(wdOf(ym, d)) >= 0 || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
+  function workDays(s, a, ym, upto) { var out = [], days = Array.isArray(s.days) ? s.days : [], h = s.dayHist && Array.isArray(s.dayHist.days) && s.dayHist.days.length ? s.dayHist : null; for (var d = 1; d <= upto; d++) { var w = h && (h.ym ? ym < h.ym || (ym === h.ym && d < +h.from) : d < +h.from) ? h.days : days; if (w.indexOf(wdOf(ym, d)) >= 0 || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
   function zero() { return { n: 0, out: 0, in: 0, noData: 0, why: {}, places: 0, stage: [0, 0, 0, 0, 0], att: { p: 0, t: 0, u: 0 } }; }
   function countStats(recs, ym) {
     var cur = ymOf(0), upto = ym === cur ? +today().slice(8, 10) : ym < cur ? lastDay(ym) : 0, stus = [], att = {}, mon = {};
