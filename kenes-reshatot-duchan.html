@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>כנס 23.11 · דוכני הרשתות</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2'><path d='M3 21h18M5 21V10M19 21V10M9 21v-7h6v7M2 10l10-7 10 7'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --sky:#74C3ED;
+  --blue-soft:#eaf0ff; --ink:#16203c; --muted:#65739a; --line:#e3e9f5;
+  --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550; --amber:#c87415; --amber-soft:#fff4e6;
+  --w1:#2D6BFF; --w2:#FF4F2B; --w3:#10A35A; --w4:#9B4DFF; --w5:#E09A00;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px;position:relative}
+.strip{height:6px;background:linear-gradient(90deg,var(--w1) 0 20%,var(--w2) 20% 40%,var(--w3) 40% 60%,var(--w4) 60% 80%,var(--w5) 80%)}
+.site{padding:22px 0 0}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;max-width:100%;display:block}
+@media (max-width:480px){.logo{height:46px}}
+
+.hero{text-align:center;padding:18px 0 4px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);
+  box-shadow:var(--shadow-s);border-radius:999px;padding:7px 18px;font-size:15px;font-weight:700;color:var(--navy)}
+.eyebrow svg{width:17px;height:17px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(28px,6vw,40px);line-height:1.18;margin:16px 0 12px;font-weight:700;color:var(--navy)}
+.hero .lede{font-size:18px;font-weight:600;color:#3d4a70;max-width:52ch;margin:0 auto}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:30px;margin-top:22px}
+@media (max-width:560px){.card{padding:22px 16px}}
+.about p{margin:0 0 12px;color:#3d4a70}
+.about p:last-child{margin-bottom:0}
+.about .key{color:var(--ink);font-weight:700}
+.notice{display:flex;gap:11px;background:var(--amber-soft);border:1px solid #f4dcbc;border-radius:14px;padding:14px 16px;margin-top:16px;color:#6b4310;font-weight:600}
+.notice svg{flex:none;width:22px;height:22px;margin-top:2px;stroke:var(--amber);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.part{display:flex;align-items:center;gap:10px;font-family:'Rubik',sans-serif;font-size:14px;font-weight:600;color:var(--blue);margin:0 0 20px}
+.part::after{content:"";flex:1;height:1px;background:var(--line)}
+.q{margin-top:22px}
+.qtext{font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;line-height:1.38;margin-bottom:8px;display:block}
+.qtext .req{color:var(--blue)}
+.qtext .opt{color:var(--muted);font-family:'Assistant',sans-serif;font-size:15px;font-weight:500}
+
+input[type=text],input[type=tel],textarea,select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+input[type=tel]{direction:ltr;text-align:right}
+select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
+textarea{min-height:84px;resize:vertical;line-height:1.55}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:7px}
+.err.on{display:block}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:560px){.two{grid-template-columns:1fr}}
+.cond{display:none;margin-top:10px}
+.cond.on{display:block}
+
+.item{border:2px solid var(--line);border-radius:18px;padding:20px;margin-top:16px;background:#fff}
+@media (max-width:560px){.item{padding:16px 14px}}
+.item-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.item-head h3{font-family:'Rubik',sans-serif;font-size:19px;color:var(--navy);margin:0}
+.item .q:first-of-type{margin-top:14px}
+.remove{background:none;border:0;padding:8px 4px;color:var(--danger);font-family:inherit;font-weight:700;font-size:15px;cursor:pointer}
+.add{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:13px 16px;background:var(--blue-soft);
+  border:2px dashed var(--blue);border-radius:14px;color:var(--navy);font-family:inherit;font-weight:700;font-size:17px;cursor:pointer}
+.add svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round}
+
+.confirm{display:flex;gap:12px;align-items:flex-start;padding:15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;cursor:pointer;margin:0}
+.confirm input{flex:none;width:22px;height:22px;margin:3px 0 0;accent-color:var(--blue);cursor:pointer}
+.confirm b{display:block;color:var(--navy);font-family:'Rubik',sans-serif;font-weight:600;margin-bottom:3px}
+.confirm:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+.confirm.bad{border-color:var(--danger)}
+
+.actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line)}
+.btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26)}
+.btn:disabled{opacity:.6;cursor:default}
+.msg{display:none;border-radius:18px;padding:22px;margin-top:20px;text-align:center}
+.msg.on{display:block}
+.msg.ok{background:linear-gradient(160deg,#eafaf6,#f4fffd);border:1px solid #b9ebe1}
+.msg.fail{background:#fff7f8;border:1px solid #f4c9ce}
+.msg svg.big{width:42px;height:42px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.msg.ok svg.big{stroke:var(--mint)}
+.msg.fail svg.big{stroke:var(--danger)}
+.msg h3{font-family:'Rubik',sans-serif;font-size:22px;margin:8px 0 6px;color:var(--navy)}
+.msg p{margin:0 0 6px;color:#3d4a70;font-size:16.5px}
+.again{background:#fff;border:2px solid var(--danger);color:var(--danger);border-radius:12px;padding:10px 16px;font-family:inherit;font-weight:700;font-size:15.5px;cursor:pointer;margin-top:12px}
+input.hp{position:absolute!important;width:1px!important;height:1px!important;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+
+footer{text-align:center;padding:30px 20px 40px;color:var(--muted);font-size:14.5px}
+footer a{color:var(--navy);font-weight:600;text-decoration:none}
+.helpbtn{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow-s);border-radius:999px;padding:10px 20px;font-size:15px;font-weight:600;color:var(--muted)!important;margin-bottom:18px}
+.helpbtn svg{flex:none;width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.credit{margin-top:12px;font-size:13.5px;opacity:.85}
+</style>
+</head>
+<body>
+<div class="strip"></div>
+<header class="site"><div class="wrap"><img class="logo" src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>כנס המנהלים · 23.11</span>
+    <h1>הרשמה להצגת דוכן רשת בכנס המנהלים</h1>
+    <p class="lede">יוזמות רשתיות – יוצרים חדשנות והצלחה בבתי הספר המקצועיים</p>
+  </section>
+
+  <section class="card about">
+    <p>במסגרת כנס המנהלים ״מנהיגות אנושית בעידן של בינה מלאכותית״, אנו מזמינים את רשתות החינוך לקחת חלק בתערוכה ולהציג יוזמות, פרויקטים ותהליכים ייחודיים שהרשת מובילה בשיתוף בתי הספר המקצועיים של משרד העבודה.</p>
+    <p>זוהי הזדמנות לחשוף עשייה רשתית משמעותית, להציג מודלים חדשניים, לשתף בהצלחות ולהעניק השראה לרשתות ולבתי ספר נוספים.</p>
+    <p class="key">חשוב להדגיש: דוכן הרשת הוא באחריותה המלאה של רשת החינוך, לרבות בחירת התכנים, תכנון התצוגה, הכנת החומרים והקמת הדוכן.</p>
+    <p>תצוגת הרשתות נפרדת מתערוכת בתי הספר, שבה מנהלי בתי הספר מציגים יוזמות, תוצרים וסיפורי הצלחה בית ספריים.</p>
+    <p>בדוכני הרשתות הדגש הוא על יוזמות רוחביות, פרויקטים ותהליכים שהרשת מובילה בשיתוף בתי הספר המקצועיים, תוך הצגת הערך המוסף של הרשת והשפעתה על העשייה החינוכית והמקצועית.</p>
+    <p>ניתן להציג באמצעות תוצרים, תמונות, סרטונים, מצגות, מיצגים ואמצעים יצירתיים נוספים.</p>
+    <p>אנו מעודדים את הרשתות להקים דוכנים יצירתיים, חזותיים ומעוררי השראה, שישקפו את העשייה הייחודית שלהן ואת תרומתן לקידום בתי הספר המקצועיים.</p>
+    <div class="notice"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><div>התערוכה אמורה לעמוד בשעה 9:00, אנא היערכו בהתאם. במידה ותרצו להעביר אלינו את הדברים מראש, הדבר אפשרי בהחלט.</div></div>
+  </section>
+
+  <form class="card" id="form" novalidate>
+    <input type="text" class="hp" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <div class="part">פרטי הרשת</div>
+    <div class="q" style="margin-top:0">
+      <label class="qtext" for="network">שם הרשת <span class="req">*</span></label>
+      <select id="network"><option value="">בחירת רשת</option></select>
+      <div class="err" id="e_network">נא לבחור רשת.</div>
+      <div class="cond" id="netOtherWrap"><input type="text" id="netOther" placeholder="שם הרשת"><div class="err" id="e_netOther">נא לכתוב את שם הרשת.</div></div>
+    </div>
+    <div class="q">
+      <div class="two">
+        <div><label class="qtext" for="owner">שם האחראי.ת מטעם הרשת <span class="req">*</span></label><input type="text" id="owner" autocomplete="name" placeholder="שם פרטי ושם משפחה"><div class="err" id="e_owner">נא למלא שם מלא.</div></div>
+        <div><label class="qtext" for="phone">מספר טלפון <span class="req">*</span></label><input type="tel" id="phone" autocomplete="tel" inputmode="tel" placeholder="050-0000000"><div class="err" id="e_phone">נא למלא מספר טלפון.</div></div>
+      </div>
+    </div>
+
+    <div class="part" style="margin:34px 0 0">היוזמות שיוצגו בדוכן</div>
+    <div id="items"></div>
+    <button type="button" class="add" id="addBtn"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>הוספת יוזמה נוספת</button>
+
+    <div class="part" style="margin:34px 0 14px">אישור אחריות הרשת להקמת הדוכן <span class="req" style="color:var(--blue)">*</span></div>
+    <label class="confirm" id="confirmBox">
+      <input type="checkbox" id="confirm">
+      <span>אנו מאשרים כי הקמת הדוכן, הכנת התכנים והחומרים והצגת היוזמות הן באחריות רשת החינוך, וכי מדובר בתצוגה רשתית נפרדת מתערוכת בתי הספר.</span>
+    </label>
+    <div class="err" id="e_confirm">נא לאשר כדי להשלים את ההרשמה.</div>
+
+    <div class="actions">
+      <button type="submit" class="btn" id="submitBtn">שליחה</button>
+    </div>
+
+    <div class="msg fail" id="badBox">
+      <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+      <h3>השליחה לא הושלמה</h3>
+      <p>לא הצלחנו לוודא שהפרטים נקלטו. הם שמורים בדפדפן, ואפשר לנסות שוב.</p>
+      <button type="button" class="again" id="retryBtn">נסו שוב</button>
+    </div>
+  </form>
+
+  <section class="card msg ok" id="okBox">
+    <svg class="big" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.6-4.9"/></svg>
+    <h3>ההרשמה התקבלה</h3>
+    <p id="okText"></p>
+  </section>
+</main>
+
+<footer>
+  <a class="helpbtn" href="mailto:merhav@pedagogiamh.co.il?subject=%D7%A9%D7%90%D7%9C%D7%94%20%D7%A2%D7%9C%20%D7%93%D7%95%D7%9B%D7%9F%20%D7%94%D7%A8%D7%A9%D7%AA%20%D7%91%D7%9B%D7%A0%D7%A1%2023.11&body=%D7%A9%D7%9C%D7%95%D7%9D%2C%0A%D7%A8%D7%A9%D7%AA%3A%20%0A%0A%D7%94%D7%A9%D7%90%D7%9C%D7%94%20/%20%D7%94%D7%91%D7%A2%D7%99%D7%94%20%D7%91%D7%98%D7%95%D7%A4%D7%A1%3A%0A">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+    נתקלתם בבעיה? שלחו הודעה
+  </a>
+  <div>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<script>
+var API_URL = "https://script.google.com/macros/s/AKfycbzwzbcv2BPft8rNmK1U-ADYlcQ3sxt1_khT7YyZzXYsmIB8LzKqZXNMAzewli0TsWQU/exec";
+var DRAFT_KEY = "kenes-duchan-draft", CID_KEY = "kenes-duchan-cid";
+/* the same list as the conference form (kenes-reshatot.html) */
+var NETWORKS = ["אורט","עמל","עתיד","דרור","סכנין","רימונים","בית שלומית","חנוך לנער","ימינו כקדם","טל חרמון","נחלים","אחרת"];
+var ITEM_KEYS = ["name","unique","show","gear"];
+
+var $ = function(id){ return document.getElementById(id); };
+var esc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); };
+var itemSeq = 0;
+
+$("network").insertAdjacentHTML("beforeend", NETWORKS.map(function(s){ return '<option value="'+esc(s)+'">'+esc(s)+'</option>'; }).join(""));
+
+/* ---------- initiatives ---------- */
+function addItem(v){
+  v = v || {};
+  var n = ++itemSeq, el = document.createElement("div");
+  el.className = "item";
+  el.innerHTML =
+    '<div class="item-head"><h3 class="item-title"></h3><button type="button" class="remove">הסרה</button></div>' +
+    '<div class="q"><label class="qtext" for="i'+n+'_name">שם היוזמה <span class="req">*</span></label>' +
+      '<input type="text" id="i'+n+'_name" data-k="name"><div class="err">נא למלא את שם היוזמה.</div></div>' +
+    '<div class="q"><label class="qtext" for="i'+n+'_unique">ייחודיות היוזמה <span class="req">*</span></label>' +
+      '<textarea id="i'+n+'_unique" data-k="unique" rows="2"></textarea><div class="err">נא לתאר את ייחודיות היוזמה.</div></div>' +
+    '<div class="q"><label class="qtext" for="i'+n+'_show">כיצד תוצג בכנס <span class="req">*</span></label>' +
+      '<textarea id="i'+n+'_show" data-k="show" rows="2"></textarea><div class="err">נא לכתוב כיצד היוזמה תוצג בכנס.</div></div>' +
+    '<div class="q"><label class="qtext" for="i'+n+'_gear">ציוד נדרש <span class="opt">(אם לא נדרש, משאירים ריק)</span></label>' +
+      '<input type="text" id="i'+n+'_gear" data-k="gear"></div>';
+  ITEM_KEYS.forEach(function(k){ if (v[k]) el.querySelector('[data-k="'+k+'"]').value = v[k]; });
+  el.querySelector(".remove").addEventListener("click", function(){ el.remove(); renumber(); saveDraft(); });
+  $("items").appendChild(el);
+  renumber();
+  return el;
+}
+function renumber(){
+  var list = document.querySelectorAll(".item");
+  [].forEach.call(list, function(el, i){
+    el.querySelector(".item-title").textContent = "יוזמה " + (i + 1);
+    el.querySelector(".remove").hidden = list.length === 1;
+  });
+}
+$("addBtn").addEventListener("click", function(){
+  var el = addItem();
+  el.scrollIntoView({behavior:"smooth", block:"center"});
+  el.querySelector('[data-k="name"]').focus({preventScroll:true});
+  saveDraft();
+});
+
+/* ---------- read / write ---------- */
+function netName(){ return $("network").value === "אחרת" ? $("netOther").value.trim() : $("network").value; }
+function collect(){
+  return {
+    network: netName(), owner: $("owner").value.trim(), phone: $("phone").value.trim(), confirm: $("confirm").checked,
+    items: [].map.call(document.querySelectorAll(".item"), function(el){
+      var o = {}; ITEM_KEYS.forEach(function(k){ o[k] = el.querySelector('[data-k="'+k+'"]').value.trim(); }); return o;
+    })
+  };
+}
+function refresh(){ $("netOtherWrap").classList.toggle("on", $("network").value === "אחרת"); }
+function saveDraft(){ try{ localStorage.setItem(DRAFT_KEY, JSON.stringify(collect())); }catch(e){} }
+$("form").addEventListener("change", function(){ refresh(); saveDraft(); });
+$("form").addEventListener("input", function(){ clearTimeout(refresh.t); refresh.t = setTimeout(saveDraft, 300); });
+
+/* ---------- validation ---------- */
+function validate(d){
+  var ok = true, first = null;
+  function bad(errEl, cond, field){ errEl.classList.toggle("on", cond); if (field) field.classList.toggle("bad", cond); if (cond){ ok = false; first = first || errEl; } }
+  bad($("e_network"), !$("network").value, $("network"));
+  bad($("e_netOther"), $("network").value === "אחרת" && !d.network, $("netOther"));
+  bad($("e_owner"), d.owner.split(/\s+/).length < 2, $("owner"));
+  bad($("e_phone"), d.phone.replace(/\D/g,"").length < 9, $("phone"));
+  [].forEach.call(document.querySelectorAll(".item"), function(el){
+    ["name","unique","show"].forEach(function(k){
+      var f = el.querySelector('[data-k="'+k+'"]');
+      bad(f.parentNode.querySelector(".err"), !f.value.trim(), f);
+    });
+  });
+  bad($("e_confirm"), !d.confirm, $("confirmBox"));
+  if (first) first.scrollIntoView({behavior:"smooth", block:"center"});
+  return ok;
+}
+
+/* ---------- save ---------- */
+/* cid: the same submission sent twice (a retry after a lost reply) is saved once */
+function getCid(){
+  var c = "";
+  try{ c = localStorage.getItem(CID_KEY) || ""; }catch(e){}
+  if (!c){
+    var a = new Uint8Array(16); (window.crypto || window.msCrypto).getRandomValues(a);
+    c = "d" + Array.prototype.map.call(a, function(x){ return ("0" + x.toString(16)).slice(-2); }).join("");
+    try{ localStorage.setItem(CID_KEY, c); }catch(e){}
+  }
+  return c;
+}
+function submit(){
+  var d = collect(); if (!validate(d)) return;
+  saveDraft();
+  var btn = $("submitBtn"); btn.disabled = true; btn.textContent = "שולח…"; $("badBox").classList.remove("on");
+  var cid = getCid();
+  var body = { action:"duchan", cid:cid, network:d.network, owner:d.owner, phone:d.phone, confirm:d.confirm, items:d.items, website:$("website").value };
+  function saveOnce(){
+    return fetch(API_URL, { method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), credentials:"omit", redirect:"follow" })
+      .then(function(r){ return r.json(); })
+      .catch(function(){
+        /* no readable reply: ask the server whether this submission arrived */
+        return fetch(API_URL + "?mode=duchanCheck&cid=" + encodeURIComponent(cid), { credentials:"omit" })
+          .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; });
+      });
+  }
+  function saveTry(n){
+    return saveOnce().then(function(r){
+      if ((r && r.ok) || (r && r.error === "missing") || n >= 3) return r;
+      return new Promise(function(res){ setTimeout(res, 2500 * n); }).then(function(){ return saveTry(n + 1); });
+    });
+  }
+  saveTry(1).then(function(r){
+    btn.disabled = false; btn.textContent = "שליחה";
+    if (r && r.ok){
+      try{ localStorage.removeItem(DRAFT_KEY); localStorage.removeItem(CID_KEY); }catch(e){}
+      var n = d.items.length;
+      $("okText").textContent = "תודה, " + d.owner.split(" ")[0] + ". " + (n === 1 ? "היוזמה של " + d.network + " נקלטה." : n + " היוזמות של " + d.network + " נקלטו.");
+      $("form").hidden = true;
+      $("okBox").classList.add("on");
+      $("okBox").scrollIntoView({behavior:"smooth", block:"center"});
+    } else {
+      $("badBox").classList.add("on");
+      $("badBox").scrollIntoView({behavior:"smooth", block:"center"});
+    }
+  });
+}
+$("form").addEventListener("submit", function(ev){ ev.preventDefault(); submit(); });
+$("retryBtn").addEventListener("click", submit);
+
+/* ---------- start: draft in the browser, or one empty initiative ---------- */
+(function start(){
+  var draft = null;
+  try{ draft = JSON.parse(localStorage.getItem(DRAFT_KEY) || "null"); }catch(e){}
+  if (draft){
+    if (NETWORKS.indexOf(draft.network) >= 0) $("network").value = draft.network;
+    else if (draft.network){ $("network").value = "אחרת"; $("netOther").value = draft.network; }
+    $("owner").value = draft.owner || "";
+    $("phone").value = draft.phone || "";
+    $("confirm").checked = !!draft.confirm;
+    (draft.items || []).forEach(addItem);
+  }
+  if (!document.querySelector(".item")) addItem();
+  refresh();
+})();
+</script>
+</body>
+</html>
