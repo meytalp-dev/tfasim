@@ -316,10 +316,12 @@
       $('natHomeNo').textContent = L.length ? '' : 'אין בתי ספר בהיקף שלך';
     }
     /* נקודת הפתיחה: דיווח חיצוני, מסומן ונפרד. לא בקו המגמה ולא בהשוואה */
+    /* מועסקים בנקודת הפתיחה: במגמות יש רק סך (w), בלי חלוקה לחוץ ופנים. למפקח.ת מקצועי.ת השרת מחזיר רק את המגמות שלו.ה */
+    const baseMg = st => Object.entries((st && st.mg) || {}), baseW = st => { const m = baseMg(st); return m.length ? m.reduce((a, [, x]) => a + (+x.w || 0), 0) : (+st.out || 0) + (+st.in || 0); };
     function baseCard() {
       if (!BASE || !BASE.rows.length) return '';
-      const l = BASE.rows.filter(r => r.stats && r.stats.n != null), n = sum(l.map(r => r.stats), 'n'), w = sum(l.map(r => r.stats), 'out') + sum(l.map(r => r.stats), 'in'), p = n ? Math.round(w / n * 100) : null;
-      if (!l.length) return `<div class="nh-card nh-base"><h3>נקודת הפתיחה <em class="tag mid">דיווח חיצוני · ${esc(BASE.mon)}</em></h3><p class="hint">נקודת הפתיחה היא לפי בית ספר בלבד, ולא לפי מגמה.</p></div>`;
+      const l = BASE.rows.filter(r => r.stats && r.stats.n != null), n = sum(l.map(r => r.stats), 'n'), w = l.reduce((a, r) => a + baseW(r.stats), 0), p = n ? Math.round(w / n * 100) : null;
+      if (!l.length) return `<div class="nh-card nh-base"><h3>נקודת הפתיחה <em class="tag mid">דיווח חיצוני · ${esc(BASE.mon)}</em></h3><p class="hint">אין בנקודת הפתיחה נתון למגמות שבהיקף שלך.</p></div>`;
       return `<div class="nh-card nh-base"><h3>נקודת הפתיחה <em class="tag mid">דיווח חיצוני · ${esc(BASE.mon)}</em></h3><p><b class="nh-big">${pc(p)}</b> <b>${heb(w)}</b> מועסקים מתוך <b>${heb(n)}</b> לומדים · ${l.length} בתי ספר</p><p class="hint">מקור: ${esc(BASE.source)} · ${esc(BASE.date)}. לא חלק מקו המגמה של המערכת ולא נכנס להשוואה.</p></div>`;
     }
     /* ---------- מסך קטגוריה: סיכום, גרף, סינון, חיפוש, טבלה, רמזור ---------- */
@@ -476,7 +478,7 @@
         if (x.state === 'none') S.stu = S.stu || [];
         const pm = prevMap(), P = F.cmp && pm[name] && pm[name].rep ? pm[name] : null, M = x.mgs.map(m => Object.assign({}, m, { prev: P ? P.mgs.find(q => q.key === m.key) || null : null })).sort((a, b) => empPct(a) - empPct(b));
         const cols = [['מגמה', m => `<b>${esc(m.mg)}</b>`], ['מפקח.ת מקצועי.ת', m => esc(m.ps === NO_PS ? '—' : m.ps)], ['תלמידים', m => m.n], ['מועסקים', m => m.w], ['תעסוקה', m => pc(empPct(m))], ...cmpCols(), ...ioCols, ['לא מועסקים', m => m.none], ...tailCols, ['הגשה', m => m.sub ? '<em class="tag ok">הוגש</em>' : '<em class="tag no">טרם</em>']];
-        const base = BASE && BASE.rows.find(r => r.school === name), bs = base && base.stats && base.stats.n != null ? base.stats : null, bw = bs ? (+bs.out || 0) + (+bs.in || 0) : null;
+        const base = BASE && BASE.rows.find(r => r.school === name), bs = base && base.stats && base.stats.n != null ? base.stats : null, bw = bs ? baseW(bs) : null, bm = bs ? baseMg(bs).sort((a, b) => b[1].n - a[1].n) : [];
         const kp = x.rep ? [[heb(x.n), 'תלמידים בחניכות', P && dl(x.n, P.n)], [heb(x.w), 'מועסקים', P && dl(x.w, P.w)], [pc(empPct(x)), 'תעסוקה', P && dl(empPct(x), empPct(P), ' נק׳')], [heb(x.out), 'תעסוקת חוץ', P && dl(x.out, P.out)], [heb(x.inn), 'תעסוקת פנים', P && dl(x.inn, P.inn)], [heb(x.none), 'לא מועסקים', P && dl(x.none, P.none)], [dash(x.noData), 'בלי מידע על תעסוקה'], [pc(x.att), 'נוכחות בתעסוקה'], [dash(x.places), 'מקומות תעסוקה']] : [[heb(x.n), 'תלמידים בחניכות'], ['—', 'מועסקים'], [pc(null), 'תעסוקה']];
         return `<div class="nat-sch-head"><p class="hint">${esc(x.s)} · ${esc(x.net)} · ${esc(x.d)} · מפקח.ת פדגוגי.ת: ${esc(x.sup || '—')}</p><div class="emp-b noprint"><button class="btn" data-act="print">${ic('print')}הדפסה</button></div></div>
         <p class="nat-sch-mon">${monTag()} ${stateTag(x)}${P ? ` <span class="hint">מול ${esc(mLbl(F.cmp))}</span>` : ''}${x.calcAt ? ` <span class="hint">חושב ${esc(x.calcAt)}</span>` : ''}</p>
@@ -484,6 +486,7 @@
         ${x.rep ? '' : `<p class="hint">${x.state === 'pending' ? 'בית הספר עוד לא הופעל: הרשימה מחכה מוצפנת.' : x.state === 'none' ? 'לבית הספר אין עדיין מרחב במערכת.' : 'בית הספר טרם דיווח החודש (אין סימון נוכחות, הגשה או אישור). נתוני התעסוקה לא מוצגים.'}</p>`}
         <div class="kpis">${kp.map(([v, l, d]) => `<div class="kpi"><b>${v}</b><span>${l}</span>${d ? `<small class="kd">${d}</small>` : ''}</div>`).join('')}</div>
         ${bs ? `<p class="hint"><em class="tag mid">דיווח חיצוני · ${esc(BASE.mon)}</em> ${heb(bw)} מתוך ${heb(bs.n)} מועסקים (${bs.n ? Math.round(bw / bs.n * 100) : '—'}%) · נקודת הפתיחה, לא חלק מקו המגמה</p>` : ''}
+        ${bm.length ? `<details class="grp base-mg"><summary>${esc(BASE.mon)} לפי מגמה <small>${bm.length} מגמות · דיווח חיצוני</small></summary>${tbl([['מגמה', r => esc(r[0])], ['לומדים', r => r[1].n], ['מועסקים', r => r[1].w], ['תעסוקה', r => r[1].n ? Math.round(r[1].w / r[1].n * 100) + '%' : '—']], bm)}</details>` : ''}
         ${x.rep ? `<h3 class="sub-h">לפי מגמה</h3>${tbl(cols, M)}` : ''}
         ${stuSection(x)}${empSection(x)}`;
       }, bind: el => { el.onclick = e => { const b = e.target.closest('[data-pk]'); if (b && ROLE !== 'pro') openSub(natPsSpec(b.dataset.pk)); }; } };
