@@ -283,7 +283,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
         <div class="q">
           <label class="ql" for="f_semel">סמל מוסד של משרד החינוך <span class="req">*</span></label>
           <input type="text" id="f_semel" inputmode="numeric" maxlength="8" dir="ltr" autocomplete="off">
-          <div class="hint" id="semelHint" hidden>מולא לפי בית הספר שבחרתם. אם סמל המוסד במשרד החינוך שונה, תקנו כאן.</div>
+          <div class="hint" id="semelHint">כותבים כאן את הסמל של בית הספר במשרד החינוך, ולא את הסמל של משרד העבודה.</div>
           <div class="err" id="e_semel">נא לכתוב סמל מוסד (מספר)</div>
         </div>
         <div id="trows"></div>
@@ -351,10 +351,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   var FORM = null, PICK = '', loading = false;
   /* מורים להעברה למשרד החינוך (3.11.26) */
   var TEACHER_ISSUES = ['המייל שלי לא רשום במערכת', 'מורים או תלמידים בלי הרשאה או בלי מייל ארגוני'];
-  var MOSDOT = 'https://pedagogiamh.co.il/data/mosdot.json';   /* סמל מוסד לכל בית ספר, מפריסת הפיקוח */
   var XLSX_SRC = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
   var MAX_ROWS = 300;
-  var SEMEL = null, semelLoading = null, xlsxLoading = null;
+  var xlsxLoading = null;
   var rowSeq = 0, fileRows = [], fileLabel = '', teachersSent = null;
 
   function esc(s) {
@@ -450,7 +449,6 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       }
     });
     if ($('f_issue')) $('f_issue').addEventListener('change', toggleTeachers);
-    $('f_school').addEventListener('change', fillSemel);
     addRow();
     $('loading').hidden = true;
     $('form').hidden = false;
@@ -580,7 +578,6 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var on = !!sel && TEACHER_ISSUES.indexOf(sel.value) > -1;
     $('teachersQ').classList.toggle('on', on);
     if (!on) return;
-    fillSemel();
     /* פנייה על עצמי: השם והמייל שלמעלה נכנסים לשורה הראשונה, אפשר לשנות */
     if (sel.value === TEACHER_ISSUES[0]) {
       var r = $('trows').querySelector('.trow');
@@ -592,32 +589,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     }
   }
 
-  /* סמל מוסד לפי בית הספר, מפריסת הפיקוח; נטען פעם אחת כשצריך */
-  function loadSemel() {
-    if (SEMEL) return Promise.resolve(SEMEL);
-    if (!semelLoading) {
-      semelLoading = fetchJson(MOSDOT, {}, 20000).then(function (d) {
-        SEMEL = {};
-        (d.schools || []).forEach(function (s) { if (s.name && s.semel) SEMEL[s.name] = String(s.semel); });
-        return SEMEL;
-      }).catch(function () { semelLoading = null; return null; });
-    }
-    return semelLoading;
-  }
-  function fillSemel() {
-    if (!teachersOn()) return;
-    var el = $('f_semel'), school = $('f_school').value;
-    if (el.value && el.getAttribute('data-auto') !== '1') return;   /* נכתב ידנית — לא דורסים */
-    loadSemel().then(function (map) {
-      var s = map && school ? map[school] : '';
-      if (!s && el.getAttribute('data-auto') !== '1') return;
-      el.value = s || '';
-      el.setAttribute('data-auto', s ? '1' : '0');
-      $('semelHint').hidden = !s;
-      if (s) mark('semel', false, el);
-    });
-  }
-  $('f_semel').addEventListener('input', function () { this.setAttribute('data-auto', '0'); $('semelHint').hidden = true; });
+  /* סמל מוסד: המורים כותבים ידנית, כי הסמלים ב-mosdot.json הם של משרד העבודה ולהעברה צריך את של משרד החינוך (5.11.26) */
+  $('f_semel').addEventListener('input', function () { mark('semel', false, this); });
 
   /* שורות ידניות */
   var FIELDS = [
@@ -746,7 +719,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     $('tprev').innerHTML = '';
     $('f_nolist').checked = false;
     $('e_teachers').classList.remove('on');
-    $('f_semel').value = ''; $('f_semel').setAttribute('data-auto', '1'); $('semelHint').hidden = true;
+    $('f_semel').value = '';
   }
 
   /* קובץ אקסל עם רשימה: נקרא בדפדפן (SheetJS), הכותרות מזוהות לבד, והשורות מוצגות לפני השליחה */
