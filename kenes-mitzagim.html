@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>מיצגי המנהלים בכנס</title>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;900&family=Assistant:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3EDE2;--ink:#1D1B18;--soft:#5E574D;--teal:#1F6F5C;--amber:#C2620C;--line:#D8CFBF}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.65 Assistant,Arial,sans-serif}
+main{max-width:760px;margin:0 auto;padding:0 16px 40px}
+.logo{background:#fff;margin:0 -16px;padding:14px 16px;text-align:right}
+.logo img{height:46px;width:auto;max-width:100%;display:block}
+h1,h2{font-family:"Frank Ruhl Libre",Georgia,serif;font-weight:900;line-height:1.2;overflow-wrap:anywhere}
+h1{font-size:34px;margin:28px 0 8px}
+h2{font-size:25px;margin:2px 0 12px;color:var(--teal)}
+section,.block{border-top:1px solid var(--line);padding:22px 0 8px;margin-top:22px;scroll-margin-top:8px}
+.kicker{margin:0;color:var(--amber);font-weight:600;font-size:14px;letter-spacing:.06em}
+.lead{color:var(--soft);margin:0 0 6px}
+.count{font-family:"Frank Ruhl Libre",Georgia,serif;font-weight:900;font-size:21px;margin:6px 0}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0 4px}
+button{font:600 16px Assistant,Arial,sans-serif;min-height:44px;padding:8px 16px;background:var(--teal);color:#fff;border:0;cursor:pointer}
+button.alt{background:transparent;color:var(--teal);border:1px solid var(--teal)}
+.hint{color:var(--soft);font-size:15px;margin:6px 0 0}
+.new{display:inline-block;background:var(--amber);color:#fff;font-weight:600;font-size:13px;padding:0 8px;margin-inline-start:8px;vertical-align:middle;font-family:Assistant,Arial,sans-serif}
+ol.list,ul.list{list-style:none;margin:10px 0 0;padding:0}
+.list li{padding:9px 0;border-top:1px solid var(--line)}
+.list a{color:var(--teal);font-weight:600;overflow-wrap:anywhere}
+.sub{color:var(--soft);font-size:15px}
+dl{margin:0}
+dt{color:var(--amber);font-weight:600;font-size:14px;margin-top:12px}
+dd{margin:0;white-space:pre-line;overflow-wrap:anywhere}
+.empty{color:var(--soft);font-style:italic}
+.gate{padding:60px 0;text-align:center;color:var(--soft)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;font-size:15px;visibility:hidden;z-index:9}
+.toast.on{visibility:visible}
+footer{border-top:1px solid var(--line);margin-top:30px;padding-top:14px;color:var(--soft);font-size:14px}
+footer a{color:var(--soft)}
+</style>
+</head>
+<body>
+<main>
+<div class="logo"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+<h1>המנהלים שמציגים בכנס: מה הם כתבו</h1>
+<p class="lead">כנס מנהלים ורשתות, 23.11.26 · המנהל להכשרה מקצועית · משרד העבודה</p>
+<div id="app"><p class="gate">טוען…</p></div>
+<footer>נבנה ע״י <a href="https://impactos.co.il/">impactos</a></footer>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+var API = "https://script.google.com/macros/s/AKfycbzwzbcv2BPft8rNmK1U-ADYlcQ3sxt1_khT7YyZzXYsmIB8LzKqZXNMAzewli0TsWQU/exec";
+var KEY = new URLSearchParams(location.search).get("k") || "";
+var FEED = API + "?mode=mitzagim&format=text&k=" + encodeURIComponent(KEY);
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;" }[c]; }); };
+
+function toast(t) { var el = $("toast"); el.textContent = t; el.classList.add("on"); clearTimeout(toast.t); toast.t = setTimeout(function () { el.classList.remove("on"); }, 2200); }
+function copyText(t, done) {
+  function ok() { toast(done); }
+  function fallback() { var ta = document.createElement("textarea"); ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); ok(); } catch (e) {} document.body.removeChild(ta); }
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(t).then(ok, fallback); else fallback();
+}
+var newTag = function (x) { return x.isNew ? '<span class="new">חדש</span>' : ""; };
+
+function render(d) {
+  var h = '<div class="block"><p class="kicker">תמונת מצב · מתעדכן מהטפסים בכל כניסה לדף</p>' +
+    '<p class="count">' + d.total + " בתי ספר סימנו שיציגו · " + d.exhibits.length + " הגישו טופס מיצג · " + d.waiting.length + " עוד לא</p>" +
+    '<div class="tools"><button id="cpLink">העתקת קישור לבוט</button><button class="alt" id="cpText">העתקת כל הנוסח</button></div>' +
+    '<p class="hint">בוט שקורא קישורים תמיד יראה את המצב העדכני. בוט שלא קורא קישורים מקבל את הנוסח בהדבקה, והנוסח הזה לא יתעדכן בו לבד.</p></div>';
+
+  h += '<div class="block"><p class="kicker">המיצגים שהוגשו</p><ol class="list">' + d.exhibits.map(function (x, i) {
+    return '<li><a href="#m' + (i + 1) + '">' + esc(x.title) + "</a>" + newTag(x) + "<br>" + esc(x.school) + " · רשת " + esc(x.network) + " · " + esc(x.names.join(", ")) +
+      '<br><span class="sub">הוגש ' + esc(x.at) + "</span></li>";
+  }).join("") + "</ol></div>";
+
+  h += d.exhibits.map(function (x, i) {
+    var row = function (l, v) { return "<dt>" + esc(l) + "</dt><dd>" + (v ? esc(v) : '<span class="empty">לא מולא</span>') + "</dd>"; };
+    return '<section id="m' + (i + 1) + '"><p class="kicker">מיצג ' + (i + 1) + " מתוך " + d.exhibits.length + " · הוגש " + esc(x.at) + "</p><h2>" + esc(x.title) + newTag(x) + "</h2><dl>" +
+      row("בית ספר", x.school) + row("רשת", x.network) + row("מנהל.ת", x.names.join(", ")) +
+      x.fields.map(function (f) { return row(f.label, f.val); }).join("") + "</dl></section>";
+  }).join("");
+
+  h += '<section id="waiting"><p class="kicker">סימנו שיציגו, טופס המיצג עוד לא הוגש</p><h2>' + d.waiting.length + ' בתי ספר</h2><ul class="list">' +
+    d.waiting.map(function (w) { return "<li>" + esc(w.school) + " · רשת " + esc(w.network) + " · " + esc(w.names.join(", ")) + "</li>"; }).join("") + "</ul></section>";
+
+  $("app").innerHTML = h;
+  $("cpLink").onclick = function () { copyText(FEED, "הקישור לבוט הועתק"); };
+  $("cpText").onclick = function () { copyText(d.text, "הנוסח הועתק"); };
+}
+
+function fail(t) { $("app").innerHTML = '<p class="gate">' + esc(t) + "</p>"; }
+
+fetch(API + "?mode=mitzagim&k=" + encodeURIComponent(KEY), { credentials: "omit" })
+  .then(function (r) { return r.json(); })
+  .then(function (d) {
+    if (d && d.ok) render(d);
+    else fail(d && d.error === "no_access" ? "הקישור הזה לא פעיל. צריך את הקישור המלא." : "לא הצלחנו לטעון את הנתונים. נסו לרענן את הדף.");
+  })
+  .catch(function () { fail("לא הצלחנו לטעון את הנתונים. נסו לרענן את הדף."); });
+</script>
+</body>
+</html>
