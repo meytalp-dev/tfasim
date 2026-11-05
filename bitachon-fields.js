@@ -231,13 +231,13 @@ var BITACHON = (function () {
   /* ה-CSS של ההדפסה — משותף לשני הדפים */
   var PRINT_CSS = '.bp{font-family:Arial,"Segoe UI",sans-serif;color:#000;font-size:11px;line-height:1.35;direction:rtl}' +
     '.bp h1{font-size:18px;text-align:center;margin:0 0 2px}.bp .bp-sub{text-align:center;font-size:12px;margin-bottom:10px}' +
-    '.bp h2{font-size:13px;margin:12px 0 2px;font-weight:700}.bp .bp-grp{font-size:10.5px;color:#333;margin-bottom:3px}' +
+    '.bp h2{font-size:13px;margin:8px 0 2px;font-weight:700}.bp .bp-grp{font-size:10.5px;color:#333;margin-bottom:3px}' +
     '.bp table{width:100%;border-collapse:collapse;table-layout:fixed}' +
     '.bp th,.bp td{border:1px solid #000;padding:4px 5px;vertical-align:top;text-align:center;overflow-wrap:anywhere;unicode-bidi:plaintext}' +
     '.bp th{background:#e8edf5;font-weight:700;font-size:10px}.bp td{min-height:26px;height:26px;font-size:11.5px}' +
     '.bp td.note{text-align:right}' +
-    '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font-size:11.5px;flex-wrap:wrap}' +
-    '@page{size:A4 landscape;margin:12mm}';
+    '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:14px;font-size:11.5px;flex-wrap:wrap;break-inside:avoid}' +
+    '@page{size:A4 landscape;margin:9mm}';
 
   return {
     SCHOOLS: SCHOOLS, SECTIONS: SECTIONS, FIELDS: FIELDS, byKey: byKey, school: school,
