@@ -52,7 +52,7 @@
 .nh-cols{display:flex;align-items:flex-end;gap:14px;flex:1 0 auto}
 .nh-col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;gap:4px;background:transparent;border:0;padding:0 2px;cursor:pointer;font:inherit;color:var(--text);min-width:0}
 .nh-col i{display:block;background:#0A7EA3;border-radius:4px 4px 0 0}
-.nh-col.none i{background:repeating-linear-gradient(135deg,#D8D3C6 0 3px,#EEE9DE 3px 6px)}
+.nh-col.none i{background:repeating-linear-gradient(135deg,#D8D3C6 0 3px,#EEE9DE 3px 6px)}.nh-col.ext i{background:repeating-linear-gradient(135deg,#C4862A 0 4px,#E5C48F 4px 8px)}
 .nh-col>b{font-family:var(--head);font-size:1.05em;color:var(--ink)}.nh-col>span{font-size:.85em;color:var(--muted);line-height:1.2;min-height:34px}.nh-col>span small{display:block;font-size:.84em}
 .nh-col.cur>span{color:var(--ink);font-weight:700}.nh-col:hover>span{color:var(--ink)}
 .nh-tl .tl{flex:1;align-content:center;padding:10px;gap:8px;border-radius:16px}.nh-tl .tl-l{grid-template-columns:44px 1fr;gap:10px}.nh-tl .tl-l b{width:44px;height:44px;font-size:1.15em}.nh-tl .tl-l span{font-size:.85em}
