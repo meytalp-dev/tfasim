@@ -598,6 +598,8 @@ window.startApp = function (R) {
         <div class="cells">${ds.map(d => cellHtml(s, d, ed && !SUBMITTED[s.mg])).join('')}${ds.length ? '' : '<span class="hint">אין ימי עבודה</span>'}</div><div class="sum"><span>${p} מתוך ${MONTH.back ? ds.length : ds.filter(d => d <= MONTH.today).length}${MONTH.back ? '' : ' עד היום'}${hoursTxt(s)}</span><button class="lnk note-btn" data-notes="${s.id}">${ic('pen')}${nn ? 'הערות ושעות · ' + nn : 'הערה או שעות'}</button>${rc ? `<button class="lnk note-btn" data-open="${s.id}">${ic('bell')}תזכורות · ${rc}</button>` : ''}</div></div>`; }).join('')}
       <div class="roster-foot edit"><button class="btn primary big" data-act="submit" ${sub ? 'disabled' : ''}>${ic('send')}${sub ? 'הוגש' : 'שליחת הדיווח · ' + open.map(esc).join(', ') + ' · ' + esc(MONTH.name)}</button>${sub ? '' : `<span class="hint">כל המגמה: ${grp.length} תלמידים${left ? ` · ${left} ימים עוד לא סומנו` : ''}</span>`}<span class="hint">סה"כ שעות ${esc(MONTH.name)}: <b>${fmtH(shown.reduce((n, s) => n + hoursOf(s).h, 0))}</b></span></div>`;
   }
+  /* הגשה נועלת את המגמה כולה, גם כיתה שעוד לא דווחה: לפני ההגשה מפרטים את הכיתות ומזהירים על כיתה בלי אף סימון (תלונת אנרג'י טק, 5.11.26) */
+  const mgClsTxt = m => { const by = {}; active().filter(s => s.mg === m).forEach(s => (by[s.cls] = by[s.cls] || []).push(s)); const cls = Object.keys(by).sort(), none = cls.filter(c => !by[c].some(s => Object.values(ATT[s.id]).some(Boolean))); return `כיתות במגמה: ${cls.join(', ')}.${none.length ? ` אין אף סימון ב: ${none.join(', ')}, וגם זה יינעל.` : ''}`; };
   /* אחרי כל שינוי נוכחות — מכל מסלול — השלב בפירמידה מחושב מחדש */
   const afterAtt = () => { STU.forEach(s => { s.stage = stageOf(s); }); renderStuList(); renderRoster(); renderOverview(); renderChkStu(); refreshSub(); };
   /* משיכת מה שהמנטורים סימנו בקישור שלהם (Mentor.pull): נוכחות רק לימים שלא סומנו כאן ולמגמה שלא הוגשה; משוב המעסיק לטופס 5/6 אם עוד לא מולא */
@@ -620,14 +622,18 @@ window.startApp = function (R) {
   }
   document.querySelector('[data-act="mentor-pull"]').onclick = ev => mentorPull(ev.currentTarget);
   $('roster').onclick = e => {
-    const c = e.target.closest('.cell'); if (c && !canEdit()) return; if (c && !c.disabled && c.tagName === 'BUTTON') { const sid = c.closest('.row').dataset.sid, d = +c.dataset.d, cv = ATT[sid][d]; /* ✓ → ✗ → ריק. "באישור" רק ממסך ההערות */ ATT[sid][d] = cv === 'p' || cv === 's' ? 'a' : cv === 'a' || cv === 'x' ? '' : 'p'; if (!ATT[sid][d]) delete ATT[sid][d]; const s = STU.find(x => x.id === sid); s.stage = stageOf(s); afterAtt(); return; }
+    const c = e.target.closest('.cell'); if (c && !canEdit()) return;
+    /* יום במגמה שהוגשה אינו כפתור: בלי ההודעה הלחיצה פשוט לא עושה כלום */
+    const lockedRow = c && c.tagName !== 'BUTTON' && c.closest('.row'), lockedStu = lockedRow && STU.find(x => x.id === lockedRow.dataset.sid);
+    if (lockedStu && SUBMITTED[lockedStu.mg]) { toast(`הנוכחות של ${lockedStu.mg} ל${MONTH.name} הוגשה, ולכן כל המגמה נעולה. כדי לסמן: "פתיחה לתיקון" למעלה`); return; }
+    if (c && !c.disabled && c.tagName === 'BUTTON') { const sid = c.closest('.row').dataset.sid, d = +c.dataset.d, cv = ATT[sid][d]; /* ✓ → ✗ → ריק. "באישור" רק ממסך ההערות */ ATT[sid][d] = cv === 'p' || cv === 's' ? 'a' : cv === 'a' || cv === 'x' ? '' : 'p'; if (!ATT[sid][d]) delete ATT[sid][d]; const s = STU.find(x => x.id === sid); s.stage = stageOf(s); afterAtt(); return; }
     const nb = e.target.closest('[data-notes]'); if (nb) { openSub(notesSpec(STU.find(s => s.id === nb.dataset.notes))); return; }
     const od = e.target.closest('[data-off-del]'); if (od) { removeOff(shown[0].cls, +od.dataset.offDel); afterAtt(); toast('היום הוחזר לדיווח'); return; }
     if (e.target.closest('[data-act="off-open"]')) { openSub(offSpec(shown[0].cls)); return; }
     if (!canEdit()) return;
     if (e.target.closest('[data-act="submit"]')) {
       const mgs = [...new Set(shown.map(s => s.mg))].filter(m => !SUBMITTED[m]); if (!mgs.length) return;
-      const parts = mgs.map(m => { const l = active().filter(s => s.mg === m), miss = l.reduce((n, s) => n + dates(s).filter(d => d <= MONTH.today && !ATT[s.id][d]).length, 0); return `${m}: ${l.length} תלמידים${miss ? `, ${miss} ימים עוד לא סומנו` : ', הכול מסומן'}`; });
+      const parts = mgs.map(m => { const l = active().filter(s => s.mg === m), miss = l.reduce((n, s) => n + dates(s).filter(d => d <= MONTH.today && !ATT[s.id][d]).length, 0); return `${m}: ${l.length} תלמידים${miss ? `, ${miss} ימים עוד לא סומנו` : ', הכול מסומן'}\n${mgClsTxt(m)}`; });
       if (!confirm(`להגיש את נוכחות ${MONTH.name} של כל המגמה?\n\n${parts.join('\n')}\n\nאחרי ההגשה החודש נעול.`)) return;
       mgs.forEach(m => SUBMITTED[m] = true); afterAtt(); toast('הדיווח של ' + mgs.join(', ') + ' ל' + MONTH.name + ' נשלח'); return;
     }
@@ -1606,7 +1612,7 @@ window.startApp = function (R) {
       if (!mg) return show(`<p>איזו מגמה להגיש? למשל: הגש את הנוכחות של ${esc(MGS[0])}.</p>`, null);
       if (SUBMITTED[mg]) return show(`<p>${esc(mg)} כבר הוגשה ל${esc(MONTH.name)}.</p>`, null);
       const l = active().filter(s => s.mg === mg), miss = l.reduce((n, s) => n + dates(s).filter(d => d <= MONTH.today && !ATT[s.id][d]).length, 0);
-      return show(`<p>להגיש את נוכחות <b>${esc(mg)}</b> ל${esc(MONTH.name)}? ${l.length} תלמידים${miss ? `, <b>${miss} ימים עדיין לא סומנו</b>` : ', הכול מסומן'}. אחרי ההגשה החודש נעול.</p>`, () => { SUBMITTED[mg] = true; afterAtt(); return 'נוכחות ' + mg + ' הוגשה'; });
+      return show(`<p>להגיש את נוכחות <b>${esc(mg)}</b> ל${esc(MONTH.name)}? ${l.length} תלמידים${miss ? `, <b>${miss} ימים עדיין לא סומנו</b>` : ', הכול מסומן'}. ${esc(mgClsTxt(mg))} אחרי ההגשה החודש נעול.</p>`, () => { SUBMITTED[mg] = true; afterAtt(); return 'נוכחות ' + mg + ' הוגשה'; });
     }
     if (who) {
       const tik = `<a href="#" data-open="${who.id}">לתיק</a>`;
