@@ -88,26 +88,26 @@ var BITACHON = (function () {
      label = הכותרת כפי שהיא בקובץ (להדפסה ולגיליון); short = כותרת קצרה לטופס */
   var FIELDS = [
     // א. פרטי המוסד
-    { key: 'authority', sec: 'a', label: 'שם הרשות', type: 'text', req: true },
+    { key: 'authority', sec: 'a', label: 'שם הרשות', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
     { key: 'owner', sec: 'a', label: 'בעלות', type: 'auto', hint: 'מתמלא לפי בית הספר, ניתן לתיקון' },
     { key: 'school', sec: 'a', label: 'שם בית הספר', type: 'school', req: true },
     { key: 'semel', sec: 'a', label: 'סמל מוסד', type: 'auto' },
-    { key: 'address', sec: 'a', label: 'כתובת בית הספר', type: 'text', req: true },
-    { key: 'schoolEmail', sec: 'a', label: 'דוא"ל המוסד', type: 'email' },
-    { key: 'principal', sec: 'a', label: 'שם המנהל/ת', type: 'text', req: true },
+    { key: 'address', sec: 'a', label: 'כתובת בית הספר', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'schoolEmail', sec: 'a', label: 'דוא"ל המוסד', type: 'email', req: true },
+    { key: 'principal', sec: 'a', label: 'שם המנהל/ת', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
     { key: 'principalPhone', sec: 'a', label: 'נייד מנהל/ת', type: 'tel', req: true },
-    { key: 'staff', sec: 'a', label: 'מספר צוות בוגר חינוכי', type: 'num' },
+    { key: 'staff', sec: 'a', label: 'מספר צוות בוגר חינוכי', type: 'num', req: true },
     { key: 'students', sec: 'a', label: 'מספר תלמידים בשנת תשפ"ז', type: 'num', req: true },
     { key: 'notesA', sec: 'a', label: 'הערות לנתונים', type: 'note' },
     // ב. רכז ביטחון
     { key: 'hasCoord', sec: 'b', label: 'האם יש רכז ביטחון', type: 'has', req: true },
     { key: 'coordName', sec: 'b', label: 'שם רכז הביטחון', type: 'text', req: true, when: ['hasCoord', 'יש'] },
-    { key: 'coordId', sec: 'b', label: 'ת"ז רכז הביטחון', type: 'tz', when: ['hasCoord', 'יש'] },
+    { key: 'coordId', sec: 'b', label: 'ת"ז רכז הביטחון', type: 'tz', req: true, when: ['hasCoord', 'יש'] },
     { key: 'coordPhone', sec: 'b', label: 'טלפון רכז הביטחון', type: 'tel', req: true, when: ['hasCoord', 'יש'] },
-    { key: 'coordEmail', sec: 'b', label: 'מייל רכז הביטחון', type: 'email', when: ['hasCoord', 'יש'] },
+    { key: 'coordEmail', sec: 'b', label: 'מייל רכז הביטחון', type: 'email', req: true, when: ['hasCoord', 'יש'] },
     { key: 'coordTrained', sec: 'b', label: 'האם עבר הכשרה בקורס של משרד החינוך?', type: 'yn', req: true, when: ['hasCoord', 'יש'] },
-    { key: 'kabatName', sec: 'b', label: 'שם קב"ט מוס"ח של הרשות', type: 'text' },
-    { key: 'kabatPhone', sec: 'b', label: 'נייד קב"ט', type: 'tel' },
+    { key: 'kabatName', sec: 'b', label: 'שם קב"ט מוס"ח של הרשות', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'kabatPhone', sec: 'b', label: 'נייד קב"ט', type: 'tel', req: true, when: ['kabatEscort', 'יש'] },
     { key: 'kabatEscort', sec: 'b', label: 'ליווי קב"ט הרשות', type: 'has', req: true },
     { key: 'notesB', sec: 'b', label: 'הערות לנתונים', type: 'note' },
     // ג. מוכנות ואמצעים
@@ -116,7 +116,7 @@ var BITACHON = (function () {
     { key: 'firstAidKit', sec: 'c', group: 'עזרה ראשונה', label: 'תיק עזרה ראשונה ע"פ תקן', type: 'yn', req: true },
     { key: 'stretcher', sec: 'c', group: 'עזרה ראשונה', label: 'אלונקה לפי תקן', type: 'yn', req: true },
     { key: 'defib', sec: 'c', group: 'עזרה ראשונה', label: 'מכשיר דפיברילטור', type: 'yn', req: true },
-    { key: 'defibCompany', sec: 'c', group: 'עזרה ראשונה', label: 'אם קיים איזו חברה (חובה מעל 500)', short: 'חברת הדפיברילטור', type: 'text', when: ['defib', 'כן'] },
+    { key: 'defibCompany', sec: 'c', group: 'עזרה ראשונה', label: 'אם קיים איזו חברה (חובה מעל 500)', short: 'חברת הדפיברילטור', type: 'text', req: true, when: ['defib', 'כן'] },
     { key: 'epipen', sec: 'c', group: 'עזרה ראשונה', label: 'מזרק אפיפן מרכיב חובה', type: 'yn', req: true },
     { key: 'rescueCabinet', sec: 'c', group: 'עזרה ראשונה', label: 'ארון חילוץ מחלץ קל', type: 'yn', req: true },
     { key: 'quakeAlert', sec: 'c', group: 'רעידת אדמה', label: 'האם קיימת מערכת התרעה לרעידת אדמה', type: 'yn', req: true },
@@ -144,7 +144,7 @@ var BITACHON = (function () {
     { key: 'caravans', sec: 'e', group: 'סקר מרכיבי ביטחון', label: 'מס\' כיתות יבילים/קרוואנים', type: 'num', req: true, hint: '0 אם אין' },
     { key: 'notesE', sec: 'e', label: 'הערות', type: 'note' },
     // מגיש/ת הדוח
-    { key: 'submitter', sec: 'f', label: 'מגיש/ת הדוח', type: 'text', req: true },
+    { key: 'submitter', sec: 'f', label: 'מגיש/ת הדוח', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
     { key: 'submitterRole', sec: 'f', label: 'תפקיד מגיש/ת הדוח', type: 'text', req: true }
   ];
 
@@ -223,7 +223,7 @@ var BITACHON = (function () {
     var at = d.at || '';
     h += '<div class="bp-foot"><span>תאריך: <bdi dir="ltr">' + esc(at || '___/___/___') + '</bdi>.</span>' +
       '<span>מגיש/ת הדו"ח: ' + esc(d.submitter || '__________________') + (d.submitterRole ? ' (' + esc(d.submitterRole) + ')' : '') + '</span>' +
-      '<span>חתימה וחותמת המוסד: _______________________.</span></div>';
+      '<span>חתימת מנהל/ת המוסד וחותמת: _______________________.</span></div>';
     h += '</div>';
     return h;
   }
@@ -231,13 +231,13 @@ var BITACHON = (function () {
   /* ה-CSS של ההדפסה — משותף לשני הדפים */
   var PRINT_CSS = '.bp{font-family:Arial,"Segoe UI",sans-serif;color:#000;font-size:11px;line-height:1.35;direction:rtl}' +
     '.bp h1{font-size:18px;text-align:center;margin:0 0 2px}.bp .bp-sub{text-align:center;font-size:12px;margin-bottom:10px}' +
-    '.bp h2{font-size:13px;margin:12px 0 2px;font-weight:700}.bp .bp-grp{font-size:10.5px;color:#333;margin-bottom:3px}' +
+    '.bp h2{font-size:13px;margin:8px 0 2px;font-weight:700}.bp .bp-grp{font-size:10.5px;color:#333;margin-bottom:3px}' +
     '.bp table{width:100%;border-collapse:collapse;table-layout:fixed}' +
     '.bp th,.bp td{border:1px solid #000;padding:4px 5px;vertical-align:top;text-align:center;overflow-wrap:anywhere;unicode-bidi:plaintext}' +
     '.bp th{background:#e8edf5;font-weight:700;font-size:10px}.bp td{min-height:26px;height:26px;font-size:11.5px}' +
     '.bp td.note{text-align:right}' +
-    '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:22px;font-size:11.5px;flex-wrap:wrap}' +
-    '@page{size:A4 landscape;margin:12mm}';
+    '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:14px;font-size:11.5px;flex-wrap:wrap;break-inside:avoid}' +
+    '@page{size:A4 landscape;margin:9mm}';
 
   return {
     SCHOOLS: SCHOOLS, SECTIONS: SECTIONS, FIELDS: FIELDS, byKey: byKey, school: school,
