@@ -71,6 +71,16 @@ function render(d) {
     '<div class="tools"><button id="cpLink">העתקת קישור לבוט</button><button class="alt" id="cpText">העתקת כל הנוסח</button></div>' +
     '<p class="hint">בוט שקורא קישורים תמיד יראה את המצב העדכני. בוט שלא קורא קישורים מקבל את הנוסח בהדבקה, והנוסח הזה לא יתעדכן בו לבד.</p></div>';
 
+  var gear = function (x) {
+    var f = x.fields.filter(function (f) { return f.label === "צרכים בכנס"; })[0];
+    var a = f && f.val ? f.val.split("|").map(function (s) { return s.trim(); }).filter(Boolean) : [];
+    return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " ו" + a[a.length - 1];
+  };
+  h += '<div class="block"><p class="kicker">ציוד שכל בית ספר צריך בכנס</p><ul class="list">' + d.exhibits.map(function (x) {
+    var g = gear(x);
+    return "<li><b>" + esc(x.school) + ":</b> " + (g ? esc(g) + "." : '<span class="empty">לא מולא</span>') + "</li>";
+  }).join("") + "</ul></div>";
+
   h += '<div class="block"><p class="kicker">המיצגים שהוגשו</p><ol class="list">' + d.exhibits.map(function (x, i) {
     return '<li><a href="#m' + (i + 1) + '">' + esc(x.title) + "</a>" + newTag(x) + "<br>" + esc(x.school) + " · רשת " + esc(x.network) + " · " + esc(x.names.join(", ")) +
       '<br><span class="sub">הוגש ' + esc(x.at) + "</span></li>";
