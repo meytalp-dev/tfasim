@@ -30,6 +30,10 @@ h1{font:700 2.1rem/1.2 "Frank Ruhl Libre",serif;margin:0}
 .chev{width:18px;height:18px;flex:none;transition:transform .2s;stroke:var(--soft)}
 .sec-head[aria-expanded=true] .chev{transform:rotate(180deg)}
 .sec-body{border-top:1px solid var(--line);padding:4px 14px 14px}
+.plan{display:flex;align-items:flex-start;gap:10px;background:var(--amber-bg);border-radius:8px;padding:10px 14px 10px 4px;margin:10px 0 6px}
+.plan-main{flex:1;min-width:0;padding-top:4px}
+.plan-label{font-size:.82rem;font-weight:700;color:#6F4706}
+.plan-text{white-space:pre-wrap;overflow-wrap:anywhere}
 .task{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .check{appearance:none;-webkit-appearance:none;flex:none;width:24px;height:24px;margin:10px 0 0;border:2px solid var(--teal);border-radius:6px;background:#fff;cursor:pointer;position:relative}
 .check:checked{background:var(--teal)}
@@ -70,7 +74,7 @@ footer a{color:inherit}
 <body>
 <div class="logo-band"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
 <main>
-  <h1>הכנות לכנס המנהלים</h1>
+  <h1>לו"ז והכנות לכנס המנהלים</h1>
   <div class="date">23.11.26</div>
   <div id="summary" hidden>
     <div class="progress-label" id="progress"></div>
@@ -102,7 +106,7 @@ var ICON = {
   plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
 };
 
-var tasks = [], openSection = null, draft = null, busy = false, writes = 0, loaded = false, toastTimer, ownerQueue = Promise.resolve();
+var details = {}, tasks = [], openSection = null, draft = null, busy = false, writes = 0, loaded = false, toastTimer, ownerQueue = Promise.resolve();
 var app = document.getElementById('app');
 
 function esc(s) {
@@ -140,6 +144,7 @@ function load() {
       if (!d.ok) throw new Error(d.error || 'failed');
       if (startedAt !== writes) return;
       tasks = d.tasks;
+      details = d.details || {};
       if (!loaded) {
         loaded = true;
         var first = SECTIONS.filter(function (s) { return inSection(s.id).some(function (t) { return !t.done; }); })[0];
@@ -154,6 +159,16 @@ function load() {
 
 function inSection(id) {
   return tasks.filter(function (t) { return t.section === id; });
+}
+
+function planHtml(sectionId) {
+  if (draft && draft.plan && draft.section === sectionId) {
+    return '<div class="editor"><label for="f-text">מה עושים</label><textarea id="f-text" rows="4" maxlength="2000">' + esc(draft.text) + '</textarea>' +
+      '<div class="actions"><button type="button" class="btn primary" data-act="save"' + (busy ? ' disabled' : '') + '>' + (busy ? 'שומר…' : 'שמירה') + '</button>' +
+      '<button type="button" class="btn" data-act="cancel"' + (busy ? ' disabled' : '') + '>ביטול</button></div></div>';
+  }
+  return '<div class="plan"><div class="plan-main"><div class="plan-label">מה עושים</div><div class="plan-text">' + esc(details[sectionId]) + '</div></div>' +
+    '<button type="button" class="icon-btn" data-act="edit-plan" data-section="' + sectionId + '" aria-label="עריכת מה עושים">' + ICON.edit + '</button></div>';
 }
 
 function editorHtml() {
@@ -197,7 +212,7 @@ function render() {
     var body = '';
     if (open) {
       var addingHere = draft && !draft.existing && draft.section === s.id;
-      body = '<div class="sec-body">' +
+      body = '<div class="sec-body">' + planHtml(s.id) +
         (list.length || addingHere ? list.map(taskHtml).join('') : '<div class="empty">אין עדיין משימות בחלק הזה.</div>') +
         (addingHere ? editorHtml() : '<button type="button" class="add" data-act="add" data-section="' + s.id + '">' + ICON.plus + 'הוספת משימה</button>') +
         '</div>';
@@ -250,8 +265,27 @@ function quickOwner(id, owner) {
   });
 }
 
+function savePlan() {
+  var section = draft.section, text = draft.text.trim();
+  busy = true;
+  writes++;
+  render();
+  post({ action: 'details', id: section, text: text }).then(function () {
+    details[section] = text;
+    busy = false;
+    draft = null;
+    writes++;
+    render();
+  }).catch(function () {
+    busy = false;
+    render();
+    toast('השמירה נכשלה. הטקסט נשאר כאן, נסו שוב.');
+  });
+}
+
 function save() {
   if (busy) return;
+  if (draft.plan) { savePlan(); return; }
   var text = draft.text.trim();
   if (!text) { toast('צריך לכתוב את המשימה.'); return; }
   busy = true;
@@ -318,6 +352,10 @@ app.addEventListener('click', function (e) {
   } else if (act === 'add') {
     if (busy) return;
     startEdit({ existing: false, id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), section: b.getAttribute('data-section'), text: '', owners: [], note: '' });
+  } else if (act === 'edit-plan') {
+    if (busy) return;
+    var ps = b.getAttribute('data-section');
+    startEdit({ plan: true, existing: true, id: 'plan:' + ps, section: ps, text: details[ps] || '' });
   } else if (act === 'quick-owner') {
     quickOwner(b.getAttribute('data-id'), b.getAttribute('data-owner'));
   } else if (act === 'owner') {
