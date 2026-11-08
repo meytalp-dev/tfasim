@@ -223,7 +223,9 @@ var BITACHON = (function () {
     var at = d.at || '';
     h += '<div class="bp-foot"><span>תאריך: <bdi dir="ltr">' + esc(at || '___/___/___') + '</bdi>.</span>' +
       '<span>מגיש/ת הדו"ח: ' + esc(d.submitter || '__________________') + (d.submitterRole ? ' (' + esc(d.submitterRole) + ')' : '') + '</span>' +
-      '<span>חתימת מנהל/ת המוסד וחותמת: _______________________.</span></div>';
+      '<span>חתימת מנהל/ת המוסד וחותמת: _______________________.</span></div>' +
+      '<div class="bp-contact">בכל מקרה של אי הבנה או בעיה: אבי סנדלר, נייד <bdi dir="ltr">050-3166467</bdi>, ' +
+      '\u05d3\u05d5\u05d0"\u05dc avi10534@gmail.com</div>';
     h += '</div>';
     return h;
   }
@@ -237,6 +239,7 @@ var BITACHON = (function () {
     '.bp th{background:#e8edf5;font-weight:700;font-size:10px}.bp td{min-height:26px;height:26px;font-size:11.5px}' +
     '.bp td.note{text-align:right}' +
     '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:14px;font-size:11.5px;flex-wrap:wrap;break-inside:avoid}' +
+    '.bp .bp-contact{margin-top:8px;font-size:11.5px;text-align:center}' +
     '@page{size:A4 landscape;margin:9mm}';
 
   return {
