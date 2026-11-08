@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>הישג משמעותי של בית הספר</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- טופס מנהלים: הישג משמעותי + תמונה (8.11.26). השרת: רויטל\hesegim-gas (merhav) -->
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5; --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px;position:relative}
+.site{background:#fff;border-bottom:1px solid var(--line);padding:16px 0}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;max-width:100%;display:block}
+@media (max-width:480px){.logo{height:46px}}
+h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,6vw,34px);line-height:1.2;margin:26px 0 0;font-weight:700;color:var(--navy);text-align:center}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:28px;margin-top:22px}
+@media (max-width:560px){.card{padding:22px 16px}}
+.q{margin-top:22px}
+.q:first-of-type{margin-top:0}
+.ql{display:block;font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;margin-bottom:8px}
+.ql .req{color:var(--blue)}
+.ql .opt{color:var(--muted);font-family:'Assistant',sans-serif;font-size:15px;font-weight:500}
+select,textarea{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+textarea{min-height:150px;resize:vertical;line-height:1.55;display:block}
+select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
+select:focus,textarea:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:6px}
+.err.on{display:block}
+#form input.hp{position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+.file{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;clip-path:inset(50%)}
+.pick{display:flex;align-items:center;justify-content:center;gap:10px;padding:22px 16px;border:2px dashed #c9d5ee;border-radius:14px;background:#fbfcff;
+  color:var(--navy);font-weight:600;cursor:pointer;transition:border-color .18s var(--ease),background .18s var(--ease)}
+.pick:hover,.file:focus-visible + .pick{border-color:var(--blue);background:var(--blue-soft)}
+.pick svg{width:24px;height:24px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.chosen{display:flex;align-items:center;gap:12px;padding:10px;border:2px solid var(--line);border-radius:14px;background:#fbfcff}
+.chosen img{width:72px;height:72px;object-fit:cover;border-radius:10px;flex:none}
+.chosen .fname{flex:1;min-width:0;font-size:15.5px;overflow-wrap:anywhere}
+.rm{flex:none;font:inherit;font-size:15px;font-weight:600;color:var(--danger);background:none;border:0;padding:8px;cursor:pointer}
+.actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
+.btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26);transition:transform .16s var(--ease)}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:default}
+.fail{display:none;color:var(--danger);font-weight:600;margin:12px 0 0}
+.fail.on{display:block}
+.helpbtn{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;background:#fff}
+.helpbtn:hover{color:var(--navy);border-color:#c9d5ee}
+.helpbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.done{text-align:center;padding:12px 0}
+.done svg{width:48px;height:48px;fill:none;stroke:var(--mint);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.done h2{font-family:'Rubik',sans-serif;color:var(--navy);margin:8px 0 0;font-size:24px}
+.credit{text-align:center;color:var(--muted);font-size:14px;padding:26px 0 30px}
+.credit a{color:inherit}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <img class="logo" src="https://pedagogiamh.co.il/vaada/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית">
+</div></header>
+
+<main class="wrap">
+  <h1>הישג משמעותי של בית הספר</h1>
+
+  <form class="card" id="form" novalidate>
+    <input class="hp" type="text" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <div class="q">
+      <label class="ql" for="school">שם בית הספר <span class="req">*</span></label>
+      <select id="school" required><option disabled selected value="">בחרו בית ספר</option></select>
+      <div class="err" id="e_school">יש לבחור בית ספר</div>
+    </div>
+
+    <div class="q">
+      <label class="ql" for="text">מהו ההישג המשמעותי של בית הספר בשנה החולפת? <span class="req">*</span></label>
+      <textarea id="text" maxlength="3000" required></textarea>
+      <div class="err" id="e_text">יש לכתוב את ההישג</div>
+    </div>
+
+    <div class="q">
+      <label class="ql" for="photo">תמונה <span class="opt">(לא חובה)</span></label>
+      <input class="file" type="file" id="photo" accept="image/*">
+      <label class="pick" for="photo" id="pick">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m21 16-5-5L5 20"/></svg>
+        <span>בחירת תמונה</span>
+      </label>
+      <div class="chosen" id="chosen" hidden>
+        <img id="thumb" alt="התמונה שנבחרה">
+        <div class="fname" id="fname" dir="auto"></div>
+        <button type="button" class="rm" id="rm">הסרה</button>
+      </div>
+      <div class="err" id="e_photo"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="send" type="submit">שליחה</button>
+      <div class="fail" id="fail" role="alert"></div>
+      <a class="helpbtn" id="help" href="https://wa.me/972536256653" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>נתקלתם בבעיה? שלחו הודעה</a>
+    </div>
+  </form>
+
+  <section class="card done" id="done" hidden>
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.7 2.7L16 9.8"/></svg>
+    <h2>התשובה נשלחה, תודה רבה</h2>
+  </section>
+
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</main>
+
+<script>
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbzZq5MKWWIPaK9yfxxrkOJmJ4JAkFV5SwJwGQEWqJv685B1tpK-VhD3qvqO7QhbZZ1hrw/exec';
+  var SCHOOLS = [["54107","אבו סנאן"],["54105","אום אל פחם בנות"],["54112","אום אל פחם בנים"],["42925","אור דניאל"],["62903","אור העתיד תורני מקצועי"],["45005","אורט אורמת"],["65007","אורט בית הערבה"],["55003","אורט כרמל"],["45002","אורט תל נוף"],["45001","אורט תעשייה אווירית"],["54113","אכסאל"],["54100","אל אמאני סכנין"],["54108","אלחכמה כסרא-סמיע"],["54021","אנרג'י טק"],["55621","בית אל"],["82923","בית דוד"],["64100","בית חנינה בנות"],["64102","בית חנינה בנים"],["52918","ג'וליס בנות"],["45007","דן גורמה"],["53405","דרור גליל"],["83425","דרור נווה מדבר"],["61902","הדר"],["53403","התיכון החברתי חיפה"],["63401","חוש\"ן"],["54109","טורען"],["58801","טל חרמון"],["55400","ישיבת חנוך לנער"],["82922","ישיבת עתיד אור מנחם"],["55501","כפר זיתים"],["54102","כפר יסיף"],["64103","כפר עקב"],["84101","לקייה"],["83424","מצפה רמון"],["54009","מרחביה/מעיינות"],["46101","נחלים"],["54008","נצרת"],["64101","סור באהר"],["84104","סכנין תל שבע"],["64001","עמל אשדוד"],["44011","עמל טייבה ב'"],["44050","עמל טק אין"],["84003","עמל רהט"],["54101","ערערה"],["82918","עתיד באר שבע"],["52923","עתיד בת עמי"],["52916","עתיד גליל מערבי ירכא בנים"],["52922","עתיד טק ביר אל מכסור"],["42924","עתיד כפר חב\"ד"],["52901","עתיד כרמיאל"],["42919","עתיד פלמחים"],["65079","צור ברק"],["52921","צור ים"],["82921","קמ\"ג דימונה"],["51511","רימונים"],["54017","רמת דוד"],["84102","שגב שלום"],["54106","שפרעם"],["44008","תיכון החממה"],["43403","תיכון חברתי ת\"א"],["52909","תיכון טכנולוגי אי טק סקול (מסעדה)"],["52919","תיכון עוצמ\"ה עתיד זוקו"],["54040","תיכון שיח"],["52920","תפן ליזמות"]];
+  var MAX_BYTES = 10 * 1024 * 1024;
+  var KEEP_BYTES = 1.5 * 1024 * 1024; // תמונה קטנה נשלחת כמו שהיא
+  var MAX_SIDE = 1920;
+  var EXT_OK = /\.(jpe?g|png|webp|heic|heif)$/i;
+  var ERRORS = {
+    school: 'בית הספר לא נמצא ברשימה. יש לבחור שוב.',
+    text: 'יש לכתוב את ההישג.',
+    long: 'הטקסט ארוך מדי.',
+    type: 'אפשר להעלות רק קובץ תמונה.',
+    size: 'התמונה גדולה מדי (עד 10MB).',
+    busy: 'המערכת עמוסה כרגע. נסו שוב בעוד רגע.',
+    limit: 'הגענו למכסה היומית. נסו שוב מחר.'
+  };
+
+  function $(id) { return document.getElementById(id); }
+  var photo = $('photo'), file = null, thumbUrl = '';
+
+  SCHOOLS.forEach(function (s) {
+    var o = document.createElement('option');
+    o.value = s[0]; o.textContent = s[1];
+    $('school').appendChild(o);
+  });
+
+  function setErr(id, field, msg) {
+    var e = $(id);
+    if (msg) e.textContent = msg;
+    e.classList.toggle('on', !!msg);
+    if (field) field.classList.toggle('bad', !!msg);
+  }
+
+  function clearPhoto() {
+    file = null;
+    photo.value = '';
+    if (thumbUrl) URL.revokeObjectURL(thumbUrl);
+    thumbUrl = '';
+    $('chosen').hidden = true;
+    $('pick').hidden = false;
+  }
+
+  photo.addEventListener('change', function () {
+    var f = photo.files[0];
+    setErr('e_photo', null, '');
+    if (!f) return;
+    if (f.type.indexOf('image/') !== 0 && !EXT_OK.test(f.name)) {
+      clearPhoto();
+      setErr('e_photo', null, 'אפשר להעלות רק קובץ תמונה');
+      return;
+    }
+    file = f;
+    if (thumbUrl) URL.revokeObjectURL(thumbUrl);
+    thumbUrl = URL.createObjectURL(f);
+    $('thumb').hidden = false;
+    $('thumb').src = thumbUrl;
+    $('fname').textContent = f.name;
+    $('chosen').hidden = false;
+    $('pick').hidden = true;
+  });
+  $('thumb').addEventListener('error', function () { this.hidden = true; }); // HEIC במחשב — בלי תצוגה מקדימה
+  $('rm').addEventListener('click', function () { clearPhoto(); setErr('e_photo', null, ''); });
+
+  $('school').addEventListener('change', function () {
+    setErr('e_school', this, '');
+    var name = this.options[this.selectedIndex].textContent;
+    $('help').href = 'https://wa.me/972536256653?text=' + encodeURIComponent('שלום, בטופס ההישג המשמעותי של ' + name + '.\nתיאור הבעיה: ');
+  });
+  $('text').addEventListener('input', function () { setErr('e_text', this, ''); });
+
+  function readRaw(f) {
+    return new Promise(function (resolve, reject) {
+      if (f.size > MAX_BYTES) return reject('size');
+      var r = new FileReader();
+      r.onerror = function () { reject('read'); };
+      r.onload = function () {
+        resolve({ fileName: f.name, mime: f.type || 'image/jpeg', data: String(r.result).split(',')[1] });
+      };
+      r.readAsDataURL(f);
+    });
+  }
+
+  // תמונת טלפון גדולה מוקטנת בדפדפן, כדי שהשליחה תעבור גם בקליטה חלשה
+  function prepare(f) {
+    if (f.size <= KEEP_BYTES) return readRaw(f);
+    return new Promise(function (resolve, reject) {
+      var img = new Image(), url = URL.createObjectURL(f);
+      img.onerror = function () { URL.revokeObjectURL(url); readRaw(f).then(resolve, reject); };
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var k = Math.min(1, MAX_SIDE / Math.max(img.naturalWidth, img.naturalHeight));
+        var c = document.createElement('canvas');
+        c.width = Math.round(img.naturalWidth * k);
+        c.height = Math.round(img.naturalHeight * k);
+        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+        var out = c.toDataURL('image/jpeg', 0.85);
+        resolve({ fileName: f.name.replace(/\.[^.]+$/, '') + '.jpg', mime: 'image/jpeg', data: out.split(',')[1] });
+      };
+      img.src = url;
+    });
+  }
+
+  function fail(msg) {
+    $('fail').textContent = msg;
+    $('fail').classList.add('on');
+    $('send').disabled = false;
+    $('send').textContent = 'שליחה';
+  }
+
+  $('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    $('fail').classList.remove('on');
+    var code = $('school').value, text = $('text').value.trim();
+    setErr('e_school', $('school'), code ? '' : 'יש לבחור בית ספר');
+    setErr('e_text', $('text'), text ? '' : 'יש לכתוב את ההישג');
+    if (!code) return $('school').focus();
+    if (!text) return $('text').focus();
+
+    $('send').disabled = true;
+    $('send').textContent = 'שולחים…';
+    (file ? prepare(file) : Promise.resolve({})).then(function (img) {
+      var body = { code: code, text: text, website: $('website').value };
+      if (img.data) { body.fileName = img.fileName; body.mime = img.mime; body.data = img.data; }
+      return fetch(API, { method: 'POST', credentials: 'omit', body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+    }).then(function (res) {
+      if (!res.ok) return fail(ERRORS[res.error] || 'השליחה לא הצליחה. נסו שוב.');
+      $('form').hidden = true;
+      $('done').hidden = false;
+      window.scrollTo(0, 0);
+    }).catch(function (e) {
+      fail(e === 'size' ? ERRORS.size : 'השליחה לא הצליחה. בדקו את החיבור ונסו שוב.');
+    });
+  });
+})();
+</script>
+</body>
+</html>
