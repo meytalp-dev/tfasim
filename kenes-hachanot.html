@@ -39,7 +39,9 @@ h1{font:700 2.1rem/1.2 "Frank Ruhl Libre",serif;margin:0}
 .task-text{overflow-wrap:anywhere}
 .task.done .task-text{text-decoration:line-through;color:var(--soft)}
 .owners{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.owner{background:var(--amber-bg);color:#6F4706;border-radius:20px;padding:1px 10px;font-size:.82rem}
+.qo{min-height:44px;padding:0;background:none;border:0;cursor:pointer;display:inline-flex;align-items:center}
+.qo span{border:1px solid var(--line);color:var(--soft);border-radius:20px;padding:3px 12px;font-size:.84rem}
+.qo[aria-pressed=true] span{background:var(--amber-bg);border-color:var(--amber);color:#6F4706;font-weight:700}
 .note{color:var(--soft);font-size:.9rem;margin-top:4px;white-space:pre-wrap;overflow-wrap:anywhere}
 .icon-btn{flex:none;width:44px;height:44px;display:grid;place-items:center;background:none;border:0;border-radius:8px;cursor:pointer}
 .icon-btn:hover{background:var(--teal-bg)}
@@ -100,7 +102,7 @@ var ICON = {
   plus: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>'
 };
 
-var tasks = [], openSection = null, draft = null, busy = false, writes = 0, loaded = false, toastTimer;
+var tasks = [], openSection = null, draft = null, busy = false, writes = 0, loaded = false, toastTimer, ownerQueue = Promise.resolve();
 var app = document.getElementById('app');
 
 function esc(s) {
@@ -174,7 +176,9 @@ function taskHtml(t) {
   return '<div class="task' + (t.done ? ' done' : '') + '">' +
     '<label class="check-wrap"><input class="check" type="checkbox" data-id="' + esc(t.id) + '"' + (t.done ? ' checked' : '') + ' aria-label="' + esc('הושלם: ' + t.text) + '"></label>' +
     '<div class="task-main"><div class="task-text">' + esc(t.text) + '</div>' +
-    (t.owners.length ? '<div class="owners">' + t.owners.map(function (o) { return '<span class="owner">' + esc(o) + '</span>'; }).join('') + '</div>' : '') +
+    '<div class="owners" role="group" aria-label="אחראית">' + OWNERS.map(function (o) {
+      return '<button type="button" class="qo" data-act="quick-owner" data-id="' + esc(t.id) + '" data-owner="' + esc(o) + '" aria-pressed="' + (t.owners.indexOf(o) >= 0) + '"><span>' + esc(o) + '</span></button>';
+    }).join('') + '</div>' +
     (t.note ? '<div class="note">' + esc(t.note) + '</div>' : '') +
     '</div><button type="button" class="icon-btn" data-act="edit" data-id="' + esc(t.id) + '" aria-label="' + esc('עריכה: ' + t.text) + '">' + ICON.edit + '</button></div>';
 }
@@ -219,6 +223,27 @@ function toggle(id, checked) {
   render();
   post({ action: 'toggle', id: id, done: checked }).catch(function () {
     t.done = !checked;
+    writes++;
+    render();
+    toast('הסימון לא נשמר. נסו שוב.');
+  });
+}
+
+function quickOwner(id, owner) {
+  var t = tasks.filter(function (x) { return x.id === id; })[0];
+  if (!t) return;
+  var before = t.owners.slice();
+  var i = t.owners.indexOf(owner);
+  if (i >= 0) t.owners.splice(i, 1); else t.owners.push(owner);
+  var owners = t.owners.slice();
+  writes++;
+  render();
+  ownerQueue = ownerQueue.then(function () {
+    return post({ action: 'save', id: t.id, section: t.section, text: t.text, owners: owners, note: t.note });
+  }).then(function () {
+    writes++;
+  }).catch(function () {
+    t.owners = before;
     writes++;
     render();
     toast('הסימון לא נשמר. נסו שוב.');
@@ -293,6 +318,8 @@ app.addEventListener('click', function (e) {
   } else if (act === 'add') {
     if (busy) return;
     startEdit({ existing: false, id: 't' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7), section: b.getAttribute('data-section'), text: '', owners: [], note: '' });
+  } else if (act === 'quick-owner') {
+    quickOwner(b.getAttribute('data-id'), b.getAttribute('data-owner'));
   } else if (act === 'owner') {
     var o = b.getAttribute('data-owner'), i = draft.owners.indexOf(o);
     if (i >= 0) draft.owners.splice(i, 1); else draft.owners.push(o);
