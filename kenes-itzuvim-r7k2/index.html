@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>עיצובי הדפוס · כנס מנהלים ורשתות 23.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Heebo:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ec;--card:#fffdf8;--navy:#0f2f52;--navy2:#2b5a7a;--teal:#3a8f86;--amber:#c8955a;--amber2:#e2b886;--ink:#1d2b3a;--muted:#5d6b78;--line:#e6dccb}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{background:var(--paper);color:var(--ink);font-family:'Heebo',sans-serif;font-size:16px;line-height:1.6}
+a{color:inherit}
+.top{background:#fff;border-bottom:1px solid var(--line);text-align:center;padding:18px 16px 10px}
+.top img{height:58px}
+header.hero{max-width:1080px;margin:0 auto;padding:34px 16px 10px;text-align:center}
+.kick{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.14em;color:var(--amber);font-weight:700}
+.kick::before,.kick::after{content:"";width:34px;height:1px;background:var(--amber)}
+h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:clamp(32px,6vw,56px);line-height:1.05;color:var(--navy);margin-top:10px}
+h1 em{font-style:normal;color:var(--teal)}
+.lede{max-width:640px;margin:14px auto 0;color:var(--muted);font-size:17px}
+nav.chips{position:sticky;top:0;z-index:5;background:rgba(247,243,236,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);margin-top:22px}
+nav.chips .in{max-width:1080px;margin:0 auto;padding:10px 16px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+nav.chips a{text-decoration:none;font-size:14px;font-weight:500;padding:5px 13px;border-radius:30px;background:#fff;border:1px solid var(--line);color:var(--navy)}
+nav.chips a:hover{border-color:var(--amber)}
+main{max-width:1080px;margin:0 auto;padding:10px 16px 40px}
+section.grp{margin-top:38px}
+section.grp>h2{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:28px;color:var(--navy);display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--navy);padding-bottom:6px}
+section.grp>h2 small{font-family:'Heebo';font-size:13px;font-weight:500;color:var(--amber);letter-spacing:.1em}
+.item{display:grid;grid-template-columns:300px 1fr;gap:28px;align-items:start;padding:26px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item.wide{grid-template-columns:1fr}
+.thumb{display:block;background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px;box-shadow:0 10px 24px -18px rgba(15,47,82,.45);cursor:zoom-in}
+.thumb img{display:block;width:100%;height:auto;max-height:520px;object-fit:contain}
+.item.wide .thumb img{max-height:440px}
+.meta .no{font-family:'Frank Ruhl Libre',serif;font-size:15px;color:var(--amber);font-weight:700}
+.meta h3{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:26px;color:var(--navy);line-height:1.15;margin-top:2px}
+.spec{margin-top:6px;color:var(--navy2);font-size:15px;font-weight:500}
+.desc{margin-top:8px;color:var(--ink)}
+.note{margin-top:10px;font-size:14px;background:#fbf1e3;border-right:3px solid var(--amber);padding:8px 12px;border-radius:4px}
+.files{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+.file{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.file .fn{font-size:14px;color:var(--muted);min-width:0}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-family:'Heebo';font-size:15px;font-weight:700;padding:9px 16px;border-radius:30px;border:0;cursor:pointer;line-height:1.2}
+.btn svg{width:17px;height:17px;flex:0 0 auto}
+.btn.dl{background:var(--navy);color:#fff}
+.btn.dl.sm{font-size:14px;padding:7px 13px;font-weight:500}
+.btn.ml{background:#fff;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal)}
+.btn:hover{filter:brightness(1.08)}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:26px 16px 34px;border-top:1px solid var(--line);margin-top:20px}
+.toast{position:fixed;left:50%;bottom:22px;translate:-50% 0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;max-width:92vw;text-align:center;z-index:20}
+.toast.on{opacity:1}
+.lb{position:fixed;inset:0;background:rgba(15,25,40,.86);display:none;align-items:center;justify-content:center;z-index:30;padding:16px;cursor:zoom-out}
+.lb.on{display:flex}
+.lb img{max-width:100%;max-height:100%;background:#fff;border-radius:4px}
+@media (max-width:760px){
+  .item{grid-template-columns:1fr;gap:14px}
+  .thumb img{max-height:420px}
+  .meta h3{font-size:23px}
+}
+</style>
+</head>
+<body>
+<div class="top"><img src="logo.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+<header class="hero">
+  <div class="kick">כנס מנהלים ורשתות · 23.11.26</div>
+  <h1>עיצובי <em>הדפוס</em> לכנס</h1>
+  <p class="lede">כל הפריטים במקום אחד. לכל פריט אפשר להוריד את קובץ הדפוס (PDF עם בליד וסימני חיתוך) או לשלוח אותו במייל, למשל לבית הדפוס.</p>
+</header>
+<nav class="chips"><div class="in" id="nav"></div></nav>
+<main id="main"></main>
+<footer>נבנה ע״י <a href="https://impactos.co.il/">impactos</a></footer>
+<div class="toast" id="toast"></div>
+<div class="lb" id="lb"><img alt=""></div>
+<div id="clip" contenteditable="true" style="position:fixed;left:-9999px;top:0;opacity:0"></div>
+
+<script>
+const GROUPS=[
+ {id:'tagim',t:'תגים ומדבקות',items:[
+  {t:'תג שם',spec:'9.5×14.5 ס״מ · בליד 3 מ״מ · סימני חיתוך',d:'תג עם שורות ריקות לשם ולתפקיד, ומקום למדבקת הכוח.',img:'tag.jpg',files:[['תגי שם','tag.pdf']]},
+  {t:'מדבקות הכוחות',spec:'10 כוחות · 7×4 ס״מ',d:'מדבקה לכל אחד מעשרת הכוחות האנושיים, להדבקה על התג.',img:'stickers.jpg',files:[['מדבקות הכוחות','stickers.pdf']]}
+ ]},
+ {id:'kapot',t:'קאפות',items:[
+  {t:'קאפת הכוחות',spec:'70×100 ס״מ · בליד 5 מ״מ',d:'"מהו הכוח האנושי שלך?" עם הסבר על עשרת הכוחות.',img:'kapa-kochot.jpg',files:[['קאפת הכוחות','kapa-kochot.pdf']]},
+  {t:'קאפות הרשתות',spec:'70×100 ס״מ · בליד 5 מ״מ · קאפה לכל רשת',d:'שם הרשת והלוגו שלה, בעיצוב של קאפת הכוחות.',img:'kapot.jpg',wide:true,
+   note:'סכנין: ממתין ללוגו של הרשת. דרור: טיוטה. הלוגו מהאתר ברזולוציה נמוכה, וצריך קובץ איכותי מהרשת.',
+   files:[['אורט','kapa-ort.pdf'],['עמל','kapa-amal.pdf'],['עתיד','kapa-atid.pdf'],['דרור (טיוטה)','kapa-dror-tyuta.pdf']]}
+ ]},
+ {id:'rollups',t:'רולאפים',items:[
+  {t:'רולאפ ברוכים הבאים',spec:'85×200 ס״מ · בליד 5 מ״מ · 10 ס״מ תחתונים נכנסים למעמד',d:'ברוכים הבאים, נושא הכנס והאיור של ההזמנה.',img:'rollup-bruchim.jpg',files:[['ברוכים הבאים','rollup-bruchim.pdf']]},
+  {t:'רולאפ לוח הזמנים',spec:'85×200 ס״מ · בליד 5 מ״מ',d:'לוח הזמנים של הכנס, לפי ההזמנה.',img:'rollup-luz.jpg',files:[['לוח הזמנים','rollup-luz.pdf']]},
+  {t:'חמשת עקרונות החינוך היוצר',spec:'5 רולאפים · 85×200 ס״מ · בליד 5 מ״מ',d:'רולאפ לכל עיקרון, לשימוש גם אחרי הכנס. כשהם עומדים בשורה, 01 מימין עד 05 משמאל, הגלים ממשיכים מרולאפ לרולאפ.',img:'rollup-ekronot.jpg',wide:true,
+   files:[['01 · האדם והחברה במרכז','rollup-ekron-1.pdf'],['02 · למידה דואלית ופיתוח מיומנויות','rollup-ekron-2.pdf'],['03 · רלוונטיות לכל אדם','rollup-ekron-3.pdf'],['04 · פתיחת אפשרויות ואופקים','rollup-ekron-4.pdf'],['05 · מודל חי ודינמי','rollup-ekron-5.pdf']]}
+ ]},
+ {id:'shulchanot',t:'לשולחנות העגולים',items:[
+  {t:'דף הנחיות למנחי השולחנות',spec:'A4 · 4 עמודים',d:'מהלך הפעילות, שלוש התחנות והשקף המסכם.',img:'manchim.jpg',files:[['דף המנחים','manchim.pdf']]},
+  {t:'כרטיסיות שיח',spec:'9 כרטיסיות · 10×15 ס״מ · דו־צדדי',d:'הכרטיסיות מונחות הפוכות על השולחן, והמספר על הגב. 01–06: שאלות התחנה הראשונה. 07: מסתכלים קדימה · 2030. 08: מתחילים מחר בבוקר. 09: המוטו הניהולי שלי. בקובץ כל כרטיסייה היא עמוד פנים ועמוד גב, להדפסה דו־צדדית.',img:'kartisiyot.jpg',wide:true,files:[['כרטיסיות שיח','kartisiyot.pdf']]},
+  {t:'פתקים למטריות',spec:'5 נוסחים · 10×5 ס״מ · חור בצד ימין',d:'מיקום החור מסומן בעיגול מקווקו.',img:'petakim.jpg',files:[['פתקים למטריות','petakim-mitriyot.pdf']]}
+ ]},
+ {id:'mitzagim',t:'מיצגי בתי הספר',items:[
+  {t:'דף מיצג לכל בית ספר',spec:'A4 · 11 בתי ספר · בליד 3 מ״מ',d:'שם בית הספר, המיצג, הבעיה, מה עשו ומה השתנה, טיפ, ומה מוצג. הברקוד מוביל לדף המלווה של הכנס. התוכן מטופס המיצג שהמנהלים מילאו.',img:'dapei-mitzag.jpg',wide:true,files:[['11 דפי המיצג','dapei-mitzag.pdf']]}
+ ]}
+];
+
+const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(matchMedia('(pointer:coarse)').matches&&innerWidth<900);
+const abs=f=>new URL('files/'+f,location.href).href;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const IC={dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>',
+          ml:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'};
+
+function mailParts(it){
+  const subject=`קובץ לדפוס: ${it.t} · כנס מנהלים ורשתות 23.11`;
+  const lines=[`שלום,`,``,`מצורפים קישורים לקובץ הדפוס של ${it.t}.`,`גודל: ${it.spec}`,`הקבצים כוללים בליד וסימני חיתוך.`,``];
+  it.files.forEach(([n,f])=>lines.push(`${n}: ${abs(f)}`));
+  lines.push('',`תודה`);
+  const text=lines.join('\n');
+  const html=`<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:15px;line-height:1.6">
+   <p>שלום,</p><p>מצורפים קישורים לקובץ הדפוס של <b>${esc(it.t)}</b>.<br>גודל: ${esc(it.spec)}<br>הקבצים כוללים בליד וסימני חיתוך.</p>
+   <ul style="padding-right:20px;margin:0">${it.files.map(([n,f])=>`<li><a href="${abs(f)}">${esc(n)} (PDF)</a></li>`).join('')}</ul><p>תודה</p></div>`;
+  return {subject,text,html};
+}
+
+const nav=document.getElementById('nav'),main=document.getElementById('main');let no=0;
+GROUPS.forEach(g=>{
+  nav.insertAdjacentHTML('beforeend',`<a href="#${g.id}">${g.t}</a>`);
+  const sec=document.createElement('section');sec.className='grp';sec.id=g.id;
+  sec.innerHTML=`<h2>${g.t}<small>${g.items.length===1?'פריט אחד':g.items.length+' פריטים'}</small></h2>`;
+  g.items.forEach(it=>{
+    no++;const m=mailParts(it);
+    const mailto=`mailto:?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.text)}`;
+    const multi=it.files.length>1;
+    const filesHtml=multi?`<div class="files">${it.files.map(([n,f])=>`<div class="file"><a class="btn dl sm" href="files/${f}" download>${IC.dl}${esc(n)}</a></div>`).join('')}</div>`:'';
+    const el=document.createElement('article');el.className='item'+(it.wide?' wide':'');
+    el.innerHTML=`<a class="thumb" href="img/${it.img}" data-lb><img src="img/${it.img}" alt="${esc(it.t)}" loading="lazy"></a>
+     <div class="meta"><div class="no">${String(no).padStart(2,'0')}</div><h3>${esc(it.t)}</h3><div class="spec">${esc(it.spec)}</div><p class="desc">${esc(it.d)}</p>
+     ${it.note?`<div class="note">${esc(it.note)}</div>`:''}
+     ${filesHtml}
+     <div class="btns">${multi?'':`<a class="btn dl" href="files/${it.files[0][1]}" download>${IC.dl}הורדת הקובץ</a>`}
+      <a class="btn ml" href="${mailto}" data-mail="${no-1}">${IC.ml}${multi?'שליחת כל הקבצים במייל':'שליחה במייל'}</a></div></div>`;
+    el._mail=m;sec.append(el);
+  });
+  main.append(sec);
+});
+const ITEMS=[...document.querySelectorAll('.item')];
+
+const toast=(t,ms=4200)=>{const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),ms);};
+document.addEventListener('click',e=>{
+  const a=e.target.closest('[data-mail]');
+  if(a&&!isMobile){
+    e.preventDefault();
+    const m=ITEMS[+a.dataset.mail]._mail, clip=document.getElementById('clip');
+    clip.innerHTML=m.html;const r=document.createRange();r.selectNodeContents(clip);const s=getSelection();s.removeAllRanges();s.addRange(r);
+    let ok=false;try{ok=document.execCommand('copy');}catch(_){}
+    s.removeAllRanges();
+    const url='https://mail.google.com/mail/?view=cm&fs=1&su='+encodeURIComponent(m.subject)+(ok?'':'&body='+encodeURIComponent(m.text));
+    window.open(url,'_blank');
+    toast(ok?'נפתחה טיוטה ב-Gmail. לחצי בגוף המייל ו-Ctrl+V כדי להדביק את הנוסח והקישורים.':'נפתחה טיוטה ב-Gmail עם הנוסח והקישורים.',6000);
+    return;
+  }
+  const t=e.target.closest('[data-lb]');
+  if(t){e.preventDefault();const lb=document.getElementById('lb');lb.querySelector('img').src=t.getAttribute('href');lb.classList.add('on');}
+});
+document.getElementById('lb').addEventListener('click',e=>e.currentTarget.classList.remove('on'));
+</script>
+</body>
+</html>
