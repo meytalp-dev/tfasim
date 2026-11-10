@@ -67,11 +67,16 @@ body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px
 .row .nm small{display:block;color:var(--muted);font-size:13.5px;font-weight:400}
 .row .wh{font-size:15.5px;color:#3d4a70;overflow-wrap:anywhere}
 .row .at{color:var(--muted);font-size:14px;white-space:nowrap;direction:ltr;text-align:left}
+.row .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.sg{display:inline-block;margin-top:3px;font-size:13.5px;font-weight:600;border-radius:999px;padding:1px 10px}
+.sg.ok{background:var(--mint-soft);color:#0b7a6c;border:1px solid #b9ebe1}
+.sg.wait{background:#fff4e0;color:#8a5400;border:1px solid #f1d29c}
+.chip.wait{background:#fff4e0;color:#8a5400;border-color:#f1d29c}
 @media (max-width:700px){
   .row{grid-template-columns:1fr auto}
   .row .wh{grid-column:1 / -1}
   .row .at{grid-row:1;grid-column:2}
-  .row .pr{grid-column:1 / -1;justify-self:start}
+  .row .acts{grid-column:1 / -1;justify-content:flex-start}
 }
 .msg{text-align:center;color:var(--muted);padding:30px 10px}
 .msg.err{color:var(--danger)}
@@ -118,7 +123,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
 <div id="printArea"></div>
 
-<script src="bitachon-fields.js"></script>
+<script src="bitachon-fields.js?v=20261110sign"></script>
 <script>
 (function () {
   'use strict';
@@ -188,7 +193,18 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var done = SCHOOLS.filter(function (s) { return filled[s[1]]; });
     var h = '';
 
-    h += '<div class="card">' + meter('בתי ספר שמילאו את הטופס', done.length, SCHOOLS.length) + '</div>';
+    var unsigned = rows.filter(function (r) { return !r.sigAt; });
+    h += '<div class="card">' + meter('בתי ספר שמילאו את הטופס', done.length, SCHOOLS.length) +
+      '<div style="height:14px"></div>' + meter('מתוכם נחתמו על ידי המנהל/ת', done.length - unsigned.length, done.length) + '</div>';
+
+    // מילאו וממתינים לחתימת המנהל/ת
+    if (unsigned.length) {
+      h += '<h2 class="sec">ממתינים לחתימת המנהל/ת · ' + unsigned.length +
+        '<button class="copy" type="button" data-copy="unsigned">' + ICON_COPY + 'העתקה</button></h2>';
+      h += '<div class="card"><div class="chips">' + unsigned.slice().sort(function (a, b) { return a.school.localeCompare(b.school, 'he'); })
+        .map(function (r) { return '<span class="chip wait">' + esc(r.school) + '</span>'; }).join('') + '</div>' +
+        '<div style="font-size:14.5px;color:var(--muted);margin-top:10px">לכל בית ספר כאן יש כפתור "קישור חתימה" ברשימה למטה, אם צריך לשלוח שוב למנהל/ת.</div></div>';
+    }
 
     // טרם מילאו — כולם, ואז לפי מפקח.ת
     var by = {};
@@ -214,9 +230,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       rows.slice().sort(function (a, b) { return a.school.localeCompare(b.school, 'he'); }).forEach(function (r) {
         var s = B.school(r.school);
         h += '<div class="row"><div class="nm">' + esc(r.school) + '<small>' + esc(s ? s[2] + ' · ' + s[3].join(', ') : '') + '</small></div>' +
-          '<div class="wh">' + esc(r.submitter || '') + (r.role ? ' · ' + esc(r.role) : '') + '</div>' +
+          '<div class="wh">' + esc(r.submitter || '') + (r.role ? ' · ' + esc(r.role) : '') +
+            '<br>' + (r.sigAt ? '<span class="sg ok">נחתם · ' + esc(r.sigBy || '') + ' · <bdi dir="ltr">' + esc(r.sigAt) + '</bdi></span>' : '<span class="sg wait">ממתין לחתימת המנהל/ת</span>') + '</div>' +
           '<div class="at">' + esc(r.at) + '</div>' +
-          '<button class="pr" type="button" data-print="' + esc(r.school) + '">' + ICON_PRINT + 'הדפסה</button></div>';
+          '<div class="acts">' + (r.sigAt ? '' : '<button class="copy" type="button" data-signlink="' + esc(r.school) + '">' + ICON_COPY + 'קישור חתימה</button>') +
+          '<button class="pr" type="button" data-print="' + esc(r.school) + '">' + ICON_PRINT + 'הדפסה</button></div></div>';
       });
     }
     h += '</div>';
@@ -225,10 +243,34 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     $('out').querySelectorAll('[data-copy]').forEach(function (b) {
       b.addEventListener('click', function () {
         var k = b.getAttribute('data-copy');
+        if (k === 'unsigned') {
+          var ul = unsigned.map(function (r) { return r.school; }).sort(function (a, b) { return a.localeCompare(b, 'he'); });
+          copyText('מילאו את ריכוז נתוני הביטחון תשפ"ז וממתינים לחתימה דיגיטלית של המנהל/ת (' + ul.length + '):\n' +
+            ul.map(function (n) { return '• ' + n; }).join('\n'), b);
+          return;
+        }
         var list = k === 'all' ? missing.map(function (s) { return s[1]; }) : by[k].miss;
         var txt = (k === 'all' ? 'טרם מילאו את ריכוז נתוני הביטחון תשפ"ז' : 'טרם מילאו את ריכוז נתוני הביטחון תשפ"ז — ' + k) + ' (' + list.length + '):\n' +
           list.map(function (n) { return '• ' + n; }).join('\n') + '\nהטופס: https://tfasim.pedagogiamh.co.il/bitachon.html';
         copyText(txt, b);
+      });
+    });
+    // קישור החתימה של בית ספר — דורש את המפתח המלא (הקישור פותח את הנתונים של בית הספר)
+    $('out').querySelectorAll('[data-signlink]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        needKey(function () {
+          var school = b.getAttribute('data-signlink');
+          b.disabled = true;
+          fetch(EXEC + '?mode=get&key=' + fullKey + '&school=' + encodeURIComponent(school) + '&t=' + Date.now())
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              b.disabled = false;
+              if (!res.ok) { if (res.error === 'key') badKey(); else alert('לא נמצאו נתונים לבית הספר.'); return; }
+              if (!res.row.signKey) { alert(res.row.sigImg ? 'בית הספר כבר חתם.' : 'אין קישור חתימה לבית הספר הזה. רכז/ת הביטחון צריך/ה לשלוח את הטופס שוב.'); return; }
+              copyText('https://tfasim.pedagogiamh.co.il/bitachon.html?sign=' + res.row.signKey, b);
+            })
+            .catch(function () { b.disabled = false; alert('לא הצלחנו לטעון את הקישור. נסו שוב.'); });
+        });
       });
     });
     $('out').querySelectorAll('[data-print]').forEach(function (b) {

@@ -88,13 +88,13 @@ var BITACHON = (function () {
      label = הכותרת כפי שהיא בקובץ (להדפסה ולגיליון); short = כותרת קצרה לטופס */
   var FIELDS = [
     // א. פרטי המוסד
-    { key: 'authority', sec: 'a', label: 'שם הרשות', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'authority', sec: 'a', label: 'שם הרשות', type: 'text', req: true },
     { key: 'owner', sec: 'a', label: 'בעלות', type: 'auto', hint: 'מתמלא לפי בית הספר, ניתן לתיקון' },
     { key: 'school', sec: 'a', label: 'שם בית הספר', type: 'school', req: true },
     { key: 'semel', sec: 'a', label: 'סמל מוסד', type: 'auto' },
-    { key: 'address', sec: 'a', label: 'כתובת בית הספר', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'address', sec: 'a', label: 'כתובת בית הספר', type: 'text', req: true },
     { key: 'schoolEmail', sec: 'a', label: 'דוא"ל המוסד', type: 'email', req: true },
-    { key: 'principal', sec: 'a', label: 'שם המנהל/ת', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'principal', sec: 'a', label: 'שם המנהל/ת', type: 'text', req: true },
     { key: 'principalPhone', sec: 'a', label: 'נייד מנהל/ת', type: 'tel', req: true },
     { key: 'staff', sec: 'a', label: 'מספר צוות בוגר חינוכי', type: 'num', req: true },
     { key: 'students', sec: 'a', label: 'מספר תלמידים בשנת תשפ"ז', type: 'num', req: true },
@@ -144,7 +144,7 @@ var BITACHON = (function () {
     { key: 'caravans', sec: 'e', group: 'סקר מרכיבי ביטחון', label: 'מס\' כיתות יבילים/קרוואנים', type: 'num', req: true, hint: '0 אם אין' },
     { key: 'notesE', sec: 'e', label: 'הערות', type: 'note' },
     // מגיש/ת הדוח
-    { key: 'submitter', sec: 'f', label: 'מגיש/ת הדוח', type: 'text', req: true, when: ['kabatEscort', 'יש'] },
+    { key: 'submitter', sec: 'f', label: 'מגיש/ת הדוח', type: 'text', req: true },
     { key: 'submitterRole', sec: 'f', label: 'תפקיד מגיש/ת הדוח', type: 'text', req: true }
   ];
 
@@ -187,13 +187,26 @@ var BITACHON = (function () {
     return String(v);
   }
 
-  /* כותרות הגיליון/האקסל — בסדר הקובץ, עם עמודות זיהוי בתחילה */
+  /* כותרות הגיליון/האקסל — בסדר הקובץ, עם עמודות זיהוי בתחילה.
+     החתימה הדיגיטלית (10.11.26) — שלוש עמודות בסוף, כדי שאותיות העמודות הקיימות לא יזוזו.
+     שליחה חדשה של הנתונים מרוקנת אותן: המנהל/ת חותם/ת על הנוסח האחרון בלבד. */
   var META_HEAD = ['עודכן', 'סמל מוסד', 'בית ספר', 'רשת', 'מפקח.ת'];
+  var SIG = [
+    { key: 'sigBy', label: 'נחתם על ידי' },
+    { key: 'sigAt', label: 'נחתם בתאריך' },
+    { key: 'sigImg', label: 'חתימת מנהל/ת המוסד (תמונה)' }
+  ];
   function head() {
-    return META_HEAD.concat(FIELDS.filter(function (f) { return f.key !== 'school' && f.key !== 'semel'; }).map(function (f) { return f.label; }));
+    return META_HEAD.concat(FIELDS.filter(function (f) { return f.key !== 'school' && f.key !== 'semel'; }).map(function (f) { return f.label; }))
+      .concat(SIG.map(function (s) { return s.label; }));
   }
   function rowKeys() {
-    return FIELDS.filter(function (f) { return f.key !== 'school' && f.key !== 'semel'; }).map(function (f) { return f.key; });
+    return FIELDS.filter(function (f) { return f.key !== 'school' && f.key !== 'semel'; }).map(function (f) { return f.key; })
+      .concat(SIG.map(function (s) { return s.key; }));
+  }
+  /* תמונת חתימה תקינה בלבד (PNG/JPEG כ-data URL) — לא מכניסים לדף שום דבר אחר */
+  function sigOk(v) {
+    return typeof v === 'string' && v.length < 48000 && /^data:image\/(png|jpeg);base64,[A-Za-z0-9+\/=]+$/.test(v);
   }
 
   function esc(s) {
@@ -223,7 +236,10 @@ var BITACHON = (function () {
     var at = d.at || '';
     h += '<div class="bp-foot"><span>תאריך: <bdi dir="ltr">' + esc(at || '___/___/___') + '</bdi>.</span>' +
       '<span>מגיש/ת הדו"ח: ' + esc(d.submitter || '__________________') + (d.submitterRole ? ' (' + esc(d.submitterRole) + ')' : '') + '</span>' +
-      '<span>חתימת מנהל/ת המוסד וחותמת: _______________________.</span></div>' +
+      (sigOk(d.sigImg)
+        ? '<span class="bp-sig">חתימת מנהל/ת המוסד: <img src="' + d.sigImg + '" alt="חתימה"><small>' + esc(d.sigBy || '') +
+          (d.sigAt ? ' · נחתם דיגיטלית <bdi dir="ltr">' + esc(d.sigAt) + '</bdi>' : '') + '</small></span>'
+        : '<span>חתימת מנהל/ת המוסד: _______________________.</span>') + '</div>' +
       '<div class="bp-contact">בכל מקרה של אי הבנה או בעיה: אבי סנדלר, נייד <bdi dir="ltr">050-3166467</bdi>, ' +
       '\u05d3\u05d5\u05d0"\u05dc avi10534@gmail.com</div>';
     h += '</div>';
@@ -240,11 +256,12 @@ var BITACHON = (function () {
     '.bp td.note{text-align:right}' +
     '.bp .bp-foot{display:flex;justify-content:space-between;gap:16px;margin-top:14px;font-size:11.5px;flex-wrap:wrap;break-inside:avoid}' +
     '.bp .bp-contact{margin-top:8px;font-size:11.5px;text-align:center}' +
+    '.bp .bp-sig{display:inline-flex;align-items:center;gap:8px}.bp .bp-sig img{height:46px;width:auto;max-width:180px}.bp .bp-sig small{font-size:10px;color:#333}' +
     '@page{size:A4 landscape;margin:9mm}';
 
   return {
     SCHOOLS: SCHOOLS, SECTIONS: SECTIONS, FIELDS: FIELDS, byKey: byKey, school: school,
-    compute: compute, active: active, num: num, head: head, rowKeys: rowKeys, META_HEAD: META_HEAD,
+    compute: compute, active: active, num: num, head: head, rowKeys: rowKeys, META_HEAD: META_HEAD, SIG: SIG, sigOk: sigOk,
     renderPrint: renderPrint, PRINT_CSS: PRINT_CSS, esc: esc
   };
 })();
