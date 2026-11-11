@@ -189,7 +189,8 @@ input[type=file].find{padding:.5em}
 /* ניהול */
 .users,.perm{list-style:none;margin:0 0 10px;padding:0}
 .users li{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line);align-items:center}
-.users li span{grid-column:1;color:var(--muted);font-size:.85em;direction:ltr;text-align:end}.users li em{grid-row:1/3}
+.users li span{grid-column:1;color:var(--muted);font-size:.85em;direction:ltr;text-align:end}.users li>b{grid-column:1;grid-row:1}.users li>span{grid-row:2}
+.users li>em{grid-column:2;grid-row:1;justify-self:start}.users li>em:last-child{grid-row:1/3}.users li>button{grid-column:2;grid-row:2}   /* 11.11.26: התגית נמתחה לכל הרוחב */
 .perm li{padding:6px 0;border-top:1px solid var(--line)}.perm label{display:flex;gap:.5em;align-items:start;cursor:pointer}
 .kv-line{display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid var(--line)}
 .rep h3 small{font-weight:400;color:var(--muted);font-size:.8em}
@@ -396,7 +397,9 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 
 /* ===== סבב תיקונים 31.10 ===== */
 @media (min-width:761px){.top{flex-wrap:nowrap}.top .nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;min-width:0;flex:1}.top .nav::-webkit-scrollbar{display:none}.nav a{white-space:nowrap}.brand{flex:none}.top .actions{flex:none}}
-@media (min-width:761px) and (max-width:1180px){.nav a .i{display:none}}
+@media (min-width:761px) and (max-width:1400px){.nav a .i{display:none}}   /* 11.11.26: עם כפתור השפה התפריט נחתך ב-1280 */
+@media (min-width:761px) and (max-width:1180px){.top .brand small{display:none}}
+@media (min-width:761px) and (max-width:1100px){.top{flex-wrap:wrap}.top .nav{order:3;flex:1 1 100%;flex-wrap:wrap;overflow:visible}}
 /* העוזר מקופל כמו "מה דורש טיפול" */
 #agent summary{display:flex;align-items:center;gap:8px;cursor:pointer;list-style:none;color:var(--ink)}#agent summary::-webkit-details-marker{display:none}
 #agent summary h2{font-size:1.1em}#agent[open] summary{margin-bottom:10px}
@@ -462,7 +465,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
       <p class="gate-msg gate-to" id="gOne"></p>
       <p class="gate-msg" id="mLogin"></p>
       <button class="btn primary big gate-btn" id="gSend" disabled>שליחת קוד למייל</button>
-      <div class="gate-links"><button class="lnk" id="gToReg">לא מצאתי את עצמי</button><button class="lnk" id="gToStaff">כניסת פיקוח ומטה</button></div>
+      <div class="gate-links"><button class="lnk" id="gToReg">לא מצאתי את עצמי</button><button class="lnk" id="gToStaff">כניסת פיקוח ומטה</button><a class="lnk" href="hadracha.html" id="gVideos">סרטוני הדרכה</a></div>
     </div>
 
     <div class="gate-form" id="gReg" hidden>
@@ -515,7 +518,7 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
 
     <div class="gate-form" id="gAct" hidden>
       <h2 class="gate-h">הפעלת המערכת של בית הספר</h2>
-      <p class="gate-msg">רשימת התלמידים כבר מחכה כאן, מוצפנת. את קוד ההפעלה קיבל.ה מנהל.ת בית הספר במייל.</p>
+      <p class="gate-msg">רשימת התלמידים כבר מחכה כאן, מוצפנת. קוד ההפעלה הגיע אליך במייל מהמרחב הפדגוגי.</p>
       <label class="field"><span>קוד ההפעלה</span><input class="find" id="aCode" dir="ltr" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>
       <label class="field"><span>סיסמה חדשה · 8 תווים לפחות</span><input class="find" id="aPass1" type="password" autocomplete="new-password"></label>
       <label class="field"><span>שוב את הסיסמה</span><input class="find" id="aPass2" type="password" autocomplete="new-password"></label>

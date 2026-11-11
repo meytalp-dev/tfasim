@@ -63,7 +63,7 @@
         R.STU.push(s);
         R.NOTES[p.id] = Object.assign({}, (pv.notes || {})[M.ym]);
       } else if (r.k.startsWith('lead:')) {
-        try { const pv = await CK.decJSON(key, r.e); if (pv) R.LEADS.push(pv); } catch (e) { R.bad++; }
+        try { const pv = await CK.decJSON(key, r.e); if (pv && pv.kind === 'todo') R.meta.todo = pv.items || []; else if (pv) R.LEADS.push(pv); } catch (e) { R.bad++; }
       } else if (r.k.startsWith('att:' + M.ym + ':')) {
         const id = r.k.split(':')[2];
         R.ATT[id] = p.a || {}; R.TIMES[id] = p.t || {}; R.OFFBAK[id] = p.ob || {}; R.SUSPBAK[id] = p.sb || {};
@@ -111,6 +111,8 @@
     out['mon:' + M.ym] = { p: R.CONF ? { sub: R.SUBMITTED, off: R.OFF, conf: R.CONF } : { sub: R.SUBMITTED, off: R.OFF } };
     const manual = {}; Object.entries(R.MANUAL).forEach(([sid, set]) => { if (set && set.size) manual[sid] = [...set]; });
     out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts, wiz: R.meta.wiz } };
+    /* "תזכיר לי…" (11.11.26): מוצפן, כי הטקסט יכול לכלול שם תלמיד.ה. רשומת lead:todo — השרת כבר מקבל lead: מוצפן */
+    if (EXIST.has('lead:todo') || (R.meta.todo || []).length) out['lead:todo'] = { p: { id: 'todo' }, priv: { kind: 'todo', items: R.meta.todo || [] } };
     return out;
   }
   const sig = r => JSON.stringify(r);

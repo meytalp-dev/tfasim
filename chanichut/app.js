@@ -13,7 +13,7 @@ window.startApp = function (R) {
   'use strict';
   const I = {
     home: '<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
-    check: '<path d="m5 12 4 4L19 7"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>', plus: '<path d="M12 5v14M5 12h14"/>',
+    check: '<path d="m5 12 4 4L19 7"/>', play: '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/>', x: '<path d="M6 6l12 12M18 6 6 18"/>', plus: '<path d="M12 5v14M5 12h14"/>',
     back: '<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>',
     send: '<path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/>',
     spark: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
@@ -417,7 +417,7 @@ window.startApp = function (R) {
     </section>
     </div>
   </main>
-  <footer class="foot"><a class="btn quiet" id="helpLink" href="mailto:merhav@pedagogiamh.co.il?subject=${encodeURIComponent('מערכת רכזי החניכות · ' + SCHOOL + ' · תקלה')}&amp;body=${encodeURIComponent('שלום,\nנתקלתי בבעיה במערכת רכזי החניכות.\n\nבית הספר: ' + SCHOOL + '\nבאיזה מסך: \nמה קרה: \n')}">${ic('mail')}נתקלתם בבעיה?</a><br>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
+  <footer class="foot"><a class="btn quiet" id="helpLink" href="mailto:merhav@pedagogiamh.co.il?subject=${encodeURIComponent('מערכת רכזי החניכות · ' + SCHOOL + ' · תקלה')}&amp;body=${encodeURIComponent('שלום,\nנתקלתי בבעיה במערכת רכזי החניכות.\n\nבית הספר: ' + SCHOOL + '\nבאיזה מסך: \nמה קרה: \n')}">${ic('mail')}נתקלתם בבעיה?</a> <a class="btn quiet" href="hadracha.html" target="_blank" rel="noopener">${ic('play')}סרטוני הדרכה</a><br>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
   <nav class="tabbar" id="tabbar">${TABS.map(v => { const [, i, l] = NAV.find(n => n[0] === v); return `<a href="#${v}" data-tab="${v}">${ic(i)}<span>${l}</span></a>`; }).join('')}<a href="#more" data-tab="more">${ic('dots')}<span>עוד</span></a></nav>
   <div class="toast" id="toast" hidden></div>`;
 
@@ -535,11 +535,15 @@ window.startApp = function (R) {
     const none = L.filter(s => !s.emp);
     if (none.length) items.push(`<li><span class="dot"></span><b>${none.length} בלי מקום עבודה:</b> ${none.map(s => `<a href="#" data-open="${s.id}">${esc(first(s))}</a>`).join(', ')}</li>`);
     openLeads().filter(l => leadDue(l) || (/פניתי/.test(l.st) && leadStale(l))).forEach(l => items.push(`<li><span class="dot"></span><b>${esc(l.name)}</b> — ${esc((leadDue(l) ? l.next : (lastLog(l) || {}).text || l.note || '').slice(0, 70))} <a href="#employers">למעסיקים</a></li>`));
+    /* "תזכיר לי…" מהעוזר: מופיע כאן מהיום שנקבע עד שמסמנים "בוצע" (11.11.26) */
+    (R.meta.todo || []).filter(x => x.m !== MONTH.m || x.d <= MONTH.today).forEach(x => items.push(`<li><span class="dot"></span><b>תזכורת:</b> ${esc(x.t)} <small>(${x.d}.${x.m})</small> <button class="lnk" data-todo-done="${esc(x.id)}">בוצע</button></li>`));
     // תוכנית חניכות מוסתרת כרגע (31.10.26)
     // const unrec = PROG.items.filter(x => x.done && !x.rec).length;
     // if (unrec) items.push(`<li><span class="dot"></span><b>תוכנית חניכות:</b> ${unrec} הוצאות בלי קבלה. <a href="#program">לתוכנית</a></li>`);
     $('todoList').innerHTML = items.join(''); $('todayN').textContent = items.length;
   }
+  document.addEventListener('click', e => { const b = e.target.closest('[data-todo-done]'); if (!b) return; e.preventDefault();
+    R.meta.todo = (R.meta.todo || []).filter(x => x.id !== b.dataset.todoDone); renderToday(); b.closest('li') && b.closest('li').remove(); toast('סומן כבוצע'); });
 
   /* ================= נוכחות ================= */
   const norm = s => String(s || '').replace(/["'״׳\s]/g, '');
@@ -1509,7 +1513,7 @@ window.startApp = function (R) {
       users: { html: () => { const cls = [...classes].sort((a, b) => a.localeCompare(b, 'he')), grades = [...new Set(cls.map(gradeOf))];
           const u = USERS == null ? '<li class="hint">טוען…</li>' : USERS.map(x => `<li><b>${esc(x.name)}</b><span>${ROLE_HE[x.role] || ''} · <span dir="ltr">${esc(x.email)}</span></span>${x.granted ? '<em class="tag ok">יש גישה</em>' : x.pub ? `<em class="tag no">מחכה לאישור</em><button class="btn edit" data-grant="${esc(x.email)}">${ic('check')}אישור גישה</button>` : '<em class="tag">עוד לא נכנס.ה</em>'}</li>`).join('');
           const row = (kind, key, lbl) => { const c = CT[kind][key] || {}; return `<div class="field-row"><label class="field"><span>${esc(lbl)}</span><input class="find" data-ct="${kind}" data-key="${esc(key)}" data-f="name" value="${esc(c.name || '')}" placeholder="שם"></label><label class="field"><span>מייל</span><input class="find" type="email" dir="ltr" data-ct="${kind}" data-key="${esc(key)}" data-f="mail" value="${esc(c.mail || '')}"></label></div>`; };
-          return `<div class="sub-card"><h3>${ic('lock')}מי נכנס.ת למערכת</h3><ul class="users">${u}</ul><p class="hint">מנהל.ת או רכז.ת נוספ.ת נרשמים במסך הכניסה, יוצרים סיסמה ומקריאים קוד אימות. כאן מאשרים.</p></div>
+          return `<div class="sub-card"><h3>${ic('lock')}מי נכנס.ת למערכת</h3><ul class="users">${u}</ul><p class="hint">מנהל.ת בית הספר מקבל.ת גישה לבד, בכניסה הבאה שלך עם סיסמה. רכז.ת פדגוגי.ת: נרשמ.ת במסך הכניסה, יוצר.ת סיסמה ומקריא.ה קוד אימות, וכאן מאשרים.</p></div>
           <div class="sub-card newform"><h3>${ic('bell')}מקבלי תזכורות היעדרות</h3>${cls.length ? `<h4 class="mf-h">מחנכי הכיתות</h4>${cls.map(c => row('cls', c, 'מחנך.ת ' + c)).join('')}<h4 class="mf-h">רכזי השכבות</h4>${grades.map(g => row('grade', g, 'רכז.ת שכבה ' + g)).join('')}` : '<p class="empty">אחרי שיש תלמידים, הכיתות יופיעו כאן.</p>'}</div>`; },
         bind: el => {
           if (USERS == null) R.hooks.users().then(l => { USERS = l; refreshSub(); });
@@ -1585,6 +1589,19 @@ window.startApp = function (R) {
   function run(text, forced) {
     const t = text.trim(); if (!t) return;
     lastCmd = t;
+    if (/(מה|מי)\s+(דורש|צריך|מחכה)|מה\s+(יש|על\s+הפרק)\s+(לי\s+)?היום|דורש[֐-ת]*\s+טיפול/.test(t)) {
+      renderToday(); const li = $('todoList').innerHTML;
+      return show(li ? `<p><b>מה דורש טיפול היום:</b></p><ul>${li.replace(/<span class="dot[^"]*"><\/span>/g, '')}</ul>` : '<p>אין היום משהו שדורש טיפול.</p>', null);
+    }
+    const rm = t.match(/^(?:בבקשה\s+)?(?:תזכיר|תזכירי|תזכירו|להזכיר|הזכר|הזכירי)\s+לי\s+(.+)$/);
+    if (rm) {
+      const d = dateOf(t); if (!d) return badDate();
+      const what = rm[1].replace(/(^|\s)(היום|מחר|מחרתיים|ב-?\d{1,2}([./]\d{1,2}([./]\d{2,4})?)?|ביום\s+[֐-ת]+)(?=$|\s|[.,])/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!what) return show('<p>על מה להזכיר? למשל: "תזכיר לי מחר להתקשר למעסיק".</p>', null);
+      return show(`<p>להוסיף ל"מה דורש טיפול היום" ${d === MONTH.today ? 'מהיום' : `ב-<b>${wd(d)} ${d}.${MONTH.m}</b>`}: <b>${esc(what)}</b>?</p>`, () => {
+        (R.meta.todo = R.meta.todo || []).push({ id: Date.now().toString(36), m: MONTH.m, d, t: what }); renderToday();
+        return `תזכורת נוספה ל-${d}.${MONTH.m}`; });
+    }
     const hits = forced ? [forced] : cmdMatch(t, active()), who = hits.length === 1 ? hits[0] : null;
     if (/מי לא הגיע/.test(t)) {
       const l = active().filter(s => Object.entries(ATT[s.id]).some(([d, v]) => v === 'a' && +d >= MONTH.today - 6));
@@ -1630,7 +1647,7 @@ window.startApp = function (R) {
       return show(`<p>לסמן ${st === 'x' ? 'ל' : 'ש'}<b>${esc(who.name)}</b> <b>${lbl}</b> ב-<b>${d}.${MONTH.m}</b>${who.emp ? ' ל' + esc(empName(who.emp)) : ''}?${warn ? ` <span class="warn">${warn}</span>` : ''}</p>`,
         () => { ATT[who.id][d] = st; if (!shown.some(s => s.id === who.id)) { $('find').value = who.cls; find(who.cls); } afterAtt(); return `סומן: ${who.name}, ${lbl}, ${d}.${MONTH.m}${st === 'a' && REM_CFG.teacher ? ' · תזכורת למחנך.ת תצא ב-16:00' : ''}`; });
     }
-    show(`<p>לא הבנתי. אפשר: "סמן ש${esc(first(sPlaced))} הגיע היום", "מי לא הגיע השבוע", "הגש את הנוכחות של ${esc(MGS[0])}", "מצא מעסיקים ל${esc(MGS[0])}", "מה חסר ל${esc(first(sNone))}", "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}".</p>`, null);
+    show(`<p>לא הבנתי. אפשר: "סמן ש${esc(first(sPlaced))} הגיע היום", "מי לא הגיע השבוע", "הגש את הנוכחות של ${esc(MGS[0])}", "מצא מעסיקים ל${esc(MGS[0])}", "מה חסר ל${esc(first(sNone))}", "אין תעסוקה ב-${MONTH.today}.${MONTH.m} לכיתה ${esc(classes[0])}", "מה דורש טיפול היום", "תזכיר לי מחר להתקשר למעסיק".</p>`, null);
   }
   function show(html, apply) {
     out.hidden = false;

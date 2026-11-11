@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סרטוני הדרכה · מערכת רכזי החניכות</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* סרטוני ההדרכה של מערכת רכזי החניכות (11.11.26): דף אחד. רשימה לפי סדר העבודה, וכל סרטון נפתח במסך משלו. עברית/ערבית */
+:root{--bg:#F6F2E9;--card:#FFFDF8;--ink:#1D4F5E;--text:#243B42;--muted:#6B7272;--line:#DCD3C2;--amber:#C4862A;--tint:#EEF3F0;
+ --head:'Rubik','Cairo',sans-serif;--body:'Assistant','Cairo',sans-serif}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.55}
+html[lang=ar] body{font-family:'Cairo','Assistant',sans-serif;font-size:16px}
+html[lang=ar] h1,html[lang=ar] h2,html[lang=ar] .v-t{font-family:'Cairo','Rubik',sans-serif}
+[hidden]{display:none!important}
+a{color:var(--ink)}
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:0;padding:0}
+.i{width:1.15em;height:1.15em;flex:none}
+.minhal{background:#fff;display:flex;justify-content:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.minhal img{height:46px;width:auto}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 40px}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:42px;height:46px;flex:none}
+h1{font-family:var(--head);font-weight:800;color:var(--ink);font-size:1.6em;margin:0;line-height:1.2}
+.brand small{display:block;color:var(--muted);font-size:.95rem;font-weight:400}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45em;min-height:44px;padding:.45em 1.05em;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn:focus-visible,.row:focus-visible{outline:3px solid var(--amber);outline-offset:2px}
+.lead{margin:16px 0 18px;color:var(--muted)}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:auto 1fr auto;gap:4px 14px;align-items:center;width:100%;text-align:start;padding:14px 4px;border-bottom:1px solid var(--line);min-height:64px}
+.row:hover{background:var(--tint)}
+.num{grid-row:1/3;width:38px;height:38px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--head);font-weight:800}
+.v-t{font-family:var(--head);font-weight:700;color:var(--ink);font-size:1.08em}
+.v-d{grid-column:2;color:var(--muted);font-size:.93em}
+.v-m{grid-row:1/3;grid-column:3;display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.9em;white-space:nowrap}
+.tag{display:inline-block;font-size:.78em;font-weight:700;padding:1px 9px;border-radius:999px;background:#F3E6D1;color:#7a5418;margin-inline-start:6px;vertical-align:2px}
+.soon{color:var(--muted);font-size:.85em}
+/* מסך הסרטון */
+.player-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.player-head h2{font-family:var(--head);color:var(--ink);font-size:1.35em;margin:0;line-height:1.25}
+.frame{position:relative;width:100%;aspect-ratio:16/9;background:#1D2E33;border-radius:12px;overflow:hidden}
+.frame video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.frame .ph{position:absolute;inset:0;display:grid;place-items:center;color:#fff;text-align:center;padding:20px;font-size:1.1em}
+.p-desc{margin:12px 0 4px;color:var(--text)}
+.p-nav{display:flex;justify-content:space-between;gap:10px;margin-top:16px;flex-wrap:wrap}
+.foot{margin-top:36px;text-align:center;color:var(--muted);font-size:.9em}
+.foot .help{display:inline-flex;align-items:center;gap:.4em;min-height:44px}
+.foot p{margin:6px 0}
+@media (max-width:600px){h1{font-size:1.3em}.brand svg{width:34px;height:38px}.acts{width:100%}.acts .btn{flex:1}
+ .row{grid-template-columns:auto 1fr;padding:12px 2px}.v-m{grid-row:auto;grid-column:2}.player-head h2{font-size:1.15em}}
+</style>
+</head>
+<body>
+<div class="minhal"><img src="logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+<main class="wrap">
+  <header class="head">
+    <div class="brand">
+      <svg viewBox="0 0 320 350" aria-hidden="true"><path d="M74 300 V118 C74 72 102 44 148 44 H160" fill="none" stroke="#1D4F5E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 6 H226 A60 60 0 0 1 286 66 V74 C262 78 246 94 238 116 L222 82 H166 Z" fill="#C4862A"/><rect x="206" y="22" width="80" height="312" rx="40" fill="#7F9A8E" stroke="#F6F2E9" stroke-width="9" paint-order="stroke"/></svg>
+      <div><h1 data-t="title">סרטוני הדרכה</h1><small data-t="sub">מערכת רכזי החניכות</small></div>
+    </div>
+    <div class="acts">
+      <button class="btn" id="lang" type="button">العربية</button>
+      <a class="btn primary" href="./" id="enter"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h10"/></svg><span data-t="enter">כניסה למערכת</span></a>
+    </div>
+  </header>
+
+  <section id="listView">
+    <p class="lead" data-t="lead">סרטונים קצרים, לפי סדר העבודה. כל סרטון בעברית ובערבית.</p>
+    <ol class="list" id="list"></ol>
+  </section>
+
+  <section id="playView" hidden>
+    <div class="player-head">
+      <button class="btn" id="back" type="button"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg><span data-t="back">כל הסרטונים</span></button>
+    </div>
+    <h2 id="pTitle" style="font-family:var(--head);color:var(--ink);margin:0 0 12px"></h2>
+    <div class="frame" id="frame"></div>
+    <p class="p-desc" id="pDesc"></p>
+    <div class="p-nav"><button class="btn" id="prev" type="button"></button><button class="btn primary" id="next" type="button"></button></div>
+  </section>
+
+  <footer class="foot">
+    <a class="help" id="help" href="#"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg><span data-t="help">נתקלתם בבעיה?</span></a>
+    <p data-t="org">המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</p>
+    <p><a href="https://impactos.co.il/" dir="ltr">impactos</a> <span data-t="by">נבנה על ידי</span></p>
+  </footer>
+</main>
+<script>
+/* הסרטונים באתר עצמו: video/<id>.mp4 ובערבית video/<id>-ar.mp4 (11.11.26). who: לרכז.ת או למנהל.ת */
+var VIDEOS = [
+  { id: 'hafala', sec: 70, who: 'r',
+    he: ['הפעלת המערכת', 'קוד ההפעלה, סיסמה, קוד השחזור והכניסה הראשונה'],
+    ar: ['تفعيل النظام', 'رمز التفعيل، كلمة المرور، رمز الاسترجاع والدخول الأول'] },
+  { id: 'maasikim', sec: 95, who: 'r',
+    he: ['מעסיקים, שיבוץ וימי עבודה', 'מעסיק חדש, שיוך תלמידים וימי עבודה בתיק'],
+    ar: ['المشغّلون، التنسيب وأيام العمل', 'مشغّل جديد، تنسيب الطلاب وأيام العمل في الملف'] },
+  { id: 'nochechut', sec: 122, who: 'r',
+    he: ['איך מדווחים נוכחות', 'סימון יומי, הערות, יום בלי תעסוקה והגשת החודש'],
+    ar: ['كيف نسجّل الحضور', 'تسجيل يومي، ملاحظات، يوم بلا تشغيل وتقديم الشهر'] },
+  { id: 'tik', sec: 70, who: 'r',
+    he: ['תיק התלמיד.ה ואבני הדרך', 'טפסי אבני הדרך, מסמכים והצ\'ק ליסט'],
+    ar: ['ملف الطالب/ة ومحطات الطريق', 'نماذج المحطات، المستندات وقائمة الفحص'] },
+  { id: 'dochot', sec: 46, who: 'r',
+    he: ['דוחות והגשה', 'דוח תעסוקה, ייצוא לאקסל, דוח למנהל.ת ונוכחות לפי ימים'],
+    ar: ['التقارير والتقديم', 'تقرير التشغيل، التصدير إلى إكسل، تقرير للمدير/ة والحضور حسب الأيام'] },
+  { id: 'chanichi', sec: 72, who: 'r',
+    he: ['חניכי, העוזר', 'פקודות במילים פשוטות: לסמן, לבדוק, להגיש'],
+    ar: ['«חניכי»، المساعد', 'أوامر بكلمات بسيطة: تسجيل، فحص، تقديم'] },
+  { id: 'ashaf', sec: 63, who: 'r',
+    he: ['אשף מציאת מעסיקים ותיעוד פניות', 'מאגר המעסיקים, פניות, נוסח פנייה והוספה כמעסיק'],
+    ar: ['معالج إيجاد المشغّلين وتوثيق التوجّهات', 'مخزون المشغّلين، التوجّهات، نص التوجّه والإضافة كمشغّل'] },
+  { id: 'mishtamshim', sec: 54, who: 'r',
+    he: ['משתמשים, מחנכים ורכזי שכבה', 'מי נכנס.ת למערכת, אישור רכז.ת פדגוגי.ת, מחנכים ורכזי שכבה'],
+    ar: ['المستخدمون، المربّون ومركّزو الطبقات', 'من يدخل إلى النظام، موافقة المركّز/ة التربوي/ة، المربّون ومركّزو الطبقات'] },
+  { id: 'menahel', sec: 56, who: 'm',
+    he: ['כניסת מנהלים', 'קוד למייל, סיסמה, והשמות נפתחים לבד'],
+    ar: ['دخول المديرين', 'رمز بالبريد، كلمة مرور، والأسماء تُفتح تلقائيًا'] },
+  { id: 'shichachti', sec: 42, who: 'a',
+    he: ['שכחתי את הסיסמה', 'כניסה עם קוד השחזור'],
+    ar: ['نسيت كلمة المرور', 'الدخول برمز الاسترجاع'] }
+];
+var T = {
+  he: { title: 'סרטוני הדרכה', sub: 'מערכת רכזי החניכות', enter: 'כניסה למערכת', lead: 'סרטונים קצרים, לפי סדר העבודה. כל סרטון בעברית ובערבית.', back: 'כל הסרטונים', help: 'נתקלתם בבעיה?', org: 'המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה', by: 'נבנה על ידי', lang: 'العربية', next: 'הסרטון הבא', prev: 'הקודם', soon: 'יעלה בקרוב', min: 'דק׳', sec: 'שנ׳', m: 'למנהלים', a: 'לכולם', last: 'חזרה לרשימה', docTitle: 'סרטוני הדרכה · מערכת רכזי החניכות' },
+  ar: { title: 'فيديوهات إرشاد', sub: 'نظام مركّزي التلمذة المهنية', enter: 'الدخول إلى النظام', lead: 'فيديوهات قصيرة، حسب ترتيب العمل. كل فيديو بالعبرية وبالعربية.', back: 'كل الفيديوهات', help: 'واجهتم مشكلة؟', org: 'الحيّز التربوي · إدارة التأهيل المهني · وزارة العمل', by: 'بناه', lang: 'עברית', next: 'الفيديو التالي', prev: 'السابق', soon: 'سيُرفع قريبًا', min: 'د', sec: 'ث', m: 'للمديرين', a: 'للجميع', last: 'العودة إلى القائمة', docTitle: 'فيديوهات إرشاد · نظام مركّزي التلمذة المهنية' }
+};
+var $ = function (id) { return document.getElementById(id); };
+var esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+var L = 'he';
+try { var q = new URLSearchParams(location.search).get('lang'); L = q === 'ar' ? 'ar' : q === 'he' ? 'he' : (localStorage.getItem('chanichut-hadracha-lang') || localStorage.getItem('chanichut-lang')) === 'ar' ? 'ar' : 'he'; } catch (e) {}   /* ברירת המחדל: השפה שנבחרה במערכת */
+var dur = function (s) { var t = T[L], m = Math.floor(s / 60), r = s % 60; return m ? m + ':' + String(r).padStart(2, '0') + ' ' + t.min : r + ' ' + t.sec; };
+var ytOf = function (v) { return 'video/' + v.id + (L === 'ar' ? '-ar' : '') + '.mp4'; };
+function helpHref() {
+  var subj = L === 'ar' ? 'فيديوهات إرشاد · نظام التلمذة' : 'סרטוני הדרכה · מערכת רכזי החניכות';
+  var body = L === 'ar' ? 'مرحبًا،\nواجهت مشكلة.\n\nالمدرسة: \nما حدث: \n' : 'שלום,\nנתקלתי בבעיה.\n\nבית הספר: \nמה קרה: \n';
+  return 'mailto:merhav@pedagogiamh.co.il?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+}
+function paintStatic() {
+  var t = T[L];
+  document.documentElement.lang = L; document.title = t.docTitle;
+  document.querySelectorAll('[data-t]').forEach(function (el) { el.textContent = t[el.dataset.t]; });
+  $('lang').textContent = t.lang; $('lang').lang = L === 'ar' ? 'he' : 'ar';
+  $('help').href = helpHref();
+}
+function paintList() {
+  var t = T[L];
+  $('list').innerHTML = VIDEOS.map(function (v, i) {
+    var x = v[L], tag = v.who === 'm' ? '<span class="tag">' + t.m + '</span>' : v.who === 'a' ? '<span class="tag">' + t.a + '</span>' : '';
+    return '<li><button class="row" type="button" data-v="' + v.id + '"><span class="num">' + (i + 1) + '</span><span class="v-t">' + esc(x[0]) + tag + '</span><span class="v-d">' + esc(x[1]) + '</span><span class="v-m">'
+      + (ytOf(v) ? '<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/></svg>' + dur(v.sec) : '<span class="soon">' + t.soon + '</span>') + '</span></button></li>';
+  }).join('');
+}
+var CUR = -1;
+function open(i, push) {
+  var v = VIDEOS[i], t = T[L]; if (!v) return home(push);
+  CUR = i; $('listView').hidden = true; $('playView').hidden = false;
+  $('pTitle').textContent = (i + 1) + '. ' + v[L][0]; $('pDesc').textContent = v[L][1];
+  var yt = ytOf(v);
+  $('frame').innerHTML = yt ? '<video src="' + yt + '" title="' + esc(v[L][0]) + '" controls playsinline preload="metadata"></video>'
+    : '<div class="ph">' + t.soon + '</div>';
+  $('prev').hidden = i === 0; $('prev').textContent = t.prev;
+  $('next').textContent = i < VIDEOS.length - 1 ? t.next + ': ' + VIDEOS[i + 1][L][0] : t.last;
+  if (push !== false) history.pushState({ v: v.id }, '', '#' + v.id);
+  window.scrollTo(0, 0);
+}
+function home(push) {
+  CUR = -1; $('frame').innerHTML = ''; $('playView').hidden = true; $('listView').hidden = false;
+  if (push !== false) history.pushState({}, '', location.pathname + location.search);
+}
+function fromHash() { var id = location.hash.slice(1), i = VIDEOS.findIndex(function (v) { return v.id === id; }); if (i >= 0) open(i, false); else home(false); }
+$('list').addEventListener('click', function (e) { var b = e.target.closest('[data-v]'); if (b) open(VIDEOS.findIndex(function (v) { return v.id === b.dataset.v; })); });
+$('back').onclick = function () { home(); };
+$('prev').onclick = function () { open(CUR - 1); };
+$('next').onclick = function () { if (CUR < VIDEOS.length - 1) open(CUR + 1); else home(); };
+$('lang').onclick = function () { L = L === 'ar' ? 'he' : 'ar'; try { localStorage.setItem('chanichut-hadracha-lang', L); } catch (e) {} paintStatic(); paintList(); if (CUR >= 0) open(CUR, false); };
+window.addEventListener('popstate', fromHash);
+paintStatic(); paintList(); fromHash();
+</script>
+</body>
+</html>
