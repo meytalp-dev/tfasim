@@ -115,10 +115,12 @@
   }
   const sig = r => JSON.stringify(r);
 
+  /* מי שומר.ת נתונים: רכז.ת, ומ-11.11.26 גם מנהל.ת (R.role 'manager') */
+  const editor = () => !!R && (R.role === 'rakaz' || R.role === 'manager');
   function watch() {
     Object.entries(records()).forEach(([k, r]) => { SNAP[k] = sig(r); });
     QSNAP = JSON.stringify(R.remqKeys);
-    if (R.role !== 'rakaz') return;
+    if (!editor()) return;
     const kick = () => { if (!failT) schedule(DEBOUNCE); };
     ['click', 'change', 'input', 'keyup'].forEach(t => document.addEventListener(t, kick));
     window.addEventListener('popstate', kick);
@@ -127,12 +129,12 @@
     window.addEventListener('beforeunload', e => { if (!leaving && (busy || dirtyCount())) { flush(true); e.preventDefault(); e.returnValue = ''; } });
     schedule(50);   /* תור התזכורות מתעדכן גם בלי פעולה, למשל אחרי שינוי שם */
   }
-  function dirtyCount() { if (!R || R.role !== 'rakaz') return 0; let n = 0; const cur = records(); Object.entries(cur).forEach(([k, r]) => { if (SNAP[k] !== sig(r)) n++; }); Object.keys(SNAP).forEach(k => { if (!(k in cur)) n++; }); return n; }
+  function dirtyCount() { if (!editor()) return 0; let n = 0; const cur = records(); Object.entries(cur).forEach(([k, r]) => { if (SNAP[k] !== sig(r)) n++; }); Object.keys(SNAP).forEach(k => { if (!(k in cur)) n++; }); return n; }
   function schedule(ms) { clearTimeout(timer); timer = setTimeout(() => { timer = 0; flush(); }, ms); }
   function status(t, cls) { const el = document.getElementById('saveSt'); if (el) { el.textContent = t; el.className = 'save-st ' + (cls || ''); } }
 
   async function flush(beacon) {
-    if (!R || R.role !== 'rakaz') return;
+    if (!editor()) return;
     if (busy) { again = true; return; }
     const cur = records(), send = [];
     for (const [k, r] of Object.entries(cur)) {

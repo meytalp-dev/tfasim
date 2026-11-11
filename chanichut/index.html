@@ -281,8 +281,8 @@ svg.gate-logo,svg.brand-mark{aspect-ratio:320/350;height:auto;display:block}svg.
 .brand-mark{width:36px}
 /* תפקידים: רכז.ת עורך.ת; מנהל.ת ומנהל.ת המערכת רק רואים */
 .sys-only,.nav a.sys-only{display:none}body[data-role=system] .sys-only,body[data-role=system] .nav a.sys-only{display:inline-flex}
-body[data-role]:not([data-role=rakaz]) .edit,body[data-role]:not([data-role=rakaz]) #agent{display:none!important}
-body[data-role=manager] #roster .cell,body[data-role=manager] .tik input,body[data-role=manager] .tik select,body[data-role=manager] .tik .dp,body[data-role=manager] .chk-items input,body[data-role=manager] .perm input,
+body[data-role=manager] [data-grant]{display:none!important}
+body[data-role]:not([data-role=rakaz]):not([data-role=manager]) .edit,body[data-role]:not([data-role=rakaz]):not([data-role=manager]) #agent{display:none!important}
 body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data-role=system] .tik select,body[data-role=system] .tik .dp,body[data-role=system] .chk-items input,body[data-role=system] .perm input{pointer-events:none}
 /* יום בלי תעסוקה לכל הכיתה */
 .off-btn{margin-inline-start:auto;text-decoration:none;color:var(--ink)}

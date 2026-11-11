@@ -30,12 +30,13 @@
   /* ================= שרת מדומה ================= */
   var DBK = 'chanichut2-mock-db';
   var ROLES = ['rakaz', 'principal', 'pedco', 'system', 'staff', 'ped', 'pro', 'net'], KEYED = ['rakaz', 'principal', 'pedco'], NAT = ['system', 'staff', 'ped', 'pro', 'net'];
+  var EDIT = ['rakaz', 'principal'];   /* מנהל.ת עורך.ת כמו רכז.ת (11.11.26), כמו EDIT_ בשרת */
   var PIKUAH = 'פיקוח', NETP = 'רשת · ';
   var WHY = ['חסרים מסמכים', 'לא נמצא מעסיק', 'נגישות תחבורתית', 'סיבה אישית', 'עזב.ה'];
   /* מי רשאי לכל פעולה — כמו ALLOW_ בשרת */
   var ALLOW = {
     me: ROLES, logout: ROLES, keys: KEYED, keysSet: KEYED, load: KEYED, empDb: KEYED,
-    keysInit: ['rakaz'], keysActivate: ['rakaz'], grant: ['rakaz'], put: ['rakaz'], remqSet: ['rakaz'], remSend: ['rakaz'], monConf: ['rakaz'], raw: ['rakaz'],
+    keysInit: ['rakaz'], keysActivate: ['rakaz'], grant: ['rakaz'], put: EDIT, remqSet: EDIT, remSend: EDIT, monConf: EDIT, raw: ['rakaz'],
     rakazAdd: ['principal'],
     preload: ['system'], preloadStatus: ['system'], activationSend: ['system'], schoolsAdmin: ['system'], permsLoad: ['system'], baselineLoad: ['system'], stateRefresh: ['system'],
     schoolDelete: ['system'], updateLoad: ['system'], updateSend: ['system'], updateDone: ['rakaz'],
@@ -270,7 +271,7 @@
   }
   function mentorRakaz(d, s, q) {
     if (['mentorCreate', 'mentorRevoke', 'mentorPull'].indexOf(q.action) < 0) return { ok: false, error: 'badaction' };
-    if (s.role !== 'rakaz') return { ok: false, error: KEYED.indexOf(s.role) >= 0 ? 'readonly' : 'forbidden' };
+    if (EDIT.indexOf(s.role) < 0) return { ok: false, error: KEYED.indexOf(s.role) >= 0 ? 'readonly' : 'forbidden' };
     var t = d.schools[s.school] = d.schools[s.school] || { keys: {}, recovery: null, recs: {} }, recs = t.recs, day = today();
     var links = function () { return Object.keys(recs).filter(function (key) { return key.indexOf('ml:') === 0; }).map(function (key) { var L = mLink(recs[key].p); L.k = key.slice(3); return L; }); };
     var revoke = function (L) { recs['ml:' + L.k] = { p: { emp: L.emp, ids: L.ids, created: L.created, revoked: day, wrap: L.wrap }, e: recs['ml:' + L.k].e }; };

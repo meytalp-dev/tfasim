@@ -208,7 +208,7 @@ window.startApp = function (R) {
 
   const SUBMITTED = R.SUBMITTED;
   /* רשימת מותרים: רק רכז.ת החניכות עורכ.ת. כל תפקיד אחר צפייה בלבד, גם במקלדת */
-  const canEdit = () => document.body.dataset.role === 'rakaz';
+  const canEdit = () => document.body.dataset.role === 'rakaz' || document.body.dataset.role === 'manager';   /* מנהל.ת עורך.ת מ-11.11.26 */
   const MGS = [], classes = [];
   /* המגמות והכיתות נגזרות מהתלמידים, ומתעדכנות כשנוסף.ה תלמיד.ה */
   const syncGroups = () => { MGS.splice(0, MGS.length, ...new Set(STU.map(s => s.mg).filter(Boolean))); classes.splice(0, classes.length, ...new Set(STU.map(s => s.cls).filter(Boolean))); };
@@ -438,7 +438,7 @@ window.startApp = function (R) {
     /* גוף חדש בכל ציור — כדי שמאזינים של מסך קודם לא יפעלו במסך הזה */
     const old = $('subBody'), body = old.cloneNode(false); old.replaceWith(body); body.innerHTML = s.html();
     if (s.bind) s.bind(body, s);
-    if (ROLE !== 'rakaz') body.querySelectorAll('input,select,textarea,button.dp,button[data-stage]').forEach(x => { if (!x.classList.contains('view-ok')) x.disabled = true; });
+    if (!canEdit()) body.querySelectorAll('input,select,textarea,button.dp,button[data-stage]').forEach(x => { if (!x.classList.contains('view-ok')) x.disabled = true; });
     if (s.dirtyWatch) body.addEventListener('input', () => { s.dirty = true; });
     markNav();
   }
