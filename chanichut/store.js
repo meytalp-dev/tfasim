@@ -122,6 +122,8 @@
   function watch() {
     Object.entries(records()).forEach(([k, r]) => { SNAP[k] = sig(r); });
     QSNAP = JSON.stringify(R.remqKeys);
+    /* רשומות שהאפליקציה תיקנה בטעינה (R.forceSave, למשל ימי עבודה לפי הכלל החדש): נשמרות בשמירה הראשונה */
+    (R.forceSave || []).forEach(k => { delete SNAP[k]; });
     if (!editor()) return;
     const kick = () => { if (!failT) schedule(DEBOUNCE); };
     ['click', 'change', 'input', 'keyup'].forEach(t => document.addEventListener(t, kick));
