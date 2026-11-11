@@ -173,7 +173,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       .then(function (r) { return r.json(); })
       .then(function (res) {
         if (!res.ok) throw new Error(res.error || 'error');
-        rows = res.rows || [];
+        // r.raw = השם כפי שנשמר בגיליון (לבקשות לשרת); r.school = השם הנוכחי (שורות ישנות של "מרחביה/מעיינות" → "מעיינות")
+        rows = (res.rows || []).map(function (r) { r.raw = r.school; r.school = B.canon(r.school); return r; });
         $('upd').textContent = 'עודכן ' + new Date().toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
         render();
       })
@@ -233,9 +234,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
           '<div class="wh">' + esc(r.submitter || '') + (r.role ? ' · ' + esc(r.role) : '') +
             '<br>' + (r.sigAt ? '<span class="sg ok">נחתם · ' + esc(r.sigBy || '') + ' · <bdi dir="ltr">' + esc(r.sigAt) + '</bdi></span>' : '<span class="sg wait">ממתין לחתימת המנהל/ת</span>') + '</div>' +
           '<div class="at">' + esc(r.at) + '</div>' +
-          '<div class="acts">' + (r.sigAt ? '' : '<button class="copy" type="button" data-signlink="' + esc(r.school) + '">' + ICON_COPY + 'קישור חתימה</button>') +
-          '<button class="copy" type="button" data-editlink="' + esc(r.school) + '">' + ICON_COPY + 'קישור עריכה</button>' +
-          '<button class="pr" type="button" data-print="' + esc(r.school) + '">' + ICON_PRINT + 'הדפסה</button></div></div>';
+          '<div class="acts">' + (r.sigAt ? '' : '<button class="copy" type="button" data-signlink="' + esc(r.raw) + '">' + ICON_COPY + 'קישור חתימה</button>') +
+          '<button class="copy" type="button" data-editlink="' + esc(r.raw) + '">' + ICON_COPY + 'קישור עריכה</button>' +
+          '<button class="pr" type="button" data-print="' + esc(r.raw) + '">' + ICON_PRINT + 'הדפסה</button></div></div>';
       });
     }
     h += '</div>';
@@ -315,6 +316,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       .then(function (res) {
         btn.disabled = false;
         if (!res.ok) { if (res.error === 'key') badKey(); else alert('לא נמצאו נתונים לבית הספר.'); return; }
+        res.row.school = B.canon(res.row.school);
         $('printArea').innerHTML = B.renderPrint(res.row);
         window.print();
       })
@@ -339,7 +341,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
           var res = a[1];
           btn.disabled = false;
           if (!res.ok) { if (res.error === 'key') badKey(); else alert('הייצוא לא הצליח.'); return; }
-          var aoa = [res.head].concat(res.rows);
+          var aoa = [res.head].concat((res.rows || []).map(function (row) { return row.map(B.canon); }));
           var ws = XLSX.utils.aoa_to_sheet(aoa);
           ws['!cols'] = res.head.map(function (hd, i) { return { wch: i === 0 ? 16 : Math.min(40, Math.max(12, String(hd).length)) }; });
           var wb = XLSX.utils.book_new();

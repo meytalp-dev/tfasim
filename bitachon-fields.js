@@ -40,7 +40,7 @@ var BITACHON = (function () {
     ["44011","עמל טייבה ב'","עמל",["ויסאם סואלחה"]],
     ["44050","עמל טק אין","עמל",["סיגלית דאי"]],
     ["54008","נצרת","עמל",["יסמין אמון"]],
-    ["54009","מרחביה/מעיינות","עמל",["יששכר חפץ"]],
+    ["54009","מעיינות","עמל",["יששכר חפץ"]],
     ["54017","רמת דוד","עמל",["ליאת צבר"]],
     ["54021","אנרג'י טק","עמל",["ליאת צבר"]],
     ["54040","תיכון שיח","עמל",["ליאת צבר"]],
@@ -151,7 +151,16 @@ var BITACHON = (function () {
   var byKey = {};
   FIELDS.forEach(function (f) { byKey[f.key] = f; });
 
+  // שמות קודמים → השם הנוכחי. בגיליון נשארו שורות בשם הקודם (מיטל, 11.11.26: לא עורכים את הגיליון)
+  var ALIASES = { 'מרחביה/מעיינות': 'מעיינות', 'מרחביה': 'מעיינות' };
+  function canon(name) {
+    if (typeof name !== 'string') return name;
+    var n = name.trim();
+    return Object.prototype.hasOwnProperty.call(ALIASES, n) ? ALIASES[n] : name;
+  }
+
   function school(name) {
+    name = String(canon(name == null ? '' : String(name))).trim();
     for (var i = 0; i < SCHOOLS.length; i++) if (SCHOOLS[i][1] === name) return SCHOOLS[i];
     return null;
   }
@@ -260,7 +269,7 @@ var BITACHON = (function () {
     '@page{size:A4 landscape;margin:9mm}';
 
   return {
-    SCHOOLS: SCHOOLS, SECTIONS: SECTIONS, FIELDS: FIELDS, byKey: byKey, school: school,
+    SCHOOLS: SCHOOLS, SECTIONS: SECTIONS, FIELDS: FIELDS, byKey: byKey, school: school, canon: canon,
     compute: compute, active: active, num: num, head: head, rowKeys: rowKeys, META_HEAD: META_HEAD, SIG: SIG, sigOk: sigOk,
     renderPrint: renderPrint, PRINT_CSS: PRINT_CSS, esc: esc
   };

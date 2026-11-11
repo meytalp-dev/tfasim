@@ -324,6 +324,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       return;
     }
     var el = $('f_' + f.key);
+    if (f.type === 'school') v = B.canon(v); // טיוטה/שורה ישנה בשם הקודם
     if (el) el.value = v == null ? '' : v;
   }
   function data() {
@@ -436,7 +437,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     $('failMsg').classList.remove('on');
     var ctrl = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 45000);
-    fetch(API, { method: 'POST', body: JSON.stringify(d), signal: ctrl ? ctrl.signal : undefined })
+    // השרת (bitachon-gas) עדיין מכיר רק את השם הקודם "מרחביה/מעיינות" — שולחים אותו בשם הזה כדי שלא יידחה וכדי שיעדכן את אותה שורה.
+    // אחרי שהשרת יקבל את Fields.js המעודכן (עם canon) — אפשר להסיר; גם אז השם הקודם יתקבל ויישמר כ"מעיינות".
+    var wire = d.school === 'מעיינות' ? JSON.parse(JSON.stringify(d)) : d;
+    if (wire !== d) wire.school = 'מרחביה/מעיינות';
+    fetch(API, { method: 'POST', body: JSON.stringify(wire), signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         clearTimeout(t);
@@ -528,6 +533,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
           return;
         }
         var d = res.row;
+        d.school = B.canon(d.school); // שורה ישנה בשם "מרחביה/מעיינות" → "מעיינות" ברשימה
         B.FIELDS.forEach(function (f) { if (f.type !== 'calc' && d[f.key] != null) setVal(f, d[f.key]); });
         $('f_school').disabled = true; // הקישור שייך לבית ספר אחד
         $('ebTitle').textContent = 'עריכת הנתונים של ' + d.school;
@@ -560,6 +566,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
           return;
         }
         var d = res.row;
+        d.school = B.canon(d.school);
         if (d.sigImg) { showSigned(d); return; }
         sub.textContent = d.school + ' · סמל מוסד ' + d.semel + ' · נשלח ' + (d.at || '');
         body.innerHTML = review(d) +

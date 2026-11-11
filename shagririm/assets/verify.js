@@ -38,7 +38,12 @@
     return h;
   }
 
+  // שמות קודמים → השם ברשימה (מיטל, 11.11.26). ברשימת ההשתלמות בשרת נשארו פרטים בשם הקודם.
+  var OLD_NAMES = { "מרחביה/מעיינות": "מעיינות", "מרחביה": "מעיינות" };
+  function canonSchool(n) { var t = String(n == null ? "" : n).trim(); return Object.prototype.hasOwnProperty.call(OLD_NAMES, t) ? OLD_NAMES[t] : n; }
+
   function schoolOptions(cur) {
+    cur = canonSchool(cur);
     var list = (w.SH_SCHOOLS || []).slice();
     if (cur && list.indexOf(cur) < 0) list.unshift(cur);
     return '<option value="">בחירת בית ספר…</option>' + list.map(function (n) {
@@ -80,6 +85,8 @@
     ev.preventDefault();
     var btn = el("vf-ok"), err = el("vf-err");
     var body = { name: el("vf-name").value, school: el("vf-school").value, mail: el("vf-mail").value };
+    // אותו בית ספר בשם הקודם — שולחים את השם השמור, כדי שזה לא ייחשב תיקון שממתין לאישור
+    if (V.data && body.school && body.school === canonSchool(V.data.school)) body.school = V.data.school;
     err.hidden = true;
     if (body.name.trim().length < 2) { err.textContent = ERR.badname; err.hidden = false; return; }
     if (!body.school) { err.textContent = ERR.badschool; err.hidden = false; return; }
