@@ -163,6 +163,17 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   border-radius:10px;font-family:inherit;font-size:13.5px;font-weight:600;padding:6px 12px;cursor:pointer}
 .mg-up:hover{background:#f4f7ff}
 .mg-school input[type=file]{display:none}
+#mgWrap{display:none;margin-top:22px}
+#mgWrap.on,body.mabat #mgWrap{display:block}
+body.mabat #mgWrap{margin:0 0 22px}
+body.mg-in #list{display:none}
+.mg-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mg-tools select{width:auto;flex:none;padding:6px 34px 6px 12px;font-size:14.5px;border-radius:10px;border-width:1.5px}
+.mg-tools .lbl{font-size:13.5px;color:var(--muted)}
+.mg-school .st{margin-top:6px}
+#mgFind{width:100%;padding:11px 14px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:16px;color:var(--ink);margin:0 0 12px}
+#mgFind:focus{outline:none;border-color:var(--blue);background:#fff}
 </style>
 </head>
 <body>
@@ -183,6 +194,24 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     <p class="hint">קבצים מותרים: PDF, Word, Excel, PowerPoint או תמונה, עד 10MB. אפשר להעלות יותר מקובץ אחד לבית ספר.</p>
   </div>
 
+  <!-- ניהול לרויטל אמיר (קוד למייל): סטטוס, העלאה ומחיקה בכל בתי הספר — במבט־על ובדף ההעלאה -->
+  <section id="mgWrap">
+    <div class="card" id="manage">
+      <label class="ql" for="mgEmail">ניהול — סטטוסים וקבצים, כניסה עם קוד למייל</label>
+      <div id="mgStep1">
+        <input type="email" id="mgEmail" dir="ltr" placeholder="המייל שלך" autocomplete="email">
+        <button type="button" class="up" id="mgSend">שליחת קוד למייל</button>
+        <p class="hint">נשלח קוד חד-פעמי למייל. הכניסה מיועדת למפקחת הארצית. אחרי האימות אפשר לשנות סטטוס, להעלות ולמחוק קבצים בכל בתי הספר.</p>
+      </div>
+      <div id="mgStep2" hidden>
+        <input type="text" id="mgCode" dir="ltr" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="הקוד מהמייל (6 ספרות)" autocomplete="one-time-code">
+        <button type="button" class="up" id="mgVerify">אימות הקוד</button>
+      </div>
+      <div class="st" id="mgSt" role="status"></div>
+    </div>
+    <div id="mgPanel"></div>
+  </section>
+
   <section id="list">
     <div class="count" id="count"></div>
     <div class="bar"><i id="barFill" style="width:0"></i></div>
@@ -192,20 +221,6 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
   <!-- מבט־על לרויטל: sal-mefakchim.html#mabat -->
   <section id="mabat">
-    <div class="card" id="manage">
-      <label class="ql" for="mgEmail">ניהול קבצים — כניסה עם קוד למייל</label>
-      <div id="mgStep1">
-        <input type="email" id="mgEmail" dir="ltr" placeholder="המייל שלך" autocomplete="email">
-        <button type="button" class="up" id="mgSend">שליחת קוד למייל</button>
-        <p class="hint">נשלח קוד חד-פעמי למייל. הכניסה מיועדת למפקחת הארצית. אחרי האימות אפשר להעלות ולמחוק קבצים בכל בתי הספר.</p>
-      </div>
-      <div id="mgStep2" hidden>
-        <input type="text" id="mgCode" dir="ltr" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="הקוד מהמייל (6 ספרות)" autocomplete="one-time-code">
-        <button type="button" class="up" id="mgVerify">אימות הקוד</button>
-      </div>
-      <div class="st" id="mgSt" role="status"></div>
-    </div>
-    <div id="mgPanel"></div>
     <div class="card">
       <div class="count" id="mCount">טוען…</div>
       <div class="bar"><i id="mBar" style="width:0"></i></div>
@@ -247,6 +262,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   'use strict';
   var API = 'https://script.google.com/macros/s/AKfycbzOYyHQfueEkFLm7AYjy_Dno7B5_U8jgaIA_2Nv-P_uHaU5otGsutwBkGE1ydKy6QM19g/exec';
   var MAX = 10 * 1024 * 1024;
+  var ALL_SUP = 'רויטל אמיר'; // המפקחת הארצית — כל בתי הספר (מיטל 11.11.26)
   var EXT_OK = /\.(pdf|docx?|xlsx?|pptx?|jpe?g|png|heic)$/i;
   var $ = function (id) { return document.getElementById(id); };
 
@@ -333,8 +349,15 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
   function mine() {
     var sup = $('f_sup').value;
-    return SCHOOLS.filter(function (s) { return s[3].indexOf(sup) > -1; })
+    return SCHOOLS.filter(function (s) { return sup === ALL_SUP || s[3].indexOf(sup) > -1; })
       .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
+  }
+
+  // רויטל אמיר בדף ההעלאה: כל בתי הספר + אזור הניהול (סטטוס, מחיקה) אחרי קוד למייל
+  function syncSupMode() {
+    var isAll = $('f_sup').value === ALL_SUP;
+    $('mgWrap').classList.toggle('on', isAll);
+    document.body.classList.toggle('mg-in', isAll && !!mgToken);
   }
 
   function render() {
@@ -360,12 +383,13 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   function loadUploads() {
     return fetch(API + '?mode=list', { credentials: 'omit' })
       .then(function (r) { return r.json(); })
-      .then(function (res) { if (res.ok) { uploads = res.uploads || {}; loaded = true; $('loadFail').classList.remove('on'); } })
+      .then(function (res) { if (res.ok) { uploads = res.uploads || {}; applyStatuses(res.statuses); loaded = true; $('loadFail').classList.remove('on'); } })
       .catch(function () { if (!loaded) $('loadFail').classList.add('on'); });
   }
 
   $('f_sup').addEventListener('change', function () {
     try { localStorage.setItem('salSup', this.value); } catch (e) {}
+    syncSupMode();
     render();
   });
 
@@ -428,14 +452,29 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
 
   // אושרו — מ-1.11.26 כל בתי הספר (מיטל), חוץ משגב שלום, סכנין תל שבע, החממה ועמל רהט
   var NOT_APPROVED = { '84102': 1, '84104': 1, '44008': 1, '84003': 1 };
-  var APPROVED = {};
-  SCHOOLS.forEach(function (s) { if (!NOT_APPROVED[s[0]]) APPROVED[s[0]] = 1; });
-
   // עולים לוועדה — אין כרגע (ועדת 29.10.26 אושרה כולה)
-  var VAADA = {};
-
+  var BASE_VAADA = {};
   // אושרו בלי סל — אין לנו סל תוכניות שלהם (מיטל 28.10.26; אורמת ובית הערבה הגישו 29.10)
-  var NOSAL = { '45001': 1 };
+  var BASE_NOSAL = { '45001': 1 };
+
+  // הסטטוס בפועל: הרשימה שבדף, ומעליה מה שרויטל שינתה במסך הניהול (לשונית "סטטוסים" בשרת, מ-11.11.26)
+  var STATUS_LABEL = { approved: 'אושר', nosal: 'אושר בלי סל', vaada: 'לוועדה', pending: 'טרם אושר' };
+  var APPROVED = {}, VAADA = {}, NOSAL = {}, OVERRIDE = {};
+  function baseStatus(code) {
+    return BASE_NOSAL[code] ? 'nosal' : BASE_VAADA[code] ? 'vaada' : NOT_APPROVED[code] ? 'pending' : 'approved';
+  }
+  function statusOf(code) { return OVERRIDE[code] || baseStatus(code); }
+  function applyStatuses(st) {
+    if (st) OVERRIDE = st;
+    APPROVED = {}; VAADA = {}; NOSAL = {};
+    SCHOOLS.forEach(function (s) {
+      var k = statusOf(s[0]);
+      if (k === 'approved' || k === 'nosal') APPROVED[s[0]] = 1;
+      if (k === 'nosal') NOSAL[s[0]] = 1;
+      if (k === 'vaada') VAADA[s[0]] = 1;
+    });
+  }
+  applyStatuses();
 
   function renderMabat() {
     var has = function (s) { return (uploads[s[0]] || []).length > 0; };
@@ -445,7 +484,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var nNs = SCHOOLS.filter(function (s) { return APPROVED[s[0]] && NOSAL[s[0]]; }).length;
     $('mLegend').innerHTML = '<span><span class="chip ok">ירוק</span> אושר · ' + cnt(0) + '</span>' +
       '<span><span class="chip ok ns">מקווקו</span> מתוכם אושרו בלי סל · ' + nNs + '</span>' +
-      '<span><span class="chip vd">ורוד</span> לוועדה 29.10 · ' + cnt(1) + '</span>' +
+      '<span><span class="chip vd">ורוד</span> לוועדה · ' + cnt(1) + '</span>' +
       '<span><span class="chip">כחול</span> הסל אצלנו, טרם אושר · ' + cnt(2) + '</span>' +
       '<span><span class="chip no">אדום</span> אין לנו סל · ' + cnt(3) + '</span>';
     var done = SCHOOLS.filter(has).length;
@@ -518,6 +557,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       var ok = APPROVED[r.s[0]];
       return '<div class="up-row' + (ok ? ' ok' : '') + '"><div class="info"><b>' + esc(r.s[1]) + '</b>' + (ok ? '<span class="tag-ok">מאושר</span>' : '') + '<div class="meta">' + esc(r.x.by || '') + ' · <bdi>' + esc(r.x.f) + '</bdi> · ' + esc(r.x.at) + '</div></div>' + link + '</div>';
     }).join('') : '<p class="empty">עוד לא הועלו קבצים</p>';
+    renderReview();
   }
 
   // הערות סקירה (sal-review.js) — רק לבתי ספר שעוד לא אושרו
@@ -527,6 +567,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     var R = window.SAL_REVIEW;
     if (!R || !R.schools) return;
     var list = R.schools.filter(function (s) { return !APPROVED[s.code]; });
+    $('rvH').hidden = !list.length;
     if (!list.length) return;
     var nBig = 0, nEq = 0;
     list.forEach(function (s) { s.flags.forEach(function (f) { if (f.type === 'מעל 40,000') nBig++; else nEq++; }); });
@@ -563,8 +604,29 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   }
 
   // ניהול קבצים מאובטח (#mabat): קוד חד-פעמי למייל, ואז העלאה/מחיקה בטווח שהשרת מאשר.
-  // אין ברשימת הערות או סודות בצד הלקוח — ההרשאה נאכפת בשרת בלבד; ה-token נשמר בזיכרון בלבד.
+  // אין ברשימת הערות או סודות בצד הלקוח — ההרשאה נאכפת בשרת בלבד. ה-token נשמר רק בלשונית הזו
+  // (sessionStorage), כדי שרענון לא יחייב קוד חדש; בשרת הוא פג אחרי 30 דקות.
   var mgToken = '', mgName = '', mgSchools = [];
+  try {
+    var mgSaved = JSON.parse(sessionStorage.getItem('salMg') || 'null');
+    if (mgSaved && mgSaved.t) { mgToken = mgSaved.t; mgName = mgSaved.n || ''; mgSchools = mgSaved.s || []; }
+  } catch (e) {}
+
+  function mgShowIn() {
+    $('mgStep1').hidden = !!mgToken; $('mgStep2').hidden = true;
+    syncSupMode();
+  }
+
+  // הכניסה פגה: חוזרים למסך הקוד
+  function mgLogout(msg) {
+    mgToken = ''; mgName = ''; mgSchools = [];
+    try { sessionStorage.removeItem('salMg'); } catch (e) {}
+    mgShowIn();
+    mgRenderPanel();
+    if (document.body.classList.contains('mabat')) renderMabat(); else render();
+    mgStatus('bad', msg || 'הכניסה פגה. שלחו קוד חדש למייל.');
+    $('manage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 
   function mgStatus(cls, text) {
     var st = $('mgSt');
@@ -580,17 +642,40 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     if (!mgToken) { $('mgPanel').innerHTML = ''; return; }
     var list = SCHOOLS.filter(function (s) { return mgSchools.indexOf(s[0]) > -1; })
       .sort(function (a, b) { return a[1].localeCompare(b[1], 'he'); });
-    $('mgPanel').innerHTML = '<div class="mg-head">ניהול קבצים — ' + esc(mgName) + ' · ' + list.length + ' בתי ספר</div>' +
+    var q = $('mgFind') ? $('mgFind').value : '';
+    $('mgPanel').innerHTML = '<div class="mg-head">ניהול — ' + esc(mgName) + ' · ' + list.length + ' בתי ספר</div>' +
+      '<input type="search" id="mgFind" placeholder="חיפוש בית ספר, רשת או מפקח.ת" aria-label="חיפוש בית ספר">' +
       list.map(function (s) {
         var u = uploads[s[0]] || [];
         var files = u.map(function (x) {
           return '<div class="mg-file"><span class="fname"><bdi>' + esc(x.f) + '</bdi> <span class="when">· ' + esc(x.at) + (x.by ? ' · ' + esc(x.by) : '') + '</span></span>' +
             '<button type="button" class="mg-del" data-code="' + s[0] + '" data-t="' + (x.t || '') + '" data-f="' + esc(x.f) + '">מחיקה</button></div>';
         }).join('');
-        return '<div class="mg-school" data-code="' + s[0] + '"><h3>' + esc(s[1]) + '</h3><span class="net">' + esc(s[2]) + '</span>' +
-          '<label class="mg-up">העלאת קובץ<input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.heic,image/*"></label>' +
+        var cur = statusOf(s[0]);
+        var opts = Object.keys(STATUS_LABEL).map(function (k) {
+          return '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + STATUS_LABEL[k] + '</option>';
+        }).join('');
+        return '<div class="mg-school" data-code="' + s[0] + '" data-find="' + esc((s[1] + ' ' + s[2] + ' ' + s[3].join(' ')).toLowerCase()) + '">' +
+          '<h3>' + esc(s[1]) + '</h3><span class="net">' + esc(s[2]) + ' · ' + esc(s[3].join(', ')) + '</span>' +
+          '<div class="mg-tools"><span class="lbl">סטטוס</span><select class="mg-status" aria-label="סטטוס ' + esc(s[1]) + '">' + opts + '</select>' +
+          '<label class="mg-up">העלאת קובץ<input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.heic,image/*"></label></div>' +
           files + '<div class="st" role="status"></div></div>';
       }).join('');
+    $('mgFind').value = q;
+    mgFilter();
+  }
+
+  function mgFilter() {
+    var q = ($('mgFind').value || '').trim().toLowerCase();
+    Array.prototype.forEach.call($('mgPanel').querySelectorAll('.mg-school'), function (c) {
+      c.hidden = !!q && c.getAttribute('data-find').indexOf(q) < 0;
+    });
+  }
+
+  // אחרי כל שינוי: מרעננים את מסך הניהול, את המבט־על ואת רשימת דף ההעלאה
+  function mgRefreshAll() {
+    mgRenderPanel();
+    if (document.body.classList.contains('mabat')) renderMabat(); else render();
   }
 
   function mgSetSt(card, cls, text) {
@@ -621,8 +706,9 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     mgPost({ action: 'otp_verify', email: email, code: code }).then(function (res) {
       if (!res.ok) { mgStatus('bad', 'הקוד שגוי או שפג תוקפו. נסו שוב או שלחו קוד חדש.'); return; }
       mgToken = res.token; mgName = res.name || ''; mgSchools = res.schools || [];
-      $('mgStep1').hidden = true; $('mgStep2').hidden = true;
-      mgStatus('ok', 'מחוברת. אפשר לנהל את הקבצים למטה.');
+      try { sessionStorage.setItem('salMg', JSON.stringify({ t: mgToken, n: mgName, s: mgSchools })); } catch (e) {}
+      mgShowIn();
+      mgStatus('ok', 'מחוברת. אפשר לשנות סטטוס, להעלות ולמחוק למטה.');
       mgRenderPanel();
     }).catch(function () {
       mgStatus('bad', 'האימות לא הצליח. בדקו את החיבור ונסו שוב.');
@@ -641,23 +727,51 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     btn.disabled = true; btn.textContent = 'מוחק…';
     mgPost({ action: 'delete', token: mgToken, code: code, t: Number(t) }).then(function (res) {
       if (!res.ok) {
+        if (res.error === 'auth') { mgLogout(); return; }
         btn.disabled = false; btn.textContent = 'מחיקה';
-        mgStatus('bad', res.error === 'auth' ? 'הכניסה פגה. התחברו שוב עם קוד חדש.' : 'המחיקה לא הצליחה. נסו שוב.');
+        mgStatus('bad', 'המחיקה לא הצליחה. נסו שוב.');
         return;
       }
       uploads[code] = (uploads[code] || []).filter(function (x) { return String(x.t) !== String(t); });
-      mgRenderPanel();
-      renderMabat();
-      mgStatus('ok', 'הקובץ "' + fname + '" הועבר לארכיון.');
+      mgRefreshAll();
+      var c = $('mgPanel').querySelector('.mg-school[data-code="' + code + '"]');
+      if (c) mgSetSt(c, 'ok', 'הקובץ "' + fname + '" הועבר לארכיון.');
     }).catch(function () {
       btn.disabled = false; btn.textContent = 'מחיקה';
       mgStatus('bad', 'המחיקה לא הצליחה. בדקו את החיבור ונסו שוב.');
     });
   });
 
+  $('mgPanel').addEventListener('input', function (ev) { if (ev.target.id === 'mgFind') mgFilter(); });
+
+  // שינוי סטטוס — נשמר בשרת (לשונית "סטטוסים") וגובר על הרשימה שבדף
+  function mgSetStatus(sel) {
+    var card = sel.closest('.mg-school');
+    var code = card.getAttribute('data-code');
+    var prev = statusOf(code);
+    var val = sel.value;
+    sel.disabled = true;
+    mgSetSt(card, 'wait', 'שומר…');
+    mgPost({ action: 'status', token: mgToken, code: code, status: val }).then(function (res) {
+      if (!res.ok) {
+        if (res.error === 'auth') { mgLogout(); return; }
+        throw new Error(res.error || 'error');
+      }
+      OVERRIDE[code] = val;
+      applyStatuses();
+      mgRefreshAll();
+      var c = $('mgPanel').querySelector('.mg-school[data-code="' + code + '"]');
+      if (c) mgSetSt(c, 'ok', 'הסטטוס עודכן: ' + STATUS_LABEL[val]);
+    }).catch(function () {
+      sel.disabled = false; sel.value = prev;
+      mgSetSt(card, 'bad', 'השינוי לא נשמר. בדקו את החיבור ונסו שוב.');
+    });
+  }
+
   // העלאה ממסך הניהול — עם אסימון הכניסה, לכל בית ספר בטווח
   $('mgPanel').addEventListener('change', function (ev) {
     var input = ev.target;
+    if (input.classList.contains('mg-status') && mgToken) { mgSetStatus(input); return; }
     if (input.type !== 'file' || !input.files.length || !mgToken) return;
     var file = input.files[0];
     var card = input.closest('.mg-school');
@@ -671,7 +785,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
       mgPost({ sup: mgName, code: code, fileName: file.name, mime: file.type, data: data, token: mgToken, website: '' })
         .then(function (res) {
           if (!res.ok) throw new Error(res.error || 'error');
-          return loadUploads().then(function () { mgRenderPanel(); renderMabat(); });
+          return loadUploads().then(function () {
+            mgRefreshAll();
+            var c = $('mgPanel').querySelector('.mg-school[data-code="' + code + '"]');
+            if (c) mgSetSt(c, 'ok', 'הקובץ הועלה');
+          });
         })
         .catch(function () {
           mgSetSt(card, 'bad', 'ההעלאה לא הצליחה. נסו שוב.');
@@ -693,9 +811,11 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     document.title = 'סל תוכניות — מבט־על';
     document.querySelector('.hero h1').textContent = 'סל תוכניות — מבט־על';
     document.querySelector('.hero p').textContent = 'מה המפקחים העלו, ובאילו בתי ספר עוד חסר.';
+    mgShowIn();
     loadUploads().then(function () {
       if (!loaded) { $('mFail').classList.add('on'); $('mCount').textContent = ''; return; }
       renderMabat();
+      mgRenderPanel();
     });
     return;
   }
@@ -703,7 +823,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   var saved = '';
   try { saved = localStorage.getItem('salSup') || ''; } catch (e) {}
   if (saved && names[saved]) { $('f_sup').value = saved; render(); }
-  loadUploads().then(render);
+  mgShowIn();
+  loadUploads().then(function () { render(); mgRenderPanel(); });
 })();
 </script>
 </body>
