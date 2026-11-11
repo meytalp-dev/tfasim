@@ -426,8 +426,8 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
   var ICON_COPY = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>';
   var ICON_OPEN = '<svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>';
 
-  // אושרו — מ-1.11.26 כל בתי הספר (מיטל), חוץ מלקייה, שגב שלום, סכנין תל שבע, החממה ועמל רהט
-  var NOT_APPROVED = { '84101': 1, '84102': 1, '84104': 1, '44008': 1, '84003': 1 };
+  // אושרו — מ-1.11.26 כל בתי הספר (מיטל), חוץ משגב שלום, סכנין תל שבע, החממה ועמל רהט
+  var NOT_APPROVED = { '84102': 1, '84104': 1, '44008': 1, '84003': 1 };
   var APPROVED = {};
   SCHOOLS.forEach(function (s) { if (!NOT_APPROVED[s[0]]) APPROVED[s[0]] = 1; });
 
