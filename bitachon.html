@@ -437,11 +437,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
     $('failMsg').classList.remove('on');
     var ctrl = window.AbortController ? new AbortController() : null;
     var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 45000);
-    // השרת (bitachon-gas) עדיין מכיר רק את השם הקודם "מרחביה/מעיינות" — שולחים אותו בשם הזה כדי שלא יידחה וכדי שיעדכן את אותה שורה.
-    // אחרי שהשרת יקבל את Fields.js המעודכן (עם canon) — אפשר להסיר; גם אז השם הקודם יתקבל ויישמר כ"מעיינות".
-    var wire = d.school === 'מעיינות' ? JSON.parse(JSON.stringify(d)) : d;
-    if (wire !== d) wire.school = 'מרחביה/מעיינות';
-    fetch(API, { method: 'POST', body: JSON.stringify(wire), signal: ctrl ? ctrl.signal : undefined })
+    fetch(API, { method: 'POST', body: JSON.stringify(d), signal: ctrl ? ctrl.signal : undefined })
       .then(function (r) { return r.json(); })
       .then(function (res) {
         clearTimeout(t);
