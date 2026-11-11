@@ -234,6 +234,7 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
             '<br>' + (r.sigAt ? '<span class="sg ok">נחתם · ' + esc(r.sigBy || '') + ' · <bdi dir="ltr">' + esc(r.sigAt) + '</bdi></span>' : '<span class="sg wait">ממתין לחתימת המנהל/ת</span>') + '</div>' +
           '<div class="at">' + esc(r.at) + '</div>' +
           '<div class="acts">' + (r.sigAt ? '' : '<button class="copy" type="button" data-signlink="' + esc(r.school) + '">' + ICON_COPY + 'קישור חתימה</button>') +
+          '<button class="copy" type="button" data-editlink="' + esc(r.school) + '">' + ICON_COPY + 'קישור עריכה</button>' +
           '<button class="pr" type="button" data-print="' + esc(r.school) + '">' + ICON_PRINT + 'הדפסה</button></div></div>';
       });
     }
@@ -268,6 +269,23 @@ footer a{color:var(--navy);font-weight:600;text-decoration:none}
               if (!res.ok) { if (res.error === 'key') badKey(); else alert('לא נמצאו נתונים לבית הספר.'); return; }
               if (!res.row.signKey) { alert(res.row.sigImg ? 'בית הספר כבר חתם.' : 'אין קישור חתימה לבית הספר הזה. רכז/ת הביטחון צריך/ה לשלוח את הטופס שוב.'); return; }
               copyText('https://tfasim.pedagogiamh.co.il/bitachon.html?sign=' + res.row.signKey, b);
+            })
+            .catch(function () { b.disabled = false; alert('לא הצלחנו לטעון את הקישור. נסו שוב.'); });
+        });
+      });
+    });
+    // קישור העריכה — קבוע לבית הספר; פותח את הטופס ממולא לתיקון ושליחה מחדש
+    $('out').querySelectorAll('[data-editlink]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        needKey(function () {
+          b.disabled = true;
+          fetch(EXEC + '?mode=get&key=' + fullKey + '&school=' + encodeURIComponent(b.getAttribute('data-editlink')) + '&t=' + Date.now())
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+              b.disabled = false;
+              if (!res.ok) { if (res.error === 'key') badKey(); else alert('לא נמצאו נתונים לבית הספר.'); return; }
+              if (!res.row.editKey) { alert('אין קישור עריכה לבית הספר הזה.'); return; }
+              copyText('https://tfasim.pedagogiamh.co.il/bitachon.html?edit=' + res.row.editKey, b);
             })
             .catch(function () { b.disabled = false; alert('לא הצלחנו לטעון את הקישור. נסו שוב.'); });
         });
