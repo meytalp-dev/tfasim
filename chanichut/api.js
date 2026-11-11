@@ -39,7 +39,7 @@
     rakazAdd: ['principal'],
     preload: ['system'], preloadStatus: ['system'], activationSend: ['system'], schoolsAdmin: ['system'], permsLoad: ['system'], baselineLoad: ['system'], stateRefresh: ['system'],
     schoolDelete: ['system'], updateLoad: ['system'], updateSend: ['system'], updateDone: ['rakaz'],
-    natStats: NAT, natBaseline: NAT, schoolAnon: NAT, schoolEmps: ['system', 'ped', 'pro']
+    natStats: NAT.concat(['principal']), natBaseline: NAT.concat(['principal']), schoolAnon: NAT.concat(['principal']), schoolEmps: ['system', 'ped', 'pro', 'principal']
   };
   var WRITE = ['keysInit', 'keysActivate', 'grant', 'put', 'remqSet', 'remSend', 'monConf', 'updateDone'];
   function blank() { return { perms: [], schools: {}, codes: {}, sessions: {}, remq: {}, remlog: [], outbox: [], base: null, seeded: 0, mcount: {} }; }

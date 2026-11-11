@@ -81,10 +81,12 @@
   /* ================= המבט ================= */
   window.startMabat = function (me, hooks) {
     const ROLE = me.role, API_ = window.API;
-    const ROLE_LBL = { system: 'מנהל.ת המערכת', staff: 'מטה', ped: 'מפקח.ת פדגוגי.ת', pro: 'מפקח.ת מקצועי.ת', net: 'מנהל.ת רשת' };
+    const ROLE_LBL = { system: 'מנהל.ת המערכת', staff: 'מטה', ped: 'מפקח.ת פדגוגי.ת', pro: 'מפקח.ת מקצועי.ת', net: 'מנהל.ת רשת', principal: 'מנהל.ת בית הספר' };
     const TITLE = { system: 'החניכות בכל הארץ', staff: 'המבט שלך · מטה', ped: 'המבט שלך · מפקח.ת פדגוגי.ת', pro: 'המבט שלך · מפקח.ת מקצועי.ת', net: 'המבט שלך · מנהל.ת רשת' };
-    const SEE_EMPS = ['system', 'ped', 'pro'].includes(ROLE);
-    const HOME = ROLE === 'pro' ? 'pikuah' : 'national';
+    const SEE_EMPS = ['system', 'ped', 'pro', 'principal'].includes(ROLE);
+    /* מנהל.ת שמחכה לגישה מלאה (gate.js, 11.11.26): בית הספר שלו.ה בלי שמות, עד שהרכז.ת נכנס.ת והגישה נפתחת לבד */
+    const PRIN = ROLE === 'principal';
+    const HOME = ROLE === 'pro' ? 'pikuah' : PRIN ? 'pschool' : 'national';
     document.body.dataset.role = ROLE;
     const root = $('app');
     root.innerHTML = `
@@ -129,6 +131,12 @@
       <div class="mg-table cards" id="pkTable"></div>
       <div id="pkUnrep"></div>
     </section>
+    ${PRIN ? `<section class="sec natv" id="pschool">
+      <div class="sec-head row-head"><h2>${esc(me.school)}</h2></div>
+      ${hooks && hooks.waiting ? `<div class="ps-wait noprint"><p><b>שמות התלמידים ייפתחו לך אוטומטית</b> בכניסה הבאה של רכז.ת החניכות למערכת. בינתיים מוצגים הנתונים של בית הספר, ובמקום שם: "תלמיד.ה 1", "תלמיד.ה 2".</p><button class="btn" data-act="ps-recheck">${ic('check')}בדיקה אם השמות נפתחו</button></div>` : ''}
+      <div class="nat-months noprint" id="psMonths"></div>
+      <div id="psBody"></div>
+    </section>` : ''}
     <section class="sec" id="sub">
       <div class="sec-head row-head sub-head"><button class="btn quiet noprint" data-act="sub-back">${ic('back')}חזרה</button><h2 id="subTitle"></h2></div>
       <div id="subBody"></div>
@@ -301,7 +309,22 @@
     const cmpBar = () => F.mon === EXT || !MONTHS.some(m => m !== F.mon && m !== EXT) ? '' : `<div class="nm"><b>השוואה ל</b><button class="chip ${F.cmp ? '' : 'on'}" data-cmp="" aria-pressed="${!F.cmp}">בלי</button>${MONTHS.filter(m => m !== F.mon && m !== EXT).map(m => `<button class="chip ${m === F.cmp ? 'on' : ''}" data-cmp="${m}" aria-pressed="${m === F.cmp}">${esc(mLbl(m))}</button>`).join('')}</div>`;
     function setMon(k) { if (!MONTHS.includes(k)) return; F.mon = k; if (F.cmp === k) F.cmp = ''; if (k === EXT) { F.cmp = ''; F.byCh = false; } renderAll(); }
     function setCmp(k) { F.cmp = MONTHS.includes(k) && k !== EXT ? k : ''; if (!F.cmp) F.byCh = false; renderAll(); }
-    function renderAll() { if (ROLE === 'pro') renderPikuah(); else { renderNational(); renderNatHome(); } if (cur() === 'sub' && topSub()) paintSub(); }
+    function renderAll() { if (ROLE === 'pro') renderPikuah(); else if (PRIN) renderPschool(); else { renderNational(); renderNatHome(); } if (cur() === 'sub' && topSub()) paintSub(); }
+    /* ---------- מנהל.ת שמחכה: מסך בית הספר של המבט (natSchoolSpec) כמסך הבית ---------- */
+    let PS = null, PS_YM = null;
+    function renderPschool() {
+      $('psMonths').innerHTML = monBar();
+      PS = PS || natSchoolSpec(me.school);
+      const paint = () => { const old = $('psBody'), body = old.cloneNode(false); old.replaceWith(body); body.innerHTML = PS.html(); if (PS.bind) PS.bind(body, PS); };
+      paint();
+      if (PS_YM !== F.mon) { PS_YM = F.mon; const ym = F.mon; PS.err = ''; PS.load().then(() => { if (ym === F.mon) paint(); }, e => { PS.err = e && e.message || 'רשת'; if (ym === F.mon) paint(); }); }
+    }
+    if (PRIN) $('pschool').addEventListener('click', async e => {
+      const m = e.target.closest('[data-mon]'); if (m) return setMon(m.dataset.mon);
+      const c = e.target.closest('[data-cmp]'); if (c) return setCmp(c.dataset.cmp);
+      const r = e.target.closest('[data-act="ps-recheck"]');
+      if (r) { r.disabled = true; let ok = false; try { ok = hooks && hooks.recheck ? await hooks.recheck() : false; } catch (x) {} if (!ok) { r.disabled = false; toast('עוד לא נפתח. השמות ייפתחו בכניסה הבאה של הרכז.ת'); } }
+    });
 
     /* ---------- המסך הראשי: המספר הארצי, הגרף לפי חודש, הרמזור, נקודת הפתיחה והקטגוריות ---------- */
     function renderNatHome() {
@@ -551,7 +574,8 @@
     renderNav();
     content.querySelectorAll(':scope>.sec').forEach(s => s.classList.remove('mb-cur'));
     $(HOME).classList.add('mb-cur'); document.body.dataset.view = HOME;
-    $(HOME === 'pikuah' ? 'pkKpis' : 'natHome').innerHTML = '<p class="mb-load">טוען את הנתונים מהשרת…</p>';
+    const LOADBOX = HOME === 'pikuah' ? 'pkKpis' : PRIN ? 'psBody' : 'natHome';
+    $(LOADBOX).innerHTML = '<p class="mb-load">טוען את הנתונים מהשרת…</p>';
     try { history.scrollRestoration = 'manual'; } catch (e) {}
     (async () => {
       try {
@@ -567,7 +591,7 @@
         go(HOME, { replace: true });
       } catch (e) {
         if (String(e.message) === 'badsession') return;
-        $(HOME === 'pikuah' ? 'pkKpis' : 'natHome').innerHTML = `<p class="warn">הנתונים לא נטענו (${esc(e.message)}). כדאי לרענן את הדף.</p>`;
+        $(LOADBOX).innerHTML = `<p class="warn">הנתונים לא נטענו (${esc(e.message)}). כדאי לרענן את הדף.</p>`;
       }
     })();
   };

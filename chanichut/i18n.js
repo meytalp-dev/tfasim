@@ -249,12 +249,12 @@
 
   var css = document.createElement('style');
   css.textContent =
-    '.lang-btn{font:inherit;font-weight:700;font-size:.9em;min-height:40px;padding:.35em .9em;border-radius:999px;border:1px solid var(--line,#d6d0c4);background:var(--card,#fff);color:var(--ink,#1D4F5E);cursor:pointer;white-space:nowrap;flex:none}' +
+    '.lang-btn{font:inherit;font-weight:700;font-size:.9em;min-height:44px;padding:.35em .9em;border-radius:999px;border:1px solid var(--line,#d6d0c4);background:var(--card,#fff);color:var(--ink,#1D4F5E);cursor:pointer;white-space:nowrap;flex:none}' +
     '.lang-btn:hover{border-color:currentColor}.lang-btn:focus-visible{outline:2px solid currentColor;outline-offset:2px}' +
     '.lang-btn[lang=ar]{font-family:"Noto Sans Arabic","Segoe UI",Tahoma,sans-serif}' +
     '.gate-head .lang-btn.on-gate{order:9}' +
-    '@media (min-width:761px){html[lang=ar] .top .nav{font-size:.86em}html[lang=ar] .top .nav a{padding-inline:.5em}.top .actions .lang-btn{min-height:36px;padding:.25em .75em;font-size:.85em}}' +
-    '@media (max-width:760px){.top .actions{flex-wrap:nowrap;align-items:center}.top .actions .lang-btn{min-height:36px;padding:.2em .6em;font-size:.8em}html[lang=ar] .top .brand b{font-size:.85em;white-space:nowrap}}' +
+    '@media (min-width:761px){html[lang=ar] .top .nav{font-size:.86em}html[lang=ar] .top .nav a{padding-inline:.5em}.top .actions .lang-btn{min-height:44px;padding:.25em .75em;font-size:.85em}}' +
+    '@media (max-width:760px){.top .actions{flex-wrap:nowrap;align-items:center}.top .actions .lang-btn{min-height:44px;padding:.2em .6em;font-size:.8em}html[lang=ar] .top .brand b{font-size:.85em;white-space:nowrap}}' +
     'html[lang=ar] body{font-family:"Assistant","Noto Sans Arabic","Segoe UI",Tahoma,sans-serif}';
   document.head.appendChild(css);
   var fl = document.createElement('link');

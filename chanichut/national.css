@@ -104,7 +104,11 @@
 .tabbar.mb button{display:grid;justify-items:center;align-content:center;gap:2px;min-height:52px;font-size:.74em;font-weight:600;color:var(--muted);background:transparent;border:0;border-radius:10px;font-family:inherit;cursor:pointer}
 .tabbar.mb button .i{width:22px;height:22px}
 .content>.sec.mb-cur{display:block}
-body[data-view=national] main.page,body[data-view=natcat] main.page,body[data-view=pikuah] main.page{max-width:1440px}
+body[data-view=national] main.page,body[data-view=natcat] main.page,body[data-view=pikuah] main.page,body[data-view=pschool] main.page{max-width:1440px}
+/* מנהל.ת שמחכה לשמות (11.11.26) */
+.ps-wait{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px;padding:12px 14px;border:1px solid var(--line,#d9d4c7);border-radius:12px;background:var(--soft,#f4f1ea)}
+.ps-wait p{margin:0;flex:1 1 280px;line-height:1.55}
+.ps-wait .btn{min-height:44px}
 @media (max-width:1180px){.nh-grid{grid-template-columns:1fr 1fr}.nh-tl{grid-column:1/-1}}
 @media (max-width:1100px){.nh-tl .tl-l{grid-template-columns:1fr}}
 @media (max-width:760px){#natcat .sub-head{flex-wrap:wrap}#natcat .sub-head h2{order:3;flex:1 1 100%}.nh-grid{grid-template-columns:1fr}.nc-grid{grid-template-columns:1fr;gap:8px}.nc-mini{display:none}.nc-card{padding:12px 14px;gap:4px;min-height:44px}

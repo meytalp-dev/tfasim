@@ -137,8 +137,12 @@
     if (noKey(ME)) return mabat();
     show('gBusy');
     const saved = await CK.recall(rid());
-    if (saved) { SKEY = saved; EXTRACT = false; return enter(); }
+    if (saved && ME.role !== 'rakaz') { SKEY = saved; EXTRACT = false; return enter(); }
     const r = await API.call('keys');
+    /* רכז.ת עם מפתח שמור: נכנסים ישר, אלא אם מנהל.ת מחכה לגישה. המפתח השמור לא ניתן לעטיפה, ולכן פעם אחת סיסמה (11.11.26) */
+    if (saved && r.ok && r.me && r.me.wrapped && !waiting(r).length) { SKEY = saved; EXTRACT = false; return enter(); }
+    if (saved && r.ok && r.me && r.me.wrapped) { KEYS = r; $('gHello').textContent = 'שלום' + (ME.name ? ' ' + ME.name.split(' ')[0] : ''); show('gPass'); return msg('mPass', 'מנהל.ת בית הספר מחכה לגישה. הקלדת הסיסמה פעם אחת פותחת אותה'); }
+    if (saved && !r.ok && r.error !== 'badsession') { SKEY = saved; EXTRACT = false; return enter(); }
     if (!r.ok) { if (r.error === 'badsession') return logout(); show('gLogin'); return msg('mLogin', err(r), true); }
     KEYS = r;
     $('gHello').textContent = 'שלום' + (ME.name ? ' ' + ME.name.split(' ')[0] : '');
@@ -240,7 +244,12 @@
     KEYS.me = { pub: uk.pub, encPriv: uk.encPriv, wrapped: null };
     waitScreen();
   };
-  async function waitScreen() { $('wFp').textContent = await CK.fingerprint(KEYS.me.pub); show('gWait'); }
+  /* מנהל.ת שמחכה: מבט בית הספר בלי שמות (national.js), והשמות נפתחים לבד בכניסה הבאה של הרכז.ת (11.11.26) */
+  async function waitScreen() {
+    if (ME.role === 'principal' && typeof window.startMabat === 'function') return window.startMabat(ME, { logout, recheck, waiting: true });
+    $('wFp').textContent = await CK.fingerprint(KEYS.me.pub); show('gWait');
+  }
+  async function recheck() { const r = await API.call('keys'); if (r.ok && r.me && r.me.wrapped) { location.reload(); return true; } return false; }
   $('wAgain').onclick = async () => { const r = await API.call('keys'); if (r.ok) { KEYS = r; if (r.me && r.me.wrapped) { show('gPass'); return msg('mPass', 'הגישה אושרה. אפשר להיכנס עם הסיסמה'); } } msg('mWait', 'עוד לא אושר'); };
   /* שחזור בקוד המודפס: מפתח אישי חדש, עטוף מחדש */
   $('recGo').onclick = async () => {
@@ -265,6 +274,7 @@
       R.hooks = { logout, users, grant, setBack };
       window.startApp(R);
       Store.watch();
+      if (EXTRACT && ME.role === 'rakaz') autoGrant();
     } catch (e) {
       if (String(e.message) === 'badsession') return logout();
       show('gLogin'); msg('mLogin', 'הנתונים לא נטענו (' + e.message + '). כדאי לנסות שוב', true);
@@ -293,6 +303,14 @@
     if (!EXTRACT) return { ok: false, error: 'needpass' };
     const r = await API.call('grant', { email: u.email, wrapped: await CK.wrapFor(u.pub, SKEY) });
     return r;
+  }
+  /* מנהל.ת שיצר.ה סיסמה ומחכה. רק מי שברשימת ההרשאות (השרת מחזיר רק אותם), בלי השוואת קוד אימות — החלטת מיטל 11.11.26 */
+  const waiting = k => ((k && k.users) || []).filter(u => u.role === 'principal' && u.pub && !u.granted);
+  async function autoGrant() {
+    try {
+      const k = await API.call('keys'); if (!k.ok) return;
+      for (const u of waiting(k)) { try { await grant(u); } catch (e) {} }
+    } catch (e) {}
   }
 
   /* ---------- התחלה ---------- */
