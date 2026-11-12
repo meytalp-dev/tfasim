@@ -124,7 +124,9 @@ window.startApp = function (R) {
 
   const EMPS = R.EMPS;
   /* שיבוץ רק אצל מעסיק שלא נפסל במסננת (ולא פנייה פתוחה). מעסיק "לא מאושר" נשאר ברשימה לתיעוד */
-  const canPlace = e => !!e && !e.lead && e.mas !== 'לא מאושר';
+  /* 12.11.26 מיטל: המסננת הוסרה בינתיים מהמערכת. false = לא מוצגת ולא חוסמת שיבוץ (ההחלטות השמורות נשארות בנתונים). true מחזיר אותה */
+  const MASNENET_ON = !!window.MASNENET_TEST;   /* רק בבדיקות (tests/school) מדליקים אותה */
+  const canPlace = e => !!e && !e.lead && (!MASNENET_ON || e.mas !== 'לא מאושר');
   const WHY_NONE = ['חסרים מסמכים', 'לא נמצא מעסיק', 'נגישות תחבורתית', 'סיבה אישית', 'עזב.ה'];
   /* תקנים: רק מספר. כל ערך אחר מהקובץ ("לבדוק!", "1?", תאריך) נשמר כהערה ולא מוצג כמספר */
   Object.values(EMPS).forEach(e => { const raw = String(e.slots == null ? '' : e.slots).trim(); if (!/^\d+$/.test(raw)) { e.slotsRaw = raw; e.slots = ''; } });
@@ -826,7 +828,7 @@ window.startApp = function (R) {
   function tikHtml(s) {
     const ds = dates(s), a = ATT[s.id];
     const pl = PLACE(s.emp), who = pl === 'out' ? ' · מנטור.ית ' + esc(s.mentor || (EMPS[s.emp] || {}).mentor || '') : pl === 'in' ? ' · מנהל.ת העבודה ' + esc((INS[s.emp] || {}).manager || '') : '';
-    const opts = (o, cur2) => Object.entries(o).filter(([eid, e]) => eid === cur2 || canPlace(e)).map(([eid, e]) => `<option value="${eid}" ${eid === cur2 ? 'selected' : ''}>${esc(e.name)}${e.mas === 'לא מאושר' ? ' · לא מאושר' : ''}</option>`).join('');
+    const opts = (o, cur2) => Object.entries(o).filter(([eid, e]) => eid === cur2 || canPlace(e)).map(([eid, e]) => `<option value="${eid}" ${eid === cur2 ? 'selected' : ''}>${esc(e.name)}${MASNENET_ON && e.mas === 'לא מאושר' ? ' · לא מאושר' : ''}</option>`).join('');
     const miles = milesOf(s);
     const rems = [...pending().filter(r => r.sid === s.id).map(r => ({ ...r, p: true })), ...REM.filter(r => r.sid === s.id)];
     return `<p class="hint tik-sub">${esc(s.mg)}${s.track ? ' · מסלול ' + esc(s.track) : ''} · ${esc(s.cls)}${s.act ? ' · מספר פעולה ' + esc(s.act) : ''} · ${esc(empName(s.emp))}${who}${s.start ? ' · מ-' + esc(s.start) : ''}${s.birth ? ` · שנת לידה ${esc(s.birth)} (גיל ${MONTH.y - s.birth} בערך)` : ''}${s.phone ? ` · <a href="tel:${esc(s.phone)}" dir="ltr">${esc(s.phone)}</a>` : ''}${s.phone2 ? ` · <a href="tel:${esc(s.phone2)}" dir="ltr">${esc(s.phone2)}</a>` : ''}</p>${s.note ? `<p class="snote big">${ic('pen')}${esc(s.note)}</p>` : ''}
@@ -912,7 +914,7 @@ window.startApp = function (R) {
   }
 
   /* ================= מעסיקים — רשימה לפי מגמה, פרטים במסך נפרד ================= */
-  const masTag = e => e.mas ? `<em class="tag ${e.mas === 'מאושר' ? 'ok' : e.mas === 'לא מאושר' ? 'no' : 'mid'}">${esc(e.mas)}</em>` : '<em class="tag">טרם נבדק במסננת</em>';
+  const masTag = e => !MASNENET_ON ? '' : e.mas ? `<em class="tag ${e.mas === 'מאושר' ? 'ok' : e.mas === 'לא מאושר' ? 'no' : 'mid'}">${esc(e.mas)}</em>` : '<em class="tag">טרם נבדק במסננת</em>';
   function empRows(map, kind) {
     const mgs = [...new Set([...MGS, ...Object.values(map).flatMap(e => e.mg || [])])];
     const used = new Set();
@@ -935,7 +937,7 @@ window.startApp = function (R) {
         <div class="tik-card"><h3>${ic('user')}תלמידים <small>${l.length}</small></h3><ul class="docs-l">${l.map(s => `<li class="ok">${ic('user')}<span><a href="#" data-open="${s.id}">${esc(s.name)}</a> · ${esc(s.cls)}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</span></li>`).join('') || '<li class="hint">אין תלמידים משובצים</li>'}${inn && e.min ? `<li class="${l.length < e.min ? '' : 'ok'}"><span class="${l.length < e.min ? 'warn' : ''}">${l.length} מתוך ${e.min} לפחות</span></li>` : ''}</ul><div class="emp-b edit"><button class="btn" data-act="emp-assign">${ic('user')}שיוך תלמידים</button></div></div>
         ${inn ? '' : `<div class="tik-card edit" id="mlCard"><h3>${ic('link')}קישור למנטור.ית</h3><p class="hint">הקישור פותח את שמות התלמידים שאצל המעסיק. לשלוח רק למנטור.ית. המנטור.ית מסמנ.ת בו נוכחות וממלא.ת את משוב המעסיק, ואת הסימונים מושכים במסך הנוכחות.</p><div id="mlBox"><p class="hint">בודק אם יש קישור פעיל…</p></div><div class="emp-b"><button class="btn primary" data-act="mentor-link" ${l.length ? '' : 'disabled'}>${ic('link')}קישור למנטור.ית</button><button class="btn quiet" data-act="mentor-revoke">${ic('x')}ביטול הקישור</button></div></div>`}
         ${inn ? `<div class="tik-card"><h3>${ic('wallet')}סעיף 117</h3><dl class="kv"><dt>היקף</dt><dd>${e.hours} ש"ש · 100 שעות חניכות לתלמיד.ה בשנה</dd>${e.client ? `<dt>לקוח</dt><dd>${esc(e.client)}</dd>` : ''}</dl></div>`
-          : `<div class="tik-card"><h3>${ic('filter')}המסננת</h3><dl class="kv"><dt>ההחלטה</dt><dd>${e.mas ? masTag(e) : '<span class="hint">לא נבדק</span>'}</dd>${e.recheck ? `<dt>בדיקה חוזרת</dt><dd>${esc(e.recheck)}</dd>` : ''}${e.masNotes ? `<dt>הערות</dt><dd>${esc(e.masNotes)}</dd>` : ''}</dl></div>
+          : `${!MASNENET_ON ? '' : `<div class="tik-card"><h3>${ic('filter')}המסננת</h3><dl class="kv"><dt>ההחלטה</dt><dd>${e.mas ? masTag(e) : '<span class="hint">לא נבדק</span>'}</dd>${e.recheck ? `<dt>בדיקה חוזרת</dt><dd>${esc(e.recheck)}</dd>` : ''}${e.masNotes ? `<dt>הערות</dt><dd>${esc(e.masNotes)}</dd>` : ''}</dl></div>`}
           <div class="tik-card"><h3>${ic('clock')}קשר</h3><dl class="kv"><dt>קשר אחרון</dt><dd>${esc(e.talk || '—')}</dd><dt>ביקור אחרון</dt><dd class="${e.visit === '—' || e.contact > 40 ? 'warn' : ''}">${esc(e.visit || '—')}${e.contact > 40 ? ' · באיחור' : ''}</dd>${e.status ? `<dt>סטטוס</dt><dd>${esc(e.status)}</dd>` : ''}${e.studsTxt && !l.length ? `<dt>הערה</dt><dd>${esc(e.studsTxt)}</dd>` : ''}</dl><div class="emp-b edit"><button class="btn" data-act="talked">${ic('chat')}דיברתי איתם היום</button><button class="btn" data-act="visited">${ic('check')}ביקרתי שם היום</button></div></div>`}
       </div><div class="emp-b mf-b edit"><button class="btn" data-act="emp-edit">${ic('pen')}עריכת הפרטים</button></div>`; },
       bind: el => {
@@ -1005,7 +1007,7 @@ window.startApp = function (R) {
         <div class="field-row"><div class="field"><span>מגמות</span><div class="place-row">${MGS.map(m => `<label class="pl"><input type="checkbox" name="neMg" value="${esc(m)}">${esc(m)}</label>`).join('')}</div></div><label class="field"><span>כמה תקנים</span><input class="find" id="neSlots" dir="ltr" inputmode="numeric" value="1"></label></div>
         <div class="emp-b mf-b edit"><button class="btn primary" id="neSave">${ic('check')}שמירה</button></div>
       </div>
-      <details class="sub-card masn fold"><summary>${ic('filter')}מסננת החניכות <small>אפשר למלא עכשיו או אחרי הביקור אצל המעסיק · <a href="${SITE}chanichut-masnenet.html" target="_blank" rel="noopener">המקור</a></small></summary>
+      <details class="sub-card masn fold"${MASNENET_ON ? '' : ' hidden'}><summary>${ic('filter')}מסננת החניכות <small>אפשר למלא עכשיו או אחרי הביקור אצל המעסיק · <a href="${SITE}chanichut-masnenet.html" target="_blank" rel="noopener">המקור</a></small></summary>
         <h4 class="mf-h">בקרה בכניסה</h4>
         <ul class="msp-l">${MAS_CTRL.map((c, j) => `<li><label><input type="checkbox" data-ctrl="${j}"><span>${c}</span></label></li>`).join('')}</ul>
         ${MASNENET.map(([p, pr], i) => `<div class="msp"><div class="msp-h"><b>${i + 1}. ${p}</b><em class="tag" id="msSt${i}">טרם סומן</em></div><ul class="msp-l">${pr.map(([t, must], j) => `<li><label><input type="checkbox" data-pi="${i}" data-pj="${j}"><span>${t}${must ? ' <em class="tag mid">חובה</em>' : ''}</span></label></li>`).join('')}</ul><input class="find" data-msn="${i}" placeholder="מה נצפה, מה סוכם ועד מתי"></div>`).join('')}
@@ -1058,7 +1060,7 @@ window.startApp = function (R) {
           /* manager = איש.אשת הקשר אצל מעסיק חיצוני (אצל עסק בית-ספרי: מנהל.ת העבודה). contact = ימים מהקשר האחרון */
           EMPS[id] = { name, manager: who, mentor: $('neMentor').value.trim(), phone, addr, mail: $('neMail').value.trim(), slots: /^\d+$/.test(slots) ? slots : '', mg: mgs.length ? mgs : MGS.slice(0, 1), status: '', studsTxt: '', lead: false, mas: dec, recheck: touched ? $('msRe').value.trim() : '', visit: touched ? $('msDate').value.trim().replace(/\.\d{4}$/, '') : '', contact: 0, masNotes: notes };
           if (p.lead) { p.lead.done = isoToday(); leadsChanged(); }
-          spec.dirty = false; renderEmps(); renderStuList(); closeSub(); toast(name + ' נוסף · ' + (dec || 'טרם נבדק במסננת'));
+          spec.dirty = false; renderEmps(); renderStuList(); closeSub(); toast(MASNENET_ON ? name + ' נוסף · ' + (dec || 'טרם נבדק במסננת') : name + ' נוסף');
         };
       } };
   }
