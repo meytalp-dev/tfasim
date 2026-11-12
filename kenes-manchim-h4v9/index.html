@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>חוברות למנחי השולחנות · כנס 23.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#f7f3ec;--card:#fffdf8;--navy:#0f2f52;--navy2:#2b5a7a;--teal:#3a8f86;--amber:#c8955a;--ink:#1d2b3a;--muted:#5d6b78;--line:#e6dccb;--wa:#1f8f4e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:'Heebo',sans-serif;font-size:16px;line-height:1.55}
+a{color:inherit}
+.top{background:#fff;border-bottom:1px solid var(--line);text-align:center;padding:18px 16px 10px}
+.top img{height:58px}
+header{max-width:860px;margin:0 auto;padding:30px 16px 6px;text-align:center}
+.kick{display:inline-flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.14em;color:var(--amber);font-weight:700}
+.kick::before,.kick::after{content:"";width:34px;height:1px;background:var(--amber)}
+h1{font-family:'Frank Ruhl Libre',serif;font-weight:900;font-size:clamp(30px,6vw,48px);line-height:1.08;color:var(--navy);margin-top:10px}
+h1 em{font-style:normal;color:var(--teal)}
+.lede{max-width:620px;margin:12px auto 0;color:var(--muted)}
+main{max-width:860px;margin:0 auto;padding:18px 16px 40px}
+.row{display:grid;grid-template-columns:56px 1fr auto;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.row.sent{background:#eef6f4;border-color:#bfdcd6}
+.num{width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.num small{font-size:10px;opacity:.75}
+.num b{font-family:'Frank Ruhl Libre',serif;font-size:21px}
+.who h2{font-size:18px;font-weight:700;color:var(--navy);line-height:1.25}
+.who .role{font-size:14px;color:var(--muted)}
+.who .ct{font-size:13px;color:var(--navy2);margin-top:2px}
+.who .miss{color:#a8642a}
+.btns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-family:'Heebo';font-size:14px;font-weight:700;padding:8px 14px;border-radius:30px;border:0;cursor:pointer;line-height:1.2;white-space:nowrap}
+.btn svg{width:17px;height:17px;flex:0 0 auto}
+.btn.dl{background:var(--navy);color:#fff}
+.btn.wa{background:var(--wa);color:#fff}
+.btn.ml{background:#fff;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal)}
+.btn:hover{filter:brightness(1.08)}
+.done{font-size:12px;color:var(--teal);font-weight:700;display:none;text-align:left;margin-top:4px}
+.row.sent .done{display:block}
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 16px 32px;border-top:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:22px;translate:-50% 0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;max-width:92vw;text-align:center;z-index:20}
+.toast.on{opacity:1}
+@media (max-width:680px){
+  .row{grid-template-columns:48px 1fr;gap:10px 12px}
+  .num{width:46px;height:46px}
+  .btns{grid-column:1/-1;justify-content:stretch}
+  .btn{flex:1;justify-content:center;padding:10px 8px}
+}
+</style>
+</head>
+<body>
+<div class="top"><img src="logo.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+<header>
+  <div class="kick">כנס מנהלים ורשתות · 23.11.26</div>
+  <h1>חוברות <em>למנחי השולחנות</em></h1>
+  <p class="lede">לכל מנחה החוברת של השולחן שלו: רשימת המשתתפים, מהלך הפעילות ודגם של הדף המלווה. אפשר להוריד, או לשלוח ישר למנחה בוואטסאפ או במייל.</p>
+</header>
+<main id="main"></main>
+<footer>נבנה ע״י <a href="https://impactos.co.il/">impactos</a></footer>
+<div class="toast" id="toast"></div>
+<div id="clip" contenteditable="true" style="position:fixed;left:-9999px;top:0;opacity:0"></div>
+
+<script>
+/* ph = נייד (05X-XXXXXXX), mail = כתובת. ריק = לא נמצא, הכפתור נפתח בלי נמען */
+const M=[
+ {t:1,n:'יששכר חפץ',r:'מפקח',ph:'052-8182834',mail:'ysaschar.hefez@labor.gov.il'},
+ {t:2,n:'יעקוב תומא',r:'מפקח',ph:'',mail:'Yakov.Toma@labor.gov.il'},
+ {t:2,n:'יגאל יעקבזון',r:'יועץ ארגוני',ph:'',mail:'2sadot@gmail.com'},
+ {t:3,n:'עאמר אומימה',r:'מפקחת מקצועית',ph:'',mail:'Omyma.Amer@labor.gov.il'},
+ {t:4,n:'אסתי רייפר',r:'מפקחת צוותים טיפוליים',ph:'',mail:'Ester.Raifer@labor.gov.il'},
+ {t:5,n:"שלומי ג'רופי",r:'מפקח פדגוגי חשמל ובקרת אקלים',ph:'',mail:'Shlomy.Groppi@labor.gov.il'},
+ {t:6,n:'תחיה ווקנין כהן',r:'מנהלת תחום בכיר תכנון ומדידה',ph:'',mail:'thiya.waknincohen@labor.gov.il'},
+ {t:7,n:'ליאת צבר',r:'מפקחת פדגוגית',ph:'050-7597144',mail:'liat.tzabar@labor.gov.il'},
+ {t:8,n:'ד"ר ויסאם איוב',r:'המפקח הארצי למקצועות האוטוטרוניקה',ph:'',mail:'Wasam.Ayoub@labor.gov.il'},
+ {t:9,n:'ויסאם סואלחה',r:'מפקח פדגוגי כולל',ph:'050-6290288',mail:'wesam.swalha@labor.gov.il'},
+ {t:10,n:'יסמין אמון',r:'מפקחת פדגוגית',ph:'050-9117613',mail:'yasmin.amon@labor.gov.il'},
+ {t:11,n:'עירית אלדד',r:'מפקחת מערך טיפולי',ph:'',mail:'Irit.Eldad@labor.gov.il'},
+ {t:12,n:'קתרינה ברברשטיין',r:'מפקחת',ph:'',mail:'Katerina.Bravershtein@labor.gov.il'},
+ {t:13,n:'עפרה פנטון',r:'מפקחת',ph:'',mail:'Ofra.Fenton@labor.gov.il'},
+ {t:14,n:'עידית שמעוני',r:'מלווה קהילות, מנחה ומעצבת',ph:'',mail:'Idits@bh.ort.org.il'},
+ {t:15,n:'יוסי בן יעקב',r:'מפקח',ph:'',mail:'Yosi.Ben-Yaakov@labor.gov.il'},
+ {t:16,n:'שרה כרמון רדיד',r:'מפקחת',ph:'',mail:'Sara.Carmon@labor.gov.il'},
+ {t:17,n:'שרית תורגמן יפה',r:'מפקחת',ph:'',mail:'Sarit.TurgemanJaffe@labor.gov.il'},
+ {t:18,n:'ד"ר מיכל גלסר',r:'מפקחת ארצית על המערך הטיפולי',ph:'',mail:'Michal.Glaser@labor.gov.il'},
+ {t:19,n:'אירית גיחז',r:'מפקחת',ph:'',mail:'Irit.Gihaz@labor.gov.il'},
+ {t:20,n:'רביב שורץ',r:'מפקח',ph:'050-5444106',mail:'raviv.schwartz@labor.gov.il'}
+];
+
+const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(matchMedia('(pointer:coarse)').matches&&innerWidth<900);
+const pad=t=>String(t).padStart(2,'0');
+const fileOf=m=>`files/shulchan-${pad(m.t)}.pdf`;
+const abs=m=>new URL(fileOf(m),location.href).href;
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const first=n=>n.replace(/^ד"ר\s*/,'').split(' ')[0];
+const intl=p=>{const d=p.replace(/\D/g,'');return d.startsWith('0')?'972'+d.slice(1):d;};
+const IC={
+ dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>',
+ wa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c.3 2.2 2.3 4.2 4.5 4.5l1-1.2 2 .8-.4 1.8c-3.8.4-7.6-3.4-7.2-7.2l1.8-.4.8 2z"/></svg>',
+ ml:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'};
+
+function msg(m){
+  const subject=`החוברת שלך למנחי השולחנות · שולחן ${m.t} · כנס מנהלים ורשתות 23.11`;
+  const intro=`שלום ${first(m.n)},`;
+  const body=`מצורפת החוברת שלך להנחיית שולחן ${m.t} בכנס המנהלים והרשתות ב־23.11.`;
+  const inside=`בחוברת: רשימת המשתתפים בשולחן, מהלך הפעילות בשלושה שלבים, ודגם של הדף המלווה שנציג.ת השולחן ממלא.ת.`;
+  const end=`תודה רבה על ההנחיה, ובהצלחה!`;
+  const text=[intro,'',body,inside,'',`להורדת החוברת: ${abs(m)}`,'',end].join('\n');
+  const wa=[intro,body,inside,'',`להורדה: ${abs(m)}`,'',end].join('\n');
+  const html=`<div dir="rtl" style="text-align:right;font-family:Arial,sans-serif;font-size:15px;line-height:1.6">
+<p>${esc(intro)}</p><p>${esc(body)}<br>${esc(inside)}</p>
+<table role="presentation" cellpadding="0" cellspacing="0" align="right"><tr><td bgcolor="#0f2f52" style="border-radius:8px;padding:11px 22px"><a href="${abs(m)}" style="color:#ffffff;font-weight:bold;text-decoration:none">להורדת החוברת (PDF)</a></td></tr></table>
+<p style="clear:both;padding-top:12px">${esc(end)}</p></div>`;
+  return {subject,text,wa,html};
+}
+
+const main=document.getElementById('main');
+M.forEach((m,i)=>{
+  const g=msg(m);
+  const waHref=(m.ph?`https://wa.me/${intl(m.ph)}`:'https://wa.me/')+'?text='+encodeURIComponent(g.wa);
+  const mailHref=`mailto:${m.mail}?subject=${encodeURIComponent(g.subject)}&body=${encodeURIComponent(g.text)}`;
+  const ct=[m.ph?`<span dir="ltr">${esc(m.ph)}</span>`:'<span class="miss">אין טלפון</span>',m.mail?`<span dir="ltr">${esc(m.mail)}</span>`:'<span class="miss">אין מייל</span>'].join(' · ');
+  const el=document.createElement('div');el.className='row';el.id='m'+i;
+  el.innerHTML=`<div class="num"><small>שולחן</small><b>${m.t}</b></div>
+   <div class="who"><h2>${esc(m.n)}</h2><div class="role">${esc(m.r)}</div><div class="ct">${ct}</div><div class="done">✓ נשלח מהמכשיר הזה</div></div>
+   <div class="btns">
+    <a class="btn dl" href="${fileOf(m)}" download="שולחן ${pad(m.t)} - ${esc(m.n.replace(/["']/g,''))}.pdf">${IC.dl}הורדה</a>
+    <a class="btn wa" href="${waHref}" target="_blank" rel="noopener" data-sent="${i}">${IC.wa}וואטסאפ</a>
+    <a class="btn ml" href="${mailHref}" data-mail="${i}" data-sent="${i}">${IC.ml}מייל</a>
+   </div>`;
+  el._msg=g;main.append(el);
+});
+
+/* סימון "נשלח" נשמר רק בדפדפן הזה */
+const KEY='kenes-manchim-sent';
+let sent={};try{sent=JSON.parse(localStorage.getItem(KEY)||'{}');}catch(_){}
+const mark=i=>{sent[i]=1;document.getElementById('m'+i).classList.add('sent');try{localStorage.setItem(KEY,JSON.stringify(sent));}catch(_){}};
+Object.keys(sent).forEach(i=>{const r=document.getElementById('m'+i);if(r)r.classList.add('sent');});
+
+const toast=(t,ms=5000)=>{const e=document.getElementById('toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(()=>e.classList.remove('on'),ms);};
+document.addEventListener('click',e=>{
+  const s=e.target.closest('[data-sent]');if(s)mark(+s.dataset.sent);
+  const a=e.target.closest('[data-mail]');
+  if(a&&!isMobile){
+    e.preventDefault();
+    const i=+a.dataset.mail,m=M[i],g=document.getElementById('m'+i)._msg,clip=document.getElementById('clip');
+    clip.innerHTML=g.html;const r=document.createRange();r.selectNodeContents(clip);const sel=getSelection();sel.removeAllRanges();sel.addRange(r);
+    let ok=false;try{ok=document.execCommand('copy');}catch(_){}
+    sel.removeAllRanges();
+    const url='https://mail.google.com/mail/?view=cm&fs=1&to='+encodeURIComponent(m.mail)+'&su='+encodeURIComponent(g.subject)+(ok?'':'&body='+encodeURIComponent(g.text));
+    window.open(url,'_blank');
+    toast(ok?'נפתחה טיוטה ב-Gmail. לחצי בגוף המייל ו-Ctrl+V כדי להדביק את הנוסח והכפתור להורדה.':'נפתחה טיוטה ב-Gmail עם הנוסח והקישור.',6500);
+  }
+});
+</script>
+</body>
+</html>
