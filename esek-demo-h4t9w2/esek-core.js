@@ -4,6 +4,14 @@
   'use strict';
 
   var KEY = 'esek-demo-v1';
+  var KEY2 = 'esek-demo-v2';
+  var v2mode = false;
+  /* גרסה 2 (תוספות בסוף הקובץ), בקצרה:
+     - מסלול v1 (load/save/reset/seed, מפתח esek-demo-v1) לא השתנה. מסלול v2: Esek.load2 / reset2 / seed2,
+       מפתח esek-demo-v2 דרך Esek.store = {get(), set(state)}.
+     - Esek.useStore(adapter) מחליף מתאם (למשל שרת) ועובר למצב v2; Esek.setState(s) מחליף את המצב בזיכרון
+       בלי לכתוב אותו חזרה (למשל אחרי load מהשרת). במצב v2 גם Esek.save הישן כותב דרך המתאם.
+     - Esek.now = () => new Date() הוא השעון של כל לוגיקת התאריכים החדשה (בדיקות מחליפות אותו). */
 
   /* ---------- אחסון (localStorage או זיכרון ב-node) ---------- */
   var mem = {};
@@ -31,7 +39,8 @@
   var Esek = {};
   var _uidN = 0;
   Esek._todayOverride = null;
-  Esek.today = function () { return Esek._todayOverride || fmt(new Date()); };
+  Esek.now = function () { return new Date(); }; // שעון מוזרק: בבדיקות מחליפים
+  Esek.today = function () { return Esek._todayOverride || fmt(Esek.now()); };
   Esek.fmtDate = fmt;
   Esek.addDays = addDays;
   Esek.dayOfWeek = dow;
@@ -108,6 +117,7 @@
     return s;
   };
   Esek.save = function () {
+    if (v2mode) { try { Esek.store.set(Esek.state); } catch (e0) { /* מתאם נכשל */ } return Esek.state; }
     try { store().setItem(KEY, JSON.stringify(Esek.state)); } catch (e) { /* מלא/חסום */ }
     return Esek.state;
   };
@@ -363,7 +373,7 @@
   };
   Esek.logAppt = function (orderId) {
     var st = S(), o = Esek.byId(st.orders, orderId), made = [];
-    if (!o || !o.time) return made;
+    if (!o || !o.time || o.status === 'req') return made;
     (o.stuIds || []).forEach(function (sid) {
       var has = st.entries.some(function (e) { return e.stuId === sid && e.orderId === o.id && e.date === o.date; });
       if (!has) made.push(Esek.addEntry({ stuId: sid, orderId: o.id, date: o.date, start: o.time, end: apptEndOf(o), by: 'mgr', note: 'מתור' }));
@@ -700,6 +710,606 @@
     var st = S();
     return st.students.filter(function (s) { return !st.open[s.id] && s.id !== 's13' && s.id !== 's14'; })
       .slice(0, 3).map(function (s) { return { id: s.id, name: s.name, pin: s.pin }; });
+  };
+
+  /* =====================================================================
+     גרסה 2: אחסון דרך מתאם, שכר לפי משימות, חיוב, תורים ובקשות, מלאי, הצעות, תזכורת
+     ===================================================================== */
+
+  /* ---------- אחסון v2 ---------- */
+  Esek.store = {
+    get: function () {
+      var raw = null;
+      try { raw = store().getItem(KEY2); } catch (e) { raw = null; }
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch (e2) { return null; }
+    },
+    set: function (state) {
+      try { store().setItem(KEY2, JSON.stringify(state)); } catch (e) { /* מלא/חסום */ }
+    }
+  };
+  Esek.useStore = function (adapter) {
+    if (adapter && typeof adapter.get === 'function' && typeof adapter.set === 'function') Esek.store = adapter;
+    v2mode = true;
+    return Esek.store;
+  };
+  function upgrade2(s) {
+    if (!s.biz.tasks) s.biz.tasks = [];
+    if (!s.biz.services) s.biz.services = [];
+    if (!s.biz.hours) s.biz.hours = defaultHours();
+    if (!s.stock) s.stock = { items: [], moves: [] };
+    if (!s.quotes) s.quotes = [];
+    s.orders.forEach(function (o) { upgradeOrder(o); });
+    return s;
+  }
+  function valid2(s) { return valid(s) && s.stock && Array.isArray(s.stock.items) && Array.isArray(s.quotes); }
+  Esek.setState = function (s) {
+    v2mode = true;
+    Esek.state = valid(s) ? upgrade2(s) : s;
+    return Esek.state;
+  };
+  Esek.load2 = function () {
+    v2mode = true;
+    var s = null;
+    try { s = Esek.store.get(); } catch (e) { s = null; }
+    if (!valid2(s)) { Esek.state = Esek.seed2(); Esek.save(); }
+    else Esek.state = upgrade2(s);
+    return Esek.state;
+  };
+  Esek.reset2 = function () {
+    v2mode = true;
+    Esek.state = Esek.seed2();
+    Esek.save();
+    return Esek.state;
+  };
+
+  /* ---------- עזרים ---------- */
+  function normPhone(p) {
+    var d = String(p || '').replace(/\D/g, '');
+    if (d.indexOf('972') === 0) d = '0' + d.slice(3);
+    return d;
+  }
+  Esek.normPhone = normPhone;
+  function waPhone(p) {
+    var d = normPhone(p);
+    return d.charAt(0) === '0' ? '972' + d.slice(1) : d;
+  }
+  function svOf(id) { return Esek.byId(S().biz.services, id); }
+  function splitSumOf(split) {
+    var t = 0;
+    (split || []).forEach(function (x) { t += +x.hours || 0; });
+    return r2(t);
+  }
+  Esek.splitSum = function (entry) { return splitSumOf(entry && entry.split); };
+  Esek.splitOver = function (entry) { return splitSumOf(entry.split) > r2(+entry.hours || 0) + 0.005; };
+  function fixSplit(e) { if (e.split && Esek.splitOver(e)) e.split = []; }
+  function splitFromService(sv) {
+    return ((sv && sv.split) || []).map(function (x) { return { taskId: x.taskId, hours: r2((+x.minutes || 0) / 60) }; });
+  }
+  function endDate(o) {
+    var p = parse(o.date), m = toMin(o.time) + (+o.minutes || 0);
+    p.setHours(Math.floor(m / 60), m % 60, 0, 0);
+    return p;
+  }
+
+  /* ---------- שכר לפי משימות ---------- */
+  // תעריף רגיל: entry.rate (עקיפה ידנית, bulk 'rate') ואז order.payRate ואז student.rate
+  Esek.rateOf2 = function (entry) {
+    if (entry.rate !== null && entry.rate !== undefined && entry.rate !== '') return +entry.rate;
+    return Esek.rateOf(entry);
+  };
+  Esek.payOf = function (entry) {
+    var st = S(), normal = Esek.rateOf2(entry), hours = +entry.hours || 0;
+    var over = Esek.splitOver(entry), lines = [], used = 0, idx = {};
+    if (!over) {
+      (entry.split || []).forEach(function (x) {
+        var t = Esek.byId(st.biz.tasks, x.taskId), h = +x.hours || 0;
+        if (!t || h <= 0) return;
+        if (idx[t.id] === undefined) { idx[t.id] = lines.length; lines.push({ taskId: t.id, rate: +t.rate || 0, hours: 0 }); }
+        lines[idx[t.id]].hours = r2(lines[idx[t.id]].hours + h);
+        used += h;
+      });
+    }
+    var rest = r2(hours - used);
+    if (rest > 0) lines.push({ taskId: null, rate: normal, hours: rest });
+    var total = 0;
+    lines.forEach(function (l) { total += l.hours * l.rate; });
+    return { total: r2(total), lines: lines, over: over };
+  };
+  Esek.payroll2 = function (ym) {
+    var st = S(), by = {}, order = [], rows = [];
+    Esek.entries({ ym: ym, status: 'ok' }).forEach(function (e) {
+      if (!by[e.stuId]) { by[e.stuId] = []; order.push(e.stuId); }
+      by[e.stuId].push(e);
+    });
+    order.forEach(function (id) {
+      var stu = Esek.byId(st.students, id);
+      if (!stu) return;
+      var es = by[id], map = {}, keys = [], total = 0, overN = 0;
+      es.forEach(function (e) {
+        var p = Esek.payOf(e);
+        if (p.over) overN++;
+        total += p.total;
+        p.lines.forEach(function (l) {
+          var k = (l.taskId || '') + '|' + l.rate;
+          if (!map[k]) { var t = l.taskId ? Esek.byId(st.biz.tasks, l.taskId) : null;
+            map[k] = { taskId: l.taskId, task: t ? t.name : null, rate: l.rate, hours: 0, amount: 0 }; keys.push(k); }
+          map[k].hours = r2(map[k].hours + l.hours);
+          map[k].amount = r2(map[k].amount + l.hours * l.rate);
+        });
+      });
+      var lines = keys.map(function (k) { return map[k]; }).sort(function (a, b) {
+        if (!a.taskId !== !b.taskId) return a.taskId ? 1 : -1;
+        return String(a.task || '').localeCompare(String(b.task || ''), 'he') || a.rate - b.rate;
+      });
+      rows.push({ stu: stu, hours: Esek.sumHours(es), days: Esek.workDays(es), total: r2(total), lines: lines, over: overN });
+    });
+    rows.sort(function (a, b) { return String(a.stu.name).localeCompare(String(b.stu.name), 'he'); });
+    return rows;
+  };
+
+  /* המשימות שמחויבות בהזמנה: מה שנשמר בהזמנה, ואם לא נשמר — לפי חלוקת השירות (פעם אחת לכל משימה) */
+  Esek.orderTasks = function (o) {
+    if (!o) return [];
+    if (Array.isArray(o.tasks)) return o.tasks;
+    var sv = svOf(o.serviceId);
+    return ((sv && sv.split) || []).map(function (x) { return { taskId: x.taskId, qty: 1 }; });
+  };
+  /* ---------- חיוב לקוח: הצעת מחיר > בחירת הלקוח (לפי משימה / לפי שעות וימים) ---------- */
+  Esek.custBill2 = function (custId, from, to) {
+    var st = S(), cust = Esek.byId(st.customers, custId);
+    var byTask = !!cust && cust.bill === 'tasks';
+    var all = [], rest = [], orders = [], fixed = [], tmap = {}, tkeys = [], amount = 0;
+    st.orders.forEach(function (o) {
+      if (o.custId !== custId || !o.billable) return;
+      var okAll = Esek.entries({ orderId: o.id, status: 'ok' });
+      var es = Esek.entries({ from: from, to: to, orderId: o.id, status: 'ok' });
+      var mode = (o.fixedPrice !== undefined && o.fixedPrice !== null && o.fixedPrice !== '') ? 'fixed'
+        : (byTask ? 'tasks' : 'terms');
+      var oa = 0;
+      if (mode === 'terms') {
+        all = all.concat(es); rest = rest.concat(es);
+      } else {
+        // חיוב ברמת ההזמנה: נספר בטווח שבו נופל תאריך ההזמנה (או הדיווח המאושר הראשון), ורק אם יש דיווח מאושר
+        var bd = o.date;
+        if (!bd && okAll.length) bd = okAll.map(function (e) { return e.date; }).sort()[0];
+        var inRange = okAll.length && bd && (!from || bd >= from) && (!to || bd <= to);
+        all = all.concat(es);
+        if (inRange) {
+          if (mode === 'fixed') { oa = +o.fixedPrice || 0; fixed.push({ order: o, amount: r2(oa) }); }
+          else Esek.orderTasks(o).forEach(function (x) {
+            var t = Esek.byId(st.biz.tasks, x.taskId);
+            if (!t) return;
+            var q = +x.qty || 0, a = q * (+t.price || 0);
+            if (!tmap[t.id]) { tmap[t.id] = { taskId: t.id, task: t, qty: 0, price: +t.price || 0, amount: 0 }; tkeys.push(t.id); }
+            tmap[t.id].qty += q; tmap[t.id].amount = r2(tmap[t.id].amount + a);
+            oa += a;
+          });
+          amount += oa;
+        }
+      }
+      orders.push({ order: o, hours: Esek.sumHours(es), days: Esek.workDays(es), mode: mode, amount: r2(oa) });
+    });
+    var rh = Esek.sumHours(rest), rd = Esek.workDays(rest), ra = 0;
+    if (cust) {
+      if (cust.bill === 'hours' || cust.bill === 'both') ra += rh * (+cust.rateHour || 0);
+      if (cust.bill === 'days' || cust.bill === 'both') ra += rd * (+cust.rateDay || 0);
+    }
+    var fixedTotal = 0;
+    fixed.forEach(function (f) { fixedTotal += f.amount; });
+    var taskLines = tkeys.map(function (k) { return tmap[k]; });
+    var taskTotal = 0;
+    taskLines.forEach(function (l) { taskTotal += l.amount; });
+    return { cust: cust, hours: Esek.sumHours(all), days: Esek.workDays(all), amount: r2(ra + fixedTotal + taskTotal),
+      fixedLines: fixed, taskLines: taskLines, rest: { hours: rh, days: rd, amount: r2(ra) }, orders: orders };
+  };
+
+  /* ---------- מלאי ---------- */
+  Esek.stockMove = function (itemId, delta, note, orderId) {
+    var st = S(), it = Esek.byId(st.stock.items, itemId);
+    if (!it || !isFinite(+delta) || +delta === 0) return null;
+    it.qty = r2((+it.qty || 0) + +delta);
+    var m = { id: Esek.uid(), itemId: itemId, date: Esek.today(), delta: r2(+delta), orderId: orderId || null, note: note || '' };
+    st.stock.moves.push(m);
+    Esek.save();
+    return m;
+  };
+  Esek.lowStock = function () {
+    return S().stock.items.filter(function (it) { return (+it.qty || 0) < (+it.min || 0); });
+  };
+  Esek.stockOut = function (order) {
+    var st = S(), o = typeof order === 'string' ? Esek.byId(st.orders, order) : order, made = [];
+    if (!o || o.stockDone) return made;
+    var sv = svOf(o.serviceId);
+    (sv && sv.materials || []).forEach(function (m) {
+      var mv = Esek.stockMove(m.itemId, -(+m.qty || 0), 'תור: ' + sv.name, o.id);
+      if (mv) made.push(mv);
+    });
+    o.stockDone = true;
+    Esek.save();
+    return made;
+  };
+
+  /* ---------- שרשרת: תור -> דיווח מוכן -> תלמיד.ה -> רכז.ת ---------- */
+  Esek.prepAppt = function (orderId) {
+    var st = S(), o = Esek.byId(st.orders, orderId), made = [];
+    if (!o || !o.time || o.status !== 'sched') return made;
+    var sv = svOf(o.serviceId);
+    (o.stuIds || []).forEach(function (sid) {
+      var has = st.entries.some(function (e) { return e.stuId === sid && e.orderId === o.id && e.date === o.date; });
+      if (has) return;
+      var e = { id: Esek.uid(), stuId: sid, orderId: o.id, date: o.date, start: o.time, end: apptEndOf(o),
+        hours: Esek.hoursBetween(o.time, apptEndOf(o)), by: 'mgr', status: 'prep', stuOk: false, note: 'מתור',
+        split: splitFromService(sv) };
+      fixSplit(e);
+      st.entries.push(e);
+      made.push(e);
+    });
+    if (!Array.isArray(o.tasks) && sv && sv.split && sv.split.length) {
+      o.tasks = sv.split.map(function (x) { return { taskId: x.taskId, qty: 1 }; });
+    }
+    o.status = 'done';
+    Esek.stockOut(o);
+    Esek.save();
+    return made;
+  };
+  Esek.autoPrep = function (now) {
+    now = now || Esek.now();
+    var nd = fmt(now), nm = now.getHours() * 60 + now.getMinutes(), made = [];
+    S().orders.slice().forEach(function (o) {
+      if (o.status !== 'sched' || !o.time || !o.date) return;
+      var due = o.date < nd || (o.date === nd && toMin(apptEndOf(o)) < nm);
+      if (due) made = made.concat(Esek.prepAppt(o.id));
+    });
+    return made;
+  };
+  Esek.setSplit = function (id, split) {
+    var e = Esek.byId(S().entries, id);
+    if (!e) return null;
+    var cl = (split || []).map(function (x) { return { taskId: x.taskId, hours: r2(+x.hours || 0) }; })
+      .filter(function (x) { return x.hours > 0; });
+    if (splitSumOf(cl) > r2(+e.hours || 0) + 0.005) return null;
+    e.split = cl;
+    Esek.save();
+    return e;
+  };
+  Esek.setOrderTasks = function (orderId, tasks) {
+    var o = Esek.byId(S().orders, orderId);
+    if (!o) return null;
+    o.tasks = (tasks || []).map(function (x) { return { taskId: x.taskId, qty: +x.qty || 0 }; }).filter(function (x) { return x.qty > 0; });
+    Esek.save();
+    return o;
+  };
+  Esek.stuConfirm = function (id, patch) {
+    var e = Esek.byId(S().entries, id);
+    if (!e || e.status !== 'prep') return null;
+    patch = patch || {};
+    var start = patch.start !== undefined ? patch.start : e.start, end = patch.end !== undefined ? patch.end : e.end;
+    var hours = e.hours;
+    if (patch.hours !== undefined && patch.hours !== null && patch.hours !== '') hours = r2(+patch.hours || 0);
+    else if (patch.start !== undefined || patch.end !== undefined) { if (start && end) hours = Esek.hoursBetween(start, end); }
+    if (patch.split) {
+      var cl = patch.split.map(function (x) { return { taskId: x.taskId, hours: r2(+x.hours || 0) }; }).filter(function (x) { return x.hours > 0; });
+      if (splitSumOf(cl) > hours + 0.005) return null; // פירוט מעל סך השעות: נדחה, בלי שינוי כלשהו
+    }
+    e.start = start || null; e.end = end || null; e.hours = hours;
+    if (patch.note !== undefined) e.note = patch.note;
+    if (patch.split) e.split = cl;
+    fixSplit(e); // שעות שהופחתו מתחת לפירוט הקיים: הפירוט מתבטל
+    e.status = 'wait'; e.stuOk = true;
+    Esek.save();
+    return e;
+  };
+  Esek.mgrApprove = function (id) {
+    var e = Esek.byId(S().entries, id);
+    if (!e || (e.status !== 'wait' && e.status !== 'prep')) return null;
+    e.status = 'ok';
+    Esek.save();
+    return e;
+  };
+  Esek.bulk = function (ids, action, val) {
+    var st = S(), changed = [], skipped = [];
+    (ids || []).forEach(function (id) {
+      var e = Esek.byId(st.entries, id), good = true;
+      if (!e) { skipped.push(id); return; }
+      if (action === 'ok' || action === 'no') e.status = action;
+      else if (action === 'times') {
+        var h = val && val.start && val.end ? Esek.hoursBetween(val.start, val.end) : 0;
+        if (h > 0) { e.start = val.start; e.end = val.end; e.hours = h; fixSplit(e); } else good = false;
+      } else if (action === 'hours') {
+        var v = +val;
+        if (v > 0) { e.hours = r2(v); e.start = null; e.end = null; fixSplit(e); } else good = false;
+      } else if (action === 'rate') {
+        if (val !== '' && val !== null && val !== undefined && isFinite(+val) && +val >= 0) e.rate = +val; else good = false;
+      } else good = false;
+      (good ? changed : skipped).push(id);
+    });
+    Esek.save();
+    return { changed: changed, skipped: skipped };
+  };
+  Esek.notConfirmed = function (ym) {
+    var act = {};
+    Esek.entries({ ym: ym, status: 'prep' }).forEach(function (e) { act[e.stuId] = 1; });
+    return S().students.filter(function (s) { return act[s.id]; });
+  };
+
+  /* ---------- בקשות לקוחות ---------- */
+  Esek.publicSlots = function (date, serviceId) {
+    var st = S(), sv = svOf(serviceId), len = sv ? +sv.minutes || 30 : 30;
+    var cap = +st.biz.capacity || 1, h = hoursCfgOf(), nd = Esek.now(), today = fmt(nd), nm = nd.getHours() * 60 + nd.getMinutes();
+    return Esek.slots(date, len).map(function (s) {
+      var m = toMin(s.time);
+      var free = s.busy < cap && m + len <= toMin(h.close) && date >= today && !(date === today && m <= nm);
+      return { time: s.time, free: free };
+    });
+  };
+  Esek.requestAppt = function (r) {
+    var st = S();
+    r = r || {};
+    var sv = svOf(r.serviceId), np = normPhone(r.phone), nm = String(r.name || '').replace(/^\s+|\s+$/g, '');
+    if (!sv || !r.date || !r.time || !nm || np.length < 9) return null;
+    var free = Esek.publicSlots(r.date, r.serviceId).some(function (s) { return s.time === r.time && s.free; });
+    if (!free) return null;
+    var cust = null;
+    st.customers.forEach(function (c) { if (!cust && normPhone(c.phone) === np) cust = c; });
+    if (!cust) {
+      cust = { id: Esek.uid(), name: nm, contact: nm, phone: String(r.phone).replace(/^\s+|\s+$/g, ''), email: r.email || '',
+        bill: 'tasks', rateHour: 0, rateDay: 0, note: 'נוצר מבקשה באתר' };
+      st.customers.push(cust);
+    } else if (!cust.email && r.email) cust.email = r.email;
+    var o = { id: Esek.uid(), custId: cust.id, title: sv.name + ' – ' + cust.name, typeId: sv.typeId, date: r.date, time: r.time,
+      minutes: +sv.minutes || 0, serviceId: sv.id, stuIds: [], billable: true, status: 'req', source: 'cust', payRate: null,
+      note: '', reminded: '', stockDone: false };
+    st.orders.push(o);
+    Esek.save();
+    return o;
+  };
+  Esek.acceptReq = function (orderId, stuIds) {
+    var o = Esek.byId(S().orders, orderId);
+    if (!o || o.status !== 'req') return null;
+    o.stuIds = (stuIds || []).slice();
+    o.status = 'sched';
+    Esek.save();
+    return o;
+  };
+  Esek.rejectReq = function (orderId) {
+    var o = Esek.byId(S().orders, orderId);
+    if (!o || o.status !== 'req') return null;
+    o.status = 'closed';
+    Esek.save();
+    return o;
+  };
+
+  // תור חדש מהרכז.ת או מתלמיד.ה מורשה.ית: f = {custId, serviceId, date, time, stuIds, source:'mgr'|'stu', billable?, title?, minutes?}
+  Esek.addAppt = function (f) {
+    var st = S(), sv = svOf(f.serviceId), cust = Esek.byId(st.customers, f.custId);
+    if (!f.date || !f.time) return null;
+    var o = { id: Esek.uid(), custId: cust ? cust.id : null,
+      title: f.title || ((sv ? sv.name : 'תור') + (cust ? ' – ' + cust.name : '')),
+      typeId: sv ? sv.typeId : (f.typeId || null), date: f.date, time: f.time,
+      minutes: +f.minutes || (sv ? +sv.minutes || 0 : 0), serviceId: sv ? sv.id : null,
+      stuIds: (f.stuIds || []).slice(), billable: f.billable !== false, status: 'sched',
+      source: f.source === 'stu' ? 'stu' : 'mgr', payRate: null, note: f.note || '', reminded: '', stockDone: false };
+    st.orders.push(o);
+    Esek.save();
+    return o;
+  };
+
+  /* ---------- הצעות מחיר ---------- */
+  Esek.quoteTotal = function (q) {
+    var t = 0;
+    ((q && q.lines) || []).forEach(function (l) { t += (+l.qty || 0) * (+l.price || 0); });
+    return r2(t);
+  };
+  Esek.quoteToOrder = function (quoteId, opt) {
+    var st = S(), q = Esek.byId(st.quotes, quoteId);
+    opt = opt || {};
+    if (!q) return null;
+    if (q.orderId) return Esek.byId(st.orders, q.orderId);
+    if (q.status !== 'ok') return null;
+    var first = null;
+    q.lines.forEach(function (l) { if (!first && l.serviceId && svOf(l.serviceId)) first = svOf(l.serviceId); });
+    var cust = Esek.byId(st.customers, q.custId);
+    var o = { id: Esek.uid(), custId: q.custId, title: (first ? first.name : (q.lines[0] && q.lines[0].text) || 'הצעת מחיר') + ' – ' + (cust ? cust.name : ''),
+      typeId: first ? first.typeId : (st.biz.types[0] ? st.biz.types[0].id : ''), date: opt.date || '', time: opt.time || '',
+      minutes: first ? +first.minutes || 0 : 0, serviceId: first ? first.id : null, stuIds: (opt.stuIds || []).slice(), billable: true,
+      status: opt.date && opt.time ? 'sched' : 'new', source: 'mgr', payRate: null, note: q.note || '', reminded: '', stockDone: false,
+      fixedPrice: Esek.quoteTotal(q) };
+    st.orders.push(o);
+    q.orderId = o.id;
+    Esek.save();
+    return o;
+  };
+
+  /* ---------- תזכורת ללקוח (כפתור; בלי שליחה אוטומטית) ---------- */
+  var DAYS_HE = ['יום ראשון', 'יום שני', 'יום שלישי', 'יום רביעי', 'יום חמישי', 'יום שישי', 'יום שבת'];
+  Esek.reminderText = function (orderId) {
+    var st = S(), o = Esek.byId(st.orders, orderId);
+    if (!o || !o.date) return null;
+    var cust = Esek.byId(st.customers, o.custId), sv = svOf(o.serviceId);
+    var d = parse(o.date), when = DAYS_HE[d.getDay()] + ' ' + pad2(d.getDate()) + '.' + pad2(d.getMonth() + 1) + '.' + d.getFullYear();
+    var svName = sv ? sv.name : (o.title || '');
+    var subject = 'תזכורת לתור ב' + st.biz.name + ' – ' + when + (o.time ? ' בשעה ' + o.time : '');
+    var greetName = cust ? String(cust.contact || cust.name || '').trim().split(/\s+/)[0] : '';
+    var body = 'שלום' + (greetName ? ' ' + greetName : '') + ',\n' +
+      'תזכורת לתור שלך ב' + st.biz.name + '.\n' +
+      'שירות: ' + svName + '\n' +
+      'מתי: ' + when + (o.time ? ' בשעה ' + o.time : '') + '\n' +
+      'לביטול או שינוי: ' + (st.biz.phone || '');
+    var wp = cust ? waPhone(cust.phone) : '';
+    return { subject: subject, body: body, wa: 'https://wa.me/' + wp + '?text=' + encodeURIComponent(body) };
+  };
+  Esek.markReminded = function (orderId) {
+    var o = Esek.byId(S().orders, orderId);
+    if (!o) return null;
+    o.reminded = Esek.today();
+    Esek.save();
+    return o;
+  };
+
+  /* ---------- נתוני דוגמה v2: מספרה (דטרמיניסטי; תאריכים יחסית ל-Esek.now()) ---------- */
+  Esek.seed2 = function () {
+    var rnd = mulberry32(20261114);
+    function pick(a) { return a[Math.floor(rnd() * a.length)]; }
+    var today = fmt(Esek.now()), ymNow = today.slice(0, 7), curStart = ymNow + '-01', winStart = addDays(today, -60);
+
+    var types = [{ id: 't1', name: 'עבודת מספרה', pro: true }, { id: 't2', name: 'דלפק וסידור', pro: false }];
+    var tasks = [
+      { id: 'tk1', name: 'תספורת', rate: 38, price: 80 },
+      { id: 'tk2', name: 'צבע / מריחה', rate: 42, price: 250 },
+      { id: 'tk3', name: 'שטיפה', rate: 34, price: 30 },
+      { id: 'tk4', name: 'פן', rate: 38, price: 70 },
+      { id: 'tk5', name: 'החלקה', rate: 46, price: 400 },
+      { id: 'tk6', name: 'ניקיון וסידור (פנימי)', rate: 32, price: 0 },
+      { id: 'tk7', name: 'דלפק (פנימי)', rate: 32, price: 0 }
+    ];
+    var services = [
+      { id: 'sv1', name: 'תספורת', typeId: 't1', minutes: 30, price: 80, split: [{ taskId: 'tk1', minutes: 30 }], materials: [] },
+      { id: 'sv2', name: 'תספורת ושטיפה', typeId: 't1', minutes: 45, price: 110,
+        split: [{ taskId: 'tk1', minutes: 30 }, { taskId: 'tk3', minutes: 15 }], materials: [{ itemId: 'i1', qty: 0.1 }] },
+      { id: 'sv3', name: 'צבע', typeId: 't1', minutes: 90, price: 320,
+        split: [{ taskId: 'tk2', minutes: 60 }, { taskId: 'tk4', minutes: 30 }], materials: [{ itemId: 'i2', qty: 1 }, { itemId: 'i5', qty: 1 }] },
+      { id: 'sv4', name: 'פן', typeId: 't1', minutes: 30, price: 70, split: [{ taskId: 'tk4', minutes: 30 }], materials: [{ itemId: 'i6', qty: 1 }] },
+      { id: 'sv5', name: 'החלקה', typeId: 't1', minutes: 120, price: 450,
+        split: [{ taskId: 'tk5', minutes: 90 }, { taskId: 'tk3', minutes: 15 }, { taskId: 'tk4', minutes: 15 }],
+        materials: [{ itemId: 'i4', qty: 1 }, { itemId: 'i1', qty: 0.1 }] },
+      { id: 'sv6', name: 'טיפול מסכה', typeId: 't1', minutes: 30, price: 60, split: [{ taskId: 'tk3', minutes: 30 }], materials: [{ itemId: 'i3', qty: 1 }] }
+    ];
+    var hoursCfg = defaultHours();
+    var snames = [['נור חדאד', 'יא', 34, '4821'], ['רים סעדי', 'יא', 35, '7305'], ['יואב לוי', 'יב', 36, '1593'],
+      ['שירה כהן', 'יא', 34, '6047'], ['אחמד נאסר', 'יב', 37, '2918'], ['ליאן דאהר', 'יא', 33, '8264'],
+      ['עומר כץ', 'יא', 34, '3750'], ['טל ברוך', 'יב', 36, '9136'], ['מאיה גבאי', 'יא', 33, '5482'],
+      ['דור אזולאי', 'יב', 38, '0679'], ['נועה פרץ', 'יא', 34, '3315'], ['יאסמין עלי', 'יב', 37, '7842'],
+      ['אדם קורן', 'יא', 32, '2206'], ['הדר ביטון', 'יב', 35, '6951']];
+    var students = snames.map(function (n, i) {
+      return { id: 's' + (i + 1), name: n[0], cls: n[1], grp: 'מספרה', rate: n[2], pin: n[3], canBook: i < 3 };
+    });
+    var cn = [['הדס גולן', 'tasks', 60], ['יוסי אברהם', 'tasks', 55], ['רות שלום', 'tasks', 50], ['מיכל ברנע', 'tasks', 60],
+      ['אלון דהן', 'tasks', 55], ['אבי שחר', 'tasks', 60], ['דנה מזרחי', 'tasks', 50], ['גיל אשכנזי', 'tasks', 55],
+      ['ליאת רוזן', 'hours', 60], ['שמעון בן-חיים', 'hours', 50], ['מיה סגל', 'hours', 55], ['בית אבות הדגמה', 'days', 0]];
+    var customers = cn.map(function (c, i) {
+      return { id: 'c' + (i + 1), name: c[0], contact: c[0], phone: '050-0000' + (101 + i), email: i % 2 ? '' : 'demo' + (i + 1) + '@example.com',
+        bill: c[1], rateHour: c[2], rateDay: c[1] === 'days' ? 150 : 0, note: '' };
+    });
+    customers.push({ id: 'c13', name: 'קרן ויצמן', contact: 'קרן ויצמן', phone: '050-0000113', email: '', bill: 'tasks', rateHour: 55, rateDay: 0, note: 'פנתה דרך הדף' });
+
+    var orders = [], entries = [], on = 0, en = 0;
+    function mkOrder(f) {
+      on++;
+      var o = { id: 'o' + on, custId: f.custId, title: f.title, typeId: f.typeId, date: f.date || '', time: f.time || '', minutes: f.minutes || 0,
+        serviceId: f.serviceId || null, stuIds: f.stuIds || [], billable: !!f.billable, status: f.status, payRate: null, note: f.note || '',
+        source: f.source || 'mgr', reminded: '', stockDone: !!f.stockDone };
+      if (f.tasks) o.tasks = f.tasks;
+      if (f.fixedPrice !== undefined) o.fixedPrice = f.fixedPrice;
+      orders.push(o);
+      return o;
+    }
+    function apptOrder(svId, custId, date, time, stuIds, status, extra) {
+      var sv = Esek.byId(services, svId), c = Esek.byId(customers, custId);
+      extra = extra || {};
+      return mkOrder({ custId: custId, title: sv.name + ' – ' + c.name, typeId: sv.typeId, date: date, time: time, minutes: sv.minutes,
+        serviceId: svId, stuIds: stuIds, billable: true, status: status, source: extra.source, stockDone: extra.stockDone,
+        tasks: extra.tasks, fixedPrice: extra.fixedPrice });
+    }
+    function mkEntry(stuId, orderId, date, start, hours, by, status, note, split, stuOk) {
+      var end = null;
+      if (start) { var m = toMin(start) + Math.round(hours * 60); end = pad2(Math.floor(m / 60)) + ':' + pad2(m % 60); }
+      en++;
+      var e = { id: 'e' + en, stuId: stuId, orderId: orderId, date: date, start: start || null, end: end, hours: hours, by: by,
+        status: status, note: note || '' };
+      if (split) e.split = split;
+      if (stuOk !== undefined) e.stuOk = stuOk;
+      entries.push(e);
+      return e;
+    }
+    var oClean = mkOrder({ custId: null, title: 'ניקיון וסידור הסלון', typeId: 't2', billable: false, status: 'work', note: 'עבודה פנימית' });
+    var oDesk = mkOrder({ custId: null, title: 'דלפק וקבלת קהל', typeId: 't2', billable: false, status: 'work', note: 'עבודה פנימית' });
+
+    var activeDays = [];
+    for (var d = winStart; d < today; d = addDays(d, 1)) if (hoursCfg.days.indexOf(dow(d)) >= 0) activeDays.push(d);
+    var nAct = activeDays.length;
+    var oneBefore = nAct ? activeDays[nAct - 1] : addDays(today, -1);
+    var twoBefore = nAct > 1 ? activeDays[nAct - 2] : oneBefore;
+
+    activeDays.forEach(function (day) {
+      // החודש: שני תלמידים בלי אף דיווח (להדגמת "לא דיווחו כלל")
+      var pool = day >= curStart ? students.filter(function (s) { return s.id !== 's13' && s.id !== 's14'; }) : students;
+      var used = {}, slots = ['08:00', pick(['09:30', '10:00']), '11:30', pick(['13:00', '13:30'])];
+      slots.forEach(function (tm) {
+        var sv = pick(services), cust = pick(customers.slice(0, 12)), rn = rnd(), n = rn < 0.15 ? 3 : rn < 0.55 ? 2 : 1, sids = [];
+        while (sids.length < n) { var s = pick(pool); if (!used[s.id] && sids.indexOf(s.id) < 0) sids.push(s.id); }
+        sids.forEach(function (x) { used[x] = 1; });
+        var o = apptOrder(sv.id, cust.id, day, tm, sids, 'done', { stockDone: true });
+        if (rnd() < 0.8) o.tasks = sv.split.map(function (x) { return { taskId: x.taskId, qty: 1 }; });
+        sids.forEach(function (sid) {
+          var status = day === oneBefore ? 'prep' : day === twoBefore ? 'wait' : 'ok';
+          mkEntry(sid, o.id, day, tm, r2(sv.minutes / 60), day === oneBefore ? 'mgr' : 'stu', status, day === oneBefore ? 'מתור' : '',
+            splitFromService(sv), status === 'wait' || status === 'ok' ? true : false);
+        });
+      });
+      // עבודה פנימית: שעות כלליות, לפעמים עם פירוט
+      for (var k = 0; k < 2 + (rnd() < 0.5 ? 1 : 0); k++) {
+        var s2 = pick(pool), h = pick([1, 1.5, 2]);
+        if (used[s2.id]) continue;
+        used[s2.id] = 1;
+        var split = rnd() < 0.3 ? [{ taskId: 'tk6', hours: r2(h / 2) }] : [];
+        var st2 = day === oneBefore ? 'prep' : day === twoBefore ? 'wait' : 'ok';
+        mkEntry(s2.id, rnd() < 0.5 ? oClean.id : oDesk.id, day, null, h, day === oneBefore ? 'mgr' : 'stu', st2, '', split, st2 === 'ok' || st2 === 'wait');
+      }
+    });
+    // חריגים בכוונה: מעל 8 שעות, אחרי 20:00, שבת, נדחה
+    mkEntry('s2', oClean.id, oneBefore, '08:00', 5, 'stu', 'wait', 'חריג: מעל 8 שעות', [], true);
+    mkEntry('s2', oDesk.id, oneBefore, '14:00', 4, 'stu', 'wait', '', [], true);
+    mkEntry('s4', oDesk.id, twoBefore, '16:30', 4.5, 'stu', 'ok', 'משמרת ערב (דוגמה להתרעה)', [], true);
+    var sat = addDays(today, -21);
+    while (dow(sat) !== 6) sat = addDays(sat, -1);
+    if (sat >= winStart) mkEntry('s3', oClean.id, sat, '10:00', 3, 'stu', 'ok', 'דיווח בשבת (דוגמה להתרעה)', [], true);
+    var rej = mkEntry('s5', oDesk.id, oneBefore, null, 2, 'stu', 'no', 'שעות לא תואמות', [], true);
+    void rej;
+
+    // היום: תורים (חלקם כבר הסתיימו, כדי ש-autoPrep יצור דיווחים מוכנים)
+    var todayAct = today;
+    while (hoursCfg.days.indexOf(dow(todayAct)) < 0) todayAct = addDays(todayAct, -1);
+    apptOrder('sv1', 'c1', todayAct, '08:00', ['s1'], 'sched');
+    apptOrder('sv3', 'c2', todayAct, '09:00', ['s2', 's6'], 'sched');
+    apptOrder('sv2', 'c3', todayAct, '11:00', ['s3'], 'sched');
+    apptOrder('sv4', 'c4', todayAct, '13:00', ['s1'], 'sched');
+    apptOrder('sv5', 'c5', todayAct, '14:00', ['s2'], 'sched');
+    var fut = [];
+    for (var fi = 1; fi <= 14 && fut.length < 4; fi++) { var fd = addDays(today, fi); if (hoursCfg.days.indexOf(dow(fd)) >= 0) fut.push(fd); }
+    apptOrder('sv1', 'c6', fut[0], '09:00', ['s7'], 'sched');
+    apptOrder('sv6', 'c7', fut[0], '11:00', ['s1'], 'sched', { source: 'stu' });
+    // בקשות לקוחות ממתינות
+    apptOrder('sv4', 'c9', fut[1], '10:00', [], 'req', { source: 'cust' });
+    apptOrder('sv2', 'c13', fut[2], '12:00', [], 'req', { source: 'cust' });
+
+    var stock = { items: [
+      { id: 'i1', name: 'שמפו מקצועי', unit: 'ליטר', qty: 12, min: 5 },
+      { id: 'i2', name: 'צבע שיער', unit: 'שפופרת', qty: 20, min: 8 },
+      { id: 'i3', name: 'מסכה לשיער', unit: 'יחידה', qty: 9, min: 4 },
+      { id: 'i4', name: 'תמיסת החלקה', unit: 'בקבוק', qty: 3, min: 4 },
+      { id: 'i5', name: 'כפפות', unit: 'זוג', qty: 60, min: 20 },
+      { id: 'i6', name: 'קצף עיצוב', unit: 'יחידה', qty: 10, min: 3 }],
+      moves: [
+        { id: 'm1', itemId: 'i4', date: addDays(today, -20), delta: 6, orderId: null, note: 'משלוח מהספק' },
+        { id: 'm2', itemId: 'i4', date: addDays(today, -6), delta: -3, orderId: null, note: 'שימוש בהחלקות השבוע' },
+        { id: 'm3', itemId: 'i2', date: addDays(today, -12), delta: 10, orderId: null, note: 'משלוח מהספק' }] };
+
+    var qOrder = apptOrder('sv5', 'c8', fut[1], '13:00', ['s9'], 'sched');
+    var quotes = [
+      { id: 'q1', custId: 'c1', date: addDays(today, -3), status: 'draft', lines: [{ serviceId: 'sv3', text: 'צבע', qty: 4, price: 300 }], note: 'צוות משרד, ארבעה אנשים', orderId: null },
+      { id: 'q2', custId: 'c2', date: addDays(today, -6), status: 'sent', lines: [{ serviceId: 'sv2', text: 'תספורת ושטיפה', qty: 3, price: 100 }], note: '', orderId: null },
+      { id: 'q3', custId: 'c8', date: addDays(today, -9), status: 'ok',
+        lines: [{ serviceId: 'sv5', text: 'החלקה', qty: 1, price: 450 }, { serviceId: null, text: 'מארז טיפוח', qty: 1, price: 90 }], note: 'חבילת כלה', orderId: qOrder.id },
+      { id: 'q4', custId: 'c10', date: addDays(today, -15), status: 'no', lines: [{ serviceId: 'sv3', text: 'צבע', qty: 2, price: 330 }], note: 'המחיר גבוה ללקוח', orderId: null }
+    ];
+    qOrder.fixedPrice = Esek.quoteTotal(quotes[2]);
+
+    return {
+      biz: { name: 'מספרת הדגמה', school: 'בית ספר לדוגמה', manager: 'דנה (הדגמה)', phone: '050-0000100', types: types, tasks: tasks,
+        services: services, hours: hoursCfg, capacity: 2 },
+      students: students, customers: customers, orders: orders, entries: entries, open: {}, stock: stock, quotes: quotes
+    };
   };
 
   Esek.load();
