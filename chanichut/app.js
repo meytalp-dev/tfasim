@@ -146,7 +146,7 @@ window.startApp = function (R) {
   function dates(s) { const out = [], a = ATT[s.id] || {}, h = s.dayHist && s.dayHist.days && s.dayHist.days.length ? s.dayHist : null; for (let d = 1; d <= MONTH.last; d++) { const w = h && (h.ym ? MONTH.ym < h.ym || (MONTH.ym === h.ym && d < h.from) : d < h.from) ? h.days : s.days; if (w.includes(wdOf(d)) || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
   /* שינוי ימי עבודה בתיק חל על כל חודש שעוד פתוח לדיווח (11.11.26, מיטל): החודש הקודם עד ה-15 בחודש — אם המגמה עוד לא הגישה אותו — והחודש הנוכחי כולו.
      רק חודשים שננעלו או הוגשו שומרים את הימים הקודמים. LOCK_DAY כמו בשרת */
-  const LOCK_DAY = 15;
+  const LOCK_DAY = 31; /* מיטל 15.11.26: נעילה מושבתת זמנית; להחזרה 15 */
   const openFrom = s => { const p = Store.monthInfo(1), sub = p.ym === MONTH.ym ? R.SUBMITTED : (R.MONS || {})[p.ym] || {}; return Store.monthsBack() >= 1 && new Date().getDate() <= LOCK_DAY && !sub[s.mg] ? p.ym : Store.monthInfo(0).ym; };
   function keepDays(s) { const h = s.dayHist, eff = openFrom(s); if (!h || !Array.isArray(h.days) || !h.days.length || (h.ym && h.ym < eff)) s.dayHist = { from: 1, ym: eff, days: [...s.days] }; else { h.ym = eff; h.from = 1; } }
   /* רשומות שנשמרו לפי הכלל הקודם (השינוי חל רק מהיום שבו נעשה): מתוקנות בטעינה ונשמרות לבד */
