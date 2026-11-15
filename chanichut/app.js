@@ -143,7 +143,12 @@ window.startApp = function (R) {
   const wdOf = d => new Date(MONTH.y, MONTH.m - 1, d).getDay();
   /* ימי העבודה של החודש: לפני שינוי מערכת הימים — הימים הקודמים (dayHist), ויום שכבר דווח נשאר תמיד (גם "יום נוסף").
      ימים קודמים ריקים = לא היו ימים לשמר, ולכן הם לא מעלימים כלום. ym = חודש השינוי; רשומה ישנה בלי ym: לפי מספר היום בלבד */
-  function dates(s) { const out = [], a = ATT[s.id] || {}, h = s.dayHist && s.dayHist.days && s.dayHist.days.length ? s.dayHist : null; for (let d = 1; d <= MONTH.last; d++) { const w = h && (h.ym ? MONTH.ym < h.ym || (MONTH.ym === h.ym && d < h.from) : d < h.from) ? h.days : s.days; if (w.includes(wdOf(d)) || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
+  /* 15.11.26: גרסה טהורה לפי חודש (ym), כדי לחשב גם חודשים שלא מוצגים (150 השעות). isFixed = יום עבודה קבוע לפי ימי השבוע */
+  const ymLast = ym => { const [y, m] = ym.split('-').map(Number); return new Date(y, m, 0).getDate(); };
+  const ymWd = (ym, d) => { const [y, m] = ym.split('-').map(Number); return new Date(y, m - 1, d).getDay(); };
+  function isFixed(s, ym, d) { const h = s.dayHist && s.dayHist.days && s.dayHist.days.length ? s.dayHist : null; const w = h && (h.ym ? ym < h.ym || (ym === h.ym && d < h.from) : d < h.from) ? h.days : (s.days || []); return w.includes(ymWd(ym, d)); }
+  function datesOf(s, ym, a) { const out = []; a = a || {}; for (let d = 1, L = ymLast(ym); d <= L; d++) if (isFixed(s, ym, d) || (a[d] && a[d] !== 'n')) out.push(d); return out; }
+  function dates(s) { return datesOf(s, MONTH.ym, ATT[s.id] || {}); }
   /* שינוי ימי עבודה בתיק חל על כל חודש שעוד פתוח לדיווח (11.11.26, מיטל): החודש הקודם עד ה-15 בחודש — אם המגמה עוד לא הגישה אותו — והחודש הנוכחי כולו.
      רק חודשים שננעלו או הוגשו שומרים את הימים הקודמים. LOCK_DAY כמו בשרת */
   const LOCK_DAY = 31; /* מיטל 15.11.26: נעילה מושבתת זמנית; להחזרה 15 */
@@ -170,9 +175,37 @@ window.startApp = function (R) {
   const present = v => v === 'p' || v === 's';
   /* שעות (3.11.26): שעות ביום עבודה לתלמיד.ה (או ברירת מחדל מהמעסיק), או לפי הגעה ויציאה של אותו יום; סה"כ חודשי אוטומטי, או ידני לבתי ספר שמדווחים רק סה"כ */
   const tmHours = t => { if (!t || !t.i || !t.o) return 0; const [a, b] = [t.i, t.o].map(x => { const m = String(x).match(/^(\d{1,2}):(\d{2})$/); return m ? +m[1] * 60 + +m[2] : null; }); return a == null || b == null || b <= a ? 0 : Math.round((b - a) / 6) / 10; };
-  const hrsPerDay = s => +s.hrs || +((EMPS[s.emp] || {}).hpd) || 0;
-  const hoursOf = s => { const man = s.hrsMan && s.hrsMan[MONTH.ym]; if (man != null && man !== '') return { h: +man || 0, manual: true }; let h = 0; dates(s).forEach(d => { if (!present(ATT[s.id][d])) return; h += tmHours(TIMES[s.id][d]) || hrsPerDay(s); }); return { h: Math.round(h * 10) / 10, manual: false }; };
+  /* 15.11.26: ברירות המחדל של המעסיק גם לעסק בית-ספרי (INS), לא רק למעסיק בחוץ */
+  const empOf = s => EMPS[s.emp] || INS[s.emp] || {};
+  const hrsPerDay = s => +s.hrs || +empOf(s).hpd || 0;
+  /* שעות של יום (15.11.26): שעות שתוקנו ליום (h) ← לפי הגעה ויציאה ← שעות ביום עבודה */
+  const HRS = R.HRS;
+  const hasH = (h, d) => !!h && h[d] != null && h[d] !== '';
+  const dayHours = (s, d, t, h) => hasH(h, d) ? +h[d] || 0 : tmHours((t || {})[d]) || hrsPerDay(s);
+  /* סה"כ שעות של חודש — טהור, לא תלוי בחודש המוצג */
+  function monthHours(s, ym, a, t, h) { const man = s.hrsMan && s.hrsMan[ym]; if (man != null && man !== '') return { h: +man || 0, manual: true }; let n = 0; a = a || {}; datesOf(s, ym, a).forEach(d => { if (present(a[d])) n += dayHours(s, d, t, h); }); return { h: Math.round(n * 10) / 10, manual: false }; }
+  const hoursOf = s => monthHours(s, MONTH.ym, ATT[s.id], TIMES[s.id], HRS[s.id]);
   const fmtH = h => String(Math.round((+h || 0) * 10) / 10);
+  /* מספר מקלט (גם עם פסיק עשרוני). null = לא מספר */
+  const numIn = v => { const t = String(v == null ? '' : v).trim().replace(',', '.'), n = +t; return t !== '' && isFinite(n) && n >= 0 ? Math.round(n * 100) / 100 : null; };
+  /* תעריף לשעה (15.11.26): תעריף שנרשם ליום ← של התלמיד.ה ← של המעסיק. 0 = לא הוגדר */
+  const workOf = (s, d, ym) => ((s.work || {})[ym || MONTH.ym] || {})[d] || null;
+  /* 15.11.26 (מיטל): תעריף, "במה עבדו" ודוח השכר — רק לעסק בית-ספרי (INS, מזהה שמתחיל ב-I), לא לתעסוקה בחוץ */
+  const isIn = s => !!s && PLACE(s.emp) === 'in';
+  const defRate = s => isIn(s) ? +s.rate || +empOf(s).rate || 0 : 0;
+  const rateOf = (s, d) => { if (!isIn(s)) return 0; const w = workOf(s, d); return (w && +w.r) || defRate(s); };
+  /* יעד שנתי: 150 שעות בין ספטמבר ליוני = 15 בחודש, מצטבר. גם מי ששובצ.ה באמצע השנה — אותו יעד */
+  const YEAR_GOAL = 150, MONTH_GOAL = 15;
+  const schoolMonths = () => { const now = new Date(), y0 = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1, out = []; for (let i = 0; i < 10; i++) { const m = 9 + i, y = m > 12 ? y0 + 1 : y0, mm = m > 12 ? m - 12 : m; out.push({ ym: y + '-' + String(mm).padStart(2, '0'), m: mm, y }); } return out; };
+  const curYm = () => { const n = new Date(); return n.getFullYear() + '-' + String(n.getMonth() + 1).padStart(2, '0'); };
+  /* כמה שעות היו צריכות להיות עד היום: חודשים שהסתיימו × 15, ועוד חלק יחסי מהחודש הנוכחי */
+  function expectedNow() { const now = new Date(), c = curYm(), L = schoolMonths(); let e = 0; for (const x of L) { if (x.ym < c) e += MONTH_GOAL; else if (x.ym === c) e += MONTH_GOAL * now.getDate() / ymLast(c); } return Math.min(YEAR_GOAL, Math.round(e * 10) / 10); }
+  /* שעות לפי חודש בשנה: החודש המוצג מחושב עכשיו, השאר מ-hy */
+  const monthOfYear = (s, ym) => ym === MONTH.ym ? hoursOf(s).h : +((s.hy || {})[ym]) || 0;
+  const yearHours = s => Math.round(schoolMonths().reduce((n, x) => n + (x.ym > curYm() ? 0 : monthOfYear(s, x.ym)), 0) * 10) / 10;
+  const behind = s => !!s.emp && s.status !== 'עזב' && yearHours(s) < expectedNow();
+  /* hy של החודש המוצג: מתעדכן לפני כל שמירה (R.hooks.prep), מכל מסלול שמשנה שעות. מחזיר את מי שהשתנה */
+  function syncHy() { const ch = []; STU.forEach(s => { const h = hoursOf(s).h, cur = (s.hy || {})[MONTH.ym]; if (cur === h) return; if (cur == null && !s.emp && !h) return; s.hy = Object.assign({}, s.hy, { [MONTH.ym]: h }); ch.push(s.id); }); return ch; }
   const hoursTxt = s => { const o = hoursOf(s); return o.h || hrsPerDay(s) || o.manual ? ` · ${fmtH(o.h)} שעות${o.manual ? ' (ידני)' : ''}` : ''; };
   /* זיהוי ביומן: לא כשלפני הביטוי באותו משפט יש "לא", "טרם", "חסר" וכו׳, ולא רישום של "הקישור נשלח" */
   const negated = (t, re) => { const m = t.match(re); if (!m) return true; const pre = t.slice(0, m.index).split(/[;,.·:\n]/).pop(); return /(^|\s)(לא|טרם|אין|חסר|חסרה|חסרים|בלי|ללא|נדחה|נדחתה|בוטל|בוטלה)(\s|$)/.test(pre); };
@@ -372,7 +405,7 @@ window.startApp = function (R) {
     <section class="sec" id="students">
       <div class="sec-head row-head"><h2>התלמידים שלי</h2><button class="btn primary edit" data-act="new-stu">${ic('plus')}תלמיד.ה חדש.ה</button></div>
       <div class="confirm edit" id="updBar" hidden></div>
-      <div class="stu-filters"><label class="mon-lbl">קבוצה <select class="mon-pick stu-sel" id="stuCls"><option value="">כל הקבוצות</option></select></label><label class="mon-lbl">מגמה <select class="mon-pick stu-sel" id="stuMg"><option value="">כל המגמות</option></select></label></div>
+      <div class="stu-filters"><label class="mon-lbl">קבוצה <select class="mon-pick stu-sel" id="stuCls"><option value="">כל הקבוצות</option></select></label><label class="mon-lbl">מגמה <select class="mon-pick stu-sel" id="stuMg"><option value="">כל המגמות</option></select></label><label class="mon-lbl">${YEAR_GOAL} שעות <select class="mon-pick stu-sel" id="stuPace"><option value="">כל התלמידים</option><option value="behind">בפיגור</option></select></label></div>
       <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="stuFind" class="find" placeholder="חיפוש חופשי: שם, קבוצה, מגמה או מספר פעולה" autocomplete="off"></div>
       <div id="stuHits" hidden></div>
       <div id="stuList"></div>
@@ -585,13 +618,15 @@ window.startApp = function (R) {
   const stLbl = (s, d) => { const v = ATT[s.id][d]; return v === 'a' ? 'לא הגיע.ה' : v === 'x' ? 'היעדרות באישור' : v === 'n' ? (offWhy(s, d) || (suspended(s, d) ? 'השעיה' : 'לא בעבודה')) : v ? 'הגיע.ה' : 'לא סומן'; };
   /* תא יום (3.11.26, מהפיילוט): יום בשבוע + תאריך, סימן ✓/✗ בתוך התא, "היום" במסגרת, ימים עתידיים מעומעמים ולא לחיצים */
   const isFuture = d => !MONTH.back && d > MONTH.today, isToday = d => !MONTH.back && d === MONTH.today;
-  const cellHtml = (s, d, btn) => { const v = ATT[s.id][d], note = NOTES[s.id][d], t = TIMES[s.id][d], lbl = stLbl(s, d); const tt = t && (t.i || t.o) ? ` · ${t.i || ''}–${t.o || ''}` : ''; const lock = btn && ((v === 'n' && (offWhy(s, d) || suspended(s, d))) || isFuture(d)); return `<${btn ? 'button' : 'span'} class="cell ${v || ''} ${note ? 'has-note' : ''} ${isToday(d) ? 'today' : ''} ${isFuture(d) ? 'future' : ''}" data-d="${d}" ${lock ? 'disabled' : ''} title="${esc(lbl + tt + (note ? ' · ' + note : ''))}" aria-label="${wd(d)} ${d}.${MONTH.m} · ${esc(lbl + tt + (note ? ' · הערה: ' + note : ''))}"><small>${wd(d)}</small><span>${d}</span></${btn ? 'button' : 'span'}>`; };
-  function dayLines(s) { const ds = [...new Set([...Object.keys(NOTES[s.id]), ...Object.keys(TIMES[s.id]).filter(d => TIMES[s.id][d].i || TIMES[s.id][d].o)])].map(Number).sort((a, b) => a - b); return ds.length ? `<ul class="day-notes">${ds.map(d => `<li><b>${d}.${MONTH.m}</b> ${tmTxt(TIMES[s.id][d])} ${esc(NOTES[s.id][d] || '')}</li>`).join('')}</ul>` : ''; }
+  /* 15.11.26: יום מסומן "הגיע.ה" מציג את השעות שלו (data-h). יום שאינו קבוע = "יום נוסף" במראה אחר; הקשה עליו פותחת את פרטי היום (גם בצפייה) */
+  const isExtra = (s, d) => !isFixed(s, MONTH.ym, d);
+  const cellHtml = (s, d, btn) => { const v = ATT[s.id][d], note = NOTES[s.id][d], t = TIMES[s.id][d], lbl = stLbl(s, d), ex = isExtra(s, d), wk = ex ? workOf(s, d) : null, hh = present(v) ? fmtH(dayHours(s, d, TIMES[s.id], HRS[s.id])) : ''; const tt = (t && (t.i || t.o) ? ` · ${t.i || ''}–${t.o || ''}` : '') + (hh && hh !== '0' ? ` · ${hh} שעות` : '') + (ex ? ' · יום נוסף' : '') + (wk && wk.w ? ' · ' + wk.w : ''); const lock = btn && ((v === 'n' && (offWhy(s, d) || suspended(s, d))) || isFuture(d)); return `<${btn ? 'button' : 'span'} class="cell ${v || ''} ${note ? 'has-note' : ''} ${isToday(d) ? 'today' : ''} ${isFuture(d) ? 'future' : ''} ${ex ? 'extra' : ''}" data-d="${d}" ${hh && hh !== '0' ? `data-h="${hh}"` : ''} ${lock ? 'disabled' : ''} title="${esc(lbl + tt + (note ? ' · ' + note : ''))}" aria-label="${wd(d)} ${d}.${MONTH.m} · ${esc(lbl + tt + (note ? ' · הערה: ' + note : ''))}"><small>${wd(d)}</small><span>${d}</span></${btn ? 'button' : 'span'}>`; };
+  function dayLines(s) { const wk = Object.keys((s.work || {})[MONTH.ym] || {}).filter(d => (workOf(s, d) || {}).w && present(ATT[s.id][d])); const ds = [...new Set([...Object.keys(NOTES[s.id]), ...Object.keys(TIMES[s.id]).filter(d => TIMES[s.id][d].i || TIMES[s.id][d].o), ...wk])].map(Number).sort((a, b) => a - b); return ds.length ? `<ul class="day-notes">${ds.map(d => { const w = wk.includes(String(d)) ? workOf(s, d).w : ''; return `<li><b>${d}.${MONTH.m}</b> ${tmTxt(TIMES[s.id][d])} ${w ? `<span class="xd-w">${esc(w)}</span> ` : ''}${esc(NOTES[s.id][d] || '')}</li>`; }).join('')}</ul>` : ''; }
   /* "לא ברשימה · לבדיקה": מי שלא הופיע.ה ברשימה המעודכנת (d7). נשאר.ת עד שהרכז.ת מעדכנ.ת מצב או שהרשימה הבאה כוללת אותו.ה */
   const missTag = s => s.statusSrc === 'list-missing' ? ' <em class="tag no">לא ברשימה · לבדיקה</em>' : '';
   const statusTag = s => (s.status === 'עזב' ? ' <em class="tag no">עזב.ה</em>' : s.status === 'מושעה' ? ` <em class="tag susp">מושעה.ת${s.susp && s.susp.to ? ' עד ' + esc(s.susp.to) : ''}</em>` : '') + missTag(s);
   const LEGEND = `<p class="att-how">הקשה אחת על היום = <b>✓ הגיע.ה</b> · הקשה שנייה = <b>✗ לא הגיע.ה</b> · שלישית מנקה. היעדרות באישור, הערה ושעות: בכפתור "הערה או שעות" של התלמיד.ה.</p>
-      <div class="att-legend" aria-label="מקרא"><span><i class="cell x"></i>באישור</span><span><i class="cell n"></i>לא בעבודה</span><span><i class="cell today"></i>היום</span><span><i class="cell future"></i>עוד לא הגיע</span><span><i class="cell has-note"></i>יש הערה</span></div>`;
+      <div class="att-legend" aria-label="מקרא"><span><i class="cell x"></i>באישור</span><span><i class="cell n"></i>לא בעבודה</span><span><i class="cell today"></i>היום</span><span><i class="cell future"></i>עוד לא הגיע</span><span><i class="cell has-note"></i>יש הערה</span><span><i class="cell extra"></i>יום נוסף</span></div>`;
   function renderRoster() {
     renderGroups();
     const r = $('roster');
@@ -609,7 +644,7 @@ window.startApp = function (R) {
       ${offs.length ? `<div class="off-list">${offs.map(([d, w]) => `<span class="off-chip">${wd(+d)} ${d}.${MONTH.m} · ${esc(w)}${sub ? '' : `<button class="edit" data-off-del="${d}" aria-label="ביטול">×</button>`}</span>`).join('')}</div>` : ''}
       ${shown.map(s => { const ds = dates(s), a = ATT[s.id], p = ds.filter(d => present(a[d])).length, nn = Object.keys(NOTES[s.id]).length + Object.values(TIMES[s.id]).filter(t => t.i || t.o).length, rc = remCount(s.id);
         return `<div class="row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><div class="who"><button class="name" data-open="${s.id}">${esc(s.name)}</button>${statusTag(s)}<small>${oneCls ? '' : esc(s.cls) + ' · '}${oneMg ? '' : esc(s.mg) + ' · '}${esc(empName(s.emp))}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</small>${s.note ? `<small class="snote">${esc(s.note)}</small>` : ''}</div>
-        <div class="cells">${ds.map(d => cellHtml(s, d, ed && !SUBMITTED[s.mg])).join('')}${ds.length ? '' : '<span class="hint">אין ימי עבודה</span>'}</div><div class="sum"><span>${p} מתוך ${MONTH.back ? ds.length : ds.filter(d => d <= MONTH.today).length}${MONTH.back ? '' : ' עד היום'}${hoursTxt(s)}</span><button class="lnk note-btn" data-notes="${s.id}">${ic('pen')}${nn ? 'הערות ושעות · ' + nn : 'הערה או שעות'}</button>${rc ? `<button class="lnk note-btn" data-open="${s.id}">${ic('bell')}תזכורות · ${rc}</button>` : ''}</div></div>`; }).join('')}
+        <div class="cells">${ds.map(d => cellHtml(s, d, (ed && !SUBMITTED[s.mg]) || (isExtra(s, d) && present(a[d])))).join('')}${ds.length ? '' : '<span class="hint">אין ימי עבודה</span>'}</div><div class="sum"><span>${p} מתוך ${MONTH.back ? ds.length : ds.filter(d => d <= MONTH.today).length}${MONTH.back ? '' : ' עד היום'}${hoursTxt(s)}</span><button class="lnk note-btn" data-notes="${s.id}">${ic('pen')}${nn ? 'הערות ושעות · ' + nn : 'הערה או שעות'}</button><button class="lnk note-btn edit" data-addday="${s.id}">${ic('plus')}הוספת יום עבודה</button>${rc ? `<button class="lnk note-btn" data-open="${s.id}">${ic('bell')}תזכורות · ${rc}</button>` : ''}</div></div>`; }).join('')}
       <div class="roster-foot edit"><button class="btn primary big" data-act="submit" ${sub ? 'disabled' : ''}>${ic('send')}${sub ? 'הוגש' : 'שליחת הדיווח · ' + open.map(esc).join(', ') + ' · ' + esc(MONTH.name)}</button>${sub ? '' : `<span class="hint">כל המגמה: ${grp.length} תלמידים${left ? ` · ${left} ימים עוד לא סומנו` : ''}</span>`}<span class="hint">סה"כ שעות ${esc(MONTH.name)}: <b>${fmtH(shown.reduce((n, s) => n + hoursOf(s).h, 0))}</b></span></div>`;
   }
   /* הגשה נועלת את המגמה כולה, גם כיתה שעוד לא דווחה: לפני ההגשה מפרטים את הכיתות ומזהירים על כיתה בלי אף סימון (תלונת אנרג'י טק, 5.11.26) */
@@ -635,7 +670,12 @@ window.startApp = function (R) {
     if (b) b.disabled = false;
   }
   document.querySelector('[data-act="mentor-pull"]').onclick = ev => mentorPull(ev.currentTarget);
+  /* חודש שהוגש נעול — אותה הודעה לכל המסלולים */
+  const lockMsg = s => `הנוכחות של ${s.mg} ל${MONTH.name} הוגשה, ולכן כל המגמה נעולה. כדי לסמן: "פתיחה לתיקון" למעלה`;
   $('roster').onclick = e => {
+    /* יום נוסף: הקשה פותחת את פרטי היום (שעות, במה עבדו, תעריף), גם בצפייה */
+    const xc = e.target.closest('.cell.extra'); if (xc && xc.tagName === 'BUTTON' && !xc.disabled) { const xs = STU.find(x => x.id === xc.closest('.row').dataset.sid); if (xs) openSub(extraDaySpec(xs, +xc.dataset.d)); return; }
+    const ad = e.target.closest('[data-addday]'); if (ad) { const as = STU.find(x => x.id === ad.dataset.addday); if (!as || !canEdit()) return; if (SUBMITTED[as.mg]) { toast(lockMsg(as)); return; } openSub(calSpec(as)); return; }
     const c = e.target.closest('.cell'); if (c && !canEdit()) return;
     /* יום במגמה שהוגשה אינו כפתור: בלי ההודעה הלחיצה פשוט לא עושה כלום */
     const lockedRow = c && c.tagName !== 'BUTTON' && c.closest('.row'), lockedStu = lockedRow && STU.find(x => x.id === lockedRow.dataset.sid);
@@ -660,11 +700,13 @@ window.startApp = function (R) {
   /* מסך משנה: הערות ושעות של תלמיד.ה */
   function notesSpec(s) {
     return { title: () => `${esc(s.name)} · הערות ושעות · ${esc(MONTH.name)}`, html: () => `<div class="sub-card"><p class="hint">${esc(empName(s.emp))}${s.days.length ? ' · ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : ''}</p>
-        <div class="nt-list"><div class="nt-row nt-head"><span>יום</span><span>מצב</span><span>הערה</span><span>הגעה</span><span>יציאה</span></div>${dates(s).map(d => { const t = TIMES[s.id][d] || {}, v = ATT[s.id][d], lockN = v === 'n' && (offWhy(s, d) || suspended(s, d)); return `<div class="nt-row"><b class="nt-day">${wd(d)} ${d}.${MONTH.m}</b><select class="nt-sel ${v || ''}" data-st="${d}" aria-label="מצב ל-${d}.${MONTH.m}" ${SUBMITTED[s.mg] || lockN || isFuture(d) ? 'disabled' : ''}>${lockN ? `<option value="n" selected>${esc(stLbl(s, d))}</option>` : [['', 'לא סומן'], ['p', '✓ הגיע.ה'], ['a', '✗ לא הגיע.ה'], ['x', 'היעדרות באישור']].map(([k, l]) => `<option value="${k}" ${(v === 's' ? 'p' : v || '') === k ? 'selected' : ''}>${l}</option>`).join('')}</select><input data-nd="${d}" value="${esc(NOTES[s.id][d] || '')}" placeholder="הערה ליום הזה" aria-label="הערה ל-${d}.${MONTH.m}"><label class="nt-t"><span>הגעה</span><input type="time" data-ti="${d}" value="${esc(t.i || '')}" ${SUBMITTED[s.mg] ? 'disabled' : ''}></label><label class="nt-t"><span>יציאה</span><input type="time" data-to="${d}" value="${esc(t.o || '')}" ${SUBMITTED[s.mg] ? 'disabled' : ''}></label></div>`; }).join('')}</div>${SUBMITTED[s.mg] ? `<p class="hint">הנוכחות של ${esc(s.mg)} הוגשה. לשינוי שעות: "פתיחה לתיקון" במסך הנוכחות.</p>` : ''}
+        <div class="nt-list"><div class="nt-row nt-head"><span>יום</span><span>מצב</span><span>הערה</span><span>הגעה</span><span>יציאה</span><span>שעות</span></div>${dates(s).map(d => { const t = TIMES[s.id][d] || {}, v = ATT[s.id][d], lockN = v === 'n' && (offWhy(s, d) || suspended(s, d)), hd = HRS[s.id] || {}; return `<div class="nt-row"><b class="nt-day">${wd(d)} ${d}.${MONTH.m}</b><select class="nt-sel ${v || ''}" data-st="${d}" aria-label="מצב ל-${d}.${MONTH.m}" ${SUBMITTED[s.mg] || lockN || isFuture(d) ? 'disabled' : ''}>${lockN ? `<option value="n" selected>${esc(stLbl(s, d))}</option>` : [['', 'לא סומן'], ['p', '✓ הגיע.ה'], ['a', '✗ לא הגיע.ה'], ['x', 'היעדרות באישור']].map(([k, l]) => `<option value="${k}" ${(v === 's' ? 'p' : v || '') === k ? 'selected' : ''}>${l}</option>`).join('')}</select><input data-nd="${d}" value="${esc(NOTES[s.id][d] || '')}" placeholder="הערה ליום הזה" aria-label="הערה ל-${d}.${MONTH.m}"><label class="nt-t"><span>הגעה</span><input type="time" data-ti="${d}" value="${esc(t.i || '')}" ${SUBMITTED[s.mg] ? 'disabled' : ''}></label><label class="nt-t"><span>יציאה</span><input type="time" data-to="${d}" value="${esc(t.o || '')}" ${SUBMITTED[s.mg] ? 'disabled' : ''}></label><label class="nt-t"><span>שעות</span><input class="nt-h" data-hd="${d}" dir="ltr" inputmode="decimal" value="${hasH(hd, d) ? esc(hd[d]) : ''}" placeholder="${esc(fmtH(tmHours(t) || hrsPerDay(s)))}" aria-label="שעות ל-${d}.${MONTH.m}" ${SUBMITTED[s.mg] || lockN || isFuture(d) ? 'disabled' : ''}></label></div>`; }).join('')}</div>${SUBMITTED[s.mg] ? `<p class="hint">הנוכחות של ${esc(s.mg)} הוגשה. לשינוי שעות: "פתיחה לתיקון" במסך הנוכחות.</p>` : ''}
         <div class="emp-b mf-b edit"><button class="btn primary" data-act="done">${ic('check')}סיום</button></div></div>`,
       bind: el => {
         el.addEventListener('change', e => {
           const st = e.target.closest('[data-st]'); if (st) { if (SUBMITTED[s.mg]) return toast('הנוכחות הוגשה · צריך קודם פתיחה לתיקון'); const d = +st.dataset.st; if (st.value) ATT[s.id][d] = st.value; else delete ATT[s.id][d]; s.stage = stageOf(s); afterAtt(); return; }
+          /* שעות ליום (15.11.26): ריק = חזרה לברירת המחדל */
+          const hi = e.target.closest('[data-hd]'); if (hi) { if (SUBMITTED[s.mg]) return toast('הנוכחות הוגשה · צריך קודם פתיחה לתיקון'); const d = +hi.dataset.hd, v = hi.value.trim(), n = numIn(v); if (v && !(n > 0)) { hi.value = hasH(HRS[s.id], d) ? HRS[s.id][d] : ''; return toast('שעות: מספר גדול מ-0'); } const H = HRS[s.id] = HRS[s.id] || {}; if (v) { H[d] = n; if (!ATT[s.id][d]) ATT[s.id][d] = 'p'; } else delete H[d]; s.stage = stageOf(s); afterAtt(); return; }
           const inp = e.target.closest('[data-nd]'); if (inp) { const d = +inp.dataset.nd; if (inp.value.trim()) NOTES[s.id][d] = inp.value.trim(); else delete NOTES[s.id][d]; return; }
           const ti = e.target.closest('[data-ti],[data-to]'); if (ti && SUBMITTED[s.mg]) return toast('הנוכחות הוגשה · צריך קודם פתיחה לתיקון'); if (ti) { const d = +(ti.dataset.ti || ti.dataset.to); const t = TIMES[s.id][d] = TIMES[s.id][d] || {}; if (ti.dataset.ti) t.i = ti.value; else t.o = ti.value; if (!t.i && !t.o) delete TIMES[s.id][d]; else if (!ATT[s.id][d]) ATT[s.id][d] = 'p'; }
         });
@@ -679,16 +721,77 @@ window.startApp = function (R) {
       bind: el => { el.querySelector('[data-act="save"]').onclick = () => { const d = +$('offDay').value, w = $('offWhy').value; applyOff(cls, d, w); closeSub(); toast(`${cls}: ${d}.${MONTH.m} בלי תעסוקה · ${w}`); }; } };
   }
 
+  /* מסך משנה (15.11.26): הוספת יום עבודה — לוח החודש המוצג, ראשון עד שבת. ימים קבועים ומדווחים מסומנים, עתידיים חסומים.
+     הקשה על יום שאינו קבוע פותחת את פרטי היום (מסך משלו); אפשר להוסיף כמה ימים באותה כניסה */
+  function calSpec(s) {
+    return { key: 'cal', title: () => `${esc(s.name)} · הוספת יום עבודה · ${esc(MONTH.name)}`, html: () => {
+      const lock = !!SUBMITTED[s.mg], a = ATT[s.id], cells = [];
+      for (let i = 0; i < wdOf(1); i++) cells.push('<span class="cd-blank" aria-hidden="true"></span>');
+      for (let d = 1; d <= MONTH.last; d++) {
+        const fx = isFixed(s, MONTH.ym, d), v = a[d], pr = present(v), hh = pr ? fmtH(dayHours(s, d, TIMES[s.id], HRS[s.id])) : '';
+        const lbl = fx ? 'יום עבודה קבוע' : pr ? 'יום נוסף' : v ? stLbl(s, d) : 'לא דווח';
+        const dis = lock || fx || isFuture(d) || suspended(s, d) || (v === 'n' && offWhy(s, d));
+        cells.push(`<button type="button" class="cd ${fx ? 'fixed' : ''} ${v ? 'rep ' + v : ''} ${!fx && v && v !== 'n' ? 'extra' : ''} ${isToday(d) ? 'today' : ''} ${isFuture(d) ? 'future' : ''}" data-cd="${d}" ${dis ? 'disabled' : ''} aria-label="${wd(d)} ${d}.${MONTH.m} · ${esc(lbl)}${hh && hh !== '0' ? ' · ' + hh + ' שעות' : ''}"><span>${d}</span>${hh && hh !== '0' ? `<small>${hh}</small>` : ''}</button>`);
+      }
+      const ex = dates(s).filter(d => isExtra(s, d) && ATT[s.id][d]);
+      return `<div class="sub-card"><p class="hint">${esc(empName(s.emp))} · ${s.days.length ? 'ימים קבועים ' + s.days.map(d => 'אבגדהו'[d] + '׳').join(' ') : 'אין ימי עבודה קבועים'}</p>
+        <div class="att-legend cal-leg"><span><i class="cd-k fixed"></i>יום עבודה קבוע</span><span><i class="cd-k extra"></i>יום נוסף</span><span><i class="cd-k future"></i>עוד לא הגיע</span></div>
+        <div class="cal-grid">${'אבגדהוש'.split('').map(x => `<span class="cd-h">${x}׳</span>`).join('')}${cells.join('')}</div>
+        ${lock ? `<p class="hint warn">${esc(lockMsg(s))}</p>` : ''}
+        ${ex.length ? `<h3 class="sub-h">ימים נוספים · ${esc(MONTH.name)}</h3><div class="rows">${ex.map(d => { const w = workOf(s, d) || {}; return `<button class="rowbtn" data-xd="${d}">${ic('cal')}<b>${wd(d)} ${d}.${MONTH.m}</b><span class="rtag"><em class="tag">${present(ATT[s.id][d]) ? fmtH(dayHours(s, d, TIMES[s.id], HRS[s.id])) + ' שעות' : esc(stLbl(s, d))}</em></span>${chev}${w.w ? `<small>${esc(w.w)}</small>` : ''}</button>`; }).join('')}</div>` : ''}
+        <div class="emp-b mf-b"><button class="btn primary" data-act="done">${ic('check')}סיום</button></div></div>`; },
+      bind: el => {
+        el.querySelector('.cal-grid').onclick = e => { const b = e.target.closest('[data-cd]'); if (!b || b.disabled) return; if (SUBMITTED[s.mg]) return toast(lockMsg(s)); openSub(extraDaySpec(s, +b.dataset.cd)); };
+        el.querySelectorAll('[data-xd]').forEach(b => b.onclick = () => openSub(extraDaySpec(s, +b.dataset.xd)));
+        el.querySelector('[data-act="done"]').onclick = closeSub;
+      } };
+  }
+  /* מסך משנה: פרטי יום נוסף — שעות (חובה), במה עבדו, תעריף. שמירה: a[d]='p', h[d], work[ym][d]. הסרה מנקה את שלושתם */
+  function extraDaySpec(s, d) {
+    const ed = () => canEdit() && !SUBMITTED[s.mg];
+    return { key: 'xday', dirtyWatch: true, title: () => `${esc(s.name)} · ${wd(d)} ${d}.${MONTH.m} · יום נוסף`, html: () => {
+      const v = ATT[s.id][d], had = !!v && v !== 'n', w = workOf(s, d) || {}, H = HRS[s.id] || {}, dr = defRate(s);
+      const hv = hasH(H, d) ? H[d] : present(v) ? fmtH(dayHours(s, d, TIMES[s.id], H)) : (hrsPerDay(s) || '');
+      const rv = w.r != null && w.r !== '' ? w.r : (dr || '');
+      return `<div class="sub-card newform"><p class="hint">${esc(empName(s.emp))}</p>
+        <div class="field-row"><label class="field"><span>שעות</span><input class="find" id="xdH" dir="ltr" inputmode="decimal" value="${esc(hv)}" placeholder="למשל 4"></label>${isIn(s) ? `<label class="field"><span>תעריף לשעה (₪)</span><input class="find" id="xdR" dir="ltr" inputmode="decimal" value="${esc(rv)}" placeholder="לא הוגדר תעריף"></label>` : ''}</div>
+        ${isIn(s) ? `<label class="field"><span>במה עבדו</span><input class="find" id="xdW" value="${esc(w.w || '')}" placeholder="למשל: הפקת אירוע"></label>` : ''}
+        ${SUBMITTED[s.mg] ? `<p class="hint warn">${esc(lockMsg(s))}</p>` : ''}
+        ${ed() ? `<div class="emp-b mf-b edit"><button class="btn primary" id="xdSave">${ic('check')}שמירה</button>${had ? `<button class="btn quiet" id="xdDel">${ic('trash')}הסרת היום</button>` : ''}</div>` : ''}</div>`; },
+      bind: (el, spec) => {
+        if (!ed()) { el.querySelectorAll('input').forEach(x => { x.disabled = true; }); return; }
+        $('xdSave').onclick = () => {
+          const h = numIn($('xdH').value); if (!(h > 0)) return toast('שעות: מספר גדול מ-0');
+          const rt = $('xdR') ? $('xdR').value.trim() : '', r = numIn(rt); if (rt && r == null) return toast('תעריף: רק מספר');
+          const wt = $('xdW') ? $('xdW').value.trim() : '';
+          ATT[s.id][d] = 'p'; (HRS[s.id] = HRS[s.id] || {})[d] = h;
+          if (isIn(s)) {   /* במה עבדו ותעריף — רק בעסק בית-ספרי */
+            s.work = Object.assign({}, s.work); const W = s.work[MONTH.ym] = Object.assign({}, s.work[MONTH.ym]), o = {};
+            if (wt) o.w = wt; if (r != null && r !== defRate(s)) o.r = r;
+            if (Object.keys(o).length) W[d] = o; else delete W[d]; if (!Object.keys(W).length) delete s.work[MONTH.ym];
+          }
+          s.stage = stageOf(s); spec.dirty = false; afterAtt(); closeSub(); toast(`נשמר: ${d}.${MONTH.m} · ${fmtH(h)} שעות`);
+        };
+        const del = $('xdDel'); if (del) del.onclick = () => {
+          if (!confirm(`להסיר את ${d}.${MONTH.m} מימי העבודה של ${s.name}?`)) return;
+          delete ATT[s.id][d]; if (HRS[s.id]) delete HRS[s.id][d];
+          if (s.work && s.work[MONTH.ym]) { s.work = Object.assign({}, s.work); s.work[MONTH.ym] = Object.assign({}, s.work[MONTH.ym]); delete s.work[MONTH.ym][d]; if (!Object.keys(s.work[MONTH.ym]).length) delete s.work[MONTH.ym]; }
+          s.stage = stageOf(s); spec.dirty = false; afterAtt(); closeSub(); toast('היום הוסר');
+        };
+      } };
+  }
+
   /* ================= תלמידים ================= */
   /* שורת תלמיד.ה ברשימה (3.11.26, מהפיילוט): שם (פותח תיק), שיבוץ בתיבת בחירה אחת, עיפרון לעריכה ומחיקה */
   const plOptions = s => { const cur = s.emp || ''; const grp = (map, lab) => { const l = Object.entries(map).filter(([id, e]) => id === cur || canPlace(e)); return l.length ? `<optgroup label="${lab}">${l.map(([id, e]) => `<option value="${id}" ${id === cur ? 'selected' : ''}>${esc(e.name)}</option>`).join('')}</optgroup>` : ''; };
     return `<option value="" ${!cur ? 'selected' : ''}>לא מועסק.ת</option>${grp(EMPS, 'מעסיקים')}${grp(INS, 'עסק בית-ספרי')}`; };
-  const stuRow = s => `<div class="stu-row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><button class="stu-name" data-open="${s.id}"><b>${esc(s.name)}${statusTag(s)}</b><span>${esc(s.mg)}${s.note ? ' · ' + esc(s.note) : ''}</span></button>${canEdit() ? `<select class="stu-pl" data-pl-sel="${s.id}" aria-label="שיבוץ של ${esc(s.name)}">${plOptions(s)}</select>` : `<span class="stu-emp">${esc(empName(s.emp))}</span>`}<span class="stage s${s.stage}">${STAGES[s.stage]}</span><button class="stu-edit edit" data-edit="${s.id}" aria-label="עריכת הפרטים של ${esc(s.name)}" title="עריכה ומחיקה">${ic('pen')}</button></div>`;
+  const stuRow = s => `<div class="stu-row ${s.status === 'עזב' ? 'left' : ''}" data-sid="${s.id}"><button class="stu-name" data-open="${s.id}"><b>${esc(s.name)}${statusTag(s)}</b><span>${esc(s.mg)}${s.note ? ' · ' + esc(s.note) : ''}${s.emp ? ` · <em class="h150 ${behind(s) ? 'behind' : ''}">${fmtH(yearHours(s))} מתוך ${YEAR_GOAL}</em>` : ''}</span></button>${canEdit() ? `<select class="stu-pl" data-pl-sel="${s.id}" aria-label="שיבוץ של ${esc(s.name)}">${plOptions(s)}</select>` : `<span class="stu-emp">${esc(empName(s.emp))}</span>`}<span class="stage s${s.stage}">${STAGES[s.stage]}</span><button class="stu-edit edit" data-edit="${s.id}" aria-label="עריכת הפרטים של ${esc(s.name)}" title="עריכה ומחיקה">${ic('pen')}</button></div>`;
   const clsSort = (a, b) => a.localeCompare(b, 'he', { numeric: true });
   /* הרשימה לפי קבוצה (יא · קבוצה 1 … ואז יב), בכותרת מספר הפעולה והמגמות */
   /* סינון (3.11.26): קבוצה, מגמה וחיפוש חופשי פועלים יחד על אותה רשימה. עם סינון או חיפוש כל הקבוצות פתוחות */
-  const STU_F = { cls: '', mg: '', q: '' };
-  const stuMatch = s => { const q = STU_F.q, n = norm(q); return (!STU_F.cls || s.cls === STU_F.cls) && (!STU_F.mg || s.mg === STU_F.mg) && (!n || s.name.includes(q) || norm(s.cls).includes(n) || norm(s.mg).includes(n) || (s.act && s.act.startsWith(n))); };
+  /* pace = 'behind': רק מי שבפיגור ב-150 השעות (15.11.26) */
+  const STU_F = { cls: '', mg: '', q: '', pace: '' };
+  const stuMatch = s => { const q = STU_F.q, n = norm(q); return (!STU_F.cls || s.cls === STU_F.cls) && (!STU_F.mg || s.mg === STU_F.mg) && (!STU_F.pace || behind(s)) && (!n || s.name.includes(q) || norm(s.cls).includes(n) || norm(s.mg).includes(n) || (s.act && s.act.startsWith(n))); };
   function stuFilterOpts() {
     const fill = (id, vals, all) => { const sel = $(id); if (!sel) return; const cur = sel.value; sel.innerHTML = `<option value="">${all}</option>` + vals.map(v => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join(''); if (![...sel.options].some(o => o.value === cur)) { sel.value = ''; STU_F[id === 'stuCls' ? 'cls' : 'mg'] = ''; } };
     fill('stuCls', [...new Set(STU.map(s => s.cls).filter(Boolean))].sort(clsSort), 'כל הקבוצות');
@@ -696,7 +799,7 @@ window.startApp = function (R) {
   }
   function renderStuList() {
     stuFilterOpts();
-    const filtering = !!(STU_F.cls || STU_F.mg || STU_F.q);
+    const filtering = !!(STU_F.cls || STU_F.mg || STU_F.q || STU_F.pace);
     const open = new Set([...document.querySelectorAll('#stuList details[open]')].map(d => d.dataset.cls)), groups = {};
     STU.filter(stuMatch).forEach(s => { const c = s.cls || 'בלי קבוצה'; (groups[c] = groups[c] || []).push(s); });
     const names = Object.keys(groups).sort(clsSort), shownN = names.reduce((n, c) => n + groups[c].length, 0);
@@ -706,9 +809,10 @@ window.startApp = function (R) {
   $('stuFind').oninput = e => { STU_F.q = e.target.value.trim(); renderStuList(); };
   $('stuCls').onchange = e => { STU_F.cls = e.target.value; renderStuList(); };
   $('stuMg').onchange = e => { STU_F.mg = e.target.value; renderStuList(); };
+  $('stuPace').onchange = e => { STU_F.pace = e.target.value; renderStuList(); };
   /* סקירה: לחיצה על מגמה פותחת את התלמידים שלה (מסונן; "כל המגמות" מחזיר) */
   $('mgTable').addEventListener('click', e => { const b = e.target.closest('[data-mg]'); if (!b) return; STU_F.mg = b.dataset.mg; STU_F.cls = STU_F.q = ''; $('stuFind').value = ''; $('stuCls').value = ''; $('stuMg').value = STU_F.mg; renderStuList(); go('students'); });
-  $('stuList').addEventListener('click', e => { if (e.target.closest('[data-act="stu-clear"]')) { STU_F.cls = STU_F.mg = STU_F.q = ''; $('stuFind').value = ''; $('stuCls').value = ''; $('stuMg').value = ''; renderStuList(); } });
+  $('stuList').addEventListener('click', e => { if (e.target.closest('[data-act="stu-clear"]')) { STU_F.cls = STU_F.mg = STU_F.q = STU_F.pace = ''; $('stuFind').value = ''; $('stuCls').value = ''; $('stuMg').value = ''; $('stuPace').value = ''; renderStuList(); } });
   /* שיבוץ: מקום אחד לכל השינויים (רשימה, מסך המעסיק). התיק משתמש באותם כללים */
   function setEmp(s, v, quiet) {
     v = v || '';
@@ -824,6 +928,17 @@ window.startApp = function (R) {
       } };
   }
 
+  /* ---- 150 השעות בשנה (15.11.26): שורה בתיק שפותחת מסך משלה ---- */
+  const goalBar = (n, ex) => `<span class="g150"><i style="width:${Math.min(100, n / YEAR_GOAL * 100)}%"></i>${ex != null ? `<b class="g150-x" style="inset-inline-start:${Math.min(100, ex / YEAR_GOAL * 100)}%"></b>` : ''}</span>`;
+  function progRow(s) { const n = yearHours(s); return `<div class="rows prog-rows"><button class="rowbtn" data-act="prog150">${ic('chart')}<b>התקדמות ל-${YEAR_GOAL} שעות · ${fmtH(n)} מתוך ${YEAR_GOAL}</b><span></span>${chev}<small>${goalBar(n)}</small></button></div>`; }
+  function progSpec(s) {
+    return { key: 'prog', title: () => `${esc(s.name)} · התקדמות ל-${YEAR_GOAL} שעות`, html: () => {
+      const n = yearHours(s), ex = expectedNow(), c = curYm(); let cum = 0;
+      const rows = schoolMonths().map((x, i) => { const fut = x.ym > c, h = fut ? 0 : monthOfYear(s, x.ym); cum += h; return `<div class="pg-row ${fut ? 'future' : ''} ${x.ym === c ? 'cur' : ''}" data-ym="${x.ym}"><b>${GM[i + 1]}</b><span data-l="החודש">${fut ? '—' : `${fmtH(h)} מתוך ${MONTH_GOAL}`}</span><span data-l="מצטבר">${fut ? '—' : `${fmtH(cum)} מתוך ${MONTH_GOAL * (i + 1)}`}</span></div>`; }).join('');
+      return `<div class="sub-card"><div class="g150-big"><b id="pgTotal">${fmtH(n)} מתוך ${YEAR_GOAL}</b>${goalBar(n, ex)}<p class="pg-st ${n >= ex ? 'ok' : 'no'}" id="pgStatus">${n >= ex ? 'בקצב' : `בפיגור של ${fmtH(ex - n)} שעות`}</p><small class="hint">הקו בפס = היעד עד היום · ${fmtH(ex)} שעות</small></div>
+        <div class="pg-list"><div class="pg-row pg-head"><span>חודש</span><span>החודש</span><span>מצטבר</span></div>${rows}</div></div>`; } };
+  }
+
   /* ---- התיק (מסך משנה) ---- */
   function tikHtml(s) {
     const ds = dates(s), a = ATT[s.id];
@@ -841,14 +956,14 @@ window.startApp = function (R) {
           <select id="plSel" ${!pl ? 'hidden' : ''}>${pl === 'in' ? opts(INS, s.emp) : opts(EMPS, s.emp)}</select>
           ${!pl ? `<select id="plWhy" aria-label="סיבת אי-העסקה"><option value="">סיבת אי-העסקה</option>${WHY_NONE.map(w => `<option ${s.why === w ? 'selected' : ''}>${w}</option>`).join('')}</select>` : ''}</div>
           <details class="hist"><summary>${ic('cal')}היסטוריית שיבוץ<small>${s.hist.length}</small></summary><ul class="chk-items">${s.hist.map(h => `<li><span><b>${esc(h.d)}</b> מ${esc(empName(h.from))} ל${esc(empName(h.to))}${h.why ? ' · ' + esc(h.why) : ''}</span></li>`).join('') || '<li class="hint">אין שינויים</li>'}</ul></details></div>
+        <div class="tik-card" id="workCard"><h3>${ic('cal')}ימי עבודה ונוכחות</h3><div class="daypick" id="dayPick">${'אבגדהו'.split('').map((n, i) => `<button class="dp ${s.days.includes(i) ? 'on' : ''}" data-day="${i}">${n}׳</button>`).join('')}</div><div class="cells">${ds.map(d => cellHtml(s, d, false)).join('')}</div><p class="hint">${esc(MONTH.name)}: ${ds.filter(d => present(a[d])).length} מתוך ${ds.length} ימים</p>${dayLines(s)}
+          ${(() => { /* 15.11.26: אין עוד הזנה של סה"כ ידני — רק ימים ושעות. ערך ידני שנשמר בעבר לחודש המוצג נספר ומוצג עם מחיקה */ const o = hoursOf(s), hp = empOf(s).hpd, er = empOf(s).rate, man = s.hrsMan && s.hrsMan[MONTH.ym], hasMan = man != null && man !== ''; return `<div class="field-row hrs-row"><label class="field"><span>שעות ביום עבודה</span><input class="find" id="tkHrs" dir="ltr" inputmode="decimal" value="${esc(s.hrs || '')}" placeholder="${hp ? 'מהמעסיק: ' + esc(hp) : 'למשל 4'}"></label>${isIn(s) ? `<label class="field"><span>תעריף לשעה (₪)</span><input class="find" id="tkRate" dir="ltr" inputmode="decimal" value="${esc(s.rate || '')}" placeholder="${er ? 'מהעסק: ' + esc(er) : 'לא הוגדר תעריף'}"></label>` : ''}</div>${hasMan ? `<div class="man-row" id="tkManRow"><span>סה"כ ידני שנרשם בעבר: <b>${fmtH(man)} שעות</b></span><button class="lnk edit" id="tkManDel">${ic('trash')}מחיקה וחזרה לחישוב לפי ימים</button></div>` : ''}<p class="hint">סה"כ ${esc(MONTH.name)}: <b>${fmtH(o.h)} שעות</b> ${o.manual ? '(ידני)' : '(ימים ✓ × שעות ליום)'}</p>${progRow(s)}`; })()}</div>
         <div class="tik-card" id="statusCard"><h3>${ic('user')}מצב התלמיד.ה</h3><div class="place-row"><select id="stSel">${['לומד', 'מושעה', 'עזב', 'לא ידוע'].map(v => `<option value="${v}" ${s.status === v ? 'selected' : ''}>${v === 'לומד' ? 'לומד.ת' : v === 'מושעה' ? 'מושעה.ת' : v === 'עזב' ? 'עזב.ה' : 'לא ידוע'}</option>`).join('')}</select><em class="tag ${s.statusSrc === 'list' ? '' : s.statusSrc === 'list-missing' ? 'no' : 'mid'}">${s.statusSrc === 'list' ? 'מרשימת הלומדים' : s.statusSrc === 'list-missing' ? 'לא ברשימה · לבדיקה' : 'עודכן ידנית'}</em></div>
           ${s.status === 'מושעה' ? `<div class="place-row susp-row"><label>מ-<input class="find" id="spFrom" value="${esc((s.susp || {}).from || '')}" placeholder="10.${MONTH.m}"></label><label>עד <input class="find" id="spTo" value="${esc((s.susp || {}).to || '')}" placeholder="20.${MONTH.m}"></label><input class="find why" id="spWhy" value="${esc((s.susp || {}).why || '')}" placeholder="סיבה"></div>` : ''}</div>
         <div class="tik-card pyr-card"><h3>${ic('layers')}שלב בפירמידה <em class="tag ${s.stageManual != null ? 'mid' : ''}">${s.stageManual != null ? 'עודכן ידנית' : 'אוטומטי'}</em></h3><div class="stage-row">${STAGES.map((st, i) => `<button class="st ${i === s.stage ? 'cur' : i < s.stage ? 'done' : ''}" data-stage="${i}" ${(!s.emp && i > 0) || (s.emp && i === 0) ? 'disabled' : ''}>${st}</button>`).join('')}</div><dl class="kv"><dt>מה חסם את המעבר</dt><dd>${esc(s.note || 'אין חסם')}</dd><dt>הפעולה הבאה</dt><dd>${!s.emp ? 'איתור מקום עבודה' : docsOf(s) < DOCS.length ? 'השלמת מסמכים' : 'שיחה אישית'}</dd><dt>אחראי.ת · מועד</dt><dd>רכז.ת החניכות · החודש</dd></dl></div>
         <div class="tik-card"><h3>${ic('cal')}אבני הדרך של השנה <small>מהטפסים ומהיומן</small></h3><ul class="talks miles">${MILE_ORDER.map(i => { const [m, when] = MILES[i]; return `<li class="${miles[i] ? 'ok' : ''}">${ic(miles[i] ? 'check' : 'chat')}<span>${m}</span><small>${hasForm(s, i) ? 'מולא ' + esc(s.forms[i].d) : isDraft(s, i) ? '<em class="tag mid">טיוטה</em>' : sentOf(s, i) && !miles[i] ? '<em class="tag mid">הקישור נשלח</em>' : when}</small><button class="lnk mf-open" data-form="${i}">${hasForm(s, i) ? 'צפייה' : isDraft(s, i) ? 'המשך' : 'מילוי'}</button></li>`; }).join('')}</ul></div>
         <div class="tik-card"><h3>${ic('bell')}תזכורות</h3><ul class="rem-list">${rems.map(r => `<li><small>${r.d}.${MONTH.m} · ${esc(r.who)}${r.p ? ' · <b>תצא היום ב-16:00</b>' : ' · נשלחה'}</small>${esc(r.t)}</li>`).join('') || '<li class="hint">אין תזכורות</li>'}</ul></div>
-        <div class="tik-card"><h3>${ic('file')}מסמכים <small>${docsOf(s)}/${DOCS.length}</small></h3><div class="bar"><i style="width:${docsOf(s) / DOCS.length * 100}%"></i></div><ul class="docs-l">${DOCS.map((d, i) => { const x = s.docs[i] || { s: 'miss', n: '' }; return `<li class="${x.s === 'ok' ? 'ok' : x.s === 'na' ? 'na' : ''}">${ic(x.s === 'ok' ? 'check' : x.s === 'na' ? 'x' : 'file')}<span>${d}${x.n ? ` <em class="dnote">${esc(x.n)}</em>` : ''}</span>${x.s === 'miss' || !x.s ? '<button class="lnk up-l edit" data-doc="' + i + '">התקבל</button>' : (x.s === 'na' ? '<small>לא צריך</small>' : '') + '<button class="lnk up-l edit" data-undoc="' + i + '">ביטול הסימון</button>'}</li>`; }).join('')}</ul></div>
-        <div class="tik-card"><h3>${ic('cal')}ימי עבודה ונוכחות</h3><div class="daypick" id="dayPick">${'אבגדהו'.split('').map((n, i) => `<button class="dp ${s.days.includes(i) ? 'on' : ''}" data-day="${i}">${n}׳</button>`).join('')}</div><div class="cells">${ds.map(d => cellHtml(s, d, false)).join('')}</div><p class="hint">${esc(MONTH.name)}: ${ds.filter(d => present(a[d])).length} מתוך ${ds.length} ימים</p>${dayLines(s)}
-          ${(() => { const o = hoursOf(s), hp = (EMPS[s.emp] || {}).hpd, man = s.hrsMan && s.hrsMan[MONTH.ym]; return `<div class="field-row hrs-row"><label class="field"><span>שעות ביום עבודה</span><input class="find" id="tkHrs" dir="ltr" inputmode="decimal" value="${esc(s.hrs || '')}" placeholder="${hp ? 'מהמעסיק: ' + esc(hp) : 'למשל 4'}"></label><label class="field"><span>סה"כ שעות ${esc(MONTH.name)} · ידני, במקום החישוב</span><input class="find" id="tkHrsMan" dir="ltr" inputmode="decimal" value="${man != null ? esc(man) : ''}" placeholder="רק אם מדווחים סה"כ"></label></div><p class="hint">סה"כ ${esc(MONTH.name)}: <b>${fmtH(o.h)} שעות</b> ${o.manual ? '(ידני)' : '(אוטומטי: ימים ✓ × שעות ליום, או לפי הגעה ויציאה)'}</p>`; })()}</div>
+        <div class="tik-card docs-card"><h3>${ic('file')}מסמכים <small>${docsOf(s)}/${DOCS.length}</small></h3><div class="bar"><i style="width:${docsOf(s) / DOCS.length * 100}%"></i></div><ul class="docs-l">${DOCS.map((d, i) => { const x = s.docs[i] || { s: 'miss', n: '' }; return `<li class="${x.s === 'ok' ? 'ok' : x.s === 'na' ? 'na' : ''}">${ic(x.s === 'ok' ? 'check' : x.s === 'na' ? 'x' : 'file')}<span>${d}${x.n ? ` <em class="dnote">${esc(x.n)}</em>` : ''}</span>${x.s === 'miss' || !x.s ? '<button class="lnk up-l edit" data-doc="' + i + '">התקבל</button>' : (x.s === 'na' ? '<small>לא צריך</small>' : '') + '<button class="lnk up-l edit" data-undoc="' + i + '">ביטול הסימון</button>'}</li>`; }).join('')}</ul></div>
         <div class="tik-card wide"><h3>${ic('chat')}יומן</h3><ul class="log" id="tikLog">${(s.log || []).map(l => `<li><small>${esc(l.d)}</small>${esc(l.t)}</li>`).join('') || '<li class="hint">אין רישומים עדיין</li>'}</ul><div class="log-add edit"><input placeholder="מה נאמר ומה חסר" class="find" id="logIn"><button class="btn" id="logAdd">הוספה</button></div></div>
       </div>`;
   }
@@ -858,7 +973,9 @@ window.startApp = function (R) {
     const ed = el.querySelector('[data-act="stu-edit"]'); if (ed) ed.onclick = () => openSub(editStuSpec(s));
     const num = v => { const n = +String(v).trim().replace(',', '.'); return isFinite(n) && n >= 0 ? Math.round(n * 10) / 10 : null; };
     $('tkHrs').onchange = e => { const v = e.target.value.trim(); if (v && num(v) == null) return toast('שעות: רק מספר'); s.hrs = v ? num(v) : ''; redo(); toast('שעות ביום עבודה עודכנו'); };
-    $('tkHrsMan').onchange = e => { const v = e.target.value.trim(); if (v && num(v) == null) return toast('שעות: רק מספר'); s.hrsMan = Object.assign({}, s.hrsMan); if (v) s.hrsMan[MONTH.ym] = num(v); else delete s.hrsMan[MONTH.ym]; redo(); toast(v ? 'סה"כ השעות נרשם ידנית' : 'חזרה לחישוב אוטומטי'); };
+    if ($('tkManDel')) $('tkManDel').onclick = () => { if (!canEdit() || !confirm('למחוק את הסה"כ הידני ולחזור לחישוב לפי ימים?')) return; s.hrsMan = Object.assign({}, s.hrsMan); delete s.hrsMan[MONTH.ym]; redo(); toast('חזרה לחישוב לפי ימים'); };
+    if ($('tkRate')) $('tkRate').onchange = e => { const v = e.target.value.trim(); if (v && numIn(v) == null) return toast('תעריף: רק מספר'); s.rate = v ? numIn(v) : ''; redo(); toast('התעריף לשעה עודכן'); };
+    const pg = el.querySelector('[data-act="prog150"]'); if (pg) pg.onclick = () => openSub(progSpec(s));
     $('logAdd').onclick = () => { const v = $('logIn').value.trim(); if (!v) return; s.log.unshift({ d: TODAY, t: v }); redo(); };
     $('logIn').onkeydown = e => { if (e.key === 'Enter') $('logAdd').click(); };
     el.querySelectorAll('[data-doc]').forEach(b => b.onclick = () => { s.docs[+b.dataset.doc] = { s: 'ok', n: '' }; redo(); toast('סומן שהתקבל'); });
@@ -982,7 +1099,8 @@ window.startApp = function (R) {
         <div class="field-row">${fld('name', inn ? 'שם העסק הבית-ספרי' : 'שם המעסיק')}${inn ? fld('manager', 'מנהל.ת העבודה') : fld('manager', 'איש.אשת קשר')}</div>
         ${inn ? '' : `<div class="field-row">${fld('mentor', 'מנטור.ית / חונך.ת')}</div>`}
         ${inn ? `<div class="field-row">${fld('client', 'לקוח')}</div>` : ''}
-        ${inn ? '' :`<div class="field-row">${fld('phone', 'טלפון', true)}${fld('mail', 'מייל', true)}</div><div class="field-row">${fld('addr', 'כתובת')}${fld('slots', 'כמה תקנים', true)}</div><div class="field-row">${fld('hpd', 'שעות ביום עבודה · ברירת מחדל לתלמידים אצל המעסיק', true)}</div>`}
+        ${inn ? '' :`<div class="field-row">${fld('phone', 'טלפון', true)}${fld('mail', 'מייל', true)}</div><div class="field-row">${fld('addr', 'כתובת')}${fld('slots', 'כמה תקנים', true)}</div>`}
+        <div class="field-row">${fld('hpd', inn ? 'שעות ביום עבודה · ברירת מחדל לתלמידים בעסק' : 'שעות ביום עבודה · ברירת מחדל לתלמידים אצל המעסיק', true)}${inn ? fld('rate', 'תעריף לשעה (₪) · ברירת מחדל לתלמידים בעסק', true) : ''}</div>
         <div class="field"><span>מגמות</span><div class="place-row">${[...new Set([...MGS, ...(e.mg || [])])].map(m => `<label class="pl ${(e.mg || []).includes(m) ? 'on' : ''}"><input type="checkbox" name="eeMg" value="${esc(m)}" ${(e.mg || []).includes(m) ? 'checked' : ''}>${esc(m)}</label>`).join('')}</div></div>
         <div class="emp-b mf-b"><button class="btn primary" id="eeSave">${ic('check')}שמירה</button></div></div>`,
       bind: (el, spec) => {
@@ -991,6 +1109,8 @@ window.startApp = function (R) {
           const v = {}; el.querySelectorAll('[data-ee]').forEach(x => v[x.dataset.ee] = x.value.trim());
           if (!v.name) return toast('צריך שם');
           if (!inn && v.slots && !/^\d+$/.test(v.slots)) return toast('תקנים: רק מספר');
+          if (v.hpd && numIn(v.hpd) == null) return toast('שעות: רק מספר'); if (v.hpd) v.hpd = numIn(v.hpd);
+          if ('rate' in v) { if (v.rate && numIn(v.rate) == null) return toast('תעריף: רק מספר'); if (v.rate) v.rate = numIn(v.rate); }
           const mgs = [...el.querySelectorAll('input[name="eeMg"]:checked')].map(x => x.value); if (!mgs.length) return toast('צריך לפחות מגמה אחת');
           Object.assign(e, v, { mg: mgs }); if (!inn && v.slots) e.slotsRaw = ''; if (draft) INS[id] = e;
           spec.dirty = false; renderEmps(); renderStuList(); closeSub(); toast('הפרטים עודכנו');
@@ -1362,8 +1482,29 @@ window.startApp = function (R) {
   const REPORTS = [
     ['month', 'download', 'דוח תעסוקה חודשי', () => `${esc(MONTH.label)} · ${active().length} תלמידים · ${MGS.filter(m => SUBMITTED[m]).length}/${MGS.length} מגמות הוגשו`],
     ['manager', 'eye', 'דוח חודשי למנהל.ת', () => 'מספרים לפי מגמה ופירמידה'],
-    ['days', 'cal', 'נוכחות לפי ימים', () => esc(MONTH.name) + ' · לפי כיתה']
+    ['days', 'cal', 'נוכחות לפי ימים', () => esc(MONTH.name) + ' · לפי כיתה'],
+    ['pay', 'wallet', 'דוח שעות ושכר לחשבת השכר · עסק בית-ספרי', () => `${esc(MONTH.label)} · ${payRows().length} תלמידים עם שעות`]
   ];
+  /* דוח שכר (15.11.26): רק תלמידים בעסק בית-ספרי עם שעות בחודש המוצג. שכר = Σ שעות היום × תעריף היום;
+     סה"כ ידני = סה"כ × התעריף הקבוע. בלי תעריף → "לא הוגדר תעריף" ולא נכנס לסה"כ. הנתונים נשארים בדפדפן */
+  function payRows() {
+    return STU.filter(isIn).map(s => {
+      const o = hoursOf(s); if (!(o.h > 0)) return null;
+      const ds = dates(s).filter(d => present(ATT[s.id][d]));
+      let pay = 0, miss = false; const rates = new Set();
+      if (o.manual) { const r = defRate(s); if (r) { pay = o.h * r; rates.add(r); } else miss = true; }
+      else ds.forEach(d => { const r = rateOf(s, d); if (!r) { miss = true; return; } rates.add(r); pay += dayHours(s, d, TIMES[s.id], HRS[s.id]) * r; });
+      return { s, days: ds.length, h: o.h, manual: o.manual, rates: [...rates].sort((a, b) => a - b), pay: miss ? null : Math.round(pay * 100) / 100 };
+    }).filter(Boolean).sort((a, b) => String(a.s.name).localeCompare(String(b.s.name), 'he'));
+  }
+  const nis2 = n => (Math.round((+n || 0) * 100) / 100).toLocaleString('he-IL', { maximumFractionDigits: 2 }) + ' ₪';
+  const payTot = L => ({ days: L.reduce((n, x) => n + x.days, 0), h: Math.round(L.reduce((n, x) => n + x.h, 0) * 10) / 10, pay: Math.round(L.reduce((n, x) => n + (x.pay || 0), 0) * 100) / 100, miss: L.filter(x => x.pay == null).length });
+  function exportPay() {
+    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"', L = payRows(), T = payTot(L);
+    const rows = [['שם', 'ת"ז', 'כיתה', 'מעסיק', 'ימי עבודה', 'שעות', 'תעריף', 'סה"כ שכר']].concat(L.map(x => [x.s.name, x.s.tz || '', x.s.cls, empName(x.s.emp), x.days, fmtH(x.h), x.rates.join(' / ') || 'לא הוגדר תעריף', x.pay == null ? 'לא הוגדר תעריף' : x.pay]), [['סה"כ', '', '', '', T.days, fmtH(T.h), '', T.pay]]);
+    const blob = new Blob(['﻿' + rows.map(r => r.map(q).join(',')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `דוח שעות ושכר · עסק בית-ספרי · ${SCHOOL} · ${MONTH.label}.csv`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
   /* ייצוא לקובץ CSV (נפתח באקסל). נבנה בדפדפן — השמות לא עוברים בשרת */
   function exportMonth() {
     const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
@@ -1382,6 +1523,12 @@ window.startApp = function (R) {
           <h3 class="sub-h">לפי מגמה</h3><div class="mg-table cards"><div class="mg-row mg-head m8">${lab.map(x => `<span>${x}</span>`).join('')}</div>${MGS.map(m => { const l = L.filter(s => s.mg === m), o = l.filter(s => PLACE(s.emp) === 'out').length, n = l.filter(s => PLACE(s.emp) === 'in').length; return `<div class="mg-row m8">${cellsRow([`<b>${esc(m)}</b>`, l.length, o, n, l.length - o - n, attPct(l) + '%', fmtH(l.reduce((q, s) => q + hoursOf(s).h, 0)), SUBMITTED[m] ? 'הוגש' : 'טרם'], lab)}</div>`; }).join('')}</div>
           <h3 class="sub-h">הפירמידה</h3><div class="pyr-bar">${STAGES.map((st, i) => cnt[i] ? `<span class="pyr-seg s${i}" style="flex:${cnt[i]}">${cnt[i]}</span>` : '').join('')}</div><div class="pyr-leg">${STAGES.map((st, i) => `<span><i class="s${i}"></i>${st} · ${cnt[i]}</span>`).join('')}</div></div>`; } },
       days: { html: () => `<div class="sub-card"><div class="rep-row"><select id="daysCls" class="view-ok">${classes.map(c => `<option>${esc(c)}</option>`).join('')}</select></div>${LEGEND}<div id="daysOut" class="fold-rep"></div></div>`, bind: () => { const paint = () => { const cls = $('daysCls').value, l = active().filter(s => s.cls === cls); $('daysOut').innerHTML = l.map(s => { const ds = dates(s); return `<div class="row"><div class="who"><b>${esc(s.name)}</b>${statusTag(s)}<small>${esc(empName(s.emp))}</small></div><div class="cells">${ds.map(d => cellHtml(s, d, false)).join('')}</div><div class="sum">${ds.filter(d => present(ATT[s.id][d])).length} מתוך ${ds.length}</div>${dayLines(s)}</div>`; }).join('') || '<p class="empty">אין תלמידים בכיתה.</p>'; }; $('daysCls').onchange = paint; paint(); } },
+      pay: { html: () => { const L = payRows(), T = payTot(L), lab = ['שם', 'ת"ז', 'כיתה', 'מעסיק', 'ימי עבודה', 'שעות', 'תעריף', 'סה"כ שכר'];
+        return `<div class="sub-card print-doc"><div class="pd-head"><div><b>${esc(SCHOOL)}</b><br>דוח שעות ושכר לחשבת השכר · עסק בית-ספרי<br><small>${esc(MONTH.label)}</small></div>${LOGO.replace('class="lg"', 'class="pd-logo"')}</div>
+          <div class="rep-row noprint"><button class="btn primary edit" id="payExport">${ic('download')}ייצוא לאקסל</button><button class="btn view-ok" id="payPrint">${ic('print')}הדפסה</button></div>
+          ${L.length ? `<div class="mg-table cards pay-t"><div class="mg-row mg-head pay8">${lab.map(x => `<span>${x}</span>`).join('')}</div>${L.map(x => `<div class="mg-row pay8" data-sid="${x.s.id}">${cellsRow([`<b>${esc(x.s.name)}</b>`, `<span dir="ltr">${esc(x.s.tz || '—')}</span>`, esc(x.s.cls), esc(empName(x.s.emp)), x.days, fmtH(x.h) + (x.manual ? ' (ידני)' : ''), x.rates.length ? x.rates.map(r => nis2(r)).join(' / ') : '<span class="warn">לא הוגדר תעריף</span>', x.pay == null ? '<span class="warn">לא הוגדר תעריף</span>' : `<b class="pay-v">${nis2(x.pay)}</b>`], lab)}</div>`).join('')}
+            <div class="mg-row pay8 pay-tot" id="payTot">${cellsRow([`<b>סה"כ · ${L.length} תלמידים</b>`, '', '', '', T.days, fmtH(T.h), '', `<b>${nis2(T.pay)}</b>`], lab)}</div></div>${T.miss ? `<p class="hint warn">${T.miss} בלי תעריף · לא נכללו בסה"כ השכר</p>` : ''}` : '<p class="empty">אין תלמידים בעסק בית-ספרי עם שעות בחודש הזה.</p>'}</div>`; },
+        bind: () => { const b = $('payExport'); if (b) b.onclick = () => { exportPay(); toast('הקובץ ירד · ' + MONTH.label); }; $('payPrint').onclick = () => window.print(); } },
     };
     return { title: R0[2], ...specs[k] };
   }
@@ -1676,6 +1823,27 @@ window.startApp = function (R) {
   setRole(R.role); renderUpd();
   /* לשמירה (store.js): תור תזכורות 16:00 והודעות */
   R.hooks.mails = mails; R.hooks.toast = toast;
+  /* hy (15.11.26): לפני כל שמירה — סה"כ השעות של החודש המוצג. מה שהשתנה כבר בטעינה נשמר בשמירה הראשונה */
+  R.hooks.prep = syncHy;
+  /* רק בבדיקות (tests/school, כמו MASNENET_TEST): גישה לנתונים כדי לזרוע ערך ישן שאין לו עוד שדה במסך (hrsMan) */
+  if (window.CHANICHUT_TEST) window.CHANICHUT_TEST.R = R;
+  if (canEdit()) (R.forceSave = R.forceSave || []).push(...syncHy().map(id => 'stu:' + id));
+  /* השלמה חד-פעמית ברקע: חודשים קודמים מספטמבר שחסרים ב-hy. כל חודש בנפרד; כשל בחודש לא עוצר את השאר ולא את המסך */
+  async function backfillHy() {
+    if (!canEdit() || !Store.monthAtt) return;
+    const done = new Set(R.meta.hyDone || []); let changed = false;
+    for (let b = 1; b <= Store.monthsBack(); b++) {
+      const M = Store.monthInfo(b); if (M.ym === MONTH.ym || done.has(M.ym)) continue;
+      if (!STU.some(s => s.emp && !(s.hy && M.ym in s.hy))) { done.add(M.ym); changed = true; continue; }
+      let r; try { r = await Store.monthAtt(M.ym); } catch (e) { continue; }
+      STU.forEach(s => { if (s.hy && M.ym in s.hy) return; const h = monthHours(s, M.ym, r.ATT[s.id], r.TIMES[s.id], r.HRS[s.id]).h; if (!s.emp && !h) return; s.hy = Object.assign({}, s.hy, { [M.ym]: h }); });
+      done.add(M.ym); changed = true;
+    }
+    if (!changed) return;
+    R.meta.hyDone = [...done].sort(); renderStuList(); const t = topSub(); if (t && t.key === 'prog' && !t.dirty) refreshSub();
+    try { Store.flush(); } catch (e) {}
+  }
+  setTimeout(() => { backfillHy().catch(() => {}); }, 1500);
   if (R.bad) toast(R.bad + ' רשומות לא נפתחו במפתח הזה');
   const h = (location.hash || '').slice(1);
   go(VIEWS.includes(h) && !['gate', 'sub'].includes(h) ? h : 'overview', { replace: true });

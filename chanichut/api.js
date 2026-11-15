@@ -82,7 +82,7 @@
   function nowS() { return new Date(Date.now() + 2 * 36e5).toISOString().slice(0, 16).replace('T', ' '); }
   function ymOf(back) { var t = today().split('-'), y = +t[0], m = +t[1] - (back || 0); while (m < 1) { m += 12; y--; } return y + '-' + (m < 10 ? '0' : '') + m; }
   function okCipher(v) { return v === '' || /^v1\.[A-Za-z0-9+/=]+\.[A-Za-z0-9+/=]+$/.test(String(v || '')); }
-  var STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'docs', 'stage', 'stageManual', 'why', 'formsMeta', 'created'];
+  var STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'docs', 'stage', 'stageManual', 'why', 'formsMeta', 'created', 'hy'];
   var EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
   var MON_PLAIN = ['sub', 'off', 'conf'];
   function pick(o, keys) { var r = {}; keys.forEach(function (k) { if (o && o[k] !== undefined) r[k] = o[k]; }); return r; }
@@ -121,26 +121,33 @@
   function wdOf(ym, d) { var p = ym.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, d)).getUTCDay(); }
   function lastDay(ym) { var p = ym.split('-'); return new Date(Date.UTC(+p[0], +p[1], 0)).getUTCDate(); }
   function workDays(s, a, ym, upto) { var out = [], days = Array.isArray(s.days) ? s.days : [], h = s.dayHist && Array.isArray(s.dayHist.days) && s.dayHist.days.length ? s.dayHist : null; for (var d = 1; d <= upto; d++) { var w = h && (h.ym ? ym < h.ym || (ym === h.ym && d < +h.from) : d < +h.from) ? h.days : days; if (w.indexOf(wdOf(ym, d)) >= 0 || (a[d] && a[d] !== 'n')) out.push(d); } return out; }
-  function zero() { return { n: 0, out: 0, in: 0, noData: 0, why: {}, places: 0, stage: [0, 0, 0, 0, 0], att: { p: 0, t: 0, u: 0 } }; }
+  function zero() { return { n: 0, out: 0, in: 0, noData: 0, why: {}, places: 0, stage: [0, 0, 0, 0, 0], att: { p: 0, t: 0, u: 0 }, hrs: { n: 0, sum: 0, ok: 0 } }; }
+  /* 150 שעות בשנה, 15 בחודש ספטמבר–יוני, מצטבר — כמו hrsExp_ בשרת */
+  function syIdx(ym) { var m = +ym.split('-')[1]; return m >= 9 ? m - 9 : m + 3; }
+  function syMonths(ym) { var p = ym.split('-'), y = +p[0], m = +p[1], out = []; for (var i = 0; i <= syIdx(ym); i++) { var mm = 9 + i, yy = m >= 9 ? y : y - 1; if (mm > 12) { mm -= 12; yy++; } out.push(yy + '-' + (mm < 10 ? '0' : '') + mm); } return out; }
+  function hrsExp(ym) { var n = syIdx(ym), cur = ymOf(0), v; if (n >= 10) return 150; if (ym === cur) v = 15 * n + 15 * (+today().slice(8, 10)) / lastDay(ym); else v = ym < cur ? 15 * (n + 1) : 15 * n; return Math.round(Math.min(150, v) * 10) / 10; }
+  function hrsTot(hy, months) { var t = 0; months.forEach(function (m) { var v = hy && +hy[m]; if (v > 0 && isFinite(v)) t += v; }); return Math.round(t * 10) / 10; }
   function countStats(recs, ym) {
-    var cur = ymOf(0), upto = ym === cur ? +today().slice(8, 10) : ym < cur ? lastDay(ym) : 0, stus = [], att = {}, mon = {};
+    var cur = ymOf(0), upto = ym === cur ? +today().slice(8, 10) : ym < cur ? lastDay(ym) : 0, stus = [], att = {}, mon = {}, hM = syMonths(ym), hE = hrsExp(ym);
     Object.keys(recs).forEach(function (k) { var p = recs[k].p || {}; if (/^stu:/.test(k)) stus.push(p); else if (k.indexOf('att:' + ym + ':') === 0) att[k.split(':')[2]] = p.a || {}; else if (k === 'mon:' + ym) mon = p; });
     var sub = mon.sub || {}, all = zero(), mg = {}, places = {}, mgP = {}, marked = false;
     Object.keys(att).forEach(function (id) { Object.keys(att[id]).forEach(function (x) { if (att[id][x]) marked = true; }); });
-    var add = function (o, s, a, place, ds) {
+    var add = function (o, s, a, place, ds, ht) {
       o.n++; if (place === 'out') o.out++; else if (place === 'in') o.in++; else if (s.why) { var w = WHY.indexOf(s.why) >= 0 ? s.why : 'אחר'; o.why[w] = (o.why[w] || 0) + 1; } else o.noData++;
       var st = +s.stage; o.stage[st >= 0 && st <= 4 ? st : 0]++;
       ds.forEach(function (x) { var v = a[x]; if (!v) { o.att.u++; return; } if (v === 'n' || v === 'x') return; o.att.t++; if (v === 'p' || v === 's') o.att.p++; });
+      if (ht != null) { o.hrs.n++; o.hrs.sum += ht; if (ht >= hE) o.hrs.ok++; }
     };
     stus.forEach(function (s) {
       var name = nn(s.mg) || 'ללא מגמה', o = mg[name] = mg[name] || Object.assign(zero(), { code: '', sub: !!sub[s.mg] });
       if (!o.code && s.mgc) o.code = String(s.mgc);
       if (s.status === 'עזב') return;
-      var a = att[s.id] || {}, emp = String(s.emp || ''), place = !emp ? '' : emp[0] === 'I' ? 'in' : 'out';
-      var ds = workDays(s, a, ym, upto); add(all, s, a, place, ds); add(o, s, a, place, ds);
+      var a = att[s.id] || {}, emp = String(s.emp || ''), place = !emp ? '' : emp[0] === 'I' ? 'in' : 'out', ht = emp ? hrsTot(s.hy, hM) : null;
+      var ds = workDays(s, a, ym, upto); add(all, s, a, place, ds, ht); add(o, s, a, place, ds, ht);
       if (emp) { places[emp] = 1; (mgP[name] = mgP[name] || {})[emp] = 1; }
     });
-    all.places = Object.keys(places).length; Object.keys(mg).forEach(function (k) { mg[k].places = Object.keys(mgP[k] || {}).length; });
+    all.places = Object.keys(places).length; Object.keys(mg).forEach(function (k) { mg[k].places = Object.keys(mgP[k] || {}).length; mg[k].hrs.sum = Math.round(mg[k].hrs.sum * 10) / 10; });
+    all.hrs.sum = Math.round(all.hrs.sum * 10) / 10; all.hrsExp = hE;
     var names = Object.keys(mg).filter(function (k) { return k !== 'ללא מגמה'; });
     all.allMg = names.length; all.subMg = names.filter(function (k) { return mg[k].sub; }).length; all.marked = marked; all.conf = mon.conf || null; all.mg = mg;
     return all;
@@ -148,7 +155,7 @@
   function stateOf(rs, st) { if (rs !== 'active') return rs; if (st.conf || (st.allMg && st.subMg === st.allMg)) return 'done'; return st.marked || st.subMg || st.out || st.in ? 'partial' : 'silent'; }
   function filterMg(st, sc, school) {
     if (!st || !sc.mg) return st;
-    var o = zero(), mg = {}, sub = 0, all = 0;
+    var o = zero(), mg = {}, sub = 0, all = 0, hasH = false;
     Object.keys(st.mg || {}).forEach(function (k) {
       var x = st.mg[k]; if (!mgIn(sc, school, k, x.code)) return;
       mg[k] = x; all++; if (x.sub) sub++;
@@ -156,15 +163,18 @@
       Object.keys(x.why || {}).forEach(function (w) { o.why[w] = (o.why[w] || 0) + x.why[w]; });
       (x.stage || []).forEach(function (v, i) { o.stage[i] += +v || 0; });
       ['p', 't', 'u'].forEach(function (f) { o.att[f] += +(x.att || {})[f] || 0; });
+      if (x.hrs) { hasH = true; ['n', 'sum', 'ok'].forEach(function (f) { o.hrs[f] += +x.hrs[f] || 0; }); }
     });
+    o.hrs = hasH ? { n: o.hrs.n, sum: Math.round(o.hrs.sum * 10) / 10, ok: o.hrs.ok } : null; o.hrsExp = st.hrsExp == null ? null : st.hrsExp;
     o.allMg = all; o.subMg = sub; o.conf = st.conf; o.marked = st.marked; o.mg = mg; return o;
   }
   function view(st, state) {
     if (state === 'none' || !st) return null;
-    if (state === 'pending' || state === 'silent') return { n: st.n, out: null, in: null, noData: null, why: null, places: null, stage: null, att: null, attPct: null, empPct: null, subMg: null, allMg: st.allMg == null ? null : st.allMg, conf: null, mg: null };
+    if (state === 'pending' || state === 'silent') return { n: st.n, out: null, in: null, noData: null, why: null, places: null, stage: null, att: null, attPct: null, empPct: null, subMg: null, allMg: st.allMg == null ? null : st.allMg, conf: null, mg: null, hrs: null, hrsExp: null };
     var r = JSON.parse(JSON.stringify(st)); delete r.marked;
     r.empPct = r.n ? Math.round((r.out + r.in) / r.n * 100) : null; r.attPct = r.att && r.att.t ? Math.round(r.att.p / r.att.t * 100) : null;
-    Object.keys(r.mg || {}).forEach(function (k) { var x = r.mg[k]; x.empPct = x.n ? Math.round((x.out + x.in) / x.n * 100) : null; x.attPct = x.att && x.att.t ? Math.round(x.att.p / x.att.t * 100) : null; });
+    if (!r.hrs) r.hrs = null; if (r.hrsExp == null) r.hrsExp = null;
+    Object.keys(r.mg || {}).forEach(function (k) { var x = r.mg[k]; x.empPct = x.n ? Math.round((x.out + x.in) / x.n * 100) : null; x.attPct = x.att && x.att.t ? Math.round(x.att.p / x.att.t * 100) : null; if (!x.hrs) x.hrs = null; });
     return r;
   }
   function natRow(d, sc, school, ym) {
@@ -489,11 +499,11 @@
           var r = q.recs[i], key = String(r.k || ''), pl = r.p || {}, e = String(r.e || '');
           if (!okCipher(e)) return { ok: false, error: 'notencrypted', key: key };
           if (/^stu:/.test(key)) { if (!e) return { ok: false, error: 'notencrypted', key: key }; pl = pick(pl, STU_PLAIN); if (Array.isArray(pl.docs)) pl.docs = pl.docs.map(function (x) { return { s: x && x.s || 'miss' }; }); }
-          else if (/^att:\d{4}-\d{2}:/.test(key)) { pl = pick(pl, ['a', 't', 'ob', 'sb']); e = ''; }
+          else if (/^att:\d{4}-\d{2}:/.test(key)) { pl = pick(pl, ['a', 't', 'ob', 'sb', 'h']); e = ''; }
           else if (/^emp:/.test(key)) pl = pick(pl, EMP_PLAIN);
           else if (/^lead:/.test(key)) { if (!e) return { ok: false, error: 'notencrypted', key: key }; pl = pick(pl, ['id']); }
           else if (/^mon:\d{4}-\d{2}$/.test(key)) { pl = pick(pl, MON_PLAIN); e = ''; if (pl.conf === undefined && sc1.recs[key] && sc1.recs[key].p.conf) pl.conf = sc1.recs[key].p.conf; }
-          else if (key === 'meta') { pl = pick(pl, ['frames', 'remCfg', 'gantt', 'manual', 'contacts', 'wiz']); e = ''; }
+          else if (key === 'meta') { pl = pick(pl, ['frames', 'remCfg', 'gantt', 'manual', 'contacts', 'wiz', 'hyDone']); e = ''; }
           else return { ok: false, error: 'badkey', key: key };
           if (r.del) delete sc1.recs[key]; else sc1.recs[key] = { p: pl, e: e };
         }

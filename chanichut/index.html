@@ -169,7 +169,8 @@ input[type=file].find{padding:.5em}
 .att-legend .cell.today{outline:2px solid var(--ink);outline-offset:1px;border-color:transparent}.att-legend .cell.future{opacity:.4;border:1px solid var(--ink)}
 .nt-sel{font:inherit;font-size:.92rem;padding:.4em .6em;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--text);min-width:0;width:100%}.nt-sel.a{color:var(--no)}.nt-sel.p,.nt-sel.s{color:var(--ok)}.nt-sel.x{color:var(--warn)}
 #roster .sum{font-size:.82em}
-.roster-foot{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding:16px 0 0;margin-top:4px}
+.roster-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-top:1px solid var(--line);padding:16px 0 0;margin-top:4px}
+.roster-foot .btn{white-space:normal;max-width:100%;text-align:start}
 .daypick{display:flex;gap:6px;margin:4px 0 6px}
 .dp{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line);color:var(--muted);font-family:var(--head);font-weight:600}
 .dp.on{background:var(--ink);border-color:var(--ink);color:#fff}
@@ -444,6 +445,49 @@ body[data-role=system] #roster .cell,body[data-role=system] .tik input,body[data
   .rep select,.wiz select,.rep-row select{min-height:44px}
   .dp{width:44px;height:44px}
 }
+/* ===== שעות, ימים נוספים, 150 שעות ודוח שכר (15.11.26) ===== */
+#roster .cell.p[data-h]::after,#roster .cell.s[data-h]::after{content:'✓ ' attr(data-h);font-size:.82em;white-space:nowrap}
+#roster .cell.extra,.cell.extra{border-style:dashed;border-width:2px}
+#roster .cell.extra.p,#roster .cell.extra.s,.cell.extra.p,.cell.extra.s{background:#94600F;border:2px solid #94600F;color:#fff}
+.att-legend .cell.extra{border:0;background:#94600F}
+.nt-row{grid-template-columns:96px 150px minmax(0,1fr) 100px 100px 80px}
+.nt-row input.nt-h{text-align:center;font-family:var(--head)}
+.xd-w{color:var(--ink);font-weight:600}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin:8px 0 12px;max-width:520px}
+.cd-h{text-align:center;font-family:var(--head);font-size:.85em;color:var(--muted);padding:2px 0}
+.cd{min-height:48px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--text);font-family:var(--head);display:grid;align-content:center;justify-items:center;gap:0;padding:2px 0;cursor:pointer;min-width:0}
+.cd span{font-weight:700}.cd small{font-size:.72em;line-height:1.1}
+.cd.fixed{background:var(--tint);color:var(--ink);border-color:var(--ink)}
+.cd.fixed.rep.p,.cd.fixed.rep.s{background:var(--ink);color:#fff}
+.cd.extra{background:#94600F;border-color:#94600F;color:#fff}
+.cd.rep.a,.cd.rep.x{border:2px dashed var(--warn);color:var(--warn)}
+.cd.today{outline:2px solid var(--ink);outline-offset:2px}
+.cd.future{opacity:.4}.cd:disabled{cursor:default}
+.cd-blank{min-height:48px}
+.cd-k{display:inline-block;width:16px;height:16px;border-radius:5px;border:1px solid var(--line)}.cd-k.fixed{background:var(--tint);border-color:var(--ink)}.cd-k.extra{background:#94600F;border-color:#94600F}.cd-k.future{opacity:.4;border-color:var(--ink)}
+.prog-rows{margin-top:12px}
+/* תיק (15.11.26): ימי עבודה מיד אחרי "איפה עובד.ת", בגובה שתי שורות; מצב התלמיד.ה והפירמידה לצדו, המסמכים ברוחב מלא — בלי חור בגריד */
+@media (min-width:761px){.tik-grid>#workCard{grid-row:span 2}.tik-grid>.docs-card{grid-column:1/-1}}
+.man-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin-top:10px;padding:6px 10px;border-radius:8px;background:#F3E6CF;font-size:.9em;color:var(--warn)}.man-row .lnk{display:inline-flex;align-items:center;gap:.3em;min-height:44px;color:var(--warn)}
+.g150{position:relative;display:block;height:8px;background:var(--tint);border-radius:4px;margin-top:6px;overflow:visible}.g150 i{display:block;height:100%;background:var(--ok);border-radius:4px}
+.g150-x{position:absolute;top:-5px;width:3px;height:18px;background:var(--ink);border-radius:2px;transform:translateX(50%)}
+.g150-big{display:grid;gap:6px;margin-bottom:14px}.g150-big>b{font-family:var(--head);font-size:2em;color:var(--ink);line-height:1.1}.g150-big .g150{height:12px;border-radius:6px}.g150-big .g150 i{border-radius:6px}.g150-big .g150-x{top:-5px;height:22px}
+.pg-st{margin:6px 0 0;font-family:var(--head);font-weight:700;font-size:1.1em}.pg-st.ok{color:var(--ok)}.pg-st.no{color:var(--warn)}
+.pg-list{display:grid;border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
+.pg-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;align-items:center;padding:10px 14px;border-top:1px solid var(--line);min-height:44px}
+.pg-row:first-child{border-top:0}.pg-head{background:var(--tint);font-size:.85em;color:var(--muted)}.pg-row b{font-family:var(--head);color:var(--ink)}
+.pg-row.future{color:var(--muted);opacity:.55}.pg-row.cur{background:#FBF6EA}
+.h150{font-style:normal;font-family:var(--head);color:var(--ok)}.h150.behind{color:var(--warn);font-weight:700}
+.mg-row.pay8{grid-template-columns:1.4fr 1fr .7fr 1.2fr .7fr .7fr .9fr 1fr}
+.pay-tot{background:var(--tint);font-weight:700}
+.rep-row .btn{min-height:44px}
+@media (max-width:760px){
+  .nt-row{grid-template-columns:1fr 1fr}
+  .cal-grid{gap:4px;max-width:none}.cd{min-height:44px}
+  .mg-table.cards .mg-row.pay8{grid-template-columns:1fr 1fr;min-width:0;gap:4px 12px;padding:12px 14px}
+  .pg-row{grid-template-columns:1fr 1fr}.pg-head{display:none}.pg-row>b{grid-column:1/-1}.pg-row>span[data-l]::before{content:attr(data-l) " · ";color:var(--muted);font-size:.85em}
+}
+@media print{.mg-table.cards .mg-head{display:grid!important}.mg-row.pay8{grid-template-columns:1.4fr 1fr .7fr 1.2fr .7fr .7fr .9fr 1fr!important}.mg-row>span[data-l]::before{content:none!important}}
 </style>
 </head>
 <body data-view="gate">

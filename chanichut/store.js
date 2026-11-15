@@ -9,12 +9,14 @@
   const DOCS = ['תעודת זהות', 'חשבון בנק', 'אישור רפואי', 'טופס מוכנות ליציאה (חתום)', 'הסכם התקשרות עם המעסיק'];
   const MN = ['ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני', 'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'];
   /* statusSrc: 'list' (מרשימת הלומדים) | 'manual' (עודכן ידנית) | 'list-missing' (לא ברשימה המעודכנת · לבדיקה) */
-  const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created'];
-  /* hrs = שעות ביום עבודה, hrsMan = {חודש: סה"כ ידני} (3.11.26) — מוצפנים בתיק, בלי שינוי בשרת */
-  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor', 'hrs', 'hrsMan'];
+  /* hy = {חודש: סה"כ שעות} (15.11.26) — מספרים בלבד, גלוי, לספירת 150 השעות בשנה */
+  const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created', 'hy'];
+  /* hrs = שעות ביום עבודה, hrsMan = {חודש: סה"כ ידני} (3.11.26) — מוצפנים בתיק, בלי שינוי בשרת.
+     rate = תעריף לשעה, work = {חודש: {יום: {w: במה עבדו, r: תעריף ליום}}} (15.11.26) — מוצפנים */
+  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor', 'hrs', 'hrsMan', 'rate', 'work'];
   const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
   /* טקסט חופשי של מעסיק — עלול לכלול שמות, ולכן מוצפן */
-  const EMP_PRIV = ['studsTxt', 'masNotes', 'hpd'];   /* hpd = שעות ביום עבודה, ברירת מחדל לתלמידים אצל המעסיק */
+  const EMP_PRIV = ['studsTxt', 'masNotes', 'hpd', 'rate'];   /* hpd = שעות ביום עבודה, rate = תעריף לשעה — ברירות מחדל לתלמידים אצל המעסיק */
   /* ריכוז שמירות: ממתינים 2.5 שניות אחרי הפעולה האחרונה. אחרי כשל — המתנה גוברת עם פיזור */
   const DEBOUNCE = 2500, MAX_BATCH = 300, BEACON_BYTES = 48000;
   const pick = (o, ks) => { const r = {}; ks.forEach(k => { if (o[k] !== undefined) r[k] = o[k]; }); return r; };
@@ -43,7 +45,7 @@
     const res = await API.call('load', { ym: M.ym });
     if (!res.ok) throw new Error(res.error || 'load');
     R = { month: M, school: me.school, me, role: me.role === 'principal' ? 'manager' : me.role, DOCS,
-      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MONS: {}, CONF: null, MANUAL: {},
+      EMPS: {}, INS: {}, LEADS: [], STU: [], ATT: {}, NOTES: {}, TIMES: {}, HRS: {}, OFF: {}, OFFBAK: {}, SUSPBAK: {}, SUBMITTED: {}, MONS: {}, CONF: null, MANUAL: {},
       meta: { frames: 'both', remCfg: { teacher: true, grade: true, streak: 3 }, gantt: {}, contacts: { cls: {}, grade: {} } }, REMLOG: [], bad: 0,
       /* רשימה מעודכנת ממתינה (רק לרכז.ת): הרשומות upd: מוצפנות במפתח חד-פעמי אחר, ולכן עוברות כמו שהן.
          מסך התלמידים פותח אותן עם הקוד מהמייל: CK.unwrapRecovery(code, update.wrap) ואז פענוח של כל e */
@@ -66,7 +68,7 @@
         try { const pv = await CK.decJSON(key, r.e); if (pv && pv.kind === 'todo') R.meta.todo = pv.items || []; else if (pv) R.LEADS.push(pv); } catch (e) { R.bad++; }
       } else if (r.k.startsWith('att:' + M.ym + ':')) {
         const id = r.k.split(':')[2];
-        R.ATT[id] = p.a || {}; R.TIMES[id] = p.t || {}; R.OFFBAK[id] = p.ob || {}; R.SUSPBAK[id] = p.sb || {};
+        R.ATT[id] = p.a || {}; R.TIMES[id] = p.t || {}; R.HRS[id] = p.h || {}; R.OFFBAK[id] = p.ob || {}; R.SUSPBAK[id] = p.sb || {};
       } else if (r.k.startsWith('emp:')) {
         const id = r.k.slice(4); let pv = {};
         if (r.e) { try { pv = (await CK.decJSON(key, r.e)) || {}; } catch (e) { R.bad++; } }
@@ -82,7 +84,7 @@
     }
     R.STU.sort((a, b) => String(a.created || '').localeCompare(String(b.created || '')) || String(a.name).localeCompare(String(b.name), 'he'));
     R.LEADS.sort((a, b) => (b.created || 0) - (a.created || 0));
-    R.STU.forEach(s => { ['ATT', 'NOTES', 'TIMES', 'OFFBAK', 'SUSPBAK'].forEach(k => { R[k][s.id] = R[k][s.id] || {}; }); R.MANUAL[s.id] = R.MANUAL[s.id] || new Set(); });
+    R.STU.forEach(s => { ['ATT', 'NOTES', 'TIMES', 'HRS', 'OFFBAK', 'SUSPBAK'].forEach(k => { R[k][s.id] = R[k][s.id] || {}; }); R.MANUAL[s.id] = R.MANUAL[s.id] || new Set(); });
     /* תזכורות שכבר יצאו החודש — בלי שם, השם מתווסף כאן מהתיק */
     R.REMLOG = (res.remlog || []).filter(x => x.m === M.ym);
     R.remqKeys = (res.remq || []).slice().sort();
@@ -90,8 +92,19 @@
     return R;
   }
 
+  /* נוכחות של חודש אחר (לחישוב שעות של חודשים קודמים, 15.11.26): קריאה בלבד, לא נוגעת במצב המוצג */
+  async function monthAtt(ym) {
+    const res = await API.call('load', { ym });
+    if (!res || !res.ok) throw new Error((res && res.error) || 'load');
+    const out = { ATT: {}, TIMES: {}, HRS: {} };
+    (res.recs || []).forEach(r => { if (!r.k.startsWith('att:' + ym + ':')) return; const id = r.k.split(':')[2], p = r.p || {}; out.ATT[id] = p.a || {}; out.TIMES[id] = p.t || {}; out.HRS[id] = p.h || {}; });
+    return out;
+  }
+
   /* ---------- המצב הנוכחי כרשומות ---------- */
   function records() {
+    /* לפני כל השוואה: האפליקציה מעדכנת נתונים נגזרים (hy = סה"כ השעות של החודש המוצג) */
+    if (R.hooks && R.hooks.prep) { try { R.hooks.prep(); } catch (e) {} }
     const M = R.month, out = {};
     R.STU.forEach(s => {
       const p = pick(s, STU_PLAIN);
@@ -102,7 +115,7 @@
       pv.notes = Object.assign({}, (PRIV[s.id] || {}).notes, { [M.ym]: R.NOTES[s.id] || {} });
       if (!Object.keys(pv.notes[M.ym]).length) delete pv.notes[M.ym];
       out['stu:' + s.id] = { p, priv: pv };
-      const a = { a: R.ATT[s.id] || {}, t: R.TIMES[s.id] || {}, ob: R.OFFBAK[s.id] || {}, sb: R.SUSPBAK[s.id] || {} };
+      const a = { a: R.ATT[s.id] || {}, t: R.TIMES[s.id] || {}, ob: R.OFFBAK[s.id] || {}, sb: R.SUSPBAK[s.id] || {}, h: R.HRS[s.id] || {} };
       const ak = 'att:' + M.ym + ':' + s.id;
       if (EXIST.has(ak) || Object.values(a).some(o => Object.keys(o).length)) out[ak] = { p: a };
     });
@@ -110,7 +123,7 @@
     R.LEADS.forEach(l => { out['lead:' + l.id] = { p: { id: l.id }, priv: l }; });
     out['mon:' + M.ym] = { p: R.CONF ? { sub: R.SUBMITTED, off: R.OFF, conf: R.CONF } : { sub: R.SUBMITTED, off: R.OFF } };
     const manual = {}; Object.entries(R.MANUAL).forEach(([sid, set]) => { if (set && set.size) manual[sid] = [...set]; });
-    out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts, wiz: R.meta.wiz } };
+    out.meta = { p: { frames: R.meta.frames, remCfg: R.meta.remCfg, gantt: R.meta.gantt, manual, contacts: R.meta.contacts, wiz: R.meta.wiz, hyDone: R.meta.hyDone } };
     /* "תזכיר לי…" (11.11.26): מוצפן, כי הטקסט יכול לכלול שם תלמיד.ה. רשומת lead:todo — השרת כבר מקבל lead: מוצפן */
     if (EXIST.has('lead:todo') || (R.meta.todo || []).length) out['lead:todo'] = { p: { id: 'todo' }, priv: { kind: 'todo', items: R.meta.todo || [] } };
     return out;
@@ -186,5 +199,5 @@
     }
   }
 
-  root.Store = { load, watch, flush, leave, monthInfo, monthsBack, dirtyCount, DOCS };
+  root.Store = { load, watch, flush, leave, monthInfo, monthsBack, dirtyCount, monthAtt, DOCS };
 })(window);
