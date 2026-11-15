@@ -47,16 +47,19 @@
   }
   function closeHits() { $('gHits').hidden = true; $('gFind').setAttribute('aria-expanded', 'false'); }
   function markHit() { [...$('gHits').querySelectorAll('.gate-hit')].forEach((b, i) => { b.classList.toggle('on', i === HIT); if (i === HIT) b.scrollIntoView({ block: 'nearest' }); }); }
-  function drawHits() {
-    if ($('gFind').value && $('gFind').value === $('gSchool').value) return closeHits();
-    const q = norm($('gFind').value).split(' ').filter(Boolean), pool = STAFF ? OTHERS : SCH;
+  /* all: לחיצה על השדה. בכניסת פיקוח ומטה מקום שכבר נבחר לא חוסם את הרשימה — כך מחליפים בין מטה, פיקוח והמרחב הפדגוגי בלי למחוק */
+  function drawHits(all) {
+    const sel = $('gFind').value && $('gFind').value === $('gSchool').value;
+    if (sel && !(all === true && STAFF)) return closeHits();
+    const q = sel ? [] : norm($('gFind').value).split(' ').filter(Boolean), pool = STAFF ? OTHERS : SCH;
     HITS = !q.length ? (STAFF ? OTHERS : []) : pool.filter(n => { const t = norm(n); return q.every(w => t.includes(w)); });
     HIT = HITS.length === 1 ? 0 : -1;
     $('gHits').innerHTML = HITS.map(n => `<button type="button" class="gate-hit" role="option" data-v="${esc(n)}">${esc(n)}</button>`).join('') || (q.length ? '<p class="gate-none">לא נמצא. אפשר לנסות מילה אחרת, או "לא מצאתי את עצמי"</p>' : '');
     $('gHits').hidden = !$('gHits').innerHTML; $('gFind').setAttribute('aria-expanded', String(!$('gHits').hidden)); markHit();
   }
   function pick(n) { $('gSchool').value = n; $('gSchool').onchange(); }
-  $('gFind').onfocus = () => { $('gFind').select(); drawHits(); };
+  $('gFind').onfocus = () => { $('gFind').select(); drawHits(true); };
+  $('gFind').onclick = () => { if ($('gHits').hidden) drawHits(true); };
   $('gFind').oninput = () => { if ($('gSchool').value) { $('gSchool').value = ''; $('gSchool').onchange(true); } drawHits(); };
   $('gFind').onkeydown = e => {
     if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); if (HITS.length && !$('gHits').hidden) { HIT = (HIT + (e.key === 'ArrowDown' ? 1 : HITS.length - 1 + (HIT < 0 ? 1 : 0))) % HITS.length; markHit(); } }

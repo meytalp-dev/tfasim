@@ -46,6 +46,8 @@
 .mgc-b{position:relative}.mgc-c{position:absolute;top:0;bottom:0;width:2px;background:#22343A}.mgc-ck{display:inline-block;width:2px;height:12px;background:#22343A}
 /* המסך הראשי של הארצי */
 .nh-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;margin-bottom:8px}
+.nat-gap{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;margin-bottom:12px;padding:10px 16px;background:var(--card);border:1px solid var(--line);border-inline-start:4px solid var(--ink);border-radius:var(--r-card);font:inherit;color:var(--text);text-align:start;cursor:pointer}
+.nat-gap>span{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.nat-gap b{color:var(--ink);font-family:var(--head)}.nat-gap small{color:var(--muted)}.nat-gap .kpi-go{flex:none}.nat-gap:hover{border-color:var(--ink)}
 .nh-card{background:var(--card);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 16px;display:flex;flex-direction:column;gap:8px;min-width:0;text-align:start;font:inherit;color:var(--text)}
 .nh-card h3{margin:0;font-size:1em;color:var(--ink)}.nh-card p{margin:0}
 .nh-big{font-family:var(--head);line-height:1;margin:6px 0}.nh-big .pc{font-size:3em;padding:.08em .3em}

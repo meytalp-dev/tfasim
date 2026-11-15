@@ -99,6 +99,7 @@
     <section class="sec natv" id="national">
       <div class="sec-head row-head"><h2>${TITLE[ROLE] || 'המבט שלך'} <span id="natTag"></span></h2><button class="btn noprint" data-act="print">${ic('print')}הדפסה</button></div>
       <div class="nat-months noprint" id="natMonths"></div>
+      <div class="noprint" id="natGap"></div>
       <div class="nh-grid" id="natHome"></div>
       <div id="natBase"></div>
       <h3 class="sub-h">הקטגוריות</h3>
@@ -227,7 +228,7 @@
 
     /* ---------- הנתונים: חודשים מהשרת בלבד, שורה לכל בית ספר ---------- */
     const DATA = {};   /* ym → שורות */
-    let MONTHS = [], BASE = null, YEARS = 1, EXT = '';   /* EXT: חודש נקודת הפתיחה (דיווח חיצוני), נבנה בדפדפן מ-natBaseline */
+    let MONTHS = [], BASE = null, YEARS = 1, EXT = '', NOW = '';   /* NOW: החודש הנוכחי מהשרת — הפעלה ושיבוץ הם מצב של עכשיו, לא של החודש שנבחר */   /* EXT: חודש נקודת הפתיחה (דיווח חיצוני), נבנה בדפדפן מ-natBaseline */
     function rowOf(r) {
       const b = BY_NAME[r.school] || {}, st = r.stats, rep = r.state === 'partial' || r.state === 'done';
       const x = { name: r.school, label: r.school, semel: r.semel || b.semel || '', net: b.net || '', d: b.d || '', s: b.s || '', sup: b.sup || '', state: r.state || 'none', rep, locked: r.locked, calcAt: r.calcAt || '',
@@ -333,10 +334,11 @@
       const band = k => R.filter(x => lvl(empPct(x)) === k).length, unrep = L.length - R.length;
       $('natTag').innerHTML = `· ${monTag()}`;
       $('natMonths').innerHTML = monBar();
-      $('natHome').innerHTML = `<div class="nh-card nh-hero"><h3>תעסוקה בחניכות</h3><b class="nh-big">${pc(empPct(A))}</b><p>${A.w == null ? 'אף בית ספר טרם דיווח' : `<b>${heb(A.w)}</b> מועסקים מתוך <b>${heb(A.nRep)}</b> לומדים`}</p><p class="nh-cov">${covTxt(A)}</p>${P && P.rep1 ? `<small class="kd">${dl(empPct(A), empPct(P), ' נק׳')} מול ${esc(mLbl(F.cmp))}</small>` : ''}</div>
+      { const G = gapLists(); $('natGap').innerHTML = G.off.length || G.idle.length ? `<button class="nat-gap" data-act="gap">${ic('building')}<span><b>בתי ספר שלא הופעלו או לא שיבצו</b><small>${G.off.length} לא הופעלו · ${G.idle.length} הופעלו ולא שיבצו אף תלמיד.ה</small></span><small class="kpi-go">לרשימה ${chev}</small></button>` : ''; }
+      $('natHome').innerHTML =`<div class="nh-card nh-hero"><h3>תעסוקה בחניכות</h3><b class="nh-big">${pc(empPct(A))}</b><p>${A.w == null ? 'אף בית ספר טרם דיווח' : `<b>${heb(A.w)}</b> מועסקים מתוך <b>${heb(A.nRep)}</b> לומדים`}</p><p class="nh-cov">${covTxt(A)}</p>${P && P.rep1 ? `<small class="kd">${dl(empPct(A), empPct(P), ' נק׳')} מול ${esc(mLbl(F.cmp))}</small>` : ''}</div>
       <div class="nh-card"><h3>התעסוקה לפי חודש</h3><div class="nh-cols">${months.map(r => { const p = empPct(r.A); return `<button class="nh-col ${p == null ? 'none' : ''} ${r.m === EXT ? 'ext' : ''} ${r.m === F.mon ? 'cur' : ''}" data-mon="${r.m}" data-tip="${esc(mLbl(r.m))}: ${p == null ? 'טרם דיווח' : `${heb(r.A.w)} מתוך ${heb(r.A.nRep)} מועסקים · ${covTxt(r.A)}`}"><b>${p == null ? '—' : p + '%'}</b><i style="height:${p == null ? 2 : Math.max(2, Math.round(p / maxP * 110))}px"></i><span>${esc(mLbl(r.m))}<small>${r.m === EXT ? 'דיווח חיצוני' : `${r.A.rep} מתוך ${r.A.cnt} דיווחו`}</small></span></button>`; }).join('')}</div><div class="nh-cmp noprint">${cmpBar()}</div></div>
       <div class="nh-card nh-tl"><h3>רמזור בתי הספר</h3><div class="tl">${BANDS.map(([k, l]) => `<button class="tl-l ${k}" data-band="${k}"><b>${band(k)}</b><span>${l}</span></button>`).join('')}<button class="tl-l x tl-x" data-band="x"><b>${unrep}</b><span>${NOREP()}</span></button></div></div>`;
-      $('natBase').innerHTML = baseCard();
+      $('natBase').innerHTML = '';   /* כרטיס נקודת הפתיחה הוסר מהמבט (מיטל, 11.11.26). ספטמבר נשאר בבורר החודשים */
       $('natCats').innerHTML = CATS.map(([k, i, t]) => {
         let mini, line;
         if (k === 'io') { mini = A.w ? `<span class="ios">${ioSeg(A.out, A.inn)}</span>` : '<span class="hint">—</span>'; line = A.w == null ? 'טרם דיווח' : `חוץ ${heb(A.out)} · פנים ${heb(A.inn)}`; }
@@ -478,6 +480,23 @@
       return { title: `${UNIT[sl]} בלי אף מועסק.ת`, html: () => `<div class="nat-sch-head"><p class="nat-sch-mon">${rowsZ.length} · ${monTag()} · מתוך מי שדיווחו</p><div class="emp-b noprint"><button class="btn" data-act="copy-zero">${ic('file')}העתקת הרשימה</button><button class="btn" data-act="print">${ic('print')}הדפסה</button></div></div>${tbl(cols, rowsZ)}`,
         bind: el => { el.onclick = e => { if (e.target.closest('[data-act="copy-zero"]')) return copyList(rowsZ.map(x => x.label)); const s = e.target.closest('[data-natsch]'); if (s) return openSub(natSchoolSpec(s.dataset.natsch)); const g = e.target.closest('[data-grp]'); if (g) openGroup(g.dataset.grp, g.dataset.k); }; } };
     }
+    /* "לא הופעלו" = הרשימה מחכה מוצפנת (pending) או שאין לבית הספר רשימה (none).
+       "לא שיבצו" = הופעל, ואין אף תלמיד.ה משובץ.ת אצל מעסיק (w ריק או 0). תמיד לפי החודש הנוכחי */
+    function gapLists() {
+      const L = rows(NOW).slice().sort((a, b) => a.name.localeCompare(b.name, 'he'));
+      return { off: L.filter(x => x.state === 'pending' || x.state === 'none'), idle: L.filter(x => x.state !== 'pending' && x.state !== 'none' && !(x.w > 0)) };
+    }
+    function natGapSpec() {
+      const G = gapLists(), sch = x => `<button class="name" data-natsch="${esc(x.name)}">${esc(x.name)}</button>`;
+      const cols = extra => [['בית ספר', sch], ['רשת', x => esc(x.net || '—')], ['מפקח.ת פדגוגי.ת', x => esc(x.sup || '—')], extra];
+      const part = (id, title, l, extra, none) => l.length ? `<details class="insights gap-part"><summary>${title} <small>${l.length} בתי ספר</small></summary><div class="emp-b noprint"><button class="btn" data-act="copy-gap" data-g="${id}">${ic('file')}העתקת הרשימה</button></div>${tbl(cols(extra), l)}</details>` : `<h3 class="sub-h">${title} <small>0</small></h3><p class="hint">${none}</p>`;
+      return { title: 'בתי ספר שלא הופעלו או לא שיבצו',
+        html: () => `<div class="nat-sch-head"><p class="nat-sch-mon">נכון ל${esc(mLbl(NOW))}</p><div class="emp-b noprint"><button class="btn" data-act="print">${ic('print')}הדפסה</button></div></div>` +
+          part('off', 'לא הופעלו', G.off, ['מצב', x => x.state === 'none' ? 'אין רשימת תלמידים' : 'הרשימה מחכה להפעלה'], 'כל בתי הספר הופעלו') +
+          part('idle', 'הופעלו ולא שיבצו אף תלמיד.ה', G.idle, ['תלמידים', x => dash(x.n)], 'בכל בית ספר שהופעל יש לפחות תלמיד.ה משובץ.ת אחד.ת'),
+        bind: el => { el.onclick = e => { const c = e.target.closest('[data-act="copy-gap"]'); if (c) return copyList(G[c.dataset.g].map(x => x.name)); const s = e.target.closest('[data-natsch]'); if (s) openSub(natSchoolSpec(s.dataset.natsch)); }; } };
+    }
+    $('natGap').onclick = e => { if (e.target.closest('[data-act="gap"]')) openSub(natGapSpec()); };
     function grpKpis(l, sc) {
       const A = agg(l), pl = l.map(x => x.prev).filter(Boolean), P = pl.length && F.cmp ? agg(pl) : null, d = (a, b) => P && P.rep1 ? dl(a, b) : '';
       return [[sc, 'בתי ספר'], [dash(A.nRep), 'תלמידים בחניכות', d(A.nRep, P && P.nRep)], [dash(A.w), 'מועסקים', d(A.w, P && P.w)], [pc(empPct(A)), 'תעסוקה', P && P.rep1 ? dl(empPct(A), empPct(P), ' נק׳') : ''], ...(A.out != null ? [[A.out, 'תעסוקת חוץ', d(A.out, P && P.out)], [A.inn, 'תעסוקת פנים', d(A.inn, P && P.inn)]] : []), [dash(A.none), 'לא מועסקים', d(A.none, P && P.none)], ...(A.cnt > A.rep ? [[A.cnt - A.rep, NOREP(), '', 'x']] : [])];
@@ -557,7 +576,7 @@
       $('pkCov').innerHTML = covTxt(AS) + (AS.rep < AS.cnt ? ' · האחוזים רק על מי שדיווחו' : '');
       const pl = M.map(m => m.prev).filter(Boolean), P = pl.length && F.cmp ? agg(pl) : null, d = (a, b) => P && P.rep1 ? dl(a, b) : '';
       $('pkKpis').innerHTML = [[AS.rep + (AS.cnt > AS.rep ? ` מתוך ${AS.cnt}` : ''), 'בתי ספר דיווחו'], [M.length, 'מגמות'], [dash(A.nRep), 'תלמידים בחניכות', d(A.nRep, P && P.nRep)], [dash(A.w), 'מועסקים', d(A.w, P && P.w)], [pc(empPct(A)), 'תעסוקה', P && P.rep1 ? dl(empPct(A), empPct(P), ' נק׳') : ''], [dash(A.places), 'מקומות תעסוקה'], [A.out == null ? '—' : `${A.out} · ${A.inn}`, 'תעסוקת חוץ · פנים'], [pc(A.att), 'נוכחות בתעסוקה']].map(kpiHtml).join('');
-      $('pkBase').innerHTML = baseCard();
+      $('pkBase').innerHTML = '';
       $('pkChart').innerHTML = M.filter(m => m.rep).length > 1 ? rateChart(M.map(m => Object.assign({}, m, { label: m.sch.name + ' · ' + m.mg })), { title: 'אחוז התעסוקה לפי בית ספר ומגמה', attr: g => `data-natsch="${esc(g.k)}"` }) : '';
       const cols = [['בית ספר', m => `<button class="name" data-natsch="${esc(m.sch.name)}">${esc(m.sch.name)}</button>`], ['מגמה', m => esc(m.mg)], ['תלמידים', m => m.n], ['מועסקים', m => m.w], ['תעסוקה', m => pc(empPct(m))], ...cmpCols(), ...ioCols, ['לא מועסקים', m => m.none], ...tailCols];
       const el = $('pkTable'); el.style.setProperty('--c', cols.length - 2); el.innerHTML = table(cols, M);
@@ -583,7 +602,7 @@
         const first = await loadMonth('');
         MONTHS = [...new Set((first.months || []).concat([first.ym]).filter(m => /^\d{4}-\d{2}$/.test(m)))].sort();
         YEARS = new Set(MONTHS.map(m => m.slice(0, 4))).size;
-        F.mon = MONTHS.includes(first.ym) ? first.ym : MONTHS[MONTHS.length - 1];
+        F.mon = MONTHS.includes(first.ym) ? first.ym : MONTHS[MONTHS.length - 1]; NOW = F.mon;
         await Promise.all(MONTHS.filter(m => !DATA[m]).map(m => loadMonth(m)));
         try { const b = await api('natBaseline'); const rowsB = b.rows || []; BASE = rowsB.length ? { rows: rowsB, source: rowsB[0].source || 'קובץ חיצוני', date: rowsB[0].date || '', mon: monName((rowsB[0].date || '').slice(0, 7)) } : null; } catch (e) { BASE = null; }
         { const ym = BASE ? String(BASE.date).slice(0, 7) : ''; if (/^\d{4}-\d{2}$/.test(ym) && !MONTHS.includes(ym)) { EXT = ym; DATA[ym] = extRows(rows(F.mon)); MONTHS = MONTHS.concat(ym).sort(); YEARS = new Set(MONTHS.map(m => m.slice(0, 4))).size; } }
