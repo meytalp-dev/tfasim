@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>רישום לכנס הכשרה מקצועית · בני ובנות שירות</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23224292' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='3' y='4' width='18' height='17' rx='2'/><path d='M3 9h18M8 2v4M16 2v4'/></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&family=Rubik:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- רישום לכנס הכשרה מקצועית 16.12.26: בני ובנות שירות, רכזות בתי הספר ורכזות העמותה (15.11.26).
+     השרת: רויטל\kenes-sherut-1612-gas (merhav) -->
+<style>
+:root{
+  --navy:#224292; --blue:#185CFF; --blue-soft:#eaf0ff;
+  --ink:#16203c; --muted:#65739a; --line:#e3e9f5; --bg:#f6f8fd; --mint:#12b39f; --danger:#d64550;
+  --ease:cubic-bezier(.22,.9,.3,1);
+  --shadow-s:0 1px 2px rgba(34,66,146,.05), 0 4px 14px rgba(34,66,146,.06);
+  --shadow-m:0 2px 6px rgba(34,66,146,.06), 0 18px 44px rgba(34,66,146,.10);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;font-family:'Assistant','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.62;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.wrap{max-width:680px;margin:0 auto;padding:0 16px;position:relative}
+.site{background:#fff;border-bottom:1px solid var(--line);padding:16px 0}
+.site .wrap{display:flex;justify-content:center}
+.logo{height:56px;width:auto;max-width:100%;display:block}
+@media (max-width:480px){.logo{height:46px}}
+.hero{text-align:center;padding:26px 0 0}
+.hero h1{font-family:'Rubik',sans-serif;font-size:clamp(26px,6vw,34px);line-height:1.2;margin:0 0 8px;font-weight:700;color:var(--navy)}
+.hero p{margin:0 auto;font-size:17.5px;color:#3d4a70;max-width:46ch}
+.info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}
+@media (max-width:560px){.info{grid-template-columns:1fr}}
+.info div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;box-shadow:var(--shadow-s);display:flex;align-items:center;gap:12px}
+.info svg{width:24px;height:24px;flex:none;fill:none;stroke:var(--blue);stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.info p{margin:0}
+.info b{display:block;font-family:'Rubik',sans-serif;font-weight:600;color:var(--navy);font-size:16.5px;line-height:1.3}
+.info span{display:block;color:var(--muted);font-size:15px;line-height:1.35}
+.card{background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow-m);padding:28px;margin-top:22px}
+@media (max-width:560px){.card{padding:22px 16px}}
+.q{margin-top:22px;border:0;padding:0;margin-inline:0;min-width:0}
+.q.first{margin-top:0}
+.ql{display:block;font-family:'Rubik',sans-serif;font-size:18px;color:var(--navy);font-weight:600;margin-bottom:8px;padding:0}
+.ql .req{color:var(--blue)}
+/* בחירת תפקיד */
+.roles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:560px){.roles{grid-template-columns:1fr}}
+.role{position:relative;display:block;cursor:pointer}
+.role input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.role span{display:flex;align-items:center;justify-content:center;gap:9px;min-height:56px;padding:12px 10px;text-align:center;
+  border:2px solid var(--line);border-radius:14px;background:#fbfcff;font-weight:600;color:var(--ink);line-height:1.3;
+  transition:border-color .18s var(--ease),background .18s var(--ease),color .18s var(--ease)}
+.role svg{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.role:hover span{border-color:#c9d5ee}
+.role input:checked + span{border-color:var(--blue);background:var(--blue-soft);color:var(--navy)}
+.role input:focus-visible + span{box-shadow:0 0 0 4px rgba(24,92,255,.18)}
+.roles.bad .role span{border-color:var(--danger);background:#fff7f8}
+input[type=text],select{width:100%;padding:13px 15px;border:2px solid var(--line);border-radius:14px;background:#fbfcff;
+  font-family:inherit;font-size:17px;color:var(--ink);transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-inline-end:44px;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2365739a' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-size:20px;background-position:left 16px center}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--blue);background-color:#fff;box-shadow:0 0 0 4px rgba(24,92,255,.12)}
+.bad{border-color:var(--danger)!important;background-color:#fff7f8!important}
+.err{display:none;color:var(--danger);font-size:14.5px;font-weight:600;margin-top:6px}
+.err.on{display:block}
+#form input.hp{position:absolute;width:1px;height:1px;padding:0;border:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);opacity:0;pointer-events:none}
+.actions{margin-top:28px;padding-top:22px;border-top:1px solid var(--line);text-align:center}
+.btn{width:100%;padding:16px 22px;border:0;border-radius:16px;cursor:pointer;font-family:'Rubik',sans-serif;font-size:19px;font-weight:600;color:#fff;
+  background:linear-gradient(100deg,var(--navy),var(--blue) 70%);box-shadow:0 8px 22px rgba(24,92,255,.26);transition:transform .16s var(--ease)}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.6;cursor:default}
+.fail{display:none;color:var(--danger);font-weight:600;margin:12px 0 0}
+.fail.on{display:block}
+.helpbtn{display:inline-flex;align-items:center;gap:7px;margin-top:16px;font-size:14px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:6px 14px;text-decoration:none;background:#fff}
+.helpbtn:hover{color:var(--navy);border-color:#c9d5ee}
+.helpbtn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.done{text-align:center;padding:30px 22px}
+.done svg{width:48px;height:48px;fill:none;stroke:var(--mint);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.done h2{font-family:'Rubik',sans-serif;color:var(--navy);margin:8px 0 6px;font-size:24px}
+.done p{margin:0;color:#3d4a70}
+footer{text-align:center;padding:30px 20px 40px;color:var(--muted);font-size:14.5px}
+.credit{margin-top:8px;font-size:13.5px}
+.credit a{color:inherit}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <img class="logo" src="https://pedagogiamh.co.il/vaada/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית">
+</div></header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>רישום לכנס הכשרה מקצועית</h1>
+    <p>בני ובנות שירות, רכזות בתי הספר ורכזות העמותה</p>
+  </section>
+
+  <section class="info" aria-label="פרטי הכנס">
+    <div>
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+      <p><b><span dir="ltr" style="display:inline;color:inherit;font-size:inherit">16.12.26</span></b><span>ו' טבת</span></p>
+    </div>
+    <div>
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      <p><b>משעה 9:00</b><span>ועד השעה 15:00</span></p>
+    </div>
+    <div>
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+      <p><b><span dir="ltr" style="display:inline;color:inherit;font-size:inherit">MY CAMPUS</span></b><span>הלח"י 21, בני ברק</span></p>
+    </div>
+  </section>
+
+  <form class="card" id="form" novalidate>
+    <input class="hp" type="text" name="website" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+
+    <fieldset class="q first">
+      <legend class="ql">אני <span class="req">*</span></legend>
+      <div class="roles" id="roles">
+        <label class="role"><input type="radio" name="role" value="sherut"><span><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/></svg>בן/בת שירות</span></label>
+        <label class="role"><input type="radio" name="role" value="school"><span><svg viewBox="0 0 24 24"><path d="M3 10 12 5l9 5-9 5-9-5z"/><path d="M7 12.5V17c1.4 1.2 3.1 1.8 5 1.8s3.6-.6 5-1.8v-4.5"/></svg>רכזת בית ספר</span></label>
+        <label class="role"><input type="radio" name="role" value="amuta"><span><svg viewBox="0 0 24 24"><circle cx="8.5" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.4"/><path d="M2.5 19a6 6 0 0 1 12 0M15 19a5 5 0 0 1 6.5-4.3"/></svg>רכזת עמותה</span></label>
+      </div>
+      <div class="err" id="e_role">יש לבחור אחת מהאפשרויות</div>
+    </fieldset>
+
+    <div class="q">
+      <label class="ql" for="name">שם מלא <span class="req">*</span></label>
+      <input type="text" id="name" autocomplete="name" maxlength="80">
+      <div class="err" id="e_name">יש לכתוב שם מלא</div>
+    </div>
+
+    <div class="q" id="q_school">
+      <label class="ql" for="school">בית הספר <span class="req">*</span></label>
+      <select id="school"><option disabled selected value="">בחרו בית ספר</option></select>
+      <div class="err" id="e_school">יש לבחור בית ספר</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn" id="send" type="submit">הרשמה</button>
+      <div class="fail" id="fail" role="alert"></div>
+      <a class="helpbtn" id="help" href="https://wa.me/972536256653" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>נתקלתם בבעיה? שלחו הודעה</a>
+    </div>
+  </form>
+
+  <section class="card done" id="done" hidden role="status">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.7 2.7L16 9.8"/></svg>
+    <h2>נרשמת לכנס</h2>
+    <p>תודה, מחכות להיפגש.</p>
+  </section>
+</main>
+
+<footer>
+  <div>המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+
+<script>
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbxccprVB-G4B3rmS2oezp1bD3UK6T0s80M31PIeZ5Tsth491d1q7Og4ADRt9M-aGwlLxg/exec';
+  var SCHOOLS = [["54107","אבו סנאן"],["54105","אום אל פחם בנות"],["54112","אום אל פחם בנים"],["42925","אור דניאל"],["62903","אור העתיד תורני מקצועי"],["45005","אורט אורמת"],["65007","אורט בית הערבה"],["55003","אורט כרמל"],["45002","אורט תל נוף"],["45001","אורט תעשייה אווירית"],["54113","אכסאל"],["54100","אל אמאני סכנין"],["54108","אלחכמה כסרא-סמיע"],["54021","אנרג'י טק"],["55621","בית אל"],["82923","בית דוד"],["64100","בית חנינה בנות"],["64102","בית חנינה בנים"],["52918","ג'וליס בנות"],["45007","דן גורמה"],["53405","דרור גליל"],["83425","דרור נווה מדבר"],["61902","הדר"],["53403","התיכון החברתי חיפה"],["63401","חוש\"ן"],["54109","טורען"],["58801","טל חרמון"],["55400","ישיבת חנוך לנער"],["82922","ישיבת עתיד אור מנחם"],["55501","כפר זיתים"],["54102","כפר יסיף"],["64103","כפר עקב"],["84101","לקייה"],["54009","מעיינות"],["83424","מצפה רמון"],["46101","נחלים"],["54008","נצרת"],["64101","סור באהר"],["84104","סכנין תל שבע"],["64001","עמל אשדוד"],["44011","עמל טייבה ב'"],["44050","עמל טק אין"],["84003","עמל רהט"],["54101","ערערה"],["82918","עתיד באר שבע"],["52923","עתיד בת עמי"],["52916","עתיד גליל מערבי ירכא בנים"],["52922","עתיד טק ביר אל מכסור"],["42924","עתיד כפר חב\"ד"],["52901","עתיד כרמיאל"],["42919","עתיד פלמחים"],["65079","צור ברק"],["52921","צור ים"],["82921","קמ\"ג דימונה"],["51511","רימונים"],["54017","רמת דוד"],["84102","שגב שלום"],["54106","שפרעם"],["44008","תיכון החממה"],["43403","תיכון חברתי ת\"א"],["52909","תיכון טכנולוגי אי טק סקול (מסעדה)"],["52919","תיכון עוצמ\"ה עתיד זוקו"],["54040","תיכון שיח"],["52920","תפן ליזמות"]];
+  var ERRORS = {
+    role: 'יש לבחור אחת מהאפשרויות: בן/בת שירות, רכזת בית ספר או רכזת עמותה.',
+    name: 'יש לכתוב שם מלא.',
+    long: 'השם ארוך מדי.',
+    school: 'בית הספר לא נמצא ברשימה. יש לבחור שוב.',
+    busy: 'המערכת עמוסה כרגע. נסו שוב בעוד רגע.',
+    limit: 'הגענו למכסה היומית. נסו שוב מחר.'
+  };
+
+  function $(id) { return document.getElementById(id); }
+  var school = $('school'), nameEl = $('name');
+
+  SCHOOLS.forEach(function (s) {
+    var o = document.createElement('option');
+    o.value = s[0]; o.textContent = s[1];
+    school.appendChild(o);
+  });
+
+  function role() {
+    var r = document.querySelector('input[name=role]:checked');
+    return r ? r.value : '';
+  }
+
+  function setErr(id, field, on) {
+    $(id).classList.toggle('on', !!on);
+    if (field) field.classList.toggle('bad', !!on);
+  }
+
+  function helpLink() {
+    var s = school.value ? school.options[school.selectedIndex].textContent : '';
+    var t = 'שלום, נתקלתי בבעיה בטופס הרישום לכנס הכשרה מקצועית (16.12)' + (s ? ', ' + s : '') + '.\nתיאור הבעיה: ';
+    $('help').href = 'https://wa.me/972536256653?text=' + encodeURIComponent(t);
+  }
+
+  // רכזת עמותה לא משויכת לבית ספר: השדה נעלם והבחירה מתאפסת
+  document.querySelectorAll('input[name=role]').forEach(function (r) {
+    r.addEventListener('change', function () {
+      setErr('e_role', $('roles'), false);
+      var amuta = role() === 'amuta';
+      $('q_school').hidden = amuta;
+      if (amuta) { school.selectedIndex = 0; setErr('e_school', school, false); helpLink(); }
+    });
+  });
+  nameEl.addEventListener('input', function () { setErr('e_name', nameEl, false); });
+  school.addEventListener('change', function () { setErr('e_school', school, false); helpLink(); });
+  helpLink();
+
+  function fail(msg) {
+    $('fail').textContent = msg;
+    $('fail').classList.add('on');
+    $('send').disabled = false;
+    $('send').textContent = 'הרשמה';
+  }
+
+  $('form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    $('fail').classList.remove('on');
+    var r = role(), name = nameEl.value.replace(/\s+/g, ' ').trim();
+    var needSchool = r !== 'amuta';
+    var code = needSchool ? school.value : '';
+
+    setErr('e_role', $('roles'), !r);
+    setErr('e_name', nameEl, name.length < 2);
+    setErr('e_school', school, needSchool && !code);
+    if (!r) return $('roles').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (name.length < 2) return nameEl.focus();
+    if (needSchool && !code) return school.focus();
+
+    $('send').disabled = true;
+    $('send').textContent = 'שולחים…';
+    var body = { role: r, name: name, code: code, website: $('website').value };
+    fetch(API, { method: 'POST', credentials: 'omit', body: JSON.stringify(body) })
+      .then(function (res) { return res.json(); })
+      .then(function (res) {
+        if (!res.ok) return fail(ERRORS[res.error] || 'השליחה לא הצליחה. נסו שוב.');
+        $('form').hidden = true;
+        $('done').hidden = false;
+        window.scrollTo(0, 0);
+      })
+      .catch(function () { fail('השליחה לא הצליחה. בדקו את החיבור ונסו שוב.'); });
+  });
+})();
+</script>
+</body>
+</html>
