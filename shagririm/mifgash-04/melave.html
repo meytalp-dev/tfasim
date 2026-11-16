@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>דף מלווה · מפגש 4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mut:#5b6170;--blue:#1f4fff;--soft:#eef1ff;--or:#e8590c;--line:#d8dae2;--bg:#f6f6f3}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Heebo,sans-serif;line-height:1.55;font-size:16px}
+.top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1.5px solid var(--ink)}
+.top .in{max-width:760px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.top img{height:36px}
+.top .t{flex:1;min-width:0}
+.top .t b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .t span{font-size:13px;color:var(--mut)}
+.trk{display:flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;flex:none}
+.trk button{font:inherit;font-size:13px;border:0;background:#fff;padding:5px 12px;cursor:pointer}
+.trk button[aria-pressed=true]{background:var(--ink);color:#fff}
+.stations{max-width:760px;margin:0 auto;padding:0 16px 10px;display:flex;gap:4px;flex-wrap:wrap}
+.stations button{font:inherit;font-size:12px;font-weight:800;width:28px;height:28px;border-radius:50%;border:1.5px solid var(--ink);background:#fff;cursor:pointer;padding:0}
+.stations button.done{background:var(--soft);border-color:var(--blue);color:var(--blue)}
+.stations button.cur{background:var(--blue);border-color:var(--blue);color:#fff}
+.stations button.en{border-style:dashed}
+main{max-width:760px;margin:0 auto;padding:18px 16px 40px}
+.card{background:#fff;border:1.5px solid var(--ink);border-radius:14px;padding:20px}
+.meta{display:flex;align-items:center;gap:10px;color:var(--mut);font-size:14px;flex-wrap:wrap}
+.meta .part{color:var(--blue);font-weight:800}
+.tag{font-size:12px;border:1px solid currentColor;border-radius:999px;padding:1px 8px}
+h1{display:flex;gap:12px;align-items:flex-start;font-size:24px;line-height:1.25;margin:8px 0 12px;font-weight:900}
+h1 .n{color:var(--blue);font-size:44px;line-height:.9;font-weight:900;flex:none}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tools a{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:none;border:1.5px solid var(--ink);border-radius:999px;padding:4px 12px}
+.tools svg{width:16px;height:16px;color:var(--blue)}
+.do{font-size:17px;margin:0 0 12px}
+.warnb{display:flex;gap:10px;align-items:flex-start;background:var(--blue);color:#fff;border-radius:10px;padding:10px 12px;margin:0 0 12px;font-weight:600}
+.warnb svg{width:22px;height:22px;flex:none;color:#ffd43b}
+.prm{border:1.5px solid var(--ink);border-radius:10px;padding:12px 14px;white-space:pre-wrap;font-size:15px;background:#fafbff;margin-bottom:6px}
+.cp{font:inherit;font-size:14px;font-weight:600;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:6px 16px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px}
+.cp svg{width:16px;height:16px}
+textarea{width:100%;font:inherit;font-size:15px;border:1.5px solid var(--ink);border-radius:10px;padding:10px 12px;min-height:70px;margin-bottom:10px;resize:vertical}
+textarea:focus,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+details{border-top:1px solid var(--line);padding:2px 0}
+details:first-of-type{margin-top:6px}
+summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-weight:600;padding:10px 0;font-size:15px}
+summary::-webkit-details-marker{display:none}
+summary svg{width:18px;height:18px;color:var(--blue);flex:none}
+summary .chev{margin-inline-start:auto;transition:transform .2s;color:var(--mut)}
+details[open] summary .chev{transform:rotate(-90deg)}
+details.how summary{color:var(--blue)}
+.inn{padding:0 0 12px;font-size:15px}
+.inn ul{margin:0;padding-inline-start:18px}
+.inn li{margin-bottom:6px}
+.shot{position:relative;border:1.5px solid var(--ink);border-radius:8px;overflow:hidden;max-width:100%;margin:6px 0}
+.shot img{display:block;width:100%;height:auto}
+.shot .hl{position:absolute;border:3px solid var(--or);border-radius:6px}
+.shot.pending{display:grid;place-items:center;border-style:dashed;color:var(--mut);text-align:center;font-size:13px;background:repeating-linear-gradient(45deg,#fff,#fff 8px,#f4f5f9 8px,#f4f5f9 16px);max-height:110px}
+.shot.pending small{direction:ltr;display:block}
+.see{color:var(--mut);font-size:14px;margin:4px 0 0}
+.nav{display:flex;gap:10px;margin-top:16px}
+.nav button{font:inherit;font-weight:800;font-size:16px;border-radius:999px;padding:10px 20px;cursor:pointer}
+.next{background:var(--blue);color:#fff;border:0;flex:1}
+.back{background:#fff;border:1.5px solid var(--ink)}
+.topnext{font:inherit;font-size:13px;font-weight:800;background:var(--blue);color:#fff;border:0;border-radius:999px;padding:6px 12px;cursor:pointer;flex:none}
+.fb label{display:block;font-weight:600;margin:12px 0 6px}
+.scale{display:flex;gap:6px;flex-wrap:wrap}
+.scale button{font:inherit;width:42px;height:42px;border-radius:10px;border:1.5px solid var(--ink);background:#fff;cursor:pointer;font-weight:800}
+.scale button[aria-pressed=true]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.saved{font-size:13px;color:var(--mut)}
+.note{font-size:13px;color:var(--mut);margin-top:14px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:10px 16px 30px}
+footer a{color:inherit}
+@media(max-width:480px){h1{font-size:21px}h1 .n{font-size:36px}.top .t span{display:none}}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="in">
+    <img src="img/logo-minhal.png" alt="המנהל להכשרה מקצועית · משרד העבודה">
+    <div class="t"><b>מפגש 4 · כלי AI בחשבון משרד החינוך</b><span id="sub"></span></div>
+    <div class="trk" role="group" aria-label="מסלול"><button id="tk">כלים</button><button id="th">הובלה</button></div>
+    <button class="topnext" id="topnext">סיימתי</button>
+  </div>
+  <nav class="stations" id="stations" aria-label="שלבים"></nav>
+</div>
+<main id="main"></main>
+<footer>המנהל להכשרה מקצועית · משרד העבודה<br>נבנה על ידי impactos · <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos.co.il</a></footer>
+
+<script src="content.js"></script>
+<script src="common.js"></script>
+<script>
+const params = new URLSearchParams(location.hash.slice(1));
+let T = params.get('t') === 'h' ? 'h' : 'k';
+let cur = Math.max(0, (+params.get('s') || 1) - 1);
+let steps = [];
+const LS = 'm04_';
+const store = { get:k=>{ try{ return localStorage.getItem(LS+k) || ''; }catch(e){ return ''; } }, set:(k,v)=>{ try{ localStorage.setItem(LS+k,v); }catch(e){} } };
+
+function help(st){
+  const h = st.help || {}; let out = '';
+  if(h.see){ const s = h.see.shot && !h.see.shot.startsWith('pending:') ? SHOTS[h.see.shot] : null;
+    out += `<details><summary>${ICON.eye}מה רואים על המסך${ICON.chev}</summary><div class="inn">${h.see.shot && !h.see.shot.startsWith('pending:') ? shotHTML(h.see.shot, 320) : ''}<p class="see">${bidi(h.see.text || (s && s.see) || '')}</p></div></details>`; }
+  if(h.ask){ out += `<details><summary>${ICON.spark}שאלו את Gemini${ICON.chev}</summary><div class="inn"><div class="prm">${esc(h.ask)}</div><button class="cp" data-copy="${esc(h.ask)}">${ICON.copy}העתקה</button></div></details>`; }
+  if(h.faq && h.faq.length){ out += `<details><summary>${ICON.wrench}תקלות נפוצות${ICON.chev}</summary><div class="inn"><ul>${h.faq.map(f=>`<li>${bidi(f)}</li>`).join('')}</ul></div></details>`; }
+  return out;
+}
+function fieldHTML(f){ return `<textarea data-k="${f.key}" placeholder="${esc(f.ph)}" aria-label="${esc(f.ph)}">${esc(store.get(T+'_'+f.key))}</textarea>`; }
+function fbHTML(){
+  const q = [['clear','כמה ברורות היו ההוראות היום?'],['pace','הקצב']];
+  return `<div class="fb">
+    <label>כמה ברורות היו ההוראות היום? (1 = לא ברורות, 5 = ברורות מאוד)</label><div class="scale" data-k="fb_clear">${[1,2,3,4,5].map(n=>`<button aria-pressed="${store.get(T+'_fb_clear')==n}">${n}</button>`).join('')}</div>
+    <label>הקצב</label><div class="scale" data-k="fb_pace">${['איטי','בדיוק','מהיר'].map(n=>`<button style="width:auto;padding:0 14px" aria-pressed="${store.get(T+'_fb_pace')==n}">${n}</button>`).join('')}</div>
+    <label>מה היה הכי שימושי?</label>${fieldHTML({key:'fb_useful', ph:'למשל: הבקשה המוכנה ל-Canvas'})}
+    <label>איפה נתקעתם?</label>${fieldHTML({key:'fb_stuck', ph:'שלב, ומה קרה'})}</div>`;
+}
+
+function render(){
+  const st = steps[cur], n = cur+1;
+  const tools = (st.tools||[]).map(t=>`<a href="${LINKS[t]}${t==='staff'?'#t='+T:''}" target="_blank" rel="noopener">${ICON.ext}${TOOL_NAME[t]}</a>`).join('');
+  const tags = (st.enrich?'<span class="tag">למי שנשאר זמן</span>':'') + (st.adv?'<span class="tag">למתקדמים</span>':'');
+  const shotList = st.shots || (st.shot ? [st.shot] : []);
+  const how = shotList.length ? `<details class="how"><summary>${ICON.book}איפה לוחצים, עם צילום${ICON.chev}</summary><div class="inn">${shotList.map(nm => { const sm = SHOTS[nm]; return shotHTML(nm, 340) + (sm&&sm.see?`<p class="see">${bidi(sm.see)}</p>`:''); }).join('')}</div></details>` : '';
+  const body = st.body ? `<p class="do">${bidi(st.body)}</p>` : '';
+  document.getElementById('main').innerHTML = `<article class="card">
+    <div class="meta"><span>שלב ${n} מתוך ${steps.length}</span>${st.part?`<span class="part">${esc(st.part)}</span>`:''}${tags}</div>
+    <h1><span class="n">${n}</span><span>${bidi(st.title)}</span></h1>
+    ${tools?`<div class="tools">${tools}</div>`:''}
+    ${st.warn?`<div class="warnb">${ICON.warn}<span>${bidi(st.warn)}</span></div>`:''}
+    ${body}
+    ${st.prompt?`<div class="prm">${esc(st.prompt)}</div><button class="cp" data-copy="${esc(st.prompt)}">${ICON.copy}העתקה</button>`:''}
+    ${st.field?fieldHTML(st.field):''}${(st.fields||[]).map(fieldHTML).join('')}
+    ${st.fb?fbHTML():''}
+    ${(st.field||st.fields||st.fb)?'<div class="saved" id="saved"></div>':''}
+    ${how}${help(st)}
+    <div class="nav">${cur>0?'<button class="back" id="back">הקודם</button>':''}<button class="next" id="next">${cur<steps.length-1?'סיימתי, לשלב הבא':'סיימתי'}</button></div>
+    ${(st.field||st.fields||st.fb)?'<p class="note">התשובות נשמרות במכשיר הזה בלבד.</p>':''}
+  </article>`;
+  document.getElementById('stations').innerHTML = steps.map((s,i)=>`<button class="${i===cur?'cur':i<cur?'done':''} ${s.enrich||s.adv?'en':''}" aria-label="שלב ${i+1}: ${esc(s.title)}" title="${esc(s.title)}" ${i===cur?'aria-current="step"':''}>${i+1}</button>`).join('');
+  document.getElementById('sub').textContent = `מסלול ${SESSION[T].name} · ${SESSION[T].date}`;
+  document.getElementById('tk').setAttribute('aria-pressed', T==='k'); document.getElementById('th').setAttribute('aria-pressed', T==='h');
+  document.getElementById('topnext').textContent = cur<steps.length-1 ? 'סיימתי, הבא' : 'סיימתי';
+  const nx = document.getElementById('next'); nx.onclick = () => go(1);
+  const bk = document.getElementById('back'); if(bk) bk.onclick = () => go(-1);
+  history.replaceState(null,'',`#t=${T}&s=${n}`);
+}
+function go(d){ cur = Math.max(0, Math.min(steps.length-1, cur+d)); render(); scrollTo({top:0, behavior:'smooth'}); }
+function build(){ steps = stepsFor(T); cur = Math.min(cur, steps.length-1); render(); }
+
+document.getElementById('topnext').onclick = () => go(1);
+document.getElementById('tk').onclick = () => { T='k'; cur=0; build(); };
+document.getElementById('th').onclick = () => { T='h'; cur=0; build(); };
+document.getElementById('stations').addEventListener('click', e => { const b = e.target.closest('button'); if(!b) return; cur = [...b.parentNode.children].indexOf(b); render(); });
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'); if(c){ copyText(c.dataset.copy, c); return; }
+  const sb = e.target.closest('.scale button'); if(sb){ const g = sb.parentNode; g.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', b===sb)); store.set(T+'_'+g.dataset.k, sb.textContent); const s=document.getElementById('saved'); if(s) s.textContent='נשמר'; }
+});
+document.addEventListener('input', e => { const ta = e.target.closest('textarea[data-k]'); if(!ta) return; store.set(T+'_'+ta.dataset.k, ta.value); const s=document.getElementById('saved'); if(s) s.textContent='נשמר'; });
+loadShots().then(build);
+</script>
+</body>
+</html>

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מפגש 4 · כלי AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mut:#5b6170;--blue:#1f4fff;--blue2:#cfd9ff;--or:#e8590c;--line:#111;--bg:#e9eaee}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);font-family:Heebo,sans-serif;color:var(--ink);overflow:hidden}
+#viewport{position:fixed;inset:0}
+#stage{width:1920px;height:1080px;position:absolute;left:50%;top:50%;background:#fff;transform-origin:center;box-shadow:0 10px 40px rgba(0,0,0,.15);overflow:hidden}
+.sl{position:absolute;inset:0;padding:90px 110px;display:none}
+.sl.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sl.on{animation:none}}
+.logo{position:absolute;top:50px;left:64px;height:84px}
+.kicker{font-size:30px;letter-spacing:.06em;color:var(--blue);font-weight:600}
+h1{font-weight:900;font-size:128px;line-height:1.02;margin:16px 0 0;max-width:1250px}
+h2{font-weight:900;font-size:92px;line-height:1.05;margin:14px 0 0}
+.sub{font-size:38px;color:var(--mut);margin-top:24px;max-width:1300px}
+.ref{position:absolute;bottom:56px;right:110px;font-size:28px;color:var(--mut);display:flex;align-items:center;gap:12px}
+.ref svg{width:34px;height:34px;color:var(--blue)}
+.brand{position:absolute;bottom:40px;left:64px;font-size:22px;color:var(--mut)}
+.brand a{color:inherit}
+/* cover */
+.parts{position:absolute;bottom:110px;right:110px;left:110px;display:flex;gap:44px}
+.part{flex:1;border:3px solid var(--line);border-radius:18px;padding:30px 34px;font-size:30px}
+.part i{font-style:normal;color:var(--blue);font-weight:800;font-size:26px}
+.part b{display:block;font-size:50px;font-weight:900;margin:4px 0}
+/* step */
+.num{position:absolute;top:56px;right:84px;font-weight:900;font-size:300px;line-height:1;color:var(--blue)}
+.step .kicker,.step h2{margin-right:260px}
+.step h2{font-size:84px;margin-top:30px}
+.call{position:absolute;bottom:200px;right:110px;width:520px;font-size:36px;border-top:3px solid var(--line);padding-top:20px}
+.frame{position:absolute;bottom:100px;left:110px}
+.shot{position:relative;border:3px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.shot img{display:block;width:100%;height:auto}
+.shot .hl{position:absolute;border:7px solid var(--or);border-radius:10px;box-shadow:0 0 0 3000px rgba(255,255,255,.35)}
+.shot.pending{display:grid;place-items:center;border-style:dashed;color:var(--mut);font-size:30px;text-align:center;background:repeating-linear-gradient(45deg,#fff,#fff 16px,#f4f5f9 16px,#f4f5f9 32px)}
+.shot.pending small{font-size:22px;direction:ltr;display:block}
+/* part divider */
+.sl.partd{background:var(--blue);color:#fff}
+.partd .big{font-size:400px;font-weight:900;line-height:.9;position:absolute;left:110px;bottom:60px;opacity:.95}
+.partd .kicker{color:var(--blue2)}
+.partd h1{font-size:150px}
+.partd .sub{color:var(--blue2)}
+/* warn */
+.sl.warn{background:var(--blue);color:#fff}
+.warn .kicker{color:var(--blue2)}
+.warn h2{max-width:1000px}
+.warn .x{position:absolute;bottom:130px;right:110px;width:640px;font-size:40px;line-height:1.35}
+.warn .x svg{width:80px;height:80px;display:block;margin-bottom:18px;color:#ffd43b}
+.warn .shot{border-color:#fff}
+.warn .shot .hl{border-color:#ffd43b;box-shadow:none}
+/* prompt */
+.pbox{margin-top:46px;border:3px solid var(--line);border-radius:18px;padding:36px 44px;font-size:36px;line-height:1.5;white-space:pre-wrap;max-width:1500px;position:relative}
+.pbox .cp{position:absolute;top:-30px;left:40px}
+.cp{font:inherit;font-size:26px;font-weight:600;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 26px;display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.cp svg{width:26px;height:26px}
+/* map / list / modes */
+.rows{margin-top:56px;display:grid;gap:22px;max-width:1600px}
+.row{display:grid;grid-template-columns:1fr 420px;align-items:center;border:3px solid var(--line);border-radius:16px;padding:26px 36px;font-size:40px}
+.row b{font-weight:900;color:var(--blue);font-size:46px}
+.row.lead{border-style:dashed}
+.row.lead small{display:block;font-size:24px;color:var(--mut)}
+.items{margin-top:60px;display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.item{border-top:6px solid var(--blue);padding-top:24px;font-size:36px}
+.item b{display:block;font-size:52px;font-weight:900;margin-bottom:10px}
+.foot{position:absolute;bottom:120px;right:110px;left:110px;font-size:36px;font-weight:600;border-top:3px solid var(--line);padding-top:26px}
+.modes .rows{max-width:880px}
+.modes .row{grid-template-columns:240px 1fr;font-size:34px}
+.modes .frame{bottom:auto;top:300px}
+/* studio */
+.ol{margin-top:44px;display:grid;gap:18px;max-width:960px;counter-reset:s}
+.ol div{font-size:38px;display:flex;gap:24px;align-items:baseline}
+.ol div::before{counter-increment:s;content:counter(s);font-weight:900;color:var(--blue);font-size:56px;min-width:50px}
+.kit{position:absolute;top:280px;left:110px;width:640px;border:3px solid var(--line);border-radius:18px;padding:30px}
+.kit h3{margin:0 0 16px;font-size:30px}
+.kit a,.kit button{display:flex;align-items:center;gap:12px;font:inherit;font-size:28px;color:var(--ink);background:none;border:0;border-bottom:2px solid #e3e4ea;padding:12px 0;width:100%;text-align:right;cursor:pointer;text-decoration:none}
+.kit svg{width:28px;height:28px;color:var(--blue);flex:none}
+.bigbtn{display:inline-flex;align-items:center;gap:16px;margin-top:60px;font-size:40px;font-weight:800;background:var(--blue);color:#fff;text-decoration:none;border-radius:999px;padding:24px 50px}
+.bigbtn svg{width:40px;height:40px}
+.fl{margin-top:50px;display:grid;gap:20px;max-width:1100px}
+.fl div{border:3px solid var(--line);border-radius:14px;padding:22px 30px;font-size:34px;color:var(--mut)}
+/* בחירת חדר (מסלול כלים) */
+.rooms{margin-top:50px;display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+.room{border:3px solid var(--line);border-radius:20px;padding:34px 36px 26px;font-size:32px;position:relative;overflow:hidden}
+.room::before{content:"";position:absolute;top:0;right:0;left:0;height:12px;background:var(--blue)}
+.room i{font-style:normal;font-weight:800;font-size:28px;color:var(--blue);letter-spacing:.06em}
+.room b{display:block;font-weight:900;font-size:76px;line-height:1.1;margin:2px 0 10px;text-align:right}
+.room span{display:block;color:var(--mut);min-height:92px}
+.room a,.room button{display:flex;align-items:center;gap:12px;font:inherit;font-size:28px;color:var(--ink);background:none;border:0;border-top:2px solid #e3e4ea;padding:14px 0;width:100%;text-align:right;cursor:pointer;text-decoration:none}
+.room svg{width:28px;height:28px;color:var(--blue);flex:none}
+.sl.on .room{animation:rise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.35s + var(--i,0) * .16s)}
+/* שאלות ותשובות */
+.qa{margin-top:56px;display:grid;gap:24px;max-width:1500px}
+.qi{border:3px solid var(--line);border-radius:16px;padding:28px 38px;font-size:40px}
+.qi b{display:block;font-weight:900;font-size:50px;color:var(--blue);margin-bottom:8px}
+.sl.on .qi{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.35s + var(--i,0) * .15s)}
+/* ui */
+#ui{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(17,17,17,.88);color:#fff;border-radius:999px;padding:6px 10px;font-size:14px;z-index:5;opacity:.25;transition:opacity .2s}
+#ui:hover,#ui:focus-within{opacity:1}
+#ui button{font:inherit;background:transparent;color:#fff;border:0;padding:6px 10px;cursor:pointer;border-radius:999px}
+#ui button[aria-pressed=true]{background:#fff;color:#111}
+#ui .cnt{min-width:64px;text-align:center}
+#prog{position:fixed;top:0;right:0;height:4px;background:var(--blue);z-index:5;transition:width .3s}
+
+/* ---------- שכבת תנועה (16.11.26) ----------
+   כניסות קצרות וחד-פעמיות שמתייצבות תוך כשנייה: נראה טוב גם בשיתוף מסך בזום.
+   הכול מופעל מחדש בכל מעבר שקף, כי .sl.on עובר מ-display:none ל-block. */
+#prog{height:6px;background:linear-gradient(270deg,var(--blue),#7c9bff);box-shadow:0 0 18px rgba(31,79,255,.55);transition:width .45s cubic-bezier(.2,.8,.2,1)}
+.sl{isolation:isolate}
+/* רשת נקודות טכנית בפינה, דועכת לכיוון התוכן */
+.sl::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+  background-image:radial-gradient(#c3ccea 2px,transparent 2.2px);background-size:40px 40px;
+  -webkit-mask-image:radial-gradient(ellipse 75% 85% at 0% 100%,#000 0%,transparent 70%);mask-image:radial-gradient(ellipse 75% 85% at 0% 100%,#000 0%,transparent 70%)}
+.sl.partd::before,.sl.warn::before{background-image:linear-gradient(rgba(255,255,255,.13) 2px,transparent 2px),linear-gradient(90deg,rgba(255,255,255,.13) 2px,transparent 2px);background-size:80px 80px;
+  -webkit-mask-image:radial-gradient(ellipse 90% 100% at 0% 100%,#000 0%,transparent 75%);mask-image:radial-gradient(ellipse 90% 100% at 0% 100%,#000 0%,transparent 75%)}
+/* קו סריקה חד-פעמי בשקפי החלק והאזהרה */
+.sl.partd::after,.sl.warn::after{content:"";position:absolute;left:0;right:0;top:0;height:5px;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,transparent,#fff 30%,#fff 70%,transparent);box-shadow:0 0 40px 10px rgba(255,255,255,.45)}
+.sl.on.partd::after,.sl.on.warn::after{animation:scan 1s .15s cubic-bezier(.4,0,.2,1) both}
+@keyframes scan{0%{transform:translateY(0);opacity:0}12%{opacity:.9}85%{opacity:.9}100%{transform:translateY(1080px);opacity:0}}
+
+.kicker::before{content:"";display:inline-block;width:20px;height:20px;background:currentColor;margin-left:16px;vertical-align:middle;border-radius:3px}
+.sl.on .kicker::before{animation:blink .3s .5s 3 both}
+@keyframes blink{50%{opacity:0}}
+
+@keyframes rise{from{opacity:0;transform:translateY(46px)}to{opacity:1;transform:none}}
+@keyframes wipe{from{opacity:0;clip-path:inset(0 0 100% 0);transform:translateY(40px)}to{opacity:1;clip-path:inset(-10% -5% -15% -5%);transform:none}}
+@keyframes fromR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:none}}
+@keyframes fromL{from{opacity:0;transform:translateX(-90px)}to{opacity:1;transform:none}}
+@keyframes pop{0%{opacity:0;transform:scale(.55) rotate(-8deg)}70%{opacity:1;transform:scale(1.06) rotate(1deg)}100%{opacity:1;transform:none}}
+@keyframes shotIn{from{opacity:0;transform:perspective(1600px) rotateY(-14deg) translateX(-70px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes lock{0%{opacity:0;transform:scale(1.9)}55%{opacity:1;transform:scale(.94)}75%{transform:scale(1.05)}100%{opacity:1;transform:none}}
+@keyframes shake{0%,100%{transform:none}20%{transform:rotate(-9deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(3deg)}}
+@keyframes draw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.sl.on .kicker{animation:fromR .45s .05s cubic-bezier(.2,.8,.2,1) both}
+.sl.on h1,.sl.on h2{animation:wipe .6s .12s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .sub{animation:rise .5s .32s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .logo{animation:rise .5s 0s both}
+.sl.on .num{animation:pop .6s .05s cubic-bezier(.2,.8,.2,1) both;transform-origin:70% 50%}
+.sl.on .call{animation:fromR .5s .45s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .frame{animation:shotIn .7s .3s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .shot .hl{animation:lock .65s 1.05s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .ref{animation:rise .45s .75s both}
+.sl.on .foot{animation:rise .5s .8s both}
+.sl.on .bigbtn{animation:pop .55s .5s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .kit{animation:shotIn .65s .35s cubic-bezier(.2,.8,.2,1) both}
+.sl.on .pbox{animation:rise .5s .3s cubic-bezier(.2,.8,.2,1) both}
+.sl.on.partd .big{animation:fromL .8s .2s cubic-bezier(.2,.8,.2,1) both}
+.sl.on.warn .x svg{animation:shake .6s .6s both;transform-origin:50% 80%}
+.sl.on.warn .x{animation:fromR .5s .35s cubic-bezier(.2,.8,.2,1) both}
+/* פריטים ברצף, אחד אחרי השני */
+.sl.on .row,.sl.on .item,.sl.on .part,.sl.on .ol div,.sl.on .fl div{animation:rise .5s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.35s + var(--i,0) * .13s)}
+.row:nth-child(2),.item:nth-child(2),.part:nth-child(2),.ol div:nth-child(2),.fl div:nth-child(2){--i:1}
+.row:nth-child(3),.item:nth-child(3),.part:nth-child(3),.ol div:nth-child(3),.fl div:nth-child(3){--i:2}
+.row:nth-child(4),.item:nth-child(4),.ol div:nth-child(4),.fl div:nth-child(4){--i:3}
+.row:nth-child(5),.ol div:nth-child(5),.fl div:nth-child(5){--i:4}
+.row:nth-child(6),.ol div:nth-child(6){--i:5}
+/* קו כחול שנמתח מעל כל פריט ברשימה */
+.item{border-top:0;position:relative}
+.item::before{content:"";position:absolute;top:0;right:0;left:0;height:6px;background:var(--blue);transform-origin:right}
+.sl.on .item::before{animation:draw .6s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.45s + var(--i,0) * .13s)}
+/* בקשה (פרומפט): שורות שנכנסות אחת אחת, כמו במסוף */
+.pbox .ln{display:block}
+.sl.on .pbox .ln{animation:fromR .4s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.55s + var(--i,0) * .22s)}
+.pbox .ln:last-child::after{content:"";display:inline-block;width:14px;height:38px;background:var(--blue);margin-right:10px;vertical-align:-6px}
+.sl.on .pbox .ln:last-child::after{animation:blink .7s 1.4s 5 both}
+/* שם הכלי בטבלת "לאן הולכים" */
+.sl.on .row b{animation:fromL .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(.6s + var(--i,0) * .13s)}
+
+@media (prefers-reduced-motion:reduce){
+  .sl.on *,.sl.on::before,.sl.on::after,.sl.on *::before,.sl.on *::after{animation:none !important}
+}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="viewport"><div id="stage"></div></div>
+<div id="ui">
+  <button id="tk" aria-pressed="false">כלים</button><button id="th" aria-pressed="false">הובלה</button>
+  <span>|</span>
+  <button id="next" aria-label="הבא">&#8592;</button><span class="cnt" id="cnt"></span><button id="prev" aria-label="הקודם">&#8594;</button>
+  <span>|</span>
+  <a href="#" id="melave" style="color:#fff;padding:6px 10px">הדף המלווה</a>
+</div>
+<script src="content.js"></script>
+<script src="common.js"></script>
+<script>
+const params = new URLSearchParams(location.hash.slice(1));
+let T = params.get('t') === 'h' ? 'h' : 'k';
+let cur = Math.max(0, (+params.get('s') || 1) - 1);
+let list = [];
+const stepById = id => STEPS.find(s => s.id === id);
+const refLine = (id) => { const n = stepNo(id, T); return n ? `<div class="ref">${ICON.book}בדף המלווה: שלב ${n}</div>` : ''; };
+const LOGO = '<img class="logo" src="img/logo-minhal.png" alt="המנהל להכשרה מקצועית · משרד העבודה">';
+const BRAND = '<div class="brand">נבנה על ידי impactos · <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos.co.il</a></div>';
+
+function render(sl){
+  const S = SESSION[T], st = sl.ref ? stepById(sl.ref) : null;
+  switch(sl.k){
+  case 'cover': return `<section class="sl">${LOGO}<div class="kicker">מפגש 4 · מסלול ${S.name} · ${S.date}</div><h1>${S.title.replace(' משרד','<br>משרד')}</h1>
+    <div class="sub">שגרירי חדשנות · המנהל להכשרה מקצועית · משרד העבודה</div>
+    <div class="parts">${S.tools.map((x,i)=>`<div class="part"><i>חלק ${'אבג'[i]}</i><b>${x[0]}</b>${x[1]}</div>`).join('')}</div>${BRAND}</section>`;
+  case 'q': return `<section class="sl">${LOGO}<h2 style="margin-top:220px;font-size:120px">${sl.title}</h2><div class="sub">${sl.sub}</div>${refLine(sl.ref)}</section>`;
+  case 'map': { const rows = sl.rows.filter(r => T==='h' || r[2]==='k');
+    return `<section class="sl"><h2>${sl.title}</h2><div class="rows">${rows.map(r=>`<div class="row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
+    </section>`; }
+  case 'part': return `<section class="sl partd"><div class="kicker">חלק ${sl.n}</div><h1>${sl.title}</h1><div class="sub">${sl.sub}</div><div class="big">${sl.n}</div></section>`;
+  case 'step': { const shot = sl.shot || (st && st.shot);
+    return `<section class="sl step"><div class="num">${sl.n}</div><div class="kicker">${sl.kicker}</div><h2>${bidi(sl.title)}</h2>
+    <div class="call">${bidi(sl.call)}</div><div class="frame">${shotHTML(shot, 1060, 620)}</div>${refLine(sl.ref)}</section>`; }
+  case 'prompt': return `<section class="sl"><div class="kicker">${sl.kicker}</div><h2>${sl.title}</h2>
+    <div class="pbox"><button class="cp" data-copy="${esc(st.prompt)}">${ICON.copy}העתקה</button>${st.prompt.split('\n').map((l,i)=>`<span class="ln" style="--i:${i}">${esc(l)}</span>`).join('')}</div>${refLine(sl.ref)}</section>`;
+  case 'warn': return `<section class="sl warn"><div class="kicker">${sl.kicker}</div><h2>${sl.title}</h2>
+    <div class="x">${ICON.warn}${bidi(sl.x)}</div><div class="frame">${shotHTML(sl.shot, 900, 560)}</div>${sl.ref?refLine(sl.ref).replace('class="ref"','class="ref" style="color:#cfd9ff"'):''}</section>`;
+  case 'list': return `<section class="sl"><h2>${sl.title}</h2><div class="items">${sl.items.map(i=>`<div class="item"><b>${i[0]}</b>${bidi(i[1])}</div>`).join('')}</div><div class="foot">${bidi(sl.foot)}</div></section>`;
+  case 'modes': return `<section class="sl modes"><div class="kicker">AI Studio</div><h2>${sl.title}</h2><div class="rows">${sl.rows.map(r=>`<div class="row"><b>${r[0]}</b><span>${bidi(r[1])}</span></div>`).join('')}</div>
+    <div class="frame">${shotHTML(sl.shot, 760, 520)}</div></section>`;
+  case 'studio': {
+    if(T==='k' && sl.rooms) return `<section class="sl"><h2>${sl.titleK}</h2><div class="rooms">${sl.rooms.map((r,i)=>`<div class="room" style="--i:${i}">
+        <i>חדר</i><b dir="ltr">${esc(r.name)}</b><span>${bidi(r.what)}</span>
+        <a href="${LINKS[r.link]}" target="_blank" rel="noopener">${ICON.ext}פתיחת הכלי</a>
+        <button data-copy="${esc(P[r.prompt])}">${ICON.copy}העתקת הבקשה</button></div>`).join('')}</div>
+      <div class="foot">${bidi(sl.footK)}</div>${refLine(sl.ref)}</section>`;
+    const kit = T==='k'
+      ? {links:['gemini','vids','aistudio'], prompts:[['פעילות לכיתה · Canvas',P.canvasTool],['תכנון · Gemini Pro',P.pro],['סרטון · Vids',P.vids]],
+         steps:['בוחרים צורך אחד מיחידה 3','בוחרים כלי (הטבלה "לאן הולכים")','בונים, ומשנים בשיחה עד שזה טוב','מנסים בטלפון','מדביקים את הקישור בדף המלווה']}
+      : {links:['aistudio','firebase','gemini'], prompts:[['שאלון לצוות · AI Studio',P.asSurvey],['משחק · AI Studio',P.asGame],['הדרכה · Gemini Pro',P.proLead]],
+         steps:['בוחרים צורך אחד של הצוות מיחידה 3','בונים שאלון או כלי ב-AI Studio','לוחצים Share ובוחרים Public','שולחים למורה אחד/ת לנסות','מדביקים את הקישור בדף המלווה']};
+    return `<section class="sl"><h2 style="max-width:1000px">${sl.title}</h2><div class="ol">${kit.steps.map(s=>`<div>${bidi(s)}</div>`).join('')}</div>
+      <div class="kit"><h3>ערכת הדגמה</h3>${kit.links.map(l=>`<a href="${LINKS[l]}" target="_blank" rel="noopener">${ICON.ext}${TOOL_NAME[l]}</a>`).join('')}
+      ${kit.prompts.map(p=>`<button data-copy="${esc(p[1])}">${ICON.copy}${p[0]}</button>`).join('')}</div>${refLine(sl.ref)}</section>`; }
+  case 'staff': return `<section class="sl">${LOGO}<h2>${sl.title}</h2><div class="sub">${sl.sub}</div>
+    <a class="bigbtn" href="${LINKS.staff}#t=${T}" target="_blank" rel="noopener">${ICON.ext}פותחים את המצגת</a>${refLine(sl.ref)}</section>`;
+  case 'field': { const f = st.fields || [];
+    return `<section class="sl"><h2>${sl.title}</h2><div class="sub">${sl.sub}</div><div class="fl">${f.map(x=>`<div>${x.ph}</div>`).join('')}</div>${refLine(sl.ref)}</section>`; }
+  case 'when': return `<section class="sl"><div class="kicker">${bidi(sl.kicker)}</div><h2>${bidi(sl.title)}</h2><div class="ol" style="max-width:1560px;margin-top:36px">${sl.items.map(x=>`<div>${bidi(x)}</div>`).join('')}</div><div class="foot" style="bottom:96px">${bidi(sl.foot)}</div></section>`;
+  case 'qa': return `<section class="sl"><h2>${sl.title}</h2><div class="qa">${sl.items.map((q,i)=>`<div class="qi" style="--i:${i}"><b>${bidi(q[0])}</b><span>${bidi(q[1])}</span></div>`).join('')}</div></section>`;
+  case 'end': return `<section class="sl">${LOGO}<h2 style="margin-top:240px;font-size:130px">תודה!</h2><div class="sub">לפני שיוצאים: משוב קצר בדף המלווה. כמה ברורות היו ההוראות, ואיפה נתקעתם.</div>${refLine(sl.ref)}${BRAND}</section>`;
+  }
+  return '';
+}
+
+function build(){
+  list = SLIDES.filter(s => s.t.includes(T));
+  document.getElementById('stage').innerHTML = list.map(render).join('');
+  cur = Math.min(cur, list.length-1);
+  document.getElementById('tk').setAttribute('aria-pressed', T==='k');
+  document.getElementById('th').setAttribute('aria-pressed', T==='h');
+  document.getElementById('melave').href = 'melave.html#t=' + T;
+  show();
+}
+function show(){
+  const els = document.querySelectorAll('.sl');
+  els.forEach((e,i)=>e.classList.toggle('on', i===cur));
+  document.getElementById('cnt').textContent = `${cur+1} / ${list.length}`;
+  document.getElementById('prog').style.width = ((cur+1)/list.length*100) + '%';
+  history.replaceState(null,'',`#t=${T}&s=${cur+1}`);
+}
+function go(d){ cur = Math.max(0, Math.min(list.length-1, cur+d)); show(); }
+function fit(){ const s = Math.min(innerWidth/1920, innerHeight/1080); document.getElementById('stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit);
+addEventListener('keydown', e => {
+  if(['ArrowLeft','PageDown',' ','Enter'].includes(e.key)){ e.preventDefault(); go(1); }
+  if(['ArrowRight','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); go(-1); }
+  if(e.key==='Home'){ cur=0; show(); } if(e.key==='End'){ cur=list.length-1; show(); }
+});
+document.getElementById('next').onclick = () => go(1);
+document.getElementById('prev').onclick = () => go(-1);
+document.getElementById('tk').onclick = () => { T='k'; cur=0; build(); };
+document.getElementById('th').onclick = () => { T='h'; cur=0; build(); };
+document.addEventListener('click', e => { const b = e.target.closest('[data-copy]'); if(b){ e.stopPropagation(); copyText(b.dataset.copy, b); } });
+fit();
+loadShots().then(build);
+</script>
+</body>
+</html>

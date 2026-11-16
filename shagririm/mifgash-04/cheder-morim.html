@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>כלי AI לצוות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111;--mut:#5b6170;--blue:#1f4fff;--blue2:#cfd9ff;--or:#e8590c;--bg:#e9eaee}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);font-family:Heebo,sans-serif;color:var(--ink);overflow:hidden}
+#stage{width:1920px;height:1080px;position:absolute;left:50%;top:50%;background:#fff;box-shadow:0 10px 40px rgba(0,0,0,.15);overflow:hidden}
+.sl{position:absolute;inset:0;padding:90px 110px;display:none}
+.sl.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.sl.on{animation:none}}
+.logo{position:absolute;top:50px;left:64px;height:84px}
+.kicker{font-size:32px;letter-spacing:.04em;color:var(--blue);font-weight:600}
+h1{font-weight:900;font-size:130px;line-height:1.02;margin:20px 0 0;max-width:1350px}
+h2{font-weight:900;font-size:96px;line-height:1.05;margin:10px 0 0}
+.sub{font-size:40px;color:var(--mut);margin-top:26px;max-width:1300px}
+[contenteditable]{outline:none;border-bottom:3px dashed transparent;transition:border-color .2s}
+[contenteditable]:hover,[contenteditable]:focus{border-bottom-color:var(--or)}
+[contenteditable]:empty::before{content:attr(data-ph);color:#9aa0ad}
+.num{position:absolute;top:56px;right:84px;font-weight:900;font-size:260px;line-height:1;color:var(--blue)}
+.wnum .kicker,.wnum h2{margin-right:230px}
+.wnum h2{font-size:84px;margin-top:24px}
+.call{position:absolute;bottom:200px;right:110px;width:520px;font-size:36px;border-top:3px solid var(--ink);padding-top:20px}
+.frame{position:absolute;bottom:100px;left:110px}
+.shot{position:relative;border:3px solid var(--ink);border-radius:14px;overflow:hidden;background:#fff}
+.shot img{display:block;width:100%;height:auto}
+.shot .hl{position:absolute;border:7px solid var(--or);border-radius:10px;box-shadow:0 0 0 3000px rgba(255,255,255,.35)}
+.shot .hl.multi{box-shadow:none}
+.vid{padding-top:56px}
+.vid h2{font-size:68px;margin-top:4px}
+.vid video{position:absolute;left:50%;transform:translateX(-50%);bottom:56px;width:1344px;height:756px;border:3px solid var(--ink);border-radius:14px;background:#fff}
+.boxes{position:absolute;bottom:110px;right:110px;left:110px;display:flex;gap:40px}
+.box{flex:1;border:3px solid var(--ink);border-radius:18px;padding:34px 36px;font-size:34px;line-height:1.35}
+.box b{display:block;font-size:54px;font-weight:900;color:var(--blue);margin-bottom:10px}
+.ex{margin-top:60px;display:grid;gap:30px;max-width:1650px}
+.e{display:grid;grid-template-columns:300px 1fr;gap:40px;align-items:start;border-top:3px solid var(--ink);padding-top:26px}
+.e .who{font-size:34px;font-weight:800}
+.e .who small{display:block;font-size:26px;color:var(--blue);font-weight:600}
+.e .what{font-size:40px;line-height:1.35}
+.pbox{margin-top:50px;border:3px solid var(--ink);border-radius:18px;padding:36px 44px;font-size:38px;line-height:1.5;white-space:pre-wrap;max-width:1550px;position:relative}
+.cp{position:absolute;top:-30px;left:40px;font:inherit;font-size:26px;font-weight:600;background:var(--ink);color:#fff;border:0;border-radius:999px;padding:10px 26px;cursor:pointer}
+.ol{margin-top:60px;display:grid;gap:34px;counter-reset:s}
+.ol div{font-size:52px;display:flex;gap:34px;align-items:baseline}
+.ol div::before{counter-increment:s;content:counter(s);font-weight:900;color:var(--blue);font-size:96px;min-width:70px}
+.ol span[dir=ltr]{font-weight:800}
+.sl.blue{background:var(--blue);color:#fff}
+.blue .kicker{color:var(--blue2)}
+.blue h2{font-size:120px;max-width:1500px}
+.blue .sub{color:var(--blue2)}
+.brand{position:absolute;bottom:40px;left:64px;font-size:22px;color:var(--mut)}
+.brand a{color:inherit}
+#ui{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;background:rgba(17,17,17,.88);color:#fff;border-radius:999px;padding:6px 12px;font-size:14px;z-index:5;opacity:.25;transition:opacity .2s}
+#ui:hover,#ui:focus-within{opacity:1}
+#ui button{font:inherit;background:transparent;color:#fff;border:0;padding:6px 10px;cursor:pointer}
+#prog{position:fixed;top:0;right:0;height:4px;background:var(--blue);z-index:5;transition:width .3s}
+#hint{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:#111;color:#fff;font-size:14px;border-radius:999px;padding:6px 14px;z-index:6}
+</style>
+</head>
+<body>
+<div id="prog"></div>
+<div id="hint">לוחצים על הטקסט המקווקו כדי לכתוב את שם בית הספר. מעבר בין שקפים: חצים במקלדת.</div>
+<div id="stage">
+
+<section class="sl">
+  <img class="logo" src="img/logo-minhal.png" alt="המנהל להכשרה מקצועית · משרד העבודה">
+  <div class="kicker" contenteditable="true" data-k="school" data-ph="לוחצים כאן וכותבים את שם בית הספר"></div>
+  <h1>כלי AI שכבר יש לכם, בחינם</h1>
+  <div class="sub">10 דקות · בחשבון הגוגל של משרד החינוך</div>
+  <div class="brand">המנהל להכשרה מקצועית · משרד העבודה · נבנה על ידי impactos · <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos.co.il</a></div>
+</section>
+
+<section class="sl">
+  <div class="kicker">בחשבון של משרד החינוך</div>
+  <h2>מה יש לנו?</h2>
+  <div class="boxes">
+    <div class="box"><b>Gemini Pro</b>עוזר שחושב איתכם: מתכנן שיעור, כותב מחוון</div>
+    <div class="box"><b>Canvas</b>בונה פעילות קטנה לכיתה, או מצגת</div>
+    <div class="box"><b>Vids</b>סרטון של 10 שניות לפתיחת שיעור</div>
+    <div class="box" data-only="h"><b>AI Studio</b>שאלון לצוות, והתוצאות מגיעות רק אליכם</div>
+  </div>
+</section>
+
+<section class="sl">
+  <div class="kicker">דוגמאות</div>
+  <h2>לכיתה</h2>
+  <div class="ex">
+    <div class="e"><div class="who">מורה לחשמל<small>Canvas</small></div><div class="what">חידון של 8 שאלות על חוק אוהם, עם הסבר קצר אחרי כל תשובה. תלמידים פותחים בטלפון.</div></div>
+    <div class="e"><div class="who">מורה לעיצוב<small>Vids</small></div><div class="what">סרטון של 10 שניות שפותח שיעור על צבע, במקום עוד שקף.</div></div>
+  </div>
+</section>
+
+<section class="sl">
+  <div class="kicker">דוגמאות</div>
+  <h2>לצוות ולהנהלה</h2>
+  <div class="ex">
+    <div class="e"><div class="who">רכז/ת מגמה<small>Gemini Pro</small></div><div class="what">תכנון של 3 שיעורים לכיתה שמתקשה בקריאה. Gemini שואל קודם 3 שאלות על הכיתה.</div></div>
+    <div class="e"><div class="who">הנהלה<small>Gemini Pro</small></div><div class="what">מסיכום ישיבת צוות לרשימת משימות: מי, מה ועד מתי.</div></div>
+    <div class="e" data-only="h"><div class="who">הנהלה<small>AI Studio</small></div><div class="what">שאלון קצר לצוות. התשובות מגיעות בגרף, ורק מי שבנה רואה אותן.</div></div>
+  </div>
+</section>
+
+<section class="sl">
+  <div class="kicker">הדגמה · Canvas</div>
+  <h2>עכשיו אני מראה</h2>
+  <div class="pbox" id="demo"><button class="cp">העתקה</button>צור/י ב-Canvas פעילות קצרה לתלמידי [מגמה], כיתה [י/יא/יב]: 8 שאלות אמריקאיות על [נושא].
+אחרי כל תשובה: משוב מיד והסבר של משפט אחד. בסוף: ציון ומה כדאי לחזור עליו.
+בעברית פשוטה, מימין לשמאל, כפתורים גדולים שנוחים בטלפון.</div>
+</section>
+
+<section class="sl wnum">
+  <div class="num">1</div>
+  <div class="kicker">איך נכנסים?</div>
+  <h2>נכנסים דרך "משרד העבודה"</h2>
+  <div class="call">בדף הכניסה של משרד החינוך לסביבת גוגל: בוחרים משרד העבודה, ונכנסים עם החשבון.</div>
+  <div class="frame"><div class="shot" style="width:1060px"><img src="img/login-portal.png" alt="דף הכניסה של משרד החינוך לסביבת גוגל. בוחרים: משרד העבודה"><span class="hl" style="left:28.1%;top:72%;width:9.6%;height:5.6%"></span></div></div>
+</section>
+
+<section class="sl wnum">
+  <div class="num">2</div>
+  <div class="kicker">איך נכנסים?</div>
+  <h2>לוחצים על 9 הנקודות</h2>
+  <div class="call">בדף שנפתח, בפינה למעלה.</div>
+  <div class="frame"><div class="shot" style="width:1060px"><img src="img/login-classroom.png" alt="הדף שנפתח אחרי הכניסה. 9 הנקודות נמצאות בפינה למעלה"><span class="hl" style="left:4.4%;top:2.1%;width:3.4%;height:7%"></span></div></div>
+</section>
+
+<section class="sl wnum">
+  <div class="num">3</div>
+  <div class="kicker">איך נכנסים?</div>
+  <h2>כאן כל הכלים, בחינם</h2>
+  <div class="call">פותחים <span dir="ltr">Gemini</span>: בוחרים <span dir="ltr">Pro</span>, או מסמנים <span dir="ltr">Canvas</span>, וכותבים מה רוצים.</div>
+  <div class="frame"><div class="shot" style="width:726px"><img src="img/login-apps.png" alt="רשימת כל הכלים של גוגל, ביניהם Gemini ו-Vids"><span class="hl multi" style="left:6.6%;top:37.9%;width:10%;height:12.6%"></span><span class="hl multi" style="left:7.2%;top:75.2%;width:9.4%;height:12.6%"></span></div></div>
+</section>
+
+<section class="sl vid">
+  <div class="kicker">סרטון קצר · חצי דקה</div>
+  <h2>נכנסים ל-<span dir="ltr">Gemini</span>, ובוחרים <span dir="ltr">Pro</span></h2>
+  <video controls preload="metadata" src="video/gemini.mp4" poster="video/gemini.jpg"></video>
+</section>
+
+<section class="sl vid">
+  <div class="kicker">סרטון קצר · חצי דקה</div>
+  <h2>פעילות לכיתה ב-<span dir="ltr">Canvas</span></h2>
+  <video controls preload="metadata" src="video/canvas.mp4" poster="video/canvas.jpg"></video>
+</section>
+
+<section class="sl vid">
+  <div class="kicker">סרטון קצר · 40 שניות</div>
+  <h2>סרטון של 10 שניות ב-<span dir="ltr">Vids</span></h2>
+  <video controls preload="metadata" src="video/vids.mp4" poster="video/vids.jpg"></video>
+</section>
+
+<section class="sl blue">
+  <div class="kicker">כלל אחד</div>
+  <h2>לא מכניסים שמות, תעודות זהות וציונים של תלמידים</h2>
+  <div class="sub">ובודקים כל תשובה לפני שמשתמשים בה.</div>
+</section>
+
+<section class="sl">
+  <img class="logo" src="img/logo-minhal.png" alt="">
+  <div class="kicker">השבוע</div>
+  <h2>נסו פעילות אחת, בכיתה אחת</h2>
+  <div class="sub">נתקעתם? אני כאן: <span contenteditable="true" data-k="contact" data-ph="שם, ואיפה אפשר למצוא אותי"></span></div>
+  <div class="brand">המנהל להכשרה מקצועית · משרד העבודה · נבנה על ידי impactos · <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos.co.il</a></div>
+</section>
+
+</div>
+<div id="ui"><button id="next" aria-label="הבא">&#8592;</button><span id="cnt"></span><button id="prev" aria-label="הקודם">&#8594;</button></div>
+<script>
+const T = new URLSearchParams(location.hash.slice(1)).get('t') === 'h' ? 'h' : 'k';
+document.querySelectorAll('[data-only]').forEach(e => { if(e.dataset.only !== T) e.remove(); });
+const slides = [...document.querySelectorAll('.sl')];
+let cur = Math.max(0, Math.min(slides.length-1, (+new URLSearchParams(location.hash.slice(1)).get('s') || 1) - 1));
+function show(){ document.querySelectorAll('video').forEach(v => v.pause()); slides.forEach((s,i)=>s.classList.toggle('on', i===cur)); document.getElementById('cnt').textContent = `${cur+1} / ${slides.length}`; document.getElementById('prog').style.width = ((cur+1)/slides.length*100)+'%'; }
+function go(d){ cur = Math.max(0, Math.min(slides.length-1, cur+d)); show(); }
+function fit(){ const s = Math.min(innerWidth/1920, innerHeight/1080); document.getElementById('stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
+addEventListener('resize', fit); fit(); show();
+addEventListener('keydown', e => {
+  if(e.target.isContentEditable) return;
+  if(e.target.tagName === 'VIDEO' && (e.key === ' ' || e.key === 'Enter')) return;   /* רווח בתוך הסרטון = הפעלה, לא מעבר שקף */
+  if(['ArrowLeft','PageDown',' ','Enter'].includes(e.key)){ e.preventDefault(); go(1); }
+  if(['ArrowRight','PageUp','Backspace'].includes(e.key)){ e.preventDefault(); go(-1); }
+});
+document.getElementById('next').onclick = () => go(1);
+document.getElementById('prev').onclick = () => go(-1);
+document.querySelectorAll('[contenteditable]').forEach(el => {
+  try{ el.textContent = localStorage.getItem('staff_'+el.dataset.k) || ''; }catch(e){}
+  el.addEventListener('input', () => { try{ localStorage.setItem('staff_'+el.dataset.k, el.textContent); }catch(e){} });
+  el.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); el.blur(); } });
+});
+document.querySelector('#demo .cp').onclick = function(){
+  const t = document.getElementById('demo').textContent.replace('העתקה','').trim();
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(()=>{ this.textContent='הועתק'; setTimeout(()=>this.textContent='העתקה',1500); }).catch(()=>{});
+};
+setTimeout(()=>{ const h=document.getElementById('hint'); if(h) h.remove(); }, 6000);
+</script>
+</body>
+</html>
