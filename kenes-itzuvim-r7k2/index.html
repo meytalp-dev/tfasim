@@ -50,6 +50,15 @@ section.grp>h2 small{font-family:'Heebo';font-size:13px;font-weight:500;color:va
 .btn.dl.sm{font-size:14px;padding:7px 13px;font-weight:500}
 .btn.ml{background:#fff;color:var(--teal);box-shadow:inset 0 0 0 1.5px var(--teal)}
 .btn:hover{filter:brightness(1.08)}
+/* סטטוס לכל פריט: מוכן לשליחה / עדיין צריך דיוק. הסימון רק בקישור של מיטל (?m=) */
+.stat{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:0}
+.stat:empty{display:none}
+.sb{display:inline-flex;align-items:center;gap:6px;font-family:'Heebo';font-size:14px;font-weight:700;padding:6px 13px;border-radius:30px;line-height:1.2;border:1.5px solid var(--line);background:#fff;color:var(--muted)}
+.sb svg{width:16px;height:16px;flex:0 0 auto}
+button.sb{cursor:pointer;min-height:40px}
+button.sb:disabled{opacity:.55;cursor:wait}
+.sb.ready.on{background:#e3f3ef;border-color:var(--teal);color:#1f6b63}
+.sb.fix.on{background:#fbf1e3;border-color:var(--amber);color:#8a5a22}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:26px 16px 34px;border-top:1px solid var(--line);margin-top:20px}
 .toast{position:fixed;left:50%;bottom:22px;translate:-50% 0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;max-width:92vw;text-align:center;z-index:20}
 .toast.on{opacity:1}
@@ -136,7 +145,7 @@ GROUPS.forEach(g=>{
     const filesHtml=multi?`<div class="files">${it.files.map(([n,f])=>`<div class="file"><a class="btn dl sm" href="files/${f}" download>${IC.dl}${esc(n)}</a></div>`).join('')}</div>`:'';
     const el=document.createElement('article');el.className='item'+(it.wide?' wide':'');
     el.innerHTML=`<a class="thumb" href="img/${it.img}" data-lb><img src="img/${it.img}" alt="${esc(it.t)}" loading="lazy"></a>
-     <div class="meta"><div class="no">${String(no).padStart(2,'0')}</div><h3>${esc(it.t)}</h3><div class="spec">${esc(it.spec)}</div><p class="desc">${esc(it.d)}</p>
+     <div class="meta"><div class="no">${String(no).padStart(2,'0')}</div><h3>${esc(it.t)}</h3><div class="spec">${esc(it.spec)}</div><div class="stat" data-st="${it.img.replace(/\.\w+$/,'')}"></div><p class="desc">${esc(it.d)}</p>
      ${it.note?`<div class="note">${esc(it.note)}</div>`:''}
      ${filesHtml}
      <div class="btns">${multi?'':`<a class="btn dl" href="files/${it.files[0][1]}" download>${IC.dl}הורדת הקובץ</a>`}
@@ -165,6 +174,36 @@ document.addEventListener('click',e=>{
   if(t){e.preventDefault();const lb=document.getElementById('lb');lb.querySelector('img').src=t.getAttribute('href');lb.classList.add('on');}
 });
 document.getElementById('lb').addEventListener('click',e=>e.currentTarget.classList.remove('on'));
+
+/* ── סטטוס הפריטים: נשמר בשרת (kenes-hachanot-gas), כולם רואים; מסמנים רק עם ?m= ── */
+const ST_API='https://script.google.com/macros/s/AKfycbxxL9KPl1IjlAo5SM5CfKsF8m5A38BsKsV-_bMjKP9705BSD_O9WLlO_bIyxXhQSrx2AQ/exec';
+const MK=new URLSearchParams(location.search).get('m')||'';
+const ST={ready:['מוכן לשליחה','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'],
+          fix:['עדיין צריך דיוק','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>']};
+let stData={},stCan=false,stBusy=false;
+function stRender(){
+  document.querySelectorAll('[data-st]').forEach(box=>{
+    const cur=stData[box.dataset.st]||'';
+    box.innerHTML=stCan
+      ?Object.keys(ST).map(k=>`<button type="button" class="sb ${k}${cur===k?' on':''}" data-set="${k}" aria-pressed="${cur===k}"${stBusy?' disabled':''}>${ST[k][1]}${ST[k][0]}</button>`).join('')
+      :(ST[cur]?`<span class="sb ${cur} on">${ST[cur][1]}${ST[cur][0]}</span>`:'');
+  });
+}
+function stLoad(){
+  return fetch(ST_API+'?print=1&mk='+encodeURIComponent(MK),{credentials:'omit'}).then(r=>r.json()).then(j=>{
+    if(j&&j.ok&&!stBusy){stData=j.print||{};stCan=!!j.canMark;stRender();}
+  }).catch(()=>{});
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-set]');if(!b||stBusy)return;
+  const id=b.closest('[data-st]').dataset.st, prev=stData[id]||'', next=prev===b.dataset.set?'':b.dataset.set;
+  stData[id]=next;stBusy=true;stRender();
+  fetch(ST_API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'print',mk:MK,id,status:next})})
+   .then(r=>r.json()).then(j=>{if(!j||!j.ok)throw 0;stData=j.print||stData;toast(next?'נשמר: '+ST[next][0]:'הסימון הוסר',2200);})
+   .catch(()=>{stData[id]=prev;toast('הסימון לא נשמר. נסי שוב.');})
+   .finally(()=>{stBusy=false;stRender();});
+});
+stLoad();setInterval(()=>{if(!document.hidden)stLoad();},60000);
 </script>
 </body>
 </html>
