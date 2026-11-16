@@ -59,6 +59,10 @@ button.sb{cursor:pointer;min-height:40px}
 button.sb:disabled{opacity:.55;cursor:wait}
 .sb.ready.on{background:#e3f3ef;border-color:var(--teal);color:#1f6b63}
 .sb.fix.on{background:#fbf1e3;border-color:var(--amber);color:#8a5a22}
+.sn{flex:1 0 100%;font-size:14.5px;background:#fff;border:1px solid var(--line);border-right:3px solid var(--navy2);padding:8px 12px;border-radius:4px;overflow-wrap:anywhere}
+.sn-ed{flex:1 0 100%;display:flex;flex-direction:column;gap:8px}
+.sn-ed textarea{width:100%;font-family:'Heebo';font-size:16px;line-height:1.5;padding:10px 12px;border:1.5px solid var(--navy2);border-radius:8px;background:#fff;color:var(--ink);resize:vertical}
+.sn-act{display:flex;flex-wrap:wrap;gap:8px}.sn-act .btn{min-height:40px}
 footer{text-align:center;color:var(--muted);font-size:13px;padding:26px 16px 34px;border-top:1px solid var(--line);margin-top:20px}
 .toast{position:fixed;left:50%;bottom:22px;translate:-50% 0;background:var(--navy);color:#fff;padding:12px 18px;border-radius:10px;font-size:15px;box-shadow:0 10px 30px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .25s;max-width:92vw;text-align:center;z-index:20}
 .toast.on{opacity:1}
@@ -90,7 +94,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:26px 16px 34p
 const GROUPS=[
  {id:'tagim',t:'תגים ומדבקות',items:[
   {t:'תג שם',spec:'9.5×14.5 ס״מ · בליד 3 מ״מ · דו־צדדי',d:'מקדימה: שם, תפקיד ומקום למדבקת הכוח המנהיגותי. מאחור: "בשולחן הגדול" עם מספר השולחן והברקוד האישי. התגים האישיים, עם השמות והברקודים, נשלחים בנפרד. כאן תגים ריקים לרזרבה.',img:'tag.jpg',files:[['תג ריק (פנים + גב)','tag-reik.pdf']]},
-  {t:'מדבקות הכוחות',spec:'דף A4 לכל כוח · 12 מדבקות 7×4 ס״מ',d:'בכל דף כל המדבקות עם אותה מילה, דף לכל אחד מעשרת הכוחות. בסוף 3 דפים של מדבקות ריקות לכתיבה בטוש.',img:'stickers.jpg',files:[['מדבקות הכוחות','stickers.pdf'],['דוגמה: מדבקה אחת בגודל אמיתי','stickers-dugma.pdf']]}
+  {t:'מדבקות הכוחות',spec:'דף A4 לכל כוח · 12 מדבקות 7×4 ס״מ',d:'בכל דף כל המדבקות עם אותה מילה, דף לכל אחד מעשרת הכוחות. בסוף 3 דפים של מדבקות ריקות לכתיבה בטוש.',img:'stickers.jpg',files:[['מדבקות הכוחות','stickers.pdf'],['מדבקות בגודל אמיתי · 10 כוחות + ריקה','stickers-godel-amiti.pdf']]}
  ]},
  {id:'kapot',t:'קאפות',items:[
   {t:'קאפת הכוחות',spec:'70×100 ס״מ · בליד 5 מ״מ',d:'"מהו הכוח המנהיגותי שלך?" עם הסבר על עשרת הכוחות, ובסוף המשפט המודגש "כי בעידן שבו הטכנולוגיה מתקדמת, הכוח האמיתי שלנו נשאר אנושי".',img:'kapa-kochot.jpg',files:[['קאפת הכוחות','kapa-kochot.pdf']]},
@@ -180,28 +184,50 @@ const ST_API='https://script.google.com/macros/s/AKfycbxxL9KPl1IjlAo5SM5CfKsF8m5
 const MK=new URLSearchParams(location.search).get('m')||'';
 const ST={ready:['מוכן לשליחה','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>'],
           fix:['עדיין צריך דיוק','<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/></svg>']};
-let stData={},stCan=false,stBusy=false;
+let stData={},stNotes={},stCan=false,stBusy=false,stEdit='';
+const IC_NOTE='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h14v12H10l-5 4z"/><path d="M9 9h6M9 12h4"/></svg>';
 function stRender(){
   document.querySelectorAll('[data-st]').forEach(box=>{
-    const cur=stData[box.dataset.st]||'';
-    box.innerHTML=stCan
-      ?Object.keys(ST).map(k=>`<button type="button" class="sb ${k}${cur===k?' on':''}" data-set="${k}" aria-pressed="${cur===k}"${stBusy?' disabled':''}>${ST[k][1]}${ST[k][0]}</button>`).join('')
+    const id=box.dataset.st,cur=stData[id]||'',note=stNotes[id]||'',dis=stBusy?' disabled':'';
+    let h=stCan
+      ?Object.keys(ST).map(k=>`<button type="button" class="sb ${k}${cur===k?' on':''}" data-set="${k}" aria-pressed="${cur===k}"${dis}>${ST[k][1]}${ST[k][0]}</button>`).join('')
       :(ST[cur]?`<span class="sb ${cur} on">${ST[cur][1]}${ST[cur][0]}</span>`:'');
+    if(stCan&&stEdit===id){
+      h+=`<div class="sn-ed"><textarea rows="3" maxlength="1000" dir="rtl" placeholder="הערה לפריט הזה" aria-label="הערה">${esc(note)}</textarea>
+        <div class="sn-act"><button type="button" class="btn dl sm" data-nsave${dis}>שמירת ההערה</button><button type="button" class="sb" data-ncancel${dis}>ביטול</button></div></div>`;
+    }else{
+      if(stCan)h+=`<button type="button" class="sb" data-nedit${dis}>${IC_NOTE}${note?'עריכת ההערה':'הוספת הערה'}</button>`;
+      if(note)h+=`<div class="sn"><b>הערה:</b> ${esc(note).replace(/\n/g,'<br>')}</div>`;
+    }
+    box.innerHTML=h;
   });
 }
 function stLoad(){
   return fetch(ST_API+'?print=1&mk='+encodeURIComponent(MK),{credentials:'omit'}).then(r=>r.json()).then(j=>{
-    if(j&&j.ok&&!stBusy){stData=j.print||{};stCan=!!j.canMark;stRender();}
+    if(j&&j.ok&&!stBusy&&!stEdit){stData=j.print||{};stNotes=j.notes||{};stCan=!!j.canMark;stRender();}
   }).catch(()=>{});
 }
-document.addEventListener('click',e=>{
-  const b=e.target.closest('[data-set]');if(!b||stBusy)return;
-  const id=b.closest('[data-st]').dataset.st, prev=stData[id]||'', next=prev===b.dataset.set?'':b.dataset.set;
-  stData[id]=next;stBusy=true;stRender();
-  fetch(ST_API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:'print',mk:MK,id,status:next})})
-   .then(r=>r.json()).then(j=>{if(!j||!j.ok)throw 0;stData=j.print||stData;toast(next?'נשמר: '+ST[next][0]:'הסימון הוסר',2200);})
-   .catch(()=>{stData[id]=prev;toast('הסימון לא נשמר. נסי שוב.');})
+function stPost(body,okMsg,undo){
+  stBusy=true;stRender();
+  fetch(ST_API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(Object.assign({action:'print',mk:MK},body))})
+   .then(r=>r.json()).then(j=>{if(!j||!j.ok)throw 0;stData=j.print||stData;stNotes=j.notes||stNotes;toast(okMsg,2200);})
+   .catch(()=>{undo();toast('לא נשמר. נסי שוב.');})
    .finally(()=>{stBusy=false;stRender();});
+}
+document.addEventListener('click',e=>{
+  const box=e.target.closest('[data-st]');if(!box||stBusy)return;
+  const id=box.dataset.st,b=e.target.closest('button');if(!b)return;
+  if(b.dataset.set){
+    const prev=stData[id]||'',next=prev===b.dataset.set?'':b.dataset.set;
+    stData[id]=next;stPost({id,status:next},next?'נשמר: '+ST[next][0]:'הסימון הוסר',()=>{stData[id]=prev;});
+  }else if('nedit' in b.dataset){
+    stEdit=id;stRender();const ta=box.querySelector('textarea');if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}
+  }else if('ncancel' in b.dataset){
+    stEdit='';stRender();
+  }else if('nsave' in b.dataset){
+    const prev=stNotes[id]||'',next=box.querySelector('textarea').value.trim();
+    stNotes[id]=next;stEdit='';stPost({id,note:next},next?'ההערה נשמרה':'ההערה נמחקה',()=>{stNotes[id]=prev;stEdit=id;});
+  }
 });
 stLoad();setInterval(()=>{if(!document.hidden)stLoad();},60000);
 </script>
