@@ -988,9 +988,9 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
   /* ---------- מצפן ---------- */
   var cp = { x: 800, y: 450, r: 0, s: 1 };
   function putCompass() { comp.style.transform = 'translate(' + cp.x.toFixed(1) + 'px,' + cp.y.toFixed(1) + 'px) rotate(' + cp.r.toFixed(1) + 'deg) scale(' + cp.s.toFixed(3) + ')'; }
-  var seq = 0;
+  var seq = 0, spd = 1;
   function tween(dur, fn) {
-    var id = seq; if (reduce) dur = 1;
+    var id = seq; if (reduce) dur = 1; else dur *= spd;
     return new Promise(function (res) {
       var t0 = performance.now(); moving++;
       (function f(now) {
@@ -1051,7 +1051,7 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
 
   /* ---------- מערכות: המצפן חושף את התמונה ומפזר את הנקודות ---------- */
   var anims = [], temps = [];
-  function A(el, kf, o) { if (!el || reduce) return; o = o || {}; if (!o.easing) o.easing = EXPO; if (!o.fill) o.fill = 'backwards'; try { anims.push(el.animate(kf, o)); } catch (e) { } }
+  function A(el, kf, o) { if (!el || reduce) return; o = o || {}; if (!o.easing) o.easing = EXPO; if (!o.fill) o.fill = 'backwards'; if (spd !== 1) { o.duration = (o.duration || 0) * spd; o.delay = (o.delay || 0) * spd; } try { anims.push(el.animate(kf, o)); } catch (e) { } }
   function killAnims() { anims.forEach(function (a) { try { a.finish(); } catch (e) { } }); anims = []; temps.forEach(function (t) { if (t.parentNode) t.parentNode.removeChild(t); }); temps = []; }
   function textIn(s, rest, t0) {
     A($('.num', s), [{ opacity: 0, transform: 'translateY(60px) scale(1.15)' }, {}], { duration: 900, delay: t0 });
@@ -1212,9 +1212,10 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
   }
   cv.addEventListener('mousemove', function (e) { hover = phase ? -1 : stationAt(e); cv.style.cursor = hover >= 0 ? 'pointer' : ''; });
   cv.addEventListener('click', function (e) { var k = stationAt(e); if (k >= 0 && !phase) { hover = -1; travel(S2N[k]); } });
-  /* הצגה אוטומטית: 5 שניות לכל שקף (בקשת מיטל 16.11.26). נעצרת בשקף האחרון. */
-  var auto = false, autoT, autoBtn = $('#autobtn');
-  function autoDur(n) { return 5000; }
+  /* הצגה אוטומטית: כל המצגת ב-6 דקות (בקשת מיטל 16.11.26) - הזמן לשקף מחושב ממספר השקפים,
+     והאנימציות מואצות (spd) כדי שיישאר זמן קריאה. נעצרת בשקף האחרון. */
+  var AUTO_TOTAL = 360000, auto = false, autoT, autoBtn = $('#autobtn');
+  function autoDur(n) { return AUTO_TOTAL / slides.length; }
   function arm() {
     clearTimeout(autoT); if (!auto) return;
     var n = mode === 'map' ? cur : target;
@@ -1226,6 +1227,7 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
   }
   function setAuto(on) {
     auto = on; document.body.classList.toggle('auto', on);
+    spd = on ? Math.max(.45, Math.min(1, autoDur(0) / 8000)) : 1;
     if (autoBtn) autoBtn.setAttribute('aria-label', on ? 'השהיית ההצגה האוטומטית' : 'הצגה אוטומטית');
     if (on && target >= slides.length - 1 && mode !== 'map') { go(0); return; }  // הפעלה מהשקף האחרון = מההתחלה
     arm();
@@ -1256,7 +1258,7 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
   var rz; addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(function () { layout(); settle(mode === 'map' ? cur : target); }, 120); });
 
   /* ---------- התחלה ---------- */
-  window.__deck = { go: go, st: function (k) { var s = stage.getBoundingClientRect(); return { x: s.left + SX(P[k].x) * K, y: s.top + SY(P[k].y) * K }; }, state: function () { return { cur: cur, target: target, phase: phase, mode: mode, on: slides.filter(function (s) { return s.classList.contains('on'); }).length }; } };
+  window.__deck = { go: go, autoTotal: function (ms) { AUTO_TOTAL = ms; },st: function (k) { var s = stage.getBoundingClientRect(); return { x: s.left + SX(P[k].x) * K, y: s.top + SY(P[k].y) * K }; }, state: function () { return { cur: cur, target: target, phase: phase, mode: mode, on: slides.filter(function (s) { return s.classList.contains('on'); }).length }; } };
   layout(); settle(Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1)));
   requestAnimationFrame(loop); wake();
   function start() { layout(); settle(cur); phase = 'act'; var id = seq, p = act(cur); if (p && p.then) p.then(function (ok) { if (ok && id === seq) { phase = ''; anims = []; } }); else phase = ''; }
