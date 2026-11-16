@@ -51,7 +51,6 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
 .credit a{color:var(--blue);text-decoration:none}
 @media (max-width:620px){h1{font-size:22px}ul.list{columns:1}.logo{height:42px}}
 </style>
-<script src="https://pedagogiamh.co.il/auth.js" data-space="pikuah" data-optional data-label="פירוט הנרשמים"></script>
 </head>
 <body>
 <header class="site"><img class="logo" src="https://pedagogiamh.co.il/vaada/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></header>
@@ -129,28 +128,13 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
     $("main").innerHTML = h;
   }
 
-  /* מי טרם נרשם/ה + פירוט הנרשמים: רק אחרי כניסה מורשית */
+  /* מי טרם נרשם/ה + פירוט הנרשמים: פתוח, בלי כניסה (מיטל 16.11.26). השרת מחזיר שם, בית ספר ורכזת בלבד */
   function people() {
-    var box = $("people"), A = window.PMH_AUTH;
-    if (!token() || !(A && A.allowed && A.allowed())) {
-      box.innerHTML = '<div class="card"><b>מי טרם נרשם/ה ופירוט הנרשמים</b><p class="sub" style="margin:4px 0 10px">שמות, רק לצוות, אחרי כניסה.</p><button type="button" class="btn main" id="loginBtn">כניסה לצפייה בפירוט</button></div>';
-      $("loginBtn").onclick = function () { if (A && A.login) A.login(); };
-      return;
-    }
+    var box = $("people");
     box.innerHTML = '<div class="card loading">טוען את הפירוט…</div>';
-    var sherut = (A.load ? A.load("admin-sherut") : Promise.resolve(null)).then(function (r) {
-      return r && r.ok && Array.isArray(r.data) ? r.data : null;
-    }, function () { return null; });
-    Promise.all([
-      fetch(EXEC, { method: "POST", body: JSON.stringify({ action: "admin", token: token() }) }).then(function (r) { return r.json(); }),
-      sherut
-    ]).then(function (res) {
-      var d = res[0];
-      if (!d || !d.ok) {
-        if (d && d.error === "noauth") { box.innerHTML = '<div class="card empty err">אין לך הרשאת צפייה בפירוט הנרשמים.</div>'; return; }
-        throw new Error((d && d.error) || "fail");
-      }
-      box.innerHTML = peopleHtml(d.rows || [], res[1]);
+    fetch(EXEC + "?mode=list").then(function (r) { return r.json(); }).then(function (d) {
+      if (!d || !d.ok) throw new Error((d && d.error) || "fail");
+      box.innerHTML = peopleHtml(d.rows || [], Array.isArray(d.sherut) ? d.sherut : null);
     }).catch(function (err) {
       box.innerHTML = '<div class="card empty err">לא הצלחתי לטעון את הפירוט (' + esc(err.message) + ').</div>';
     });
@@ -182,7 +166,7 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
           miss.map(function (g) { return "<li>" + esc(g["שם"]) + "<span>" + esc(SN.canon(g["בית ספר"])) + (g["רכזת"] ? " · רכזת: " + esc(g["רכזת"]) : "") + "</span></li>"; }).join("") + "</ul>"
           : '<div class="empty">כל מי שברשימה נרשמו.</div>', true);
     } else {
-      h += '<div class="card sub">רשימת בני ובנות השירות לא נטענה בהרשאה הזו, ולכן אין כאן "מי טרם נרשם/ה".</div>';
+      h += '<div class="card sub">רשימת בני ובנות השירות לא נטענה, ולכן אין כאן "מי טרם נרשם/ה".</div>';
     }
 
     var sorted = rows.slice().sort(function (a, b) {
@@ -215,7 +199,6 @@ ul.list li span{display:block;color:var(--muted);font-size:13.5px}
   }
   load();
   people();
-  document.addEventListener("pmh:in", people);
 })();
 </script>
 </body>
