@@ -28,6 +28,8 @@
   EXT_PAGE[2] = "mifgash-02/";
   /* 1.11.26: מפגש 3 א-סינכרוני, דף אחד לשני המסלולים, בלי מצגת */
   EXT_PAGE[3] = "mifgash-03/";
+  /* 16.11.26: מפגש 4 (כמו ב-shell.js): index.html = מצגת, melave.html = דף מלווה. התשובות לא נאספות בשרת */
+  EXT_PAGE[4] = "mifgash-04/";
   /* משאבי המפגש — אותה רשימה כמו sessionRes ב-shell.js. אצל מיטל השאלון במצב בדיקה (לא נספר),
      ומיפוי הצוות נפתח במבט-העל שלה. */
   function sessionRes(tr, num) {
@@ -57,6 +59,7 @@
   function extUrl(tr, num, view) {
     if (Number(num) === 2 && tr === "הובלה") return "mifgash-02/" + (view === "deck" ? "h-deck.html" : "h.html");
     if (Number(num) === 3) return "mifgash-03/#t=" + (tr === "הובלה" ? "h" : "k");
+    if (Number(num) === 4) return "mifgash-04/" + (view === "deck" ? "index.html" : "melave.html") + "#t=" + (tr === "הובלה" ? "h" : "k");
     return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : "";
   }
   var TRACKS = ["כלים", "הובלה"];

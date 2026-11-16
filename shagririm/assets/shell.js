@@ -34,6 +34,9 @@
   /* 1.11.26: מפגש 3 א-סינכרוני: דף אחד לשני המסלולים, פרק בתיק ההטמעה. אין מצגת */
   EXT_PAGE[3] = "mifgash-03/";
   var NO_DECK = { 3: true };
+  /* 16.11.26: מפגש 4: מצגת (index.html) ודף מלווה (melave.html) נפרדים. התשובות נשמרות במכשיר של הרכז/ת, לא בשרת */
+  EXT_PAGE[4] = "mifgash-04/";
+  var LOCAL_PAGE = { 4: true };
   /* משאבי המפגש שמובנים במערכת (3.10.26: "הכול במקום אחד"). נוספים לחומרים שבגיליון.
      [כותרת, שורת הסבר, כתובת]. אותה רשימה ב-admin.js (שם הקישורים במצב בדיקה). */
   function sessionRes(num) {
@@ -74,6 +77,7 @@
   }
   function extPageUrl(num, view) {
     var u = EXT_PAGE[num];
+    if (Number(num) === 4) return "mifgash-04/" + (view === "deck" ? "index.html" : "melave.html") + "#t=" + (str(S.me.track) === "הובלה" ? "h" : "k");
     /* 1.11.26: מפגש 3, שני המסלולים: מפתח, שם, בית ספר ומסלול אחרי # */
     if (num === 3) {
       var tk3 = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
@@ -488,7 +492,7 @@
         ? quietItem("studio", "הדף המלווה", "עמוד העבודה של המפגש. נפתח כאן ביום המפגש.")
         : '<a class="v2-bigitem primary" href="' + esc(extPageUrl(s.num)) + '" target="_blank" rel="noopener">' +
           '<span class="ic">' + ico("studio") + '</span><span class="tx"><b>הדף המלווה</b><span>' +
-          (NO_DECK[s.num] ? "עובדים בקצב אישי, והכול נשמר בתיק ההטמעה" : "כאן עונים במהלך המפגש, והתשובות עולות לשקפים") + "</span></span>" +
+          (NO_DECK[s.num] ? "עובדים בקצב אישי, והכול נשמר בתיק ההטמעה" : LOCAL_PAGE[s.num] ? "ההוראות, הבקשות והצילומים של המפגש, שלב אחרי שלב" :"כאן עונים במהלך המפגש, והתשובות עולות לשקפים") + "</span></span>" +
           '<span class="end"><span class="v2-btn primary">פתיחה</span></span></a>';
     } else if (s.hasPage) {
       pg.innerHTML = '<button type="button" class="v2-bigitem primary" id="v2-open-page">' +
