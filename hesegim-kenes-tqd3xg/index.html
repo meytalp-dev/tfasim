@@ -1212,9 +1212,9 @@ body.auto #nav #autobtn{background:var(--teal);border-color:var(--teal);color:va
   }
   cv.addEventListener('mousemove', function (e) { hover = phase ? -1 : stationAt(e); cv.style.cursor = hover >= 0 ? 'pointer' : ''; });
   cv.addEventListener('click', function (e) { var k = stationAt(e); if (k >= 0 && !phase) { hover = -1; travel(S2N[k]); } });
-  /* הצגה אוטומטית: 12 שניות לשקף בית ספר, 8 לשקף מנהל ולשער. נעצרת בשקף האחרון. */
+  /* הצגה אוטומטית: 5 שניות לכל שקף (בקשת מיטל 16.11.26). נעצרת בשקף האחרון. */
   var auto = false, autoT, autoBtn = $('#autobtn');
-  function autoDur(n) { return isCov(n) || isMin(n) ? 8000 : 12000; }
+  function autoDur(n) { return 5000; }
   function arm() {
     clearTimeout(autoT); if (!auto) return;
     var n = mode === 'map' ? cur : target;
