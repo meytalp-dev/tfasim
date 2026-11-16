@@ -94,7 +94,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;padding:26px 16px 34p
 const GROUPS=[
  {id:'tagim',t:'תגים ומדבקות',items:[
   {t:'תג שם',spec:'9.5×14.5 ס״מ · בליד 3 מ״מ · דו־צדדי',d:'מקדימה: שם, תפקיד ומקום למדבקת הכוח המנהיגותי. מאחור: "בשולחן הגדול" עם מספר השולחן והברקוד האישי. התגים האישיים, עם השמות והברקודים, נשלחים בנפרד. כאן תגים ריקים לרזרבה.',img:'tag.jpg',files:[['תג ריק (פנים + גב)','tag-reik.pdf']]},
-  {t:'מדבקות הכוחות',spec:'דף A4 לכל כוח · 12 מדבקות 7×4 ס״מ',d:'בכל דף כל המדבקות עם אותה מילה, דף לכל אחד מעשרת הכוחות. בסוף 3 דפים של מדבקות ריקות לכתיבה בטוש.',img:'stickers.jpg',files:[['מדבקות הכוחות','stickers.pdf'],['מדבקות בגודל אמיתי · 10 כוחות','stickers-godel-amiti.pdf'],['מדבקה ריקה בגודל אמיתי','stickers-reika.pdf']]}
+  {t:'מדבקות הכוחות',spec:'דף A4 לכל כוח · 12 מדבקות 7×4 ס״מ',d:'בכל דף כל המדבקות עם אותה מילה, דף לכל אחד מעשרת הכוחות. בסוף 3 דפים של מדבקות ריקות לכתיבה בטוש.',img:'stickers.jpg',files:[['דפי A4 · 12 מדבקות בדף','stickers.pdf'],['מדבקות בגודל אמיתי · 10 כוחות','stickers-godel-amiti.pdf'],['מדבקה ריקה בגודל אמיתי','stickers-reika.pdf']]}
  ]},
  {id:'kapot',t:'קאפות',items:[
   {t:'קאפת הכוחות',spec:'70×100 ס״מ · בליד 5 מ״מ',d:'"מהו הכוח המנהיגותי שלך?" עם הסבר על עשרת הכוחות, ובסוף המשפט המודגש "כי בעידן שבו הטכנולוגיה מתקדמת, הכוח האמיתי שלנו נשאר אנושי".',img:'kapa-kochot.jpg',files:[['קאפת הכוחות','kapa-kochot.pdf']]},
@@ -121,6 +121,8 @@ const GROUPS=[
 
 const isMobile=/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)||(matchMedia('(pointer:coarse)').matches&&innerWidth<900);
 const abs=f=>new URL('files/'+f,location.href).href;
+/* 16.11.26 (מיטל): הקובץ יורד בשם עברי (כתובת הקובץ נשארת באנגלית כדי שהקישורים במייל לא יישברו) */
+const heName=(it,n)=>((it.files.length>1?it.t+' - '+n:it.t).replace(/[·\/:*?"<>|]/g,' ').replace(/\s+/g,' ').trim()+'.pdf');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const IC={dl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>',
           ml:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>'};
@@ -146,13 +148,13 @@ GROUPS.forEach(g=>{
     no++;const m=mailParts(it);
     const mailto=`mailto:?subject=${encodeURIComponent(m.subject)}&body=${encodeURIComponent(m.text)}`;
     const multi=it.files.length>1;
-    const filesHtml=multi?`<div class="files">${it.files.map(([n,f])=>`<div class="file"><a class="btn dl sm" href="files/${f}" download>${IC.dl}${esc(n)}</a></div>`).join('')}</div>`:'';
+    const filesHtml=multi?`<div class="files">${it.files.map(([n,f])=>`<div class="file"><a class="btn dl sm" href="files/${f}" download="${esc(heName(it,n))}">${IC.dl}${esc(n)}</a></div>`).join('')}</div>`:'';
     const el=document.createElement('article');el.className='item'+(it.wide?' wide':'');
     el.innerHTML=`<a class="thumb" href="img/${it.img}" data-lb><img src="img/${it.img}" alt="${esc(it.t)}" loading="lazy"></a>
      <div class="meta"><div class="no">${String(no).padStart(2,'0')}</div><h3>${esc(it.t)}</h3><div class="spec">${esc(it.spec)}</div><div class="stat" data-st="${it.img.replace(/\.\w+$/,'')}"></div><p class="desc">${esc(it.d)}</p>
      ${it.note?`<div class="note">${esc(it.note)}</div>`:''}
      ${filesHtml}
-     <div class="btns">${multi?'':`<a class="btn dl" href="files/${it.files[0][1]}" download>${IC.dl}הורדת הקובץ</a>`}
+     <div class="btns">${multi?'':`<a class="btn dl" href="files/${it.files[0][1]}" download="${esc(heName(it,it.files[0][0]))}">${IC.dl}הורדת הקובץ</a>`}
       <a class="btn ml" href="${mailto}" data-mail="${no-1}">${IC.ml}${multi?'שליחת כל הקבצים במייל':'שליחה במייל'}</a></div></div>`;
     el._mail=m;sec.append(el);
   });
