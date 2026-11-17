@@ -265,6 +265,13 @@ window.startApp = function (R) {
   const sPlaced = STU.find(s => PLACE(s.emp) === 'out') || STU[0];
   const sNone = STU.find(s => !s.emp && s.status !== 'עזב') || STU[STU.length - 1];
   const active = () => STU.filter(s => s.status !== 'עזב');
+  /* 16.11.26 (מיטל): התלמידים לפי שם משפחה, בסדר האלף-בית. השם שמור כשדה אחד "פרטי משפחה", ולכן שם המשפחה = כל מה שאחרי המילה הראשונה ("בן דוד", "אבו ראס" נשארים שלמים) */
+  const lastKey = n => { const w = String(n || '').trim().split(/\s+/); return w.length > 1 ? w.slice(1).join(' ') : w[0]; };
+  const byLast = (a, b) => lastKey(a.name).localeCompare(lastKey(b.name), 'he') || String(a.name).localeCompare(String(b.name), 'he');
+  const sortStu = () => STU.sort(byLast);
+  /* חיפוש לפי שם: כל מילה שהוקלדה צריכה להופיע בשם, בכל סדר ("כהן דנה" מוצא את "דנה כהן") */
+  const nameHit = (s, q) => { const w = String(q || '').trim().split(/\s+/).filter(Boolean), n = String(s.name || ''); return !!w.length && w.every(x => n.includes(x)); };
+  sortStu();
   const newLeadId = () => 'L' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   /* פניות נשמרות מוצפנות (lead:<id>). מעסיק שסומן כפנייה בקובץ נכנס פעם אחת כפנייה */
   const LEADS = R.LEADS;
@@ -396,7 +403,7 @@ window.startApp = function (R) {
       <div class="sec-head att-head"><h2>דיווח נוכחות</h2><label class="mon-lbl">חודש הדיווח <select class="mon-pick" id="monPick" aria-label="חודש הדיווח">${(() => { const N = Store.monthsBack(), opt = b => { const m = Store.monthInfo(b); return `<option value="${b}" ${MONTH.back === b ? 'selected' : ''}>${esc(m.label)}</option>`; }; const open = [0, 1].filter(b => b <= N).map(opt).join(''), old = []; for (let b = 2; b <= N; b++) old.push(opt(b)); return open + (old.length ? `<optgroup label="חודשים קודמים">${old.join('')}</optgroup>` : ''); })()}</select></label><button class="btn quiet" data-act="att-close">${ic('back')}חזרה</button></div>
       <div class="confirm" id="prevBar" hidden></div>
       <div class="stu-filters"><label class="mon-lbl">קבוצה <select class="mon-pick stu-sel" id="attCls"><option value="">בחירת קבוצה</option></select></label><label class="mon-lbl">מגמה <select class="mon-pick stu-sel" id="attMg"><option value="">בחירת מגמה</option></select></label></div>
-      <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="find" class="find big" placeholder="כיתה או מספר פעולה" autocomplete="off"></div>
+      <div class="finder"><span class="finder-ic">${ic('search')}</span><input id="find" class="find big" placeholder="שם, כיתה או מספר פעולה" autocomplete="off"></div>
       <div class="emp-b edit att-pull"><button class="btn" data-act="mentor-pull">${ic('download')}משיכת סימוני המנטור.ית</button><span class="hint">מה שהמנטורים סימנו בקישור שלהם · רק ימים שלא סומנו כאן</span></div>
       <div id="grpList" class="grp-list" hidden></div>
       <div id="roster" class="roster" hidden></div>
@@ -526,7 +533,7 @@ window.startApp = function (R) {
     if (view === 'att' && matchMedia('(pointer:fine)').matches) $('find').focus();
     try { if (o.pop) { } else if (o.replace || same) history.replaceState({ v: view, d: 0 }, '', '#' + view); else history.pushState({ v: view, d: 0 }, '', '#' + view); } catch (e) {}
   }
-  function renderMain() { renderPrevBar(); renderRoster(); renderOverview(); renderStuList(); renderEmps(); renderChkStu(); renderChkCal(); renderProgram(); renderReports(); renderAdmin(); }
+  function renderMain() { sortStu(); renderPrevBar(); renderRoster(); renderOverview(); renderStuList(); renderEmps(); renderChkStu(); renderChkCal(); renderProgram(); renderReports(); renderAdmin(); }
   const logout = () => { if (SUBS.some(x => x.dirty) && !confirm('לצאת בלי לשמור?')) return; R.hooks.logout(); };
   $('logout').onclick = logout;
   /* החודש המוצג: הנוכחי או הקודם (להגשה בתחילת החודש). מחליפים — הנתונים נטענים מחדש */
@@ -600,7 +607,7 @@ window.startApp = function (R) {
     fill('attMg', [...new Set(L.map(s => s.mg).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'he')), 'בחירת מגמה', ATT_F.mg);
   }
   function attPick() { $('find').value = ''; shown = ATT_F.cls || ATT_F.mg ? active().filter(s => (!ATT_F.cls || s.cls === ATT_F.cls) && (!ATT_F.mg || s.mg === ATT_F.mg)).sort((a, b) => clsSort(a.cls, b.cls)) : []; renderRoster(); }
-  function find(q) { ATT_F.cls = ATT_F.mg = ''; const n = norm(q), ex = active().filter(s => norm(s.cls) === n); shown = !n ? [] : ex.length ? ex : active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || s.name.includes(q.trim())); renderRoster(); }
+  function find(q) { ATT_F.cls = ATT_F.mg = ''; const n = norm(q), ex = active().filter(s => norm(s.cls) === n); shown = !n ? [] : ex.length ? ex : active().filter(s => norm(s.cls).startsWith(n) || (s.act && s.act.startsWith(n)) || nameHit(s, q)); renderRoster(); }
   /* רשימה שנטענה מראש: אין מספר כיתה, אז בוחרים קבוצה. המספור לפי סדר מספרי הפעולה */
   function renderGroups() {
     const box = $('grpList'); if (!box) return;
@@ -791,7 +798,7 @@ window.startApp = function (R) {
   /* סינון (3.11.26): קבוצה, מגמה וחיפוש חופשי פועלים יחד על אותה רשימה. עם סינון או חיפוש כל הקבוצות פתוחות */
   /* pace = 'behind': רק מי שבפיגור ב-150 השעות (15.11.26) */
   const STU_F = { cls: '', mg: '', q: '', pace: '' };
-  const stuMatch = s => { const q = STU_F.q, n = norm(q); return (!STU_F.cls || s.cls === STU_F.cls) && (!STU_F.mg || s.mg === STU_F.mg) && (!STU_F.pace || behind(s)) && (!n || s.name.includes(q) || norm(s.cls).includes(n) || norm(s.mg).includes(n) || (s.act && s.act.startsWith(n))); };
+  const stuMatch = s => { const q = STU_F.q, n = norm(q); return (!STU_F.cls || s.cls === STU_F.cls) && (!STU_F.mg || s.mg === STU_F.mg) && (!STU_F.pace || behind(s)) && (!n || nameHit(s, q) || norm(s.cls).includes(n) || norm(s.mg).includes(n) || (s.act && s.act.startsWith(n))); };
   function stuFilterOpts() {
     const fill = (id, vals, all) => { const sel = $(id); if (!sel) return; const cur = sel.value; sel.innerHTML = `<option value="">${all}</option>` + vals.map(v => `<option value="${esc(v)}" ${v === cur ? 'selected' : ''}>${esc(v)}</option>`).join(''); if (![...sel.options].some(o => o.value === cur)) { sel.value = ''; STU_F[id === 'stuCls' ? 'cls' : 'mg'] = ''; } };
     fill('stuCls', [...new Set(STU.map(s => s.cls).filter(Boolean))].sort(clsSort), 'כל הקבוצות');
@@ -1495,7 +1502,7 @@ window.startApp = function (R) {
       if (o.manual) { const r = defRate(s); if (r) { pay = o.h * r; rates.add(r); } else miss = true; }
       else ds.forEach(d => { const r = rateOf(s, d); if (!r) { miss = true; return; } rates.add(r); pay += dayHours(s, d, TIMES[s.id], HRS[s.id]) * r; });
       return { s, days: ds.length, h: o.h, manual: o.manual, rates: [...rates].sort((a, b) => a - b), pay: miss ? null : Math.round(pay * 100) / 100 };
-    }).filter(Boolean).sort((a, b) => String(a.s.name).localeCompare(String(b.s.name), 'he'));
+    }).filter(Boolean).sort((a, b) => byLast(a.s, b.s));
   }
   const nis2 = n => (Math.round((+n || 0) * 100) / 100).toLocaleString('he-IL', { maximumFractionDigits: 2 }) + ' ₪';
   const payTot = L => ({ days: L.reduce((n, x) => n + x.days, 0), h: Math.round(L.reduce((n, x) => n + x.h, 0) * 10) / 10, pay: Math.round(L.reduce((n, x) => n + (x.pay || 0), 0) * 100) / 100, miss: L.filter(x => x.pay == null).length });
