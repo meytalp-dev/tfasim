@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>איך מדווחים · מערכת רכזי החניכות</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Assistant:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* מדריך כתוב: איך מדווחים במערכת רכזי החניכות, מהכניסה הראשונה עד ההגשה (18.11.26). צילומי המסך מקופלים, מנתונים בדויים במצב הדגמה */
+:root{--bg:#F6F2E9;--card:#FFFDF8;--ink:#1D4F5E;--text:#243B42;--muted:#6B7272;--line:#DCD3C2;--amber:#C4862A;--tint:#EEF3F0;--warn:#F6EBD8;
+ --head:'Rubik',sans-serif;--body:'Assistant',sans-serif}
+*{box-sizing:border-box}html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--body);font-size:17px;line-height:1.6}
+a{color:var(--ink)}
+.i{width:1.1em;height:1.1em;flex:none;vertical-align:-.18em}
+.minhal{background:#fff;display:flex;justify-content:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.minhal img{height:46px;width:auto}
+.wrap{max-width:860px;margin:0 auto;padding:22px 16px 40px}
+.head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand svg{width:42px;height:46px;flex:none}
+h1{font-family:var(--head);font-weight:800;color:var(--ink);font-size:1.6em;margin:0;line-height:1.2}
+.brand small{display:block;color:var(--muted);font-size:.95rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45em;min-height:44px;padding:.45em 1.05em;border-radius:999px;border:1px solid var(--line);background:var(--card);font-weight:700;color:var(--ink);text-decoration:none;white-space:nowrap;font-size:1rem}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+.lead{margin:16px 0 10px;color:var(--muted)}
+/* ניווט שלבים דביק */
+.steps-nav{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);margin:0 -16px;padding:8px 16px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+.steps-nav a{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:4px 12px 4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);text-decoration:none;color:var(--ink);font-weight:600;font-size:.92rem;white-space:nowrap}
+.steps-nav a b{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--head);font-size:.82rem}
+.steps-nav a.on{border-color:var(--ink);background:var(--tint)}
+/* מסלול מקוצר */
+.path{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin:18px 0 8px}
+.path h2{font-family:var(--head);font-size:1.08em;color:var(--ink);margin:0 0 6px}
+.path ol{margin:0;padding-inline-start:1.3em}
+.path li{margin:2px 0}
+/* שלב */
+.step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-top:16px}
+.step-h{display:flex;align-items:center;gap:12px;margin:0 0 8px}
+.num{flex:none;width:40px;height:40px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center;font-family:var(--head);font-weight:800;font-size:1.1em}
+.step h2{font-family:var(--head);font-weight:700;color:var(--ink);font-size:1.25em;margin:0;line-height:1.25}
+.step h3{font-family:var(--head);font-weight:700;color:var(--ink);font-size:1.02em;margin:16px 0 4px}
+.step p{margin:6px 0}
+.step ol,.step ul{margin:6px 0;padding-inline-start:1.3em}
+.step li{margin:4px 0}
+.ui{font-weight:700;color:var(--ink);background:var(--tint);border-radius:6px;padding:0 6px;white-space:nowrap}
+.note{background:var(--warn);border-inline-start:4px solid var(--amber);border-radius:8px;padding:10px 14px;margin:12px 0 4px}
+.note b{color:#7a5418}
+.tip{background:var(--tint);border-radius:8px;padding:10px 14px;margin:12px 0 4px}
+.who{display:inline-block;font-size:.8em;font-weight:700;padding:1px 10px;border-radius:999px;background:#F3E6D1;color:#7a5418;margin-inline-start:4px;vertical-align:2px}
+/* צילומי מסך מקופלים */
+details.shot{margin-top:12px;border:1px solid var(--line);border-radius:10px;background:#fff}
+details.shot>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 14px;color:var(--ink);font-weight:600}
+details.shot>summary::-webkit-details-marker{display:none}
+details.shot>summary .chev{margin-inline-start:auto;transition:transform .2s}
+details.shot[open]>summary .chev{transform:rotate(180deg)}
+details.shot>summary:focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:10px}
+.shots{padding:4px 14px 14px;display:grid;gap:14px}
+figure{margin:0}
+figure img{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:8px;margin-inline:auto}
+figure img.narrow{max-width:420px;width:100%}
+figure img.tiny{max-width:260px;width:100%}
+figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
+.sym{display:inline-grid;place-items:center;min-width:1.6em;height:1.6em;border-radius:6px;font-weight:800;padding:0 4px}
+.sym.p{background:var(--ink);color:#fff}.sym.a{border:1.5px solid var(--amber);color:var(--amber);background:#fff}.sym.e{border:1.5px solid var(--line);background:#fff;color:var(--muted)}
+/* סרטונים */
+.videos{margin-top:26px;background:var(--ink);color:#fff;border-radius:14px;padding:20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;justify-content:space-between}
+.videos h2{font-family:var(--head);margin:0;font-size:1.25em}
+.videos p{margin:4px 0 0;opacity:.9}
+.videos .btn{background:#fff;color:var(--ink);border-color:#fff}
+.foot{margin-top:36px;text-align:center;color:var(--muted);font-size:.9em}
+.foot .help{display:inline-flex;align-items:center;gap:.4em;min-height:44px}
+.foot p{margin:6px 0}
+@media (max-width:600px){h1{font-size:1.3em}.brand svg{width:34px;height:38px}.head .btn{width:100%}.step{padding:16px 14px}.step h2{font-size:1.12em}.num{width:34px;height:34px}.shots{padding:4px 8px 10px}}
+@media print{.steps-nav,.videos .btn,.head .btn{display:none}details.shot>.shots{display:grid}.step{break-inside:avoid-page}}
+</style>
+</head>
+<body>
+<div class="minhal"><img src="logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+<main class="wrap">
+  <header class="head">
+    <div class="brand">
+      <svg viewBox="0 0 320 350" aria-hidden="true"><path d="M74 300 V118 C74 72 102 44 148 44 H160" fill="none" stroke="#1D4F5E" stroke-width="76" stroke-linecap="round" stroke-linejoin="round"/><path d="M130 6 H226 A60 60 0 0 1 286 66 V74 C262 78 246 94 238 116 L222 82 H166 Z" fill="#C4862A"/><rect x="206" y="22" width="80" height="312" rx="40" fill="#7F9A8E" stroke="#F6F2E9" stroke-width="9" paint-order="stroke"/></svg>
+      <div><h1>איך מדווחים</h1><small>מערכת רכזי החניכות · מהכניסה הראשונה ועד הגשת החודש</small></div>
+    </div>
+    <a class="btn primary" href="./"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4"/><path d="M10 16l-4-4 4-4"/><path d="M6 12h10"/></svg>כניסה למערכת</a>
+  </header>
+
+  <p class="lead">המדריך עובר על הדיווח לפי הסדר. ליד כל שלב יש צילומי מסך מקופלים: לוחצים על "צילומי מסך" כדי לפתוח. השמות בצילומים בדויים.</p>
+
+  <nav class="steps-nav" aria-label="שלבי הדיווח" id="nav"></nav>
+
+  <section class="path" aria-labelledby="pathH">
+    <h2 id="pathH">המסלול בקצרה</h2>
+    <ol>
+      <li>כניסה ראשונה: קוד מהמייל, קוד הפעלה, סיסמה ושמירת קוד השחזור</li>
+      <li>מעסיקים: מוסיפים מעסיק ומשייכים אליו תלמידים</li>
+      <li>בתיק כל תלמיד.ה: ימי העבודה הקבועים ושעות ביום</li>
+      <li><span class="ui">דיווח נוכחות</span>: מסמנים ✓ או ✗ בכל יום עבודה</li>
+      <li>מה שחורג: הערה, היעדרות באישור, שעות אחרות, יום נוסף, יום בלי תעסוקה</li>
+      <li><span class="ui">שליחת הדיווח</span> לכל מגמה, עד ה-15 בחודש הבא</li>
+      <li>מעקב: 150 השעות ודוחות</li>
+    </ol>
+  </section>
+
+  <!-- 1 -->
+  <section class="step" id="s1" data-nav="כניסה ראשונה">
+    <div class="step-h"><span class="num">1</span><h2>כניסה ראשונה והפעלת המערכת</h2></div>
+    <p>עושים את זה פעם אחת, בתחילת העבודה. רשימת התלמידים של בית הספר כבר נמצאת במערכת, מוצפנת.</p>
+    <ol>
+      <li>נכנסים לכתובת <a href="https://tfasim.pedagogiamh.co.il/chanichut/" dir="ltr">tfasim.pedagogiamh.co.il/chanichut</a>.</li>
+      <li>מקלידים את שם בית הספר ובוחרים אותו מהרשימה.</li>
+      <li>בשדה "מי נכנס.ת" בוחרים <span class="ui">רכז.ת החניכות</span>. ליד מופיע המייל שאליו יישלח הקוד, מוסתר בחלקו.</li>
+      <li>לוחצים <span class="ui">שליחת קוד למייל</span>, ומקלידים את הקוד בן 6 הספרות שמגיע במייל. לא הגיע תוך דקה? בודקים גם בספאם.</li>
+      <li>נפתח המסך "בית הספר נכנס לראשונה". מקלידים את <b>קוד ההפעלה</b>, שהגיע במייל נפרד מהמרחב הפדגוגי, ובוחרים סיסמה חדשה: 8 תווים לפחות. לוחצים <span class="ui">יצירת הסיסמה</span>.</li>
+      <li>מופיע <b>קוד השחזור</b>. לוחצים <span class="ui">הדפסה</span> או <span class="ui">העתקה</span>, ושומרים אותו במקום נעול.</li>
+      <li>מסמנים <span class="ui">שמרתי את הקוד</span> ולוחצים <span class="ui">כניסה למערכת</span>.</li>
+    </ol>
+    <div class="note"><b>חשוב:</b> השמות מוצפנים, ורק הסיסמה שלכם או קוד השחזור פותחים אותם. גם המרחב הפדגוגי לא יכול לפתוח אותם. לא שולחים את קוד השחזור במייל או בוואטסאפ.</div>
+    <h3>בכניסות הבאות</h3>
+    <p>בית הספר ← <span class="ui">רכז.ת החניכות</span> ← קוד מהמייל ← הסיסמה שלכם. שכחתם את הסיסמה? במסך הסיסמה לוחצים <span class="ui">שכחתי את הסיסמה</span>, מקלידים את קוד השחזור ובוחרים סיסמה חדשה.</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 4<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img class="narrow" src="madrich/01-gate.png" alt="מסך הכניסה: בית הספר, רכז.ת החניכות וכפתור שליחת קוד למייל" loading="lazy"><figcaption>בית הספר ← רכז.ת החניכות ← שליחת קוד למייל</figcaption></figure>
+        <figure><img class="narrow" src="madrich/02-code.png" alt="הקלדת הקוד בן 6 הספרות" loading="lazy"><figcaption>הקוד מהמייל</figcaption></figure>
+        <figure><img class="narrow" src="madrich/03-activate.png" alt="בחירת סיסמה בכניסה הראשונה" loading="lazy"><figcaption>כניסה ראשונה: בוחרים סיסמה</figcaption></figure>
+        <figure><img class="narrow" src="madrich/04-recovery.png" alt="קוד השחזור עם כפתורי הדפסה והעתקה" loading="lazy"><figcaption>קוד השחזור: מדפיסים או מעתיקים, ואז "שמרתי את הקוד"</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <!-- 2 -->
+  <section class="step" id="s2" data-nav="דף הבית">
+    <div class="step-h"><span class="num">2</span><h2>דף הבית</h2></div>
+    <p>אחרי הכניסה נפתח דף הבית: כמה תלמידים, כמה עובדים, כמה מגמות הגישו, והתעסוקה לפי מגמה. בצד: <span class="ui">מה דורש טיפול היום</span> ו<span class="ui">חניכי - העוזר המושלם</span>.</p>
+    <p>בתפריט העליון: סקירה, נוכחות, תלמידים, מעסיקים, צ'ק ליסט ו"עוד" (דוחות וניהול). הכפתור <span class="ui">דיווח נוכחות</span> נמצא למעלה בכל מסך.</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילום מסך<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots"><figure><img src="madrich/05-home.png" alt="דף הבית של המערכת" loading="lazy"><figcaption>דף הבית</figcaption></figure></div>
+    </details>
+  </section>
+
+  <!-- 3 -->
+  <section class="step" id="s3" data-nav="מעסיקים ושיבוץ">
+    <div class="step-h"><span class="num">3</span><h2>מעסיקים ושיבוץ תלמידים</h2></div>
+    <p>נוכחות מדווחים רק לתלמיד.ה ששובצ.ה אצל מעסיק או בעסק בית-ספרי. לכן קודם מכניסים את המעסיקים.</p>
+    <ol>
+      <li>נכנסים ל<span class="ui">מעסיקים</span> ולוחצים <span class="ui">מעסיק חדש</span>.</li>
+      <li>ממלאים: שם המעסיק, איש.אשת קשר, טלפון, כתובת, מנטור.ית ומייל. מסמנים מגמה וכמה תקנים. רק השם חובה, אבל אם חסרים פרטים המערכת שואלת אם לשמור בכל זאת.</li>
+      <li>לוחצים <span class="ui">שמירה</span>. המעסיק מופיע ברשימה.</li>
+      <li>לוחצים על המעסיק, ובכרטיס שלו על <span class="ui">שיוך תלמידים</span>.</li>
+      <li>מסמנים מי עובד.ת אצלו (התלמידים מסודרים לפי קבוצה) ולוחצים <span class="ui">שמירה</span>.</li>
+    </ol>
+    <div class="tip"><b>דרכים נוספות:</b> ברשימת <span class="ui">תלמידים</span> אפשר לבחור מעסיק ליד כל שם. בתיק התלמיד.ה, בכרטיס "איפה עובד.ת", בוחרים מעסיק בחוץ, עסק בית-ספרי, או "לא מועסק.ת" עם הסיבה. צריך עוד מעסיקים? <span class="ui">אשף מציאת מעסיקים</span> במסך המעסיקים.</div>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 4<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img src="madrich/06-employers.png" alt="ראש מסך המעסיקים עם הכפתורים מעסיק חדש ואשף מציאת מעסיקים" loading="lazy"><figcaption>מסך המעסיקים: "מעסיק חדש"</figcaption></figure>
+        <figure><img src="madrich/07-new-emp.png" alt="טופס מעסיק חדש ממולא" loading="lazy"><figcaption>פרטי המעסיק, מגמה ותקנים</figcaption></figure>
+        <figure><img src="madrich/08-emp-card.png" alt="כרטיס המעסיק עם הכפתור שיוך תלמידים" loading="lazy"><figcaption>כרטיס המעסיק: "שיוך תלמידים"</figcaption></figure>
+        <figure><img src="madrich/09-assign.png" alt="רשימת תלמידים לפי קבוצה עם תיבות סימון" loading="lazy"><figcaption>מסמנים את התלמידים ושומרים</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <!-- 4 -->
+  <section class="step" id="s4" data-nav="ימי עבודה ושעות">
+    <div class="step-h"><span class="num">4</span><h2>ימי עבודה ושעות בתיק התלמיד.ה</h2></div>
+    <p>המערכת בונה את ימי הדיווח מהימים הקבועים של כל תלמיד.ה. בלי ימי עבודה אין מה לסמן.</p>
+    <ol>
+      <li>לוחצים על שם התלמיד.ה (מ"תלמידים" או מכל רשימה) ונפתח התיק.</li>
+      <li>בכרטיס <span class="ui">ימי עבודה ונוכחות</span> מקישים על הימים הקבועים בשבוע, למשל א׳ וג׳. כל ימי א׳ וג׳ בחודש נוצרים לבד ומוכנים לסימון.</li>
+      <li>בשדה <span class="ui">שעות ביום עבודה</span> מקלידים כמה שעות עובד.ת ביום. אם הוגדרו שעות ביום אצל המעסיק, הן ברירת המחדל ואין צורך להקליד.</li>
+    </ol>
+    <p>מהימים והשעות המערכת מחשבת לבד את סך השעות בחודש. אין הזנה ידנית של סך השעות.</p>
+    <div class="tip">את הימים בוחרים פעם אחת, לא כל חודש. שינוי ימים חל על כל חודש שעוד פתוח לדיווח. חודש שהוגש שומר את הימים שהיו בו.</div>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילום מסך<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots"><figure><img src="madrich/10-tik-days.png" alt="בתיק התלמידה: איפה עובדת, ימי עבודה א׳ וג׳ ושעות ביום עבודה 5" loading="lazy"><figcaption>"איפה עובד.ת", ימים קבועים א׳ ג׳, ו-5 שעות ביום</figcaption></figure></div>
+    </details>
+  </section>
+
+  <!-- 5 -->
+  <section class="step" id="s5" data-nav="סימון נוכחות">
+    <div class="step-h"><span class="num">5</span><h2>סימון נוכחות</h2></div>
+    <ol>
+      <li>לוחצים <span class="ui">דיווח נוכחות</span> למעלה.</li>
+      <li>ב<span class="ui">חודש הדיווח</span> בוחרים את החודש: הנוכחי, או החודש שעבר אם עוד לא הוגש. אם החודש שעבר עוד פתוח, המערכת מזכירה ומציעה לעבור אליו.</li>
+      <li>בוחרים <span class="ui">קבוצה</span> או <span class="ui">מגמה</span>. אפשר גם לחפש לפי שם, כיתה או מספר פעולה.</li>
+      <li>ליד כל תלמיד.ה מופיעים ימי העבודה שלו.ה בחודש. מקישים על היום:
+        <ul>
+          <li>הקשה אחת = <span class="sym p">✓</span> הגיע.ה</li>
+          <li>הקשה שנייה = <span class="sym a">✗</span> לא הגיע.ה</li>
+          <li>הקשה שלישית מנקה את הסימון <span class="sym e">&nbsp;</span></li>
+        </ul>
+      </li>
+    </ol>
+    <p>ימים שעוד לא הגיעו מעומעמים, ואי אפשר לסמן אותם מראש. ליד כל תלמיד.ה מופיע הסיכום: כמה ימים מתוך כמה, וכמה שעות. השמירה אוטומטית.</p>
+    <div class="tip"><b>דרך מהירה:</b> לכתוב ל<span class="ui">חניכי</span> בדף הבית, למשל "סמן שתמר הגיעה היום". חניכי שואל לפני שהוא מסמן.</div>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 5<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img class="tiny" src="madrich/11-att-btn.png" alt="הכפתור דיווח נוכחות" loading="lazy"><figcaption>הכפתור למעלה, בכל מסך</figcaption></figure>
+        <figure><img src="madrich/12-att-top.png" alt="ראש מסך דיווח נוכחות עם בחירת חודש" loading="lazy"><figcaption>בוחרים את חודש הדיווח</figcaption></figure>
+        <figure><img src="madrich/13-roster-empty.png" alt="רשימת התלמידים של יא 1 עם ימי העבודה, לפני סימון" loading="lazy"><figcaption>לפני הסימון: ימי העבודה של כל תלמיד.ה</figcaption></figure>
+        <figure><img src="madrich/14-roster-marked.png" alt="אותה רשימה אחרי סימון: ימים מסומנים ב-וי ויום אחד ב-איקס" loading="lazy"><figcaption>אחרי הסימון: ✓ הגיע.ה, ✗ לא הגיע.ה, והשעות מתעדכנות</figcaption></figure>
+        <figure><img src="madrich/15-row.png" alt="שורה של תלמיד אחד בהגדלה" loading="lazy"><figcaption>שורה אחת: 4 מתוך 6 עד היום · 20 שעות</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <!-- 6 -->
+  <section class="step" id="s6" data-nav="הערות ושעות">
+    <div class="step-h"><span class="num">6</span><h2>היעדרות באישור, הערה או שעות אחרות</h2></div>
+    <p>כשיום חורג מהרגיל, לוחצים <span class="ui">הערה או שעות</span> בשורת התלמיד.ה. נפתחת רשימת ימי החודש, ולכל יום:</p>
+    <ul>
+      <li><b>מצב</b>: הגיע.ה, לא הגיע.ה, או <b>היעדרות באישור</b> (רק מכאן).</li>
+      <li><b>הערה</b> חופשית.</li>
+      <li><b>הגעה ויציאה</b>, או <b>שעות</b> ליום הזה כשהן שונות מהרגיל.</li>
+    </ul>
+    <p>לוחצים <span class="ui">סיום</span>. היעדרות באישור מסומנת בצבע אחר, ויום עם הערה מקבל סימן עיפרון קטן.</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילום מסך<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots"><figure><img src="madrich/16-notes.png" alt="מסך הערות ושעות: לכל יום מצב, הערה, הגעה, יציאה ושעות" loading="lazy"><figcaption>"הערה או שעות": שורה לכל יום עבודה</figcaption></figure></div>
+    </details>
+  </section>
+
+  <!-- 7 -->
+  <section class="step" id="s7" data-nav="יום נוסף">
+    <div class="step-h"><span class="num">7</span><h2>יום עבודה נוסף, שאינו קבוע</h2></div>
+    <p>תלמיד.ה עבד.ה ביום שאינו מהימים הקבועים? מוסיפים אותו כך שייספר בשעות:</p>
+    <ol>
+      <li>בשורת התלמיד.ה לוחצים <span class="ui">הוספת יום עבודה</span>.</li>
+      <li>נפתח לוח החודש. ימי העבודה הקבועים מסומנים, וימים עתידיים חסומים. מקישים על היום.</li>
+      <li>מקלידים כמה <b>שעות</b> עבד.ה (חובה). בעסק בית-ספרי מופיעים גם <b>במה עבדו</b> ו<b>תעריף לשעה</b>, לדוח השכר.</li>
+      <li><span class="ui">שמירה</span>, ואז <span class="ui">סיום</span>. אפשר להוסיף כמה ימים באותה כניסה.</li>
+    </ol>
+    <p>היום הנוסף מופיע בשורת התלמיד.ה במסגרת מקווקוות. טעות? פותחים אותו ולוחצים <span class="ui">הסרת היום</span>.</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 2<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img src="madrich/17-cal.png" alt="לוח החודש עם ימי העבודה הקבועים מסומנים" loading="lazy"><figcaption>לוח החודש: מקישים על יום שאינו קבוע</figcaption></figure>
+        <figure><img src="madrich/18-extra-day.png" alt="פרטי היום הנוסף: שדה שעות" loading="lazy"><figcaption>השעות של היום הנוסף</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <!-- 8 -->
+  <section class="step" id="s8" data-nav="יום בלי תעסוקה">
+    <div class="step-h"><span class="num">8</span><h2>יום בלי תעסוקה לכל הכיתה</h2></div>
+    <p>טיול שנתי, חג, מרתון בגרויות: יום שבו אף אחד בכיתה לא עבד, ולא צריך להיספר כהיעדרות.</p>
+    <ol>
+      <li>בוחרים קבוצה אחת במסך הנוכחות ולוחצים <span class="ui">יום בלי תעסוקה</span>.</li>
+      <li>בוחרים את היום ואת הסיבה, ולוחצים על הכפתור שמחיל על כל הכיתה.</li>
+    </ol>
+    <p>היום יוצא מהדיווח של כל הכיתה ומופיע כתגית. טעות? ה-× על התגית מחזיר אותו.</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילום מסך<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots"><figure><img src="madrich/19-off.png" alt="טופס יום בלי תעסוקה: היום, הסיבה וכפתור לכל הכיתה" loading="lazy"><figcaption>היום, הסיבה, ו"לכל יא · 1"</figcaption></figure></div>
+    </details>
+  </section>
+
+  <!-- 9 -->
+  <section class="step" id="s9" data-nav="הגשת החודש">
+    <div class="step-h"><span class="num">9</span><h2>הגשת החודש</h2></div>
+    <p>כשהחודש מסומן, שולחים את הדיווח. <b>ההגשה היא של כל המגמה</b>, לא רק של הקבוצה שמוצגת.</p>
+    <ol>
+      <li>בתחתית הרשימה לוחצים <span class="ui">שליחת הדיווח · [מגמה] · [חודש]</span>. ליד הכפתור: כמה תלמידים במגמה, כמה ימים עוד לא סומנו, וסך השעות בחודש.</li>
+      <li>המערכת מציגה סיכום: כמה תלמידים, כמה ימים עוד לא סומנו ואילו כיתות במגמה. כיתה בלי אף סימון מופיעה באזהרה, כי גם היא תינעל.</li>
+      <li>מאשרים. החודש מסומן <span class="ui">הוגש</span> וננעל.</li>
+    </ol>
+    <div class="note"><b>מועד:</b> מגישים את החודש עד ה-15 בחודש שאחריו. למשל, את נובמבר מגישים עד 15 בדצמבר.</div>
+    <h3>צריך לתקן אחרי ההגשה?</h3>
+    <p>לוחצים <span class="ui">פתיחה לתיקון</span> ליד "הוגש", מתקנים, ושולחים את הדיווח שוב. עד שלא שולחים מחדש מופיעה הודעה "הדיווח נפתח לתיקון · צריך להגיש שוב".</p>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 2<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img src="madrich/21-submit.png" alt="הכפתור שליחת הדיווח עם הסיכום לידו" loading="lazy"><figcaption>"שליחת הדיווח" לכל המגמה</figcaption></figure>
+        <figure><img src="madrich/22-submitted.png" alt="ראש הרשימה אחרי ההגשה: תגית הוגש וכפתור פתיחה לתיקון" loading="lazy"><figcaption>אחרי ההגשה: "הוגש" ו"פתיחה לתיקון"</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <!-- 10 -->
+  <section class="step" id="s10" data-nav="150 שעות ודוחות">
+    <div class="step-h"><span class="num">10</span><h2>מעקב: 150 השעות ודוחות</h2></div>
+    <h3>150 שעות בשנה</h3>
+    <p>היעד: 150 שעות לתלמיד.ה בשנה, מספטמבר עד יוני. כלומר 15 שעות בחודש, מצטבר. בתיק התלמיד.ה לוחצים <span class="ui">התקדמות ל-150 שעות</span>: כמה שעות נצברו, האם בקצב או בפיגור, ופירוט לפי חודשים. הקו בפס מסמן כמה צריך להיות עד היום.</p>
+    <h3>דוחות</h3>
+    <p><span class="ui">עוד</span> ← <span class="ui">דוחות</span>:</p>
+    <ul>
+      <li><b>דוח תעסוקה חודשי</b>: לכל תלמיד.ה מגמה, מעסיק, ימי עבודה, נוכחות, שעות והגשה. כפתור ייצוא לאקסל. הקובץ נבנה במחשב שלכם, והשמות לא עוברים בשרת.</li>
+      <li><b>דוח חודשי למנהל.ת</b>: מספרים לפי מגמה ושלבי פירמידת החניכות.</li>
+      <li><b>נוכחות לפי ימים</b>: לכל כיתה, מי הגיע.ה בכל יום עבודה בחודש.</li>
+      <li><b>דוח שעות ושכר לחשבת השכר</b>: רק לעסק בית-ספרי.</li>
+    </ul>
+    <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 2<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
+      <div class="shots">
+        <figure><img src="madrich/23-progress.png" alt="מסך התקדמות ל-150 שעות עם פס ופירוט לפי חודשים" loading="lazy"><figcaption>התקדמות ל-150 שעות</figcaption></figure>
+        <figure><img src="madrich/24-reports.png" alt="רשימת הדוחות" loading="lazy"><figcaption>הדוחות</figcaption></figure>
+      </div>
+    </details>
+  </section>
+
+  <section class="videos" aria-labelledby="vidH">
+    <div><h2 id="vidH">סרטוני הדרכה</h2><p>10 סרטונים קצרים לפי סדר העבודה, בעברית ובערבית.</p></div>
+    <a class="btn" href="https://tfasim.pedagogiamh.co.il/chanichut/hadracha.html"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/></svg>לדף הסרטונים</a>
+  </section>
+
+  <footer class="foot">
+    <a class="help" href="mailto:merhav@pedagogiamh.co.il?subject=%D7%9E%D7%A2%D7%A8%D7%9B%D7%AA%20%D7%A8%D7%9B%D7%96%D7%99%20%D7%94%D7%97%D7%A0%D7%99%D7%9B%D7%95%D7%AA%20%C2%B7%20%D7%A9%D7%90%D7%9C%D7%94%20%D7%A2%D7%9C%20%D7%94%D7%93%D7%99%D7%95%D7%95%D7%97&amp;body=%D7%A9%D7%9C%D7%95%D7%9D%2C%0A%D7%A0%D7%AA%D7%A7%D7%9C%D7%AA%D7%99%20%D7%91%D7%91%D7%A2%D7%99%D7%94.%0A%0A%D7%91%D7%99%D7%AA%20%D7%94%D7%A1%D7%A4%D7%A8%3A%20%0A%D7%9E%D7%94%20%D7%A7%D7%A8%D7%94%3A%20%0A"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>נתקלתם בבעיה?</a>
+    <p>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</p>
+    <p>נבנה על ידי <a href="https://impactos.co.il/" dir="ltr">impactos</a></p>
+  </footer>
+</main>
+<script>
+/* ניווט השלבים נבנה מה-data-nav של כל שלב, והשלב שעל המסך מודגש */
+(function () {
+  var nav = document.getElementById('nav'), steps = [].slice.call(document.querySelectorAll('.step'));
+  nav.innerHTML = steps.map(function (s, i) { return '<a href="#' + s.id + '"><b>' + (i + 1) + '</b>' + s.dataset.nav + '</a>'; }).join('');
+  /* בטלפון הצילום קטן: הקשה עליו פותחת אותו בגודל מלא */
+  [].forEach.call(document.querySelectorAll('figure img'), function (im) { var a = document.createElement('a'); a.href = im.getAttribute('src'); a.target = '_blank'; a.rel = 'noopener'; a.title = 'פתיחה בגודל מלא'; im.parentNode.insertBefore(a, im); a.appendChild(im); });
+  var links = [].slice.call(nav.querySelectorAll('a'));
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (!e.isIntersecting) return; var i = steps.indexOf(e.target);
+      links.forEach(function (a, j) { a.classList.toggle('on', j === i); });
+      var a = links[i]; if (a) nav.scrollTo({ left: a.offsetLeft - nav.clientWidth / 2 + a.offsetWidth / 2, behavior: 'smooth' }); });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+  steps.forEach(function (s) { io.observe(s); });
+})();
+</script>
+</body>
+</html>
