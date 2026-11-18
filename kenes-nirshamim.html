@@ -241,7 +241,7 @@ function render() {
   var groups = GROUP_ORDER.filter(function (g) { return inv.some(function (r) { return r.g === g; }); })
     .concat(inv.map(function (r) { return r.g; }).filter(function (g, i, a) { return GROUP_ORDER.indexOf(g) < 0 && a.indexOf(g) === i; }));
 
-  var h = '<header><div class="eyebrow">כנס מנהלים ורשתות · 23.11.26 · ג׳ייקובס חדרה</div>' +
+  var h = '<header><div class="eyebrow">כנס בתי הספר המקצועיים · 23.11.26 · ג׳ייקובס חדרה</div>' +
     '<h1>מענה להזמנה לכנס</h1>' +
     '<p class="lede">מול רשימת המוזמנים. ההצלבה לפי המייל, ואם אין התאמה, לפי השם. כולל את טופס הרשתות.</p>' +
     '<div class="big"><b>' + people.length + '</b><span>אישרו הגעה · מהם <b style="font-size:inherit;color:var(--teal)">' + reg.length + '</b> מתוך ' + total + ' מוזמנים (' + pct + '%)</span></div>' +
@@ -319,7 +319,7 @@ function render() {
       '<div class="chips">' + outside.map(function (p) { return '<span class="chip" style="background:var(--teal-soft);color:var(--teal)">' + esc(p.name) + ' <small style="color:var(--teal)">· ' + esc(where(p) || roleLabel(p)) + '</small></span>'; }).join("") + '</div></section>';
   }
 
-  h += '<footer>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br>נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>';
+  h += '<footer>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה</footer>';
   $("app").innerHTML = h;
   DATA._miss = miss; DATA._shown = shown;
   var q = $("q"); if (Q) { q.focus(); q.setSelectionRange(Q.length, Q.length); }
