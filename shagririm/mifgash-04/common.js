@@ -48,4 +48,4 @@ const ICON = {
   ext:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
   warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5" stroke-linecap="round"/></svg>'
 };
-const TOOL_NAME = { gemini:'Gemini', vids:'Vids', aistudio:'AI Studio', firebase:'Firebase', staff:'המצגת לחדר המורים' };
+const TOOL_NAME = { login:'כניסה לחשבון משרד העבודה', gemini:'Gemini', vids:'Vids', aistudio:'AI Studio', firebase:'Firebase', staff:'המצגת לחדר המורים' };

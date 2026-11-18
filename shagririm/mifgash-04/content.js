@@ -4,6 +4,8 @@
    shot: שם קובץ ב-img/ (מ-shots.json) או 'pending:<תיאור>' כשהצילום עוד לא צולם. */
 
 const LINKS = {
+  /* הכפתור "משרד העבודה" בדף הכניסה של משרד החינוך (pop.education.gov.il/sherutey-tiksuv-bachinuch/anan-google) */
+  login: 'https://www.google.com/a/avoda-edu.org.il/ServiceLogin?continue=https://classroom.google.com/&passive=true',
   gemini: 'https://gemini.google.com/',
   vids: 'https://vids.google.com/',
   aistudio: 'https://aistudio.google.com/',
@@ -44,7 +46,7 @@ const STEPS = [
     help:{ see:null, ask:null, faq:['עוד לא עשיתם? כתבו מה מתכננים לעשות השבוע, ועם מי.'] } },
 
   { id:'login', t:'kh', title:'נכנסים עם החשבון של משרד החינוך, ופותחים את 9 הנקודות',
-    body:'בדף הכניסה של משרד החינוך לסביבת גוגל בוחרים "משרד העבודה", ונכנסים עם החשבון. בדף שנפתח לוחצים על 9 הנקודות למעלה: שם כל הכלים, בחינם.', tools:['gemini'], shots:['login-portal','login-classroom','login-apps'],
+    body:'בדף הכניסה של משרד החינוך לסביבת גוגל בוחרים "משרד העבודה", ונכנסים עם החשבון. בדף שנפתח לוחצים על 9 הנקודות למעלה: שם כל הכלים, בחינם.', tools:['login','gemini'], shots:['login-portal','login-classroom','login-apps'],
     help:{ see:{shot:'login-classroom', text:'בפינה העליונה מופיעה האות של החשבון, ולידה 9 הנקודות. לוחצים על האות כדי לראות איזה חשבון פתוח.'},
       ask:P.stuck('Google Chrome, בהחלפת חשבון'),
       faq:['נפתח החשבון הפרטי ← לוחצים על התמונה בפינה ← בוחרים את החשבון של משרד החינוך.','אין סיסמה? מבקשים מרכז/ת התקשוב של הרשת, או מאיפוס הסיסמה של משרד החינוך.'] } },
@@ -93,26 +95,26 @@ const STEPS = [
       faq:['יותר מדי טקסט בשקף ← כותבים בשיחה: "עד 3 שורות בכל שקף".','הטקסט משמאל לימין ← כותבים בשיחה: "הכול מימין לשמאל".'] } },
 
   /* ---- Vids ---- */
-  { id:'vids-open', t:'k', part:'Vids', title:'פותחים Vids ולוחצים "יצירת סרטונים"',
+  { id:'vids-open', t:'kh', part:'Vids', title:'פותחים Vids ולוחצים "יצירת סרטונים"',
     body:'ב-9 הנקודות בוחרים Vids. בדף שנפתח לוחצים על "יצירת סרטונים".', tools:['vids'], shots:['vids-pick','vids-home'],
     help:{ see:{shot:'vids-create', text:'נפתח חלון "קטע וידאו מבוסס AI", עם תיבה לכתיבת הבקשה.'}, ask:P.stuck('Google Vids'),
       faq:['הממשק לא נפתח ← בודקים שזה החשבון של משרד החינוך.'] } },
-  { id:'vids-prompt', t:'k', part:'Vids', title:'כותבים מה רואים בסרטון',
+  { id:'vids-prompt', t:'kh', part:'Vids', title:'כותבים מה רואים בסרטון',
     body:'כותבים בתיבה שמתחת ל"יצירה": מי, איפה, מה קורה, ואיך המצלמה זזה. בלי טקסט בתוך הסרטון.', prompt:P.vids, tools:['vids'], shot:'vids-create',
     help:{ see:{shot:'vids-made', text:'כשהקטע מוכן, הוא מופיע מעל התיבה.'}, ask:'אני רוצה סרטון של 10 שניות שיפתח שיעור על [נושא]. כתוב/י לי 3 תיאורי סצנה קצרים: מי, איפה, מה קורה, ואיך המצלמה זזה.',
       faq:['הסרטון לא דומה למה שרציתי ← מוסיפים פרטים: אור, זווית, תנועה.','טקסט בעברית יוצא משובש ← לא מבקשים טקסט בסרטון. מוסיפים כתוביות בשלב הבא.'] } },
-  { id:'vids-add', t:'k', part:'Vids', title:'לוחצים "הוספה"', warn:'בלי הלחיצה הזו הסרטון נמחק כשסוגרים את הכרטיסייה.',
+  { id:'vids-add', t:'kh', part:'Vids', title:'לוחצים "הוספה"', warn:'בלי הלחיצה הזו הסרטון נמחק כשסוגרים את הכרטיסייה.',
     body:'מיד אחרי שהקטע נוצר, מתחת לסרטון.', tools:['vids'], shot:'vids-made',
     help:{ see:{shot:'vids-timeline'}, ask:P.stuck('Google Vids'),
       faq:['יש סצנה ריקה בהתחלה ← מוחקים אותה, אחרת היא נכנסת לסרטון.'] } },
-  { id:'vids-plus', t:'k', part:'Vids', title:'סצנה חדשה: לוחצים על +',
+  { id:'vids-plus', t:'kh', part:'Vids', title:'סצנה חדשה: לוחצים על +',
     body:'ה-+ הכחול ליד ציר הזמן פותח סצנה חדשה. כותבים בה בקשה חדשה, ושוב "הוספה".', tools:['vids'], shot:'vids-plus',
     help:{ see:null, ask:P.stuck('Google Vids, בהוספת סצנה'), faq:[] } },
-  { id:'vids-text', t:'k', part:'Vids', title:'מוסיפים כתוביות',
+  { id:'vids-text', t:'kh', part:'Vids', title:'מוסיפים כתוביות',
     body:'בסרגל הצד לוחצים על "כתוביות". לטקסט חופשי על הסרטון: "טקסט", שמתחתיו.', tools:['vids'], shot:'vids-captions',
     help:{ see:{shot:'vids-text'}, ask:P.stuck('Google Vids, בתיבת טקסט'),
       faq:['הטקסט משמאל לימין ← מסמנים את הטקסט ← יישור לימין.'] } },
-  { id:'vids-download', t:'k', part:'Vids', title:'מורידים כ-MP4',
+  { id:'vids-download', t:'kh', part:'Vids', title:'מורידים כ-MP4',
     body:'קובץ ← הורדה ← סרטון MP4.', tools:['vids'], shot:'vids-download',
     help:{ see:{shot:'vids-download', text:'בתפריט קובץ: הורדה ← סרטון MP4. באותו תפריט יש גם ייצוא ל-Drive.'}, ask:P.stuck('Google Vids, בהורדה'),
       faq:['ירד סרטון ריק ← לא לחצתם "הוספה". חוזרים לשלב הקודם.','רוצים איכות גבוהה ← "הגדלת רזולוציה" ל-1080p לפני ההורדה.'] } },
@@ -195,7 +197,7 @@ const SLIDES = [
   {k:'map', t:'kh', title:'לאן הולכים?', rows:[
     ['לתכנן שיעור, הדרכה או מחוון','Gemini Pro','k'],
     ['פעילות קטנה לכיתה, או מצגת','Canvas','k'],
-    ['סרטון של 10 שניות לפתיחת שיעור','Vids','k'],
+    ['סרטון של 10 שניות לפתיחת שיעור','Vids','kh'],
     ['כלי לצוות שאוסף תשובות, עם דשבורד','AI Studio','h']]},
   {k:'step', t:'kh', ref:'login', n:1, kicker:'לפני הכול', title:'נכנסים דרך "משרד העבודה"', call:'בדף הכניסה של משרד החינוך לסביבת גוגל: בוחרים משרד העבודה, ונכנסים עם החשבון.', shot:'login-portal'},
   {k:'step', t:'kh', ref:'login', n:2, kicker:'לפני הכול', title:'לוחצים על 9 הנקודות', call:'בדף שנפתח, בפינה למעלה.', shot:'login-classroom'},
@@ -217,15 +219,15 @@ const SLIDES = [
   {k:'step', t:'k', ref:'canvas-share', n:6, kicker:'Canvas', title:'כותבים שם לאתר', call:'ושוב פרסום. רואים אותו כל המשתמשים בדומיין Avoda-edu.', shot:'sites-publish-dialog'},
   {k:'prompt', t:'k', ref:'canvas-slides', kicker:'Canvas · לא רק פעילות', title:'גם מצגת'},
 
-  {k:'part', t:'k', n:'ג', title:'Vids', sub:'סרטון של 10 שניות, בחינם'},
-  {k:'step', t:'k', ref:'vids-open', n:1, kicker:'Vids', title:'בוחרים Vids', call:'ב-9 הנקודות.', shot:'vids-pick'},
-  {k:'step', t:'k', ref:'vids-open', n:2, kicker:'Vids', title:'לוחצים "יצירת סרטונים"', call:'בדף הראשי של Vids.', shot:'vids-home'},
-  {k:'step', t:'k', ref:'vids-prompt', n:3, kicker:'Vids', title:'כאן כותבים את הבקשה', call:'בתיבה שמתחת ל"יצירה".', shot:'vids-create'},
-  {k:'prompt', t:'k', ref:'vids-prompt', kicker:'Vids', title:'מה רואים בסרטון'},
-  {k:'warn', t:'k', ref:'vids-add', kicker:'Vids · אחרי שהקטע נוצר', title:'לוחצים "הוספה"', x:'בלי הלחיצה הזו הסרטון נמחק כשסוגרים את הכרטיסייה.', shot:'vids-made'},
-  {k:'step', t:'k', ref:'vids-plus', n:6, kicker:'Vids', title:'סצנה חדשה: לוחצים על +', call:'ואז כותבים בקשה חדשה.', shot:'vids-plus'},
-  {k:'step', t:'k', ref:'vids-text', n:7, kicker:'Vids', title:'מוסיפים כתוביות', call:'בסרגל הצד: כתוביות.'},
-  {k:'step', t:'k', ref:'vids-download', n:8, kicker:'Vids', title:'מורידים כ-MP4', call:'קובץ ← הורדה ← סרטון MP4'},
+  {k:'part', t:'kh', n:'ג', title:'Vids', sub:'סרטון של 10 שניות, בחינם'},
+  {k:'step', t:'kh', ref:'vids-open', n:1, kicker:'Vids', title:'בוחרים Vids', call:'ב-9 הנקודות.', shot:'vids-pick'},
+  {k:'step', t:'kh', ref:'vids-open', n:2, kicker:'Vids', title:'לוחצים "יצירת סרטונים"', call:'בדף הראשי של Vids.', shot:'vids-home'},
+  {k:'step', t:'kh', ref:'vids-prompt', n:3, kicker:'Vids', title:'כאן כותבים את הבקשה', call:'בתיבה שמתחת ל"יצירה".', shot:'vids-create'},
+  {k:'prompt', t:'kh', ref:'vids-prompt', kicker:'Vids', title:'מה רואים בסרטון'},
+  {k:'warn', t:'kh', ref:'vids-add', kicker:'Vids · אחרי שהקטע נוצר', title:'לוחצים "הוספה"', x:'בלי הלחיצה הזו הסרטון נמחק כשסוגרים את הכרטיסייה.', shot:'vids-made'},
+  {k:'step', t:'kh', ref:'vids-plus', n:6, kicker:'Vids', title:'סצנה חדשה: לוחצים על +', call:'ואז כותבים בקשה חדשה.', shot:'vids-plus'},
+  {k:'step', t:'kh', ref:'vids-text', n:7, kicker:'Vids', title:'מוסיפים כתוביות', call:'בסרגל הצד: כתוביות.'},
+  {k:'step', t:'kh', ref:'vids-download', n:8, kicker:'Vids', title:'מורידים כ-MP4', call:'קובץ ← הורדה ← סרטון MP4'},
 
   {k:'when', t:'k', kicker:'למתקדמים · Google AI Studio', title:'מתי AI Studio, ולא Pro?', items:[
     'כשרוצים לבנות אפליקציה, ולא לקבל תשובה',
@@ -236,14 +238,14 @@ const SLIDES = [
     foot:'Pro עונה לי. AI Studio בונה משהו שאחרים משתמשים בו.'},
   {k:'step', t:'k', ref:'enrich-k', n:1, kicker:'למתקדמים · Google AI Studio', title:'לוחצים New app', call:'aistudio.google.com ← בתפריט משמאל, תחת BUILD', shot:'aistudio-home'},
 
-  {k:'part', t:'h', n:'ג', title:'AI Studio', sub:'כלי לצוות, עם תוצאות'},
+  {k:'part', t:'h', n:'ד', title:'AI Studio', sub:'כלי לצוות, עם תוצאות'},
   {k:'step', t:'h', ref:'as-open', n:1, kicker:'AI Studio', title:'לוחצים New app', call:'בתפריט משמאל, תחת BUILD'},
   {k:'modes', t:'h', title:'שלושה מצבים', rows:[['PLAN','הבקשה הראשונה. שואל שאלות לפני שבונה.'],['DEFAULT','שינויים קטנים, אחד בכל פעם.'],['MAX','כשנתקעים. עובד יותר זמן.']], shot:'as-modes'},
   {k:'prompt', t:'h', ref:'as-prompt', kicker:'AI Studio · PLAN', title:'משחק לכיתה'},
   {k:'step', t:'h', ref:'as-answer', n:3, kicker:'AI Studio', title:'עונים לשאלות, ומאשרים', call:'הבנייה לוקחת כ-2 דקות'},
   {k:'step', t:'h', ref:'as-share', n:4, kicker:'AI Studio', title:'Share ← Public', call:'ומעתיקים את הקישור'},
   {k:'warn', t:'h', kicker:'AI Studio', title:'לא Publish', x:'Publish מבקש להגדיר תשלום (billing). לא מגדירים. משתפים רק ב-Share.', shot:'as-publish-billing'},
-  {k:'part', t:'h', n:'ד', title:'שאלון לצוות, ודשבורד', sub:'התשובות נשמרות, ורק אתם רואים אותן'},
+  {k:'part', t:'h', n:'ה', title:'שאלון לצוות, ודשבורד', sub:'התשובות נשמרות, ורק אתם רואים אותן'},
   {k:'step', t:'h', ref:'as-firebase', n:1, kicker:'פעם אחת בלבד', title:'מפעילים התחברות אנונימית', call:'Firebase ← Authentication ← Sign-in method ← Anonymous'},
   {k:'prompt', t:'h', ref:'as-survey', kicker:'AI Studio · PLAN', title:'שאלון לצוות עם דשבורד'},
   {k:'prompt', t:'h', ref:'as-live', kicker:'למתקדמים', title:'מסך תשובות חי לישיבת צוות'},
@@ -269,7 +271,7 @@ const SLIDES = [
 
 const SESSION = {
   k:{ name:'כלים', date:'16.11', title:'כלי AI בחשבון משרד החינוך', tools:[['Gemini Pro','תכנון ומחוון'],['Canvas','פעילות לכיתה'],['Vids','סרטון בחינם']] },
-  h:{ name:'הובלה', date:'18.11', title:'כלי AI בחשבון משרד החינוך', tools:[['Gemini Pro','תכנון הדרכה'],['Canvas','פעילות לכיתה'],['AI Studio','שאלון ודשבורד לצוות']] }
+  h:{ name:'הובלה', date:'18.11', title:'כלי AI בחשבון משרד החינוך', tools:[['Gemini Pro','תכנון הדרכה'],['Canvas','פעילות לכיתה'],['Vids','סרטון בחינם'],['AI Studio','שאלון ודשבורד לצוות']] }
 };
 
 function stepsFor(t){ return STEPS.filter(s => s.t.includes(t)); }

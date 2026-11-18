@@ -206,7 +206,7 @@ function render(sl){
   switch(sl.k){
   case 'cover': return `<section class="sl">${LOGO}<div class="kicker">מפגש 4 · מסלול ${S.name} · ${S.date}</div><h1>${S.title.replace(' משרד','<br>משרד')}</h1>
     <div class="sub">שגרירי חדשנות · המנהל להכשרה מקצועית · משרד העבודה</div>
-    <div class="parts">${S.tools.map((x,i)=>`<div class="part"><i>חלק ${'אבג'[i]}</i><b>${x[0]}</b>${x[1]}</div>`).join('')}</div>${BRAND}</section>`;
+    <div class="parts">${S.tools.map((x,i)=>`<div class="part"><i>חלק ${'אבגדה'[i]}</i><b>${x[0]}</b>${x[1]}</div>`).join('')}</div>${BRAND}</section>`;
   case 'q': return `<section class="sl">${LOGO}<h2 style="margin-top:220px;font-size:120px">${sl.title}</h2><div class="sub">${sl.sub}</div>${refLine(sl.ref)}</section>`;
   case 'map': { const rows = sl.rows.filter(r => T==='h' || r[2]==='k');
     return `<section class="sl"><h2>${sl.title}</h2><div class="rows">${rows.map(r=>`<div class="row"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
