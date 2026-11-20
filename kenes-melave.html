@@ -546,7 +546,7 @@ var PH = {
   kabala:  {t:"התכנסות",            d:"בוחרים כוח וכוח לאמץ ומבקרים בתערוכת הרשתות (מוצאים אנשים: לפי המתג למטה)"},
   school:  {t:"המיפוי",             d:"סיכום המיפוי של בית הספר (מפקחים: בתי הספר שלהם)"},
   lecture: {t:"ההרצאה",             d:"דבר אחד משמעותי שאני לוקח.ת"},
-  muzeon:  {t:"המוזיאון",           d:"בהפסקה: סורקים מיצגים. שלט, רעיון, מילה טובה ושאלה למציגים, חותמת"},
+  muzeon:  {t:"המוזיאון",           d:"בהפסקה: סורקים מיצגים. שלט, רעיון, מילה טובה ושאלה למציגים, תאומי רעיון"},
   tables:  {t:"שולחנות עגולים",     d:"נציג.ה מכל שולחן רושם.ת את התובנות של כולם"},
   stage:   {t:"במה ניהולית",        d:"מנהלים משתפים, מעוררים השראה ומובילים שינוי"},
   end:     {t:"סיום",               d:"סיכום כל היום, ושליחה למייל"}
@@ -1230,8 +1230,8 @@ function bindSeg() {
   });
 }
 
-/* ---- networks exhibition: like the museum — an idea I take, how far it is from me, a good word to the network,
-   "hear more", and a selfie with the initiative (the photo page, task p03) ---- */
+/* ---- networks exhibition: like the museum — an idea I take, how far it is from me, a good word to the network, "hear more".
+   (No selfie task for participants: Revital, 20.11.26) ---- */
 function netById(id) { return S.nets.filter(function (n) { return n.id === id; })[0]; }
 function iniDone(id) { return !!(S.neti[id] || S.net[id] || S.netf[id] != null); }
 function netMarks(n) { return (n.items || []).filter(function (x) { return iniDone(x.id); }).length; }
@@ -1240,7 +1240,7 @@ function drawNets() {
   if (S.netItem && iniById(S.netItem)) return drawIni();
   var n = S.netOpen && netById(S.netOpen);
   if (!n) {
-    shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים רשת ויוזמה: לוקחים רעיון, כותבים מילה טובה לרשת, ומצטלמים עם היוזמה שאהבתם.</p>' +
+    shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים רשת ויוזמה: לוקחים רעיון וכותבים מילה טובה לרשת.</p>' +
       S.nets.map(function (x) {
         var c = (x.items || []).length, m = netMarks(x);
         return '<button class="ex' + (c && m === c ? " done" : "") + '" data-net="' + esc(x.id) + '"><span class="ic">' + IC.net + "</span><span><b>" + esc(x.name) + "</b><small>" +
@@ -1266,7 +1266,6 @@ function drawNets() {
 function drawIni() {
   var h = iniById(S.netItem), x = h.item, n = h.net, id = x.id, mine = S.neti[id] || {};
   var d = S.nd && S.nd.id === id ? S.nd : (S.nd = {id:id, i:mine.i || "", r:mine.r || "", t:mine.t || "", f:S.netf[id] != null ? S.netf[id] : -1, on:!!S.net[id], ot:!!mine.t});
-  var selfie = "kenes-tmunot/?t=p03" + (DEMO ? "" : "&c=" + encodeURIComponent(S.c));
   shell(kseg() + '<p class="kick">' + esc(n.name) + "</p><h1>" + esc(x.title) + "</h1>" +
     '<div class="sign fr">' + CORNERS + '<span class="pill tab"><span>היוזמה <b>במשפט</b></span></span><p style="margin:0">' + esc(x.line) + "</p></div>" +
     '<h2 style="margin:18px 0 6px">מה מזה אפשר לעשות אצלך?</h2><p class="muted" style="margin:0 0 8px">משפט אחד. הוא יעלה בלי שם למסך הגדול.</p>' +
@@ -1278,8 +1277,7 @@ function drawIni() {
     (d.ot ? '<div class="fold"><label for="nt">משפט לרשת</label><textarea id="nt" maxlength="400" placeholder="משפט אחד שיגיע לרשת">' + esc(d.t) + "</textarea></div>"
       : '<button type="button" class="row" id="ntopen">' + IC.plus + "<span>להוסיף משפט למילה הטובה</span><small>לא חובה</small></button>") +
     '<button type="button" class="sw" id="non" aria-pressed="' + d.on + '"><span><b>רוצה לשמוע עוד</b><small>השם שלך יועבר לרשת.</small></span><i></i></button>' +
-    '<a class="btn alt" href="' + selfie + '" target="_blank" rel="noopener" style="margin-top:10px">' + IC.camera + "סלפי עם היוזמה</a>" +
-    '<button class="btn gold" id="nok" style="margin-top:8px">' + IC.check + "שמירה</button>" +
+    '<button class="btn gold" id="nok" style="margin-top:12px">' + IC.check + "שמירה</button>" +
     '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">ליוזמות של ' + esc(n.name) + "</button></p>", {k:"ini" + id});
   $("ni").oninput = function () { d.i = this.value; };
   bindFar(function (k, v) { d.f = v; });
@@ -1393,32 +1391,13 @@ function challenges() {
 }
 function exBtn(x, hit) {
   var done = !!S.ex[x.id], saved = done && S.ex[x.id].save;
-  return '<button class="ex' + (done ? " done" : "") + (hit ? " hit" : "") + '" data-id="' + x.id + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" + esc(x.school) + (done ? " · יש חותמת" : "") + "</small></span>" +
+  return '<button class="ex' + (done ? " done" : "") + (hit ? " hit" : "") + '" data-id="' + x.id + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" + esc(x.school) + (done ? " · ביקרת" : "") + "</small></span>" +
     (saved ? '<span class="bm" title="שמור בשבילי" aria-label="שמור בשבילי">' + IC.bm + "</span>" : "") + '<span class="go">' + IC.next + "</span></button>";
 }
 function drawMap() {
-  var n = Object.keys(S.ex).length, chs = challenges();
-  if (S.walk === "route" && S.chal && !chs.some(function (c) { return c[0] === S.chal; })) S.chal = "";
-  var how = '<div class="walk"><p class="kick">איך מסתובבים</p><div class="wseg" role="group" aria-label="איך מסתובבים">' +
-    '<button type="button" data-walk="free" aria-pressed="' + (S.walk !== "route") + '"><b>שיטוט חופשי</b><small>כל המיצגים, בכל סדר</small></button>' +
-    '<button type="button" data-walk="route" aria-pressed="' + (S.walk === "route") + '"><b>מסלול אישי</b><small>לפי האתגר שמעסיק אותי</small></button></div>' +
-    (S.walk === "route" ? '<p class="muted" style="margin:12px 0 8px">איזה אתגר מעסיק אותך?</p><div class="chs">' + chs.map(function (c) {
-      return '<button type="button" class="chq" data-ch="' + esc(c[0]) + '" aria-pressed="' + (S.chal === c[0]) + '">' + esc(c[0]) + "<small>" + (c[1] === 1 ? "מיצג אחד" : c[1] + " מיצגים") + "</small></button>";
-    }).join("") + "</div>" : "") + "</div>";
-  var list;
-  if (S.walk === "route" && S.chal) {
-    var hit = S.exhibits.filter(function (x) { return chOf(x).indexOf(S.chal) >= 0; }), rest = S.exhibits.filter(function (x) { return chOf(x).indexOf(S.chal) < 0; });
-    list = '<h3 class="lh">המסלול שלך · ' + esc(S.chal) + "</h3>" + hit.map(function (x) { return exBtn(x, true); }).join("") +
-      (rest.length ? '<h3 class="lh">שאר המיצגים</h3>' + rest.map(function (x) { return exBtn(x, false); }).join("") : "");
-  } else if (S.walk === "route") {
-    list = "";
-  } else {
-    list = S.exhibits.map(function (x) { return exBtn(x, false); }).join("");
-  }
-  shell('<p class="kick">המוזיאון</p><h1>הדרכון שלי</h1>' + passport() + '<p class="muted">' + n + " חותמות מתוך " + S.exhibits.length + " מיצגים. ליד כל מיצג יש ברקוד: סורקים ומתחילים.</p>" +
-    '<button class="btn" id="sc">' + IC.scan + "לסרוק ברקוד של מיצג</button>" + how + list, {k:"map"});
-  document.querySelectorAll("[data-walk]").forEach(function (b) { b.onclick = function () { S.walk = b.dataset.walk; if (S.walk === "free") S.chal = ""; drawMap(); }; });
-  document.querySelectorAll("[data-ch]").forEach(function (b) { b.onclick = function () { S.chal = b.dataset.ch; drawMap(); }; });
+  /* no passport and no personal route (Meytal, 20.11.26): all the exhibits, scan and go */
+  shell('<p class="kick">המוזיאון</p><h1>מוזיאון החדשנות</h1><p class="muted">ליד כל מיצג יש ברקוד: סורקים ומתחילים.</p>' +
+    '<button class="btn" id="sc">' + IC.scan + "לסרוק ברקוד של מיצג</button>" + '<h3 class="lh">המיצגים</h3>' + S.exhibits.map(function (x) { return exBtn(x, false); }).join(""), {k:"map"});
   $("sc").onclick = function () {
     Scanner.open("מכוונים אל הברקוד שליד המיצג", function (txt) {
       var h = codeFrom(txt);
@@ -1464,7 +1443,7 @@ function drawEx() {
       fold("q", "שאלה למנהל.ת", "מה תרצו לשאול את מי שהוביל.ה את המיזם?", d.oq) +
       sw("more", "רוצה לשמוע עוד פרטים", "השם שלך יועבר לבית הספר המציג.") +
       sw("save", "לשמור את המיצג בשבילי", "יופיע בסיכום היום שלך. משתתפים ששמרו גם הם את המיצג יראו את שמך.") +
-      '<button class="btn gold" id="nx" style="margin-top:8px">' + IC.star + "לקבל חותמת</button>" + back, {k:"ex" + x.id + "ask"});
+      '<button class="btn gold" id="nx" style="margin-top:8px">' + IC.check + "שמירה</button>" + back, {k:"ex" + x.id + "ask"});
     document.querySelectorAll("[data-rx]").forEach(function (b) {
       b.onclick = function () {
         d.r = d.r === b.dataset.rx ? "" : b.dataset.rx;
@@ -1488,8 +1467,7 @@ function drawEx() {
       }).catch(function () { btn.disabled = false; offline(); });
     };
   } else if (S.step === "stamp") {
-    shell('<div class="stampw"><div class="stamp">' + STAMPART + "<small>המוזיאון · 23.11</small><span>" + esc(x.title) + '</span></div></div><h1 class="center">עוד חותמת בדרכון</h1>' + passport() +
-      '<p class="center muted">' + Object.keys(S.ex).length + " מתוך " + S.exhibits.length + " מיצגים</p>" +
+    shell('<div class="hero"><div class="ic">' + IC.check + '</div><p class="kick">' + esc(x.title) + '</p><h1>תודה, נשמר</h1><p class="muted">מה שכתבת יגיע למציגים ויופיע בסיכום היום שלך.</p></div>' +
       (mine.save ? '<div class="twins" id="tw"><p class="muted">בודקים מי עוד שמר את המיצג…</p></div>' : "") +
       '<button class="btn" id="nx">' + IC.scan + 'לסרוק את המיצג הבא</button><button class="btn alt" id="mp">לרשימת המיצגים</button>', K);
     $("nx").onclick = function () { S.view = null; draw(); var b = $("sc"); if (b) b.click(); };
@@ -1731,7 +1709,7 @@ function drawEnd() {
   shell('<p class="kick center">סוף היום</p><h1 class="center">מה ' + esc(S.me.f) + " לוקח.ת הביתה</h1>" +
     '<div class="letter"><span class="yr">מכתב מ-2030</span><div id="ltx">' + (S.letter ? '<p class="lt">' + esc(S.letter) + "</p>" : '<p class="wait">המכתב שלך נכתב עכשיו, מתוך מה שבחרת וכתבת היום…</p>') + "</div></div>" +
     /* "people I met" only if finding people was opened at some point */
-    '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>חותמות במוזיאון</small></div></div>" +
+    '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>מיצגים שביקרתי</small></div></div>" +
     '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs +
     '<button class="btn" id="ml"' + (S.mailed ? " disabled" : "") + ">" + IC.mail + "לשלוח לי את הסיכום למייל</button>" +
     (sent ? '<p class="sentok">' + IC.check + "הבקשה נרשמה. הסיכום יישלח למייל שנרשמת איתו</p>" : "") + TAGLINE,
@@ -1903,7 +1881,7 @@ function drawScreen(r) {
     h = scrHead("כנס בתי הספר המקצועיים", "מנהיגות אנושית בעידן הבינה המלאכותית") + '<div class="calm"><div class="big">במה ניהולית</div><p class="sub">מנהלים משתפים, מעוררים השראה ומובילים שינוי</p></div>';
   } else if (r.ph === "muzeon") {
     /* the map of ideas (big) | the wall of ideas beside it, and the slider strip under the wall */
-    h = scrHead("מה לוקחים מהמוזיאון הביתה", "כל קו הוא רעיון שעבר מבית ספר לבית ספר", r.stamps + " <small>חותמות</small>") +
+    h = scrHead("מה לוקחים מהמוזיאון הביתה", "כל קו הוא רעיון שעבר מבית ספר לבית ספר", r.stamps + " <small>ביקורים</small>") +
       '<div class="mz"><div class="map">' + flowMap(r) + '</div><div class="left"><div class="wall">' +
       r.ideas.map(function (w) { return '<div class="idea">' + esc(w.t) + "<small>בעקבות " + esc(w.ex) + "</small></div>"; }).join("") +
       "</div>" + farAxis(r.far || []) + "</div></div>";
@@ -1914,7 +1892,7 @@ function drawScreen(r) {
     h = scrHead("מיפוי השימוש בבינה מלאכותית", "כל אחד.ת רואה עכשיו בטלפון את בית הספר שלו.ה") + '<div class="calm"><div class="big">הנתונים של בית הספר שלכם</div><p class="sub">בטלפון, בדף המלווה</p></div>';
   } else {
     var tn = (r.tables || []).length;
-    h = scrHead("מה לקחנו היום", "תודה שהייתם איתנו") + '<div class="totals"><div><b>' + r.joined + '</b><small>משתתפים</small></div><div><b>' + r.meets + '</b><small>מפגשים בין כוחות</small></div><div><b>' + r.stamps + '</b><small>חותמות במוזיאון</small></div><div><b>' + (r.ideas.length + r.lecN) + "</b><small>רעיונות ותובנות</small></div>" +
+    h = scrHead("מה לקחנו היום", "תודה שהייתם איתנו") + '<div class="totals"><div><b>' + r.joined + '</b><small>משתתפים</small></div><div><b>' + r.meets + '</b><small>מפגשים בין כוחות</small></div><div><b>' + r.stamps + '</b><small>ביקורים במוזיאון</small></div><div><b>' + (r.ideas.length + r.lecN) + "</b><small>רעיונות ותובנות</small></div>" +
       (tn ? "<div><b>" + tn + "</b><small>שולחנות עגולים</small></div>" : "") + "</div>";
   }
   if (h === SC.last) return;
@@ -1929,7 +1907,7 @@ function adminStart() {
   var draw = function (r) {
     if (!r.ok) { $("app").innerHTML = '<main class="adm"><h1>אין גישה</h1><p>המפתח בכתובת לא נכון.</p></main>'; return; }
     $("app").innerHTML = '<main class="adm"><p class="kick">לוח ההפעלה · כנס 23.11</p><h1>השלב עכשיו: ' + esc(PH[r.ph] ? PH[r.ph].t : r.ph) + "</h1>" +
-      '<div class="counts"><div><b>' + r.joined + "</b><small>נרשמו מתוך " + r.total + '</small></div><div><b>' + r.meets + '</b><small>מפגשים</small></div><div><b>' + r.stamps + '</b><small>חותמות</small></div><div><b>' + r.lecN + "</b><small>משפטים מההרצאה</small></div></div>" +
+      '<div class="counts"><div><b>' + r.joined + "</b><small>נרשמו מתוך " + r.total + '</small></div><div><b>' + r.meets + '</b><small>מפגשים</small></div><div><b>' + r.stamps + '</b><small>ביקורים במוזיאון</small></div><div><b>' + r.lecN + "</b><small>משפטים מההרצאה</small></div></div>" +
       '<div class="phs">' + PH_ORDER.map(function (p, i) {
         return '<button class="ph' + (r.ph === p ? " on" : "") + '" data-p="' + p + '"><span class="num">' + i + "</span><span><b>" + esc(PH[p].t) + "</b><small>" + esc(PH[p].d) + "</small></span></button>";
       }).join("") + "</div>" +
@@ -1958,7 +1936,7 @@ function adminStart() {
       post({a:"ltoff", k:k, off:r.lt.on}).then(function (x) { toast(x.ok ? (x.on ? "המכתבים פעילים" : "המכתבים כבויים: בסיום יופיע מכתב מתבנית") : "לא עודכן"); refresh(); }).catch(offline);
     };
     $("rs").onclick = function () {
-      if (!confirm("למחוק את כל התשובות, המפגשים והחותמות?")) return;
+      if (!confirm("למחוק את כל התשובות, המפגשים והביקורים?")) return;
       if (prompt("כדי לאשר, כתבו: איפוס") !== "איפוס") return;
       post({a:"reset", k:k, sure:"yes"}).then(function (x) { toast(x.ok ? "אופס" : "לא אופס"); refresh(); });
     };
