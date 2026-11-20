@@ -81,7 +81,17 @@ details[open] summary .chev{transform:rotate(180deg)}
       <p class="note">לחיצה על תחנה מעבירה אליה את כל הטלפונים תוך כ-10 שניות. התחנה הבאה מחליפה את הקודמת.</p>
       <div class="keyin hide" id="mkBox"><input id="mkIn" dir="ltr" placeholder="מפתח הלוח של הדף המלווה"><button class="btn pri" id="mkGo">שמירה</button></div>
       <div class="warn hide" id="stErr"></div>
-      <div class="row" style="margin-top:8px"><div class="t"><b>לוח ההפעלה המלא של המשחק</b><span>מכתבים מ-2030, נתונים, הגיליון</span></div><a class="btn" id="lnMelAdm" target="_blank" rel="noopener">פתיחה</a></div>
+    </div>
+  </details>
+
+  <!-- ============ letters from 2030 ============ -->
+  <details id="dLt">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>מכתבים מ-2030<span class="badge" id="bLt">...</span><svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="row"><div class="t"><b id="ltN">...</b><span id="ltSt"></span></div><button class="btn teal" id="ltGo" disabled>לכתוב עכשיו</button></div>
+      <div class="res" id="ltMsg"></div>
+      <div class="row"><div class="t"><b>הפעלה וכיבוי</b><span>כבוי = בסיום כל אחד יקבל מכתב מתבנית קבועה</span></div><button class="btn" id="ltSw" disabled>...</button></div>
+      <p class="note">המכתבים נכתבים לבד כשעוברים לתחנה "במה ניהולית", ומוכנים בטלפונים בתחנה "סיום". הכפתור "לכתוב עכשיו" נחוץ רק אם משהו נתקע.</p>
     </div>
   </details>
 
@@ -162,8 +172,38 @@ function drawSt(){
   $("nowL").textContent = cur ? lab(cur) : "...";
   $("bSt").textContent = cur ? lab(cur) : "לא מחובר";
   $("bSt").className = "badge" + (cur && cur !== "sagur" ? " ok" : "");
-  $("lnMelAdm").href = "kenes-melave.html?v=admin&k=" + encodeURIComponent(MK);
 }
+
+/* ---------- letters from 2030 (same calls as the game's own board) ---------- */
+var LT = { on: false, key: false, n: 0, busy: false };
+function drawLt(){
+  $("ltN").textContent = LT.n + " מכתבים נכתבו";
+  $("ltSt").textContent = !LT.key ? "אין מפתח בינה מלאכותית בשרת: בסיום יופיע מכתב מתבנית" : LT.on ? "פעיל" : "כבוי";
+  $("bLt").textContent = !LT.key ? "תבנית" : LT.on ? LT.n + " נכתבו" : "כבוי";
+  $("bLt").className = "badge" + (LT.key && LT.on ? " ok" : "");
+  $("ltGo").disabled = !(LT.key && LT.on) || LT.busy;
+  $("ltSw").disabled = !LT.key || LT.busy;
+  $("ltSw").textContent = LT.on ? "לכבות" : "להפעיל";
+}
+function runLetters(){
+  if (LT.busy || !MK) return;
+  LT.busy = true; drawLt(); $("ltMsg").textContent = "כותבים מכתבים...";
+  var total = 0, ai = 0;
+  (function step(){
+    post(MEL, { a: "letters", k: MK }).then(function(x){
+      if (!x || !x.ok) { LT.busy = false; $("ltMsg").textContent = x && x.error === "off" ? "המכתבים כבויים" : x && x.error === "nokey" ? "אין מפתח בינה מלאכותית" : "שגיאה, אפשר ללחוץ שוב"; loadSt(); return; }
+      total += x.done; ai += x.ai;
+      $("ltMsg").textContent = "נכתבו " + total + " מכתבים" + (x.left ? " · נשארו " + x.left + "..." : " · הכול מוכן");
+      if (x.left && x.done) step(); else { LT.busy = false; loadSt(); }
+    }).catch(function(){ LT.busy = false; $("ltMsg").textContent = "אין חיבור. אפשר ללחוץ שוב"; drawLt(); });
+  })();
+}
+$("ltGo").onclick = function(){ if (confirm("לכתוב עכשיו את המכתבים שחסרים?")) runLetters(); };
+$("ltSw").onclick = function(){
+  var off = LT.on;
+  if (!confirm(off ? "לכבות את המכתבים? בסיום יופיע מכתב מתבנית." : "להפעיל את המכתבים?")) return;
+  post(MEL, { a: "ltoff", k: MK, off: off }).then(function(x){ if (x && x.ok) { LT.on = x.on; drawLt(); } }).catch(function(){});
+};
 function stErr(t){ $("stErr").textContent = t; $("stErr").classList.toggle("hide", !t); }
 function loadSt(){
   if (!MK) { $("mkBox").classList.remove("hide"); stErr("חסר מפתח הלוח של הדף המלווה. מדביקים אותו פעם אחת, והוא נשמר בטלפון הזה."); drawSt(); return; }
@@ -171,6 +211,7 @@ function loadSt(){
     if (!r || !r.ok) { $("mkBox").classList.remove("hide"); stErr("המפתח לא התקבל. בדקי אותו והדביקי שוב."); return; }
     $("mkBox").classList.add("hide"); stErr("");
     cur = r.ph; drawSt();
+    if (r.lt && !LT.busy) { LT.on = r.lt.on; LT.key = r.lt.key; LT.n = r.lt.n; drawLt(); }
     $("nowC").innerHTML = (r.joined != null ? r.joined + " מתוך " + r.total + "<br>נכנסו למשחק" : "");
   }).catch(function(){ stErr("אין חיבור לשרת של הדף המלווה. מנסה שוב..."); });
 }
@@ -183,6 +224,8 @@ $("st").addEventListener("click", function(e){
   post(MEL, { a: "ph", k: MK, ph: ph }).then(function(r){
     if (!r || !r.ok) throw 0;
     cur = r.ph; drawSt(); loadSt();
+    /* the managers' stage: write the letters in the background, ready by the end (as the game's board does) */
+    if (r.ph === "stage" && LT.on && LT.key) runLetters();
   }).catch(function(){ stErr("המעבר לא נשמר. נסי שוב."); b.disabled = false; });
 });
 $("mkGo").onclick = function(){ MK = $("mkIn").value.trim(); store("kenes_mk", MK); loadSt(); };
