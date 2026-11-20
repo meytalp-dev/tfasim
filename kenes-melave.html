@@ -445,6 +445,25 @@ body.screen{background:var(--paper);overflow:hidden}
 .chs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chq{font-size:15px;font-weight:700;line-height:1.3;padding:10px 8px}
 .lh{margin:20px 0 8px;font-size:17px;color:var(--navy)}
+/* the museum as in the leaflet */
+.wing{display:flex;align-items:center;gap:8px;margin:22px 0 6px;font-size:16px;font-weight:800;color:var(--wc)}
+.wing i{flex:0 0 10px;height:10px;border-radius:2px;background:var(--wc);transform:rotate(45deg)}
+.exc{position:relative;display:flex;gap:12px;align-items:stretch;width:100%;text-align:right;background:#fff;border:0;border-radius:16px;padding:10px;margin:8px 0;cursor:pointer;font:inherit;color:inherit;
+  box-shadow:0 1px 0 rgba(15,47,82,.04),0 6px 18px -10px rgba(15,47,82,.25),inset 0 0 0 1px rgba(200,149,90,.28);border-inline-start:4px solid var(--wc)}
+.exc:active{transform:scale(.98)}
+.exc .exph{position:relative;flex:0 0 92px;height:92px;border-radius:12px;overflow:hidden;background:var(--tealbg);display:grid;place-items:center;color:var(--teal)}
+.exc .exph img{position:absolute;inset:0;width:100%;height:100%;max-width:none;object-fit:cover;display:block}
+.exc .exph .ok{position:absolute;inset:auto auto 6px 6px;width:26px;height:26px;border-radius:50%;background:#fff;color:var(--gold);display:grid;place-items:center;box-shadow:0 0 0 2px var(--gold)}
+.exc .exph .ok svg{width:15px;height:15px}
+.exc .tx{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.exc .tx small{color:var(--wc);font-size:13px;font-weight:800}
+.exc .tx b{color:var(--navy);font-size:16px;line-height:1.25}
+.exc .tx span{color:var(--muted);font-size:13.5px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.exc .tx em{font-style:normal;color:var(--gold);font-size:12.5px;font-weight:700}
+.exc .go{align-self:center;color:var(--gold);flex:0 0 auto;display:flex}
+.exc .go svg{width:18px;height:18px}
+.exc.done{box-shadow:0 1px 0 rgba(15,47,82,.04),0 6px 18px -10px rgba(15,47,82,.25),inset 0 0 0 1.5px var(--gold2)}
+.sign .shot{display:block;width:calc(100% + 0px);aspect-ratio:16/9;object-fit:cover;border-radius:12px;margin:4px 0 12px}
 .ex.hit{box-shadow:inset 0 0 0 2px var(--gold)}
 .card.moto .mq{font-size:21px;font-weight:800;color:var(--navy);line-height:1.4;margin:10px 0 0;text-align:center}
 .card.moto textarea{min-height:76px}
@@ -544,6 +563,21 @@ var Q = new URLSearchParams(location.search);
 var DEMO = Q.get("demo") === "1" || !EXEC;
 var VIEW = Q.get("v") || "phone";
 var LOGO = "chanichut/logo-minhal.png";
+/* the museum as in the visitor's leaflet: wing, school, title, short line, photo. Built by tools/build-leaflet.js, don't edit by hand */
+/*MZ-START*/
+var MZ = {"m01":{"w":3,"s":"דרור מצפה רמון","t":"קונדיטוריה יוצרת חברה","l":"חניכות וחניכי מגמת הקונדיטוריה אופים למען הקהילה במצפה רמון","img":"kenes-melave-img/m01.jpg","pos":"50% 35%","fit":"","bg":""},"m02":{"w":5,"s":"אורט תעשייה אווירית","t":"מגמת מכטרוניקה: מחזון למעשה","l":"מגמה חדשה שהוקמה מאפס: רחפנים, רובוטיקה ומכונות תעופה","img":"kenes-melave-img/m02.jpg","pos":"50% 55%","fit":"","bg":""},"m03":{"w":1,"s":"עתיד ג'וליס בנות","t":"מגע של רוגע","l":"חלוק תספורת מותאם חושית, שפיתחו תלמידות מגמת עיצוב שיער","img":"kenes-melave-img/m03.jpg","pos":"60% 40%","fit":"","bg":""},"m04":{"w":3,"s":"עתיד קמ\"ג דימונה","t":"מירוץ הלפיד","l":"כל תלמידי התיכון רצים 7 ק\"מ, עם הכנה בכיתות ובשיתוף עובדי הקמ\"ג","img":"kenes-melave-img/m04.jpg","pos":"55% 50%","fit":"","bg":""},"m05":{"w":4,"s":"ח'טואת אבו סנאן","t":"יוצרים פתרונות, מעצבים עתיד","l":"אפליקציה לליווי מקצועי, רובוט מטאטא למוסכים ותיק בוגר דיגיטלי","img":"kenes-melave-img/m05.jpg","pos":"50% 40%","fit":"","bg":""},"m07":{"w":3,"s":"אורט דן גורמה","t":"מהלב אל הצלחת","l":"המטבח המקצועי כמרחב חי של הנצחה, שייכות וחיבור בין־דורי","img":"kenes-melave-img/m07.jpg","pos":"50% 8%","fit":"","bg":""},"m08":{"w":2,"s":"אורט תל נוף","t":"תחרות הרובוטיקה FIRST","l":"התלמידים בונים רובוט ייעודי לתחרות רובוטיקה בינלאומית","img":"kenes-melave-img/m08.jpg","pos":"48% 60%","fit":"","bg":""},"m09":{"w":4,"s":"אורט אורמת","t":"קורות חיים כתעודה בעלת ערך","l":"לכל תלמיד קורות חיים אישיים, שהופכים מיומנויות וחוזקות להזדמנות","img":"kenes-melave-img/m09.jpg","pos":"50% 8%","fit":"","bg":""},"m10":{"w":2,"s":"רוואד אכסאל","t":"Dynamic AI Solar Fountain","l":"מזרקה סולארית חכמה שתלמידי החשמל תכננו ובנו, בשילוב בינה מלאכותית","img":"kenes-melave-img/m10.jpg","pos":"50% 45%","fit":"","bg":""},"m11":{"w":5,"s":"דרור התיכון החברתי חיפה","t":"הסיפור שלנו","l":"ספר סיפורים קצרים שכתבו מחנכי התיכון על חוויות משמעותיות","img":"kenes-melave-img/m11.jpg","pos":"50% 30%","fit":"","bg":""},"m12":{"w":5,"s":"עמל אנרג'י טק","t":"מפצחים את הקוד","l":"תלמידי חשמל בי״א מציגים פתרונות טכנולוגיים עם בקרי ארדואינו","img":"kenes-melave-img/m12.jpg","pos":"50% 45%","fit":"","bg":""},"m13":{"w":1,"s":"אורט כרמל","t":"מה התגובה שלך?","l":"משחק אינטראקטיבי וקלפים להתמודדות עם בריונות, בהומור ובאינטליגנציה חברתית","img":"kenes-melave-img/m13.jpg","pos":"45% 50%","fit":"","bg":""},"m14":{"w":1,"s":"מנאראת טורעאן","t":"סיפורו של בוגר","l":"ליווי בוגרים עד לימודי המשך ולהצלחה בעבודה, עם שותפים בקהילה","img":"kenes-melave-img/m14.jpg","pos":"50% 45%","fit":"","bg":""},"m15":{"w":4,"s":"סכנין בית חנינה בנים","t":"Dolce: קיוסק קהילתי תעסוקתי","l":"תלמידי מגמת הטבחות מפעילים קיוסק קהילתי, עם הורים כמנטורים","img":"kenes-melave-img/m15.jpg","pos":"50% 45%","fit":"","bg":""},"m16":{"w":4,"s":"דרור חוש\"ן","t":"ליווי בוגרים: הבית שתמיד אפשר לחזור אליו","l":"רכזת בוגרים ופאנל שבו בוגרים חוזרים ופותחים אופקים לתלמידי י״ב","img":"kenes-melave-img/m16.jpg","pos":"38% 55%","fit":"","bg":""},"m17":{"w":3,"s":"עמל אשדוד","t":"במה וחינוך הוליסטי","l":"מפגש חודשי על הבמה שבו נשמע קול התלמידים: פודקאסט, כתיבה יוצרת ונגינה","img":"kenes-melave-img/m17.jpg","pos":"50% 50%","fit":"","bg":""},"m18":{"w":5,"s":"עתיד באר שבע","t":"גלגולו של ברזל","l":"תלמידי מערכות הנדסיות יוצרים בעלי חיים משרשראות אופניים וחלקי מנועים ישנים","img":"kenes-melave-img/m18.jpg","pos":"","fit":"contain","bg":"#d3d3cf"}};
+var MZW = {"1":{"n":"האדם והחברה במרכז","c":"#2f6ab5"},"2":{"n":"למידה דואלית ופיתוח מיומנויות","c":"#b97f12"},"3":{"n":"רלוונטיות לכל אדם","c":"#d23c48"},"4":{"n":"פתיחת אפשרויות ואופקים","c":"#2a8530"},"5":{"n":"מודל חי ודינמי","c":"#76629f"}};
+/*MZ-END*/
+function mzOf(x) {
+  var m = MZ[x.id]; if (!m) return x;
+  var o = {}; for (var k in x) o[k] = x[k];
+  o.school = m.s || x.school; o.title = m.t || x.title; o.short = m.l || ""; o.w = m.w; o.img = m.img; o.pos = m.pos; o.fit = m.fit; o.bg = m.bg;
+  return o;
+}
+function mzImg(x, cls) {
+  if (!x.img) return "";
+  return '<img class="' + cls + '" src="' + esc(x.img) + '" alt="" loading="lazy" style="object-position:' + esc(x.pos || "50% 50%") + (x.fit ? ";object-fit:" + esc(x.fit) : "") + (x.bg ? ";background:" + esc(x.bg) : "") + '" onerror="this.remove()">';
+}
 
 var POWERS = ["הכרת תודה","חשיבה חיובית","תקווה","אופטימיות","אמפתיה","הקשבה","השראה","יצירתיות","אומץ","אמונה באדם"];
 var PCOL = ["#c8955a","#3a8f86","#2b5a7a","#d17c46","#5fb3a6","#0f2f52","#b98a3e","#2f7d73","#4a6f93","#a2683a"];
@@ -742,6 +776,9 @@ var Demo = (function () {
   var SC = ["אורט אלון","עתיד הגליל","עמל השרון","דרור הנגב","תיכון הים","עתיד הכרמל","עמל העמק"];
   var R = {}, U = {}, ph = Q.get("ph") || "kabala", MEETS = [], EXL = [], LEC = [], TB = {};
   R.demo0001 = {n:"מבקר.ת לדוגמה", f:"מבקר.ת", k:"p", label:"מנהל.ת · אורט אלון", s:"אורט אלון", t:7};
+  /* a personal demo for a reviewer (?demo=1&name=רויטל אמיר): the page greets them by name; still nothing is sent */
+  var DNAME = String(Q.get("name") || "").trim().slice(0, 40);
+  if (DNAME) { R.demo0001.n = DNAME; R.demo0001.f = DNAME.split(/\s+/)[0]; R.demo0001.label = "בדיקת הדף המלווה"; }
   for (var i = 0; i < 40; i++) R["demo" + String(1000 + i)] = {n:FN[i % FN.length] + " " + ["כהן","לוי","חסן","מזרחי","עזאם","פרץ"][i % 6], f:FN[i % FN.length], k:i % 3 ? "p" : "r", label:(i % 3 ? "מנהל.ת · " : "רכז.ת פדגוגי.ת · ") + SC[i % SC.length], s:SC[i % SC.length], t:(i % 12) + 1};
   function u(c) { return U[c] || (U[c] = {pw:"", want:"", mt:[], ex:{}, lec:"", moto:"", net:{}, netf:{}, neti:{}, fb:{}, tin:[], tout:{}}); }
   /* demo: made-up flows between real school dots, and a few slider marks, so the museum screen isn't empty */
@@ -756,6 +793,8 @@ var Demo = (function () {
     {id:"m02", school:"עמל השרון", title:"מטבח של זיכרון", line:"המטבח הפך למרחב של הנצחה וחיבור לקהילה", ch:["למידה משמעותית ומעורבות תלמידים","הורים וקהילה"], changed:"הזיכרונות הפכו לסיפור חי."},
     {id:"m03", school:"אורט אלון", title:"רובוט לתחרות בינלאומית", line:"בניית רובוט כצוות של מפעל הנדסי", ch:["למידה משמעותית ומעורבות תלמידים","חדשנות וטכנולוגיה"], changed:"התלמידים עבדו כצוות הנדסי."}
   ];
+  /* the demo museum = the real exhibits of the leaflet (when the leaflet data is in the page) */
+  if (Object.keys(MZ).length) EX = Object.keys(MZ).map(function (id) { return {id:id, school:MZ[id].s, title:MZ[id].t, line:MZ[id].l, ch:[]}; });
   /* the networks exhibition (real content) */
   var NETS = [
     {id:"ort", name:"אורט", items:[
@@ -1139,7 +1178,7 @@ function confirmMe(code) {
 function offline() { toast("אין חיבור כרגע. ננסה שוב בעוד רגע."); }
 function take(r) {
   S.ph = r.ph; S.me = r.me; S.pw = r.pw; S.want = r.want; S.mt = r.mt || []; S.ex = r.ex || {}; S.lec = r.lec || ""; S.moto = r.moto || "";
-  S.exhibits = r.exhibits || []; S.mipui = r.mipui; S.mc = S.mt.length;
+  S.exhibits = (r.exhibits || []).map(mzOf); S.mipui = r.mipui; S.mc = S.mt.length;
   S.nets = r.nets || []; S.net = r.net || {}; S.tbl = r.tbl || {t:0, rep:null, f:{}}; S.tbl.f = S.tbl.f || {}; S.fb = r.fb || {};
   S.netf = r.netf || {}; S.neti = r.neti || {}; S.tin = r.tin || []; renderTalk();
   S.meetOn = !!r.mo; if (!S.meetOn && S.view === "meet") S.view = null;
@@ -1465,10 +1504,28 @@ function exBtn(x, hit) {
   return '<button class="ex' + (done ? " done" : "") + (hit ? " hit" : "") + '" data-id="' + x.id + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" + esc(x.school) + (done ? " · ביקרת" : "") + "</small></span>" +
     (saved ? '<span class="bm" title="שמור בשבילי" aria-label="שמור בשבילי">' + IC.bm + "</span>" : "") + '<span class="go">' + IC.next + "</span></button>";
 }
+/* a card as in the leaflet: photo, school, title, short line (Meytal, 20.11.26) */
+function exCard(x) {
+  var done = !!S.ex[x.id], saved = done && S.ex[x.id].save, wc = (MZW[x.w] || {}).c || "var(--teal)";
+  return '<button class="exc' + (done ? " done" : "") + '" data-id="' + x.id + '" style="--wc:' + wc + '">' +
+    '<span class="exph">' + (mzImg(x, "") || IC.pin) + (done ? '<span class="ok">' + IC.check + "</span>" : "") + "</span>" +
+    '<span class="tx"><small>' + esc(x.school) + "</small><b>" + esc(x.title) + "</b>" + (x.short ? "<span>" + esc(x.short) + "</span>" : "") +
+    (done ? '<em>ביקרת' + (saved ? " · שמרת" : "") + "</em>" : "") + "</span>" +
+    '<span class="go">' + IC.next + "</span></button>";
+}
 function drawMap() {
-  /* no passport and no personal route (Meytal, 20.11.26): all the exhibits, scan and go */
-  shell('<p class="kick">המוזיאון</p><h1>מוזיאון החדשנות</h1><p class="muted">ליד כל מיצג יש ברקוד: סורקים ומתחילים.</p>' +
-    '<button class="btn" id="sc">' + IC.scan + "לסרוק ברקוד של מיצג</button>" + '<h3 class="lh">המיצגים</h3>' + S.exhibits.map(function (x) { return exBtn(x, false); }).join(""), {k:"map"});
+  /* no passport and no personal route (Meytal, 20.11.26): all the exhibits, scan and go. Grouped by the leaflet's wings. */
+  var groups = [], seen = {};
+  Object.keys(MZW).forEach(function (k) {
+    var xs = S.exhibits.filter(function (x) { return String(x.w) === k; });
+    xs.forEach(function (x) { seen[x.id] = 1; });
+    if (xs.length) groups.push({n:MZW[k].n, c:MZW[k].c, xs:xs});
+  });
+  var rest = S.exhibits.filter(function (x) { return !seen[x.id]; });
+  if (rest.length) groups.push({n:groups.length ? "עוד מיצגים" : "המיצגים", c:"var(--teal)", xs:rest});
+  shell('<p class="kick">המוזיאון</p><h1>מוזיאון החדשנות</h1><p class="muted">ליד כל מיצג יש ברקוד: סורקים ומתחילים. אפשר גם לבחור כאן, כמו בעלון.</p>' +
+    '<button class="btn" id="sc">' + IC.scan + "לסרוק ברקוד של מיצג</button>" +
+    groups.map(function (g) { return '<h3 class="wing" style="--wc:' + g.c + '"><i></i>' + esc(g.n) + "</h3>" + g.xs.map(exCard).join(""); }).join(""), {k:"map"});
   $("sc").onclick = function () {
     Scanner.open("מכוונים אל הברקוד שליד המיצג", function (txt) {
       var h = codeFrom(txt);
@@ -1486,7 +1543,7 @@ function drawEx() {
   var K = {k:"ex" + x.id + S.step};
   if (S.step === "sign") {
     shell(bar("sign") + '<p class="kick">' + esc(x.school) + "</p><h1>" + esc(x.title) + "</h1>" +
-      '<div class="sign fr">' + CORNERS + '<span class="pill tab"><span>השלט <b>שליד</b> המיצג</span></span><dl style="margin:0"><dt>היוזמה במשפט</dt><dd>' + esc(x.line) + "</dd>" + (x.ch && x.ch.length ? "<dt>האתגר</dt><dd>" + esc(x.ch.join(" · ")) + "</dd>" : "") + "</dl></div>" +
+      '<div class="sign fr">' + CORNERS + '<span class="pill tab"><span>השלט <b>שליד</b> המיצג</span></span>' + mzImg(x, "shot") + '<dl style="margin:0"><dt>היוזמה במשפט</dt><dd>' + esc(x.line) + "</dd>" + (x.ch && x.ch.length ? "<dt>האתגר</dt><dd>" + esc(x.ch.join(" · ")) + "</dd>" : "") + "</dl></div>" +
       '<p class="muted">התבוננו במיצג ובשלט שלידו, ואז המשיכו.</p><button class="btn" id="nx">התבוננתי, המשך' + IC.next + "</button>" + back, K);
     $("nx").onclick = function () { S.step = "idea"; drawEx(); };
   } else if (S.step === "idea") {
