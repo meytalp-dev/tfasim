@@ -451,14 +451,16 @@ body.screen{background:var(--paper);overflow:hidden}
 .card.moto .btn{margin-top:10px}
 
 /* ---------- "how far is this from me": 4 stops on a track ---------- */
-.far{margin:16px 0 6px}
+.far{margin:14px 0 6px}
+.far .when{display:none;padding:10px 0 4px}
+.far.open .when{display:block}
 .far .lab{display:block;font-weight:800;color:var(--navy);font-size:16px;margin-bottom:8px}
 .far .trk{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:0;padding-top:4px}
 .far .trk::before{content:"";position:absolute;top:17px;right:12.5%;left:12.5%;height:3px;border-radius:3px;background:linear-gradient(to left,var(--teal2),var(--gold2))}
-.far button{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0 2px;cursor:pointer;font:inherit;color:var(--muted);font-size:13.5px;font-weight:700;line-height:1.2;min-height:44px}
-.far button i{width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--gold2);transition:transform .15s}
-.far button[aria-pressed="true"]{color:var(--navy)}
-.far button[aria-pressed="true"] i{background:var(--navy);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--gold);transform:scale(1.15)}
+.far .trk button{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:0 2px;cursor:pointer;font:inherit;color:var(--muted);font-size:13.5px;font-weight:700;line-height:1.2;min-height:44px}
+.far .trk button i{width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 0 0 2px var(--gold2);transition:transform .15s}
+.far .trk button[aria-pressed="true"]{color:var(--navy)}
+.far .trk button[aria-pressed="true"] i{background:var(--navy);box-shadow:0 0 0 3px #fff,0 0 0 5px var(--gold);transform:scale(1.15)}
 .ini .far{margin:10px 0 4px}
 .ini .far .lab{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:4px}
 
@@ -551,7 +553,7 @@ var PH = {
   sagur:   {t:"לפני הכנס",          d:"מי שסורק.ת רואה \"הדף ייפתח בכנס\""},
   kabala:  {t:"התכנסות",            d:"בוחרים כוח וכוח לאמץ ומבקרים בתערוכת הרשתות (מוצאים אנשים: לפי המתג למטה)"},
   school:  {t:"המיפוי",             d:"סיכום המיפוי של בית הספר (מפקחים: בתי הספר שלהם)"},
-  lecture: {t:"ההרצאה",             d:"דבר אחד משמעותי שאני לוקח.ת"},
+  lecture: {t:"ההרצאה",             d:"דבר אחד משמעותי שאני לוקח.ת (עולה למסך רק כשמפעילים, בסוף ההרצאה)"},
   muzeon:  {t:"המוזיאון",           d:"בהפסקה: סורקים מיצגים. שלט, רעיון, מילה טובה ושאלה למציגים, תאומי רעיון"},
   tables:  {t:"שולחנות עגולים",     d:"נציג.ה מכל שולחן רושם.ת את התובנות של כולם"},
   stage:   {t:"במה ניהולית",        d:"מנהלים משתפים, מעוררים השראה ומובילים שינוי"},
@@ -711,9 +713,12 @@ function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return n
 function lsSet(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
 function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
 function chip(p) { return '<span class="chip" style="--c:' + scol(p) + '">' + sico(p) + esc(p) + "</span>"; }
+/* a scanned code: a badge (c), the shared code of the blank badges (c = "klali"), an exhibit (m), an initiative of the networks (n) */
+var KLALI = "klali";
 function codeFrom(text) {
-  var m = String(text || "").match(/[?&]c=([a-z0-9]{6,16})/i); if (m) return {c:m[1].toLowerCase()};
+  var m = String(text || "").match(/[?&]c=(klali|[a-z0-9]{6,16})(?![a-z0-9])/i); if (m) return {c:m[1].toLowerCase()};
   m = String(text || "").match(/[?&]m=m?(\d{2})/i); if (m) return {m:"m" + m[1]};
+  m = String(text || "").match(/[?&]n=([a-z]{3}\d)/i); if (m) return {n:m[1].toLowerCase()};
   return null;
 }
 
@@ -744,7 +749,7 @@ var Demo = (function () {
   var FLW = {}, FRESH = [], FARS = {m01:[0,1,0,2], m02:[2,3,3], m03:[1,1,0]};
   function addFlow() { var a = GK[Math.floor(Math.random() * GK.length)], b = DEXS[Math.floor(Math.random() * DEXS.length)]; if (a === b) return; FLW[a + "|" + b] = (FLW[a + "|" + b] || 0) + 1; FRESH.unshift({a:a, b:b}); FRESH = FRESH.slice(0, 6); }
   for (var fi = 0; fi < 18; fi++) addFlow();
-  var DLT = {}, MO = false, NIDEAS = [{t:"להזמין בוגרים לספר על המסע שלהם", ex:"מסע שמשאיר חותם", net:"דרור בתי חינוך"}];
+  var DLT = {}, MO = false, LO = false, NIDEAS = [{t:"להזמין בוגרים לספר על המסע שלהם", ex:"מסע שמשאיר חותם", net:"דרור בתי חינוך"}];
   Object.keys(R).slice(1, 31).forEach(function (c, i) { u(c).pw = POWERS[(i * 7) % 10]; u(c).want = POWERS[(i * 3 + 1) % 10]; });
   var EX = [
     {id:"m01", school:"עתיד הגליל", title:"מרכז מבקרים בהדרכת תלמידים", line:"תלמידי המגמה מדריכים קבוצות במרכז מבקרים לחינוך סביבתי", ch:["למידה משמעותית ומעורבות תלמידים","שייכות ומניעת נשירה"], changed:"התלמידים פיתחו ביטחון עצמי ויכולת ביטוי."},
@@ -819,7 +824,7 @@ var Demo = (function () {
       feed:joined.slice(-14).reverse().map(function (c) { return {f:R[c].n, s:R[c].s, pw:U[c].pw}; }),
       lastMeets:(MO ? MEETS : []).slice(-8).reverse().map(function (m) { return {a:R[m[0]].n, b:R[m[1]].n, pa:u(m[0]).pw, pb:u(m[1]).pw}; }),
       stamps:EXL.length, ideas:EXL.filter(function (x) { return x.i; }).slice(-40).reverse().map(function (x) { return {t:x.i, ex:x.title}; }),
-      lec:LEC.slice(-60).reverse(), lecN:LEC.length, tables:tables, motos:motos,
+      lo:LO, lec:LO ? LEC.slice(-60).reverse() : [], lecN:LEC.length, tables:tables, motos:motos,
       flows:Object.keys(FLW).map(function (k) { var ab = k.split("|"); return {a:ab[0], b:ab[1], n:FLW[k]}; }), fresh:FRESH.slice(), exs:DEXS,
       far:EX.filter(function (x) { return FARS[x.id] && FARS[x.id].length; }).map(function (x) { var a = FARS[x.id]; return {id:x.id, t:x.title, s:x.school, n:a.length, avg:a.reduce(function (p, q) { return p + q; }, 0) / a.length}; })};
   }
@@ -857,11 +862,11 @@ var Demo = (function () {
         var me = u(p.c), r = R[p.c], ex = {};
         Object.keys(me.ex).forEach(function (k) { ex[k] = Object.assign({}, me.ex[k]); });
         return {ok:true, ph:ph, mo:MO, c:p.c, me:{n:r.n, f:r.f, k:r.k, label:r.label}, pw:me.pw, want:me.want, mt:list(me), ex:ex, lec:me.lec, moto:me.moto, exhibits:EX,
-          mipui:{kind:"one", list:[{s:r.s, d:MIP}]},
+          mipui:r.g ? {kind:"none", list:[]} : {kind:"one", list:[{s:r.s, d:MIP}]},
           nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout)};
       }
       if (p.a === "scr") return scr();
-      if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, mo:MO, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
+      if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, mo:MO, lo:LO, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
       return {ok:false};
     },
     post: function (b) {
@@ -886,6 +891,13 @@ var Demo = (function () {
       if (b.a === "letters") return {ok:true, done:0, ai:0, left:0};
       if (b.a === "ltoff") return {ok:true, on:!b.off};
       if (b.a === "meeton") { MO = !!b.on; return {ok:true, mo:MO}; }
+      if (b.a === "lecon") { LO = !!b.on; return {ok:true, lo:LO}; }
+      if (b.a === "guest") {
+        var gn = String(b.n || "").trim().slice(0, 60); if (gn.replace(/\s/g, "").length < 2) return {ok:false, error:"name"};
+        var gc = "g" + Math.random().toString(36).slice(2, 11);
+        R[gc] = {n:gn, f:gn.split(/\s+/)[0], k:"o", label:String(b.role || "").trim().slice(0, 80), s:"", t:0, g:1};
+        return {ok:true, c:gc};
+      }
       if (b.a === "lec") { u(b.c).lec = b.t; LEC.push(b.t); return {ok:true}; }
       if (b.a === "moto") { motoAdd(b.c, String(b.t || "").slice(0, 200)); return {ok:true}; }
       if (b.a === "net") {
@@ -1040,24 +1052,65 @@ function demoPhase(ph) {
 }
 
 function phoneStart() {
-  var urlC = (Q.get("c") || "").toLowerCase(), urlM = Q.get("m");
+  var urlC = (Q.get("c") || "").toLowerCase(), urlM = Q.get("m"), urlN = Q.get("n");
   var stored = lsGet("km-c");
   if (DEMO && !stored && !urlC) stored = Demo.demoCode;
+  /* an exhibit / an initiative scanned with the camera app: kept until the phone is in the game, then opened */
   if (urlM) { var mm = String(urlM).match(/^m?(\d{2})/); lsSet("km-open", mm ? "m" + mm[1] : null); }
-  if (urlC && stored && urlC !== stored) {            /* someone else's badge, scanned with the camera app */
+  if (urlN) { var nn = String(urlN).toLowerCase().match(/^[a-z]{3}\d$/); lsSet("km-openn", nn ? nn[0] : null); }
+  if (urlC === KLALI) {                                /* a blank badge: the phone already in the game ignores it */
+    if (!stored) { clearUrl(); return guestForm(); }
+  } else if (urlC && stored && urlC !== stored) {      /* someone else's badge, scanned with the camera app */
     lsSet("km-meet", urlC);
   } else if (urlC && !stored) {
     return confirmMe(urlC);
   }
-  if (Q.get("c") || Q.get("m")) history.replaceState(null, "", location.pathname + (DEMO && Q.get("demo") ? "?demo=1" : ""));
+  if (Q.get("c") || Q.get("m") || Q.get("n")) clearUrl();
   if (!stored) return noBadge();
   S.c = stored;
   load().then(function () {
     var pending = lsGet("km-meet"); if (pending) { lsSet("km-meet", null); doMeet(pending); }
-    var open = lsGet("km-open");
-    if (open && S.exhibits.some(function (x) { return x.id === open; }) && S.pw) { lsSet("km-open", null); S.view = "ex"; S.cur = open; S.step = "sign"; draw(); }
+    openPending();
   });
   setTimeout(poll, 9000 + Math.random() * 3000);
+}
+function clearUrl() { history.replaceState(null, "", location.pathname + (DEMO && Q.get("demo") ? "?demo=1" : "")); }
+
+/* open what was scanned before the phone joined (an exhibit, an initiative). Waits until the powers are chosen. */
+function openPending() {
+  if (!S.me || S.ph === "sagur" || !S.pw || !S.want) return;
+  var open = lsGet("km-open");
+  if (open) {
+    lsSet("km-open", null);
+    if (S.exhibits.some(function (x) { return x.id === open; })) { S.view = "ex"; S.cur = open; S.step = "sign"; draw(); return; }
+  }
+  var ni = lsGet("km-openn");
+  if (ni) { lsSet("km-openn", null); openIni(ni); }
+}
+/* an initiative of the networks exhibition: it lives in the opening (kabala) */
+function openIni(id) {
+  if (!iniById(id)) { toast("היוזמה לא נמצאה"); return; }
+  if (S.ph !== "kabala") { toast("תערוכת הרשתות פתוחה בזמן ההתכנסות"); return; }
+  S.view = null; S.ktab = "nets"; S.netItem = id; S.nd = null; draw();
+}
+
+/* a blank badge (the shared code "klali"): name + school/role, and the phone gets a code of its own */
+function guestForm() {
+  shell('<div class="hero"><p class="kick">ברוכים הבאים</p><h1>איך קוראים לך?</h1><p class="muted">התג שלך עוד בלי שם. כותבים כאן, ומצטרפים לדף המלווה.</p></div>' +
+    '<label class="lab" for="gn">שם מלא</label><input type="text" id="gn" maxlength="60" autocomplete="name" placeholder="שם פרטי ושם משפחה">' +
+    '<label class="lab" for="gr" style="margin-top:12px">בית ספר או תפקיד</label><input type="text" id="gr" maxlength="80" placeholder="למשל: מנהל.ת, תיכון…">' +
+    '<button class="btn" id="gok" style="margin-top:16px">' + IC.check + "הצטרפות</button>" + TAGLINE, {credit:true, k:"guest"});
+  $("gok").onclick = function () {
+    var n = $("gn").value.trim(), role = $("gr").value.trim(), btn = $("gok");
+    if (n.replace(/\s/g, "").length < 2) { toast("כתבו את השם שלך"); $("gn").focus(); return; }
+    btn.disabled = true;
+    post({a:"guest", n:n, role:role}).then(function (r) {
+      if (!r.ok) { btn.disabled = false; toast(r.error === "full" ? "אפשר לגשת לעמדת הקבלה, ונעזור." : "לא נשמר. נסו שוב."); return; }
+      lsSet("km-c", r.c); S.c = r.c;
+      load().then(openPending);
+      setTimeout(poll, 9000 + Math.random() * 3000);
+    }).catch(function () { btn.disabled = false; offline(); });
+  };
 }
 
 function noBadge() {
@@ -1067,7 +1120,7 @@ function noBadge() {
   $("sc").onclick = function () {
     Scanner.open("מכוונים אל הברקוד שעל התג שלך", function (txt) {
       var h = codeFrom(txt);
-      if (h && h.c) confirmMe(h.c); else toast("זה לא הברקוד של התג. נסו שוב.");
+      if (h && h.c === KLALI) guestForm(); else if (h && h.c) confirmMe(h.c); else toast("זה לא הברקוד של התג. נסו שוב.");
     });
   };
 }
@@ -1078,7 +1131,7 @@ function confirmMe(code) {
     shell('<div class="hero"><p class="kick">ברוכים הבאים</p>' +
       '<div class="namecard fr">' + CORNERS + '<span class="pill tab">' + IC.rose + "<span>התג <b>האישי</b> שלך</span></span><h1>" + esc(r.me.n) + '</h1><i class="gl"></i><p class="muted">' + esc(r.me.label) + "</p></div>" +
       '<button class="btn" id="yes">' + IC.check + 'כן, זה אני</button><button class="btn alt" id="no">זה לא אני</button></div>' + TAGLINE, {credit:true, k:"confirm"});
-    $("yes").onclick = function () { lsSet("km-c", code); history.replaceState(null, "", location.pathname + (DEMO ? "?demo=1" : "")); S.c = code; take(r); draw(); setTimeout(poll, 9000 + Math.random() * 3000); };
+    $("yes").onclick = function () { lsSet("km-c", code); history.replaceState(null, "", location.pathname + (DEMO ? "?demo=1" : "")); S.c = code; take(r); draw(); openPending(); setTimeout(poll, 9000 + Math.random() * 3000); };
     $("no").onclick = function () { history.replaceState(null, "", location.pathname + (DEMO ? "?demo=1" : "")); noBadge(); };
   }).catch(offline);
 }
@@ -1202,7 +1255,7 @@ function drawPowers() {
       if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
       /* joined late (after the opening): don't ask about a part they weren't in */
       if (first && FBAT[S.ph]) fbSkip(FBAT[S.ph]);
-      S.want = want; S.pick = ""; S.pick2 = ""; S.view = null; draw(); toast("נשמר. השם שלך עלה למסך הגדול");
+      S.want = want; S.pick = ""; S.pick2 = ""; S.view = null; draw(); toast("נשמר. השם שלך עלה למסך הגדול"); openPending();
     }).catch(function () { btn.disabled = false; offline(); });
   };
 }
@@ -1249,28 +1302,24 @@ function netMarks(n) { return (n.items || []).filter(function (x) { return iniDo
 function iniById(id) { var hit = null; S.nets.forEach(function (n) { (n.items || []).forEach(function (x) { if (x.id === id) hit = {net:n, item:x}; }); }); return hit; }
 function drawNets() {
   if (S.netItem && iniById(S.netItem)) return drawIni();
-  var n = S.netOpen && netById(S.netOpen);
-  if (!n) {
-    shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים רשת ויוזמה: לוקחים רעיון וכותבים מילה טובה לרשת.</p>' +
-      S.nets.map(function (x) {
-        var c = (x.items || []).length, m = netMarks(x);
-        return '<button class="ex' + (c && m === c ? " done" : "") + '" data-net="' + esc(x.id) + '"><span class="ic">' + IC.net + "</span><span><b>" + esc(x.name) + "</b><small>" +
-          (c ? c + " יוזמות" + (m ? " · ביקרת ב-" + m : "") : "הפרטים יתעדכנו בקרוב") + '</small></span><span class="go">' + IC.next + "</span></button>";
-      }).join("") +
-      '<p class="center muted" style="margin-top:12px">הרעיונות עולים בלי שם למסך הגדול, וכל מה שכתבת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
-    document.querySelectorAll("[data-net]").forEach(function (b) { b.onclick = function () { S.netOpen = b.dataset.net; draw(); }; });
-    bindSeg();
-    return;
-  }
-  var items = n.items || [];
-  shell(kseg() + '<p class="kick">תערוכת הרשתות</p><h1>' + esc(n.name) + "</h1>" +
-    (items.length ? items.map(function (x) {
-      var done = iniDone(x.id);
-      return '<button class="ex' + (done ? " done" : "") + '" data-ini-open="' + esc(x.id) + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" +
-        esc(x.line) + '</small></span><span class="go">' + IC.next + "</span></button>";
-    }).join("") : '<div class="note" style="margin:14px 0">הפרטים יתעדכנו בקרוב</div>') +
-    '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">לכל הרשתות</button></p>', {k:"net" + n.id});
-  $("bk").onclick = function () { S.netOpen = null; draw(); };
+  /* one list (Meytal, 20.11): every initiative under its network's name, one tap away; or scan the barcode at the stand */
+  shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">ליד כל יוזמה יש ברקוד: סורקים ונכנסים. אפשר גם לבחור מהרשימה.</p>' +
+    '<button class="btn" id="nsc">' + IC.scan + "לסרוק ברקוד של יוזמה</button>" +
+    S.nets.map(function (n) {
+      var items = n.items || [];
+      return '<h3 class="lh">' + esc(n.name) + "</h3>" + (items.length ? items.map(function (x) {
+        var done = iniDone(x.id);
+        return '<button class="ex' + (done ? " done" : "") + '" data-ini-open="' + esc(x.id) + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" +
+          esc(x.line) + (done ? " · ביקרת" : "") + '</small></span><span class="go">' + IC.next + "</span></button>";
+      }).join("") : '<div class="note" style="margin:8px 0">הפרטים יתעדכנו בקרוב</div>');
+    }).join("") +
+    '<p class="center muted" style="margin-top:12px">הרעיונות עולים בלי שם למסך הגדול, וכל מה שכתבת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
+  $("nsc").onclick = function () {
+    Scanner.open("מכוונים אל הברקוד שליד היוזמה", function (txt) {
+      var h = codeFrom(txt);
+      if (h && h.n) openIni(h.n); else if (h && h.c && h.c !== KLALI) doMeet(h.c); else toast("זה לא ברקוד של יוזמה. נסו שוב.");
+    });
+  };
   document.querySelectorAll("[data-ini-open]").forEach(function (b) { b.onclick = function () { S.netItem = b.dataset.iniOpen; S.nd = null; draw(); }; });
   bindSeg();
 }
@@ -1289,7 +1338,7 @@ function drawIni() {
       : '<button type="button" class="row" id="ntopen">' + IC.plus + "<span>להוסיף משפט למילה הטובה</span><small>לא חובה</small></button>") +
     '<button type="button" class="sw" id="non" aria-pressed="' + d.on + '"><span><b>רוצה לשמוע עוד</b><small>השם שלך יועבר לרשת.</small></span><i></i></button>' +
     '<button class="btn gold" id="nok" style="margin-top:12px">' + IC.check + "שמירה</button>" +
-    '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">ליוזמות של ' + esc(n.name) + "</button></p>", {k:"ini" + id});
+    '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">לכל היוזמות</button></p>', {k:"ini" + id});
   $("ni").oninput = function () { d.i = this.value; };
   bindFar(function (k, v) { d.f = v; });
   document.querySelectorAll("[data-rx]").forEach(function (b) {
@@ -1320,6 +1369,8 @@ function scanSomeone() {
     var h = codeFrom(txt);
     if (!h) { toast("זה לא ברקוד של הכנס. נסו שוב."); return; }
     if (h.m) { openEx(h.m); return; }
+    if (h.n) { openIni(h.n); return; }
+    if (h.c === KLALI) { toast("זה תג בלי שם. אפשר לבקש מהם לסרוק אותו בעצמם."); return; }
     doMeet(h.c);
   });
 }
@@ -1360,17 +1411,26 @@ function linkArt(mine, theirs, match) {
 }
 
 /* ---- "how far is this from me": 4 stops. Tapping the marked stop again clears it. ---- */
+/* Meytal, 20.11: the "when" question opens only for whoever would like to adopt it. Turning the switch off clears the mark. */
 function farPick(sel, key) {
-  return '<div class="far" role="group" aria-label="כמה רחוק זה ממני" data-fk="' + esc(key) + '"><span class="lab">כמה רחוק זה ממני?</span><div class="trk">' +
-    FAR.map(function (l, i) { return '<button type="button" data-far="' + i + '" aria-pressed="' + (sel === i) + '"><i></i><span>' + esc(l) + "</span></button>"; }).join("") + "</div></div>";
+  var on = sel >= 0;
+  return '<div class="far' + (on ? " open" : "") + '" data-fk="' + esc(key) + '">' +
+    '<button type="button" class="sw" data-adopt aria-pressed="' + on + '"><span><b>הייתי רוצה לאמץ את זה</b><small>לא חובה</small></span><i></i></button>' +
+    '<div class="when" role="group" aria-label="מתי זה יכול לקרות אצלנו"><span class="lab">מתי זה יכול לקרות אצלנו?</span><div class="trk">' +
+    FAR.map(function (l, i) { return '<button type="button" data-far="' + i + '" aria-pressed="' + (sel === i) + '"><i></i><span>' + esc(l) + "</span></button>"; }).join("") + "</div></div></div>";
 }
 function bindFar(cb) {
   document.querySelectorAll(".far[data-fk]").forEach(function (g) {
-    var bs = g.querySelectorAll("[data-far]");
+    var bs = g.querySelectorAll("[data-far]"), ad = g.querySelector("[data-adopt]");
     var paint = function (v) { bs.forEach(function (b) { b.setAttribute("aria-pressed", +b.dataset.far === v); }); };
     bs.forEach(function (b) {
       b.onclick = function () { var v = b.getAttribute("aria-pressed") === "true" ? -1 : +b.dataset.far; paint(v); cb(g.dataset.fk, v, paint); };
     });
+    ad.onclick = function () {
+      var open = !g.classList.contains("open");
+      g.classList.toggle("open", open); ad.setAttribute("aria-pressed", open);
+      if (!open) { paint(-1); cb(g.dataset.fk, -1, paint); }
+    };
   });
 }
 
@@ -1412,7 +1472,7 @@ function drawMap() {
   $("sc").onclick = function () {
     Scanner.open("מכוונים אל הברקוד שליד המיצג", function (txt) {
       var h = codeFrom(txt);
-      if (h && h.m) openEx(h.m); else if (h && h.c) doMeet(h.c); else toast("זה לא ברקוד של מיצג. נסו שוב.");
+      if (h && h.m) openEx(h.m); else if (h && h.c && h.c !== KLALI) doMeet(h.c); else toast("זה לא ברקוד של מיצג. נסו שוב.");
     });
   };
   document.querySelectorAll("[data-id]").forEach(function (b) { b.onclick = function () { openEx(b.dataset.id); }; });
@@ -1615,7 +1675,7 @@ function drawSchool() {
 
 /* ---- the lecture ---- */
 function drawLecture() {
-  shell('<p class="kick">ההרצאה</p><h1>דבר אחד משמעותי שאני לוקח.ת מההרצאה</h1><p class="muted">משפט אחד. הוא יעלה בלי שם למסך הגדול.</p>' +
+  shell('<p class="kick">ההרצאה</p><h1>דבר אחד משמעותי שאני לוקח.ת מההרצאה</h1><p class="muted">משפט אחד, בלי שם. בסוף ההרצאה המשפטים יעלו למסך הגדול.</p>' +
     '<div class="card fr wr">' + CORNERS + '<span class="pill tab">' + IC.rose + "<span>מה <b>נשאר</b> איתי</span></span>" +
     '<textarea id="t" maxlength="300" placeholder="מה נשאר איתך?">' + esc(S.lec) + "</textarea></div>" +
     '<button class="btn" id="ok">' + IC.pen + (S.lec ? "עדכון" : "שליחה") + "</button>" + (S.lec ? '<p class="center muted" style="margin-top:10px">נשמר. אפשר לעדכן עד סוף ההרצאה.</p>' : ""), {k:"lecture"});
@@ -1625,7 +1685,7 @@ function drawLecture() {
     btn.disabled = true;
     post({a:"lec", c:S.c, t:t}).then(function (r) {
       if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
-      S.lec = t; drawLecture(); toast("נשמר, ועלה למסך הגדול");
+      S.lec = t; drawLecture(); toast("נשמר. יעלה למסך בסוף ההרצאה");
     }).catch(function () { btn.disabled = false; offline(); });
   };
 }
@@ -1883,7 +1943,7 @@ function flowMap(r) {
 /* ---- the slider strip: each exhibit at the average of "how far is this from me" ---- */
 function farAxis(far) {
   var L = 60, R = 940, step = (R - L) / 3, X = function (v) { return R - v * step; };
-  var s = '<svg viewBox="0 0 1000 150" role="img" aria-label="כמה רחוק זה מהמבקרים">' +
+  var s = '<svg viewBox="0 0 1000 150" role="img" aria-label="מתי זה יכול לקרות, לפי המבקרים">' +
     '<line x1="' + L + '" y1="96" x2="' + R + '" y2="96" stroke="#e2b886" stroke-width="4" stroke-linecap="round"/>';
   FAR.forEach(function (l, i) {
     s += '<circle cx="' + X(i) + '" cy="96" r="6" fill="#fff" stroke="#c8955a" stroke-width="2.5"/>' +
@@ -1902,7 +1962,7 @@ function farAxis(far) {
       '<circle cx="' + x.toFixed(1) + '" cy="' + y + '" r="' + rr.toFixed(1) + '" fill="#0f2f52" fill-opacity=".85" stroke="#fff" stroke-width="2"/>' +
       '<text x="' + x.toFixed(1) + '" y="' + ty + '" text-anchor="middle" font-size="17" font-weight="700" fill="#0f2f52" font-family="Heebo">' + esc(t) + "</text>";
   });
-  return '<div class="ax"><h3>כמה רחוק זה מהמבקרים? כל נקודה היא מיצג, וגדלה עם כל סימון</h3>' + s + "</svg></div>";
+  return '<div class="ax"><h3>מתי זה יכול לקרות אצלנו? כל נקודה היא מיצג, וגדלה עם כל מי שרוצה לאמץ</h3>' + s + "</svg></div>";
 }
 function scrHead(title, sub, big) {
   return '<header><div><p class="kick">כנס בתי הספר המקצועיים · מנהיגות אנושית מחברת</p><h1>' + esc(title) + '</h1><p class="sub">' + sub + '</p></div><div class="hart"></div>' + (big != null ? '<div class="big">' + big + "</div>" : "") + '<img src="' + LOGO + '" alt=""></header>';
@@ -1946,8 +2006,10 @@ function drawScreen(r) {
       r.ideas.map(function (w) { return '<div class="idea">' + esc(w.t) + "<small>בעקבות " + esc(w.ex) + "</small></div>"; }).join("") +
       "</div>" + farAxis(r.far || []) + "</div></div>";
   } else if (r.ph === "lecture") {
-    h = scrHead("דבר אחד משמעותי שאני לוקח.ת", "מה שהמשתתפים כותבים עכשיו, בלי שמות", r.lecN + " <small>משפטים</small>") +
-      '<div class="wall">' + r.lec.map(function (t) { return '<div class="idea">' + esc(t) + "</div>"; }).join("") + "</div>";
+    /* the sentences wait for the organiser (end of the lecture): until then a calm screen, nothing that competes with the speaker */
+    h = r.lo ? scrHead("דבר אחד משמעותי שאני לוקח.ת", "מה שהמשתתפים כתבו, בלי שמות", r.lecN + " <small>משפטים</small>") +
+      '<div class="wall">' + (r.lec || []).map(function (t) { return '<div class="idea">' + esc(t) + "</div>"; }).join("") + "</div>"
+      : scrHead("כנס בתי הספר המקצועיים", "מנהיגות אנושית בעידן הבינה המלאכותית") + '<div class="calm"><div class="big">ההרצאה</div><p class="sub">דבר אחד משמעותי שאני לוקח.ת: כותבים בטלפון</p></div>';
   } else if (r.ph === "school") {
     h = scrHead("מיפוי השימוש בבינה מלאכותית", "כל אחד.ת רואה עכשיו בטלפון את בית הספר שלו.ה") + '<div class="calm"><div class="big">הנתונים של בית הספר שלכם</div><p class="sub">בטלפון, בדף המלווה</p></div>';
   } else {
@@ -1974,6 +2036,9 @@ function adminStart() {
       '<div class="card" style="margin:14px 0"><p class="kick">מוצאים אנשים</p><p style="margin:0 0 8px">' +
         (r.mo ? "<b>פתוח.</b> בכל הטלפונים יש כפתור \"מוצאים אנשים\" וסריקת תגים." : "<b>סגור.</b> המשתתפים בוחרים כוח, אבל לא מחפשים אנשים ולא סורקים תגים.") + "</p>" +
         '<button class="btn ' + (r.mo ? "alt" : "") + '" id="mosw">' + (r.mo ? "לסגור את מוצאים אנשים" : "לפתוח עכשיו את מוצאים אנשים") + "</button></div>" +
+      '<div class="card" style="margin:14px 0"><p class="kick">המשפטים מההרצאה</p><p style="margin:0 0 8px">' +
+        (r.lo ? "<b>על המסך.</b> " + r.lecN + " משפטים מוצגים במסך הגדול." : "<b>מוסתרים.</b> " + r.lecN + " משפטים נכתבו. המסך מציג רק כותרת, כדי לא להפריע להרצאה.") + "</p>" +
+        '<button class="btn ' + (r.lo ? "alt" : "") + '" id="losw">' + (r.lo ? "להסתיר מהמסך" : "להציג את המשפטים על המסך") + "</button></div>" +
       ltCard(r.lt) +
       '<a class="btn navy" href="?v=screen' + (DEMO ? "&demo=1" : "") + '" target="_blank" rel="noopener">לפתוח את המסך הגדול</a>' +
       (r.sheet ? '<a class="btn alt" href="' + esc(r.sheet) + '" target="_blank" rel="noopener">הגיליון עם כל התשובות</a>' : "") +
@@ -1990,6 +2055,9 @@ function adminStart() {
     });
     $("mosw").onclick = function () {
       post({a:"meeton", k:k, on:!r.mo}).then(function (x) { toast(x.ok ? (x.mo ? "נפתח. הטלפונים יתעדכנו תוך כ-10 שניות" : "נסגר") : "לא עודכן"); refresh(); }).catch(offline);
+    };
+    $("losw").onclick = function () {
+      post({a:"lecon", k:k, on:!r.lo}).then(function (x) { toast(x.ok ? (x.lo ? "המשפטים עולים למסך" : "הוסתרו מהמסך") : "לא עודכן"); refresh(); }).catch(offline);
     };
     if ($("ltgo")) $("ltgo").onclick = runLetters;
     if ($("ltsw")) $("ltsw").onclick = function () {

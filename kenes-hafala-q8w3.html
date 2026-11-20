@@ -79,6 +79,7 @@ details[open] summary .chev{transform:rotate(180deg)}
       <div class="now" id="now"><span class="dot"></span><div><small>פעיל עכשיו בכל הטלפונים</small><b id="nowL">...</b></div><div class="cnt" id="nowC"></div></div>
       <div class="st" id="st"></div>
       <p class="note">לחיצה על תחנה מעבירה אליה את כל הטלפונים תוך כ-10 שניות. התחנה הבאה מחליפה את הקודמת.</p>
+      <div class="row hide" id="loRow"><div class="t"><b>המשפטים מההרצאה</b><span id="loSt">...</span></div><button class="btn teal" id="loSw">להציג על המסך</button></div>
       <div class="keyin hide" id="mkBox"><input id="mkIn" dir="ltr" placeholder="מפתח הלוח של הדף המלווה"><button class="btn pri" id="mkGo">שמירה</button></div>
       <div class="warn hide" id="stErr"></div>
     </div>
@@ -212,6 +213,13 @@ function loadSt(){
     $("mkBox").classList.add("hide"); stErr("");
     cur = r.ph; drawSt();
     if (r.lt && !LT.busy) { LT.on = r.lt.on; LT.key = r.lt.key; LT.n = r.lt.n; drawLt(); }
+    /* the lecture's sentences reach the big screen only on this button (end of the lecture) */
+    if (r.lo != null) {
+      LO = !!r.lo; $("loRow").classList.remove("hide");
+      $("loSt").textContent = (r.lecN || 0) + " משפטים · " + (LO ? "מוצגים על המסך הגדול" : "מוסתרים: המסך מציג רק כותרת");
+      $("loSw").textContent = LO ? "להסתיר מהמסך" : "להציג על המסך";
+      $("loSw").className = "btn" + (LO ? "" : " teal");
+    }
     $("nowC").innerHTML = (r.joined != null ? r.joined + " מתוך " + r.total + "<br>נכנסו למשחק" : "");
   }).catch(function(){ stErr("אין חיבור לשרת של הדף המלווה. מנסה שוב..."); });
 }
@@ -228,6 +236,15 @@ $("st").addEventListener("click", function(e){
     if (r.ph === "stage" && LT.on && LT.key) runLetters();
   }).catch(function(){ stErr("המעבר לא נשמר. נסי שוב."); b.disabled = false; });
 });
+var LO = false;
+$("loSw").onclick = function(){
+  if (!MK) { loadSt(); return; }
+  var b = this; b.disabled = true;
+  post(MEL, { a: "lecon", k: MK, on: !LO }).then(function(r){
+    if (!r || !r.ok) throw 0;
+    LO = r.lo; loadSt();
+  }).catch(function(){ stErr("לא עודכן. נסי שוב."); }).then(function(){ b.disabled = false; });
+};
 $("mkGo").onclick = function(){ MK = $("mkIn").value.trim(); store("kenes_mk", MK); loadSt(); };
 loadSt(); setInterval(loadSt, 20000);
 
