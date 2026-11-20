@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>השיר שלי · כנס בתי הספר המקצועיים</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800;900&family=Frank+Ruhl+Libre:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbfaf7; --ink:#0f2f52; --ink-2:#3b5373; --muted:#6b7a90; --line:#e4dfd4;
+  --teal:#3a8f86; --teal-soft:#e6f2f0; --gold:#c8955a; --gold-soft:#f7eee2; --white:#fff; --red:#b4463c;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Heebo','Segoe UI',Arial,sans-serif;font-size:17px;line-height:1.55}
+[dir=ltr]{direction:ltr;unicode-bidi:embed}
+.hide{display:none!important}
+button{font:inherit;cursor:pointer}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ============ form (phone first) ============ */
+.wrap{max-width:560px;margin:0 auto;padding:0 16px 40px}
+.top{background:var(--white);border-bottom:1px solid var(--line)}
+.top .wrap{padding:14px 16px;display:flex;justify-content:center}
+.top img{height:44px;width:auto;display:block}
+.hero{padding:26px 0 8px;position:relative}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--teal);font-weight:700;font-size:15px;letter-spacing:.2px}
+.hero h1{font-family:'Frank Ruhl Libre',serif;font-weight:700;font-size:34px;line-height:1.2;margin:8px 0 10px}
+.hero p{margin:0 0 6px;color:var(--ink-2)}
+.wave{display:block;width:100%;height:34px;margin:14px 0 4px}
+.card{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:20px 18px;margin-top:14px;box-shadow:0 1px 0 rgba(15,47,82,.04)}
+label{display:block;font-weight:700;margin:0 0 6px}
+label small{font-weight:400;color:var(--muted)}
+.f{margin-bottom:18px}
+input,textarea{width:100%;font:inherit;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;outline:none}
+input:focus,textarea:focus{border-color:var(--teal);background:var(--white)}
+textarea{min-height:110px;resize:vertical}
+.hint{font-size:14px;color:var(--muted);margin-top:6px}
+.count{float:left;font-size:13px;color:var(--muted)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.row2{grid-template-columns:1fr}}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:14px;background:var(--ink);color:#fff;font-weight:700;font-size:18px;padding:15px}
+.btn:disabled{opacity:.6}
+.err{color:var(--red);font-weight:500;margin:10px 0 0;font-size:15px}
+.help{display:inline-flex;align-items:center;gap:6px;margin:18px auto 0;border:1px solid var(--line);border-radius:99px;padding:6px 14px;color:var(--muted);font-size:14px;text-decoration:none;background:var(--white)}
+.helpbox{text-align:center}
+.done{text-align:center;padding:30px 18px}
+.done .disc{width:74px;height:74px;border-radius:50%;background:var(--teal-soft);color:var(--teal);display:grid;place-items:center;margin:0 auto 14px}
+.done .disc svg{width:36px;height:36px}
+.done h2{font-family:'Frank Ruhl Libre',serif;font-size:28px;margin:0 0 8px}
+.prev{margin:18px 0 0;padding:16px;border-radius:14px;background:var(--gold-soft);text-align:right}
+.prev q{display:block;font-family:'Frank Ruhl Libre',serif;font-size:20px;line-height:1.45;quotes:"\201D" "\201C"}
+.prev .by{margin-top:8px;color:var(--ink-2);font-size:15px}
+.link{background:none;border:0;color:var(--teal);font-weight:700;text-decoration:underline;padding:0;margin-top:16px}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
+
+/* ============ big screen ============ */
+body.screen{overflow:hidden;height:100vh;background:var(--paper)}
+.scr{position:fixed;inset:0;display:grid;grid-template-rows:auto 1fr auto;padding:2.6vh 3.2vw}
+.scr-top{display:flex;align-items:center;justify-content:space-between}
+.scr-top .logo{background:#fff;border-radius:14px;padding:1vh 1.4vw;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+.scr-top .logo img{height:5.2vh;display:block}
+.scr-title{display:flex;align-items:center;gap:1vw;font-weight:800;color:var(--teal);font-size:2.3vh;letter-spacing:.3px}
+.eq{display:inline-flex;gap:.35vh;align-items:flex-end;height:2.6vh}
+.eq i{width:.55vh;background:var(--gold);border-radius:2px;height:30%;animation:eq 1s ease-in-out infinite}
+.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}.eq i:nth-child(4){animation-delay:.1s}
+.paused .eq i{animation-play-state:paused}
+@keyframes eq{0%,100%{height:25%}50%{height:100%}}
+.scr-mid{display:grid;grid-template-columns:1.25fr 1fr;gap:4vw;align-items:center;min-height:0}
+.quote{position:relative;transition:opacity .7s,transform .7s}
+.quote.out{opacity:0;transform:translateY(2vh)}
+.quote .mark{font-family:'Frank Ruhl Libre',serif;color:var(--gold);font-size:16vh;line-height:.6;height:7vh;display:block}
+.quote .why{font-family:'Frank Ruhl Libre',serif;font-weight:500;color:var(--ink);font-size:clamp(3vh,4.6vh,6vh);line-height:1.38;margin:0}
+.quote .why.long{font-size:3.6vh}
+.quote .who{margin-top:3.6vh;display:flex;align-items:center;gap:1.2vw}
+.quote .who .bar{width:5vw;height:.5vh;background:var(--teal);border-radius:2px}
+.quote .name{font-weight:800;font-size:3.4vh}
+.quote .role{color:var(--ink-2);font-size:2.4vh}
+.side{display:flex;flex-direction:column;gap:2.4vh;transition:opacity .7s}
+.side.out{opacity:0}
+.vid{position:relative;aspect-ratio:16/9;width:100%;border-radius:2.4vh;overflow:hidden;background:#0f2f52;box-shadow:0 2vh 5vh -2vh rgba(15,47,82,.35)}
+.vid > div,.vid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.song{display:flex;align-items:center;gap:1.2vw}
+.song .note{width:6vh;height:6vh;border-radius:50%;background:var(--gold-soft);color:var(--gold);display:grid;place-items:center;flex:none}
+.song .note svg{width:3.2vh;height:3.2vh}
+.song .t{font-weight:800;font-size:3vh;line-height:1.2}
+.song .a{color:var(--ink-2);font-size:2.3vh}
+.prog{height:.6vh;background:var(--line);border-radius:3px;overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--teal);transition:width 1s linear}
+.scr-bot{display:flex;align-items:flex-end;justify-content:space-between;gap:2vw}
+.next{color:var(--muted);font-size:2.1vh;min-height:3vh}
+.next b{color:var(--ink-2);font-weight:700}
+.qr{display:flex;align-items:center;gap:1.2vw;background:#fff;border:1px solid var(--line);border-radius:2vh;padding:1.2vh 1.4vw}
+.qr .code{width:11vh;height:11vh}
+.qr .code img,.qr .code canvas{width:100%!important;height:100%!important}
+.qr .txt{font-weight:800;font-size:2.4vh;line-height:1.25}
+.qr .txt span{display:block;font-weight:500;font-size:1.9vh;color:var(--ink-2)}
+.dots{position:absolute;inset:0;pointer-events:none;z-index:-1;opacity:.55}
+.start{position:fixed;inset:0;z-index:5;background:rgba(251,250,247,.96);display:grid;place-items:center;text-align:center}
+.start h2{font-family:'Frank Ruhl Libre',serif;font-size:6vh;margin:0 0 1vh}
+.start p{color:var(--ink-2);font-size:2.4vh;margin:0 0 4vh}
+.start button{border:0;background:var(--ink);color:#fff;font-weight:800;font-size:3vh;border-radius:99px;padding:2vh 5vw;display:inline-flex;gap:1vw;align-items:center}
+.start button svg{width:3.4vh;height:3.4vh}
+.ctl{position:fixed;left:2vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:1vh;opacity:0;transition:opacity .3s;z-index:4}
+.ctl.on{opacity:1}
+.ctl button{width:6vh;height:6vh;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--ink);display:grid;place-items:center}
+.ctl button svg{width:2.8vh;height:2.8vh}
+.empty{grid-column:1/-1;text-align:center;color:var(--ink-2)}
+.empty h2{font-family:'Frank Ruhl Libre',serif;font-size:6vh;color:var(--ink);margin:0 0 2vh}
+.empty p{font-size:2.8vh}
+
+/* ============ admin ============ */
+.tabs{display:flex;gap:8px;margin:16px 0 4px;flex-wrap:wrap}
+.tabs button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font-weight:700;color:var(--ink-2)}
+.tabs button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.stat{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
+.stat div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;color:var(--ink-2)}
+.stat b{display:block;font-size:22px;color:var(--ink)}
+.it{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:12px}
+.it .h{display:flex;gap:12px;align-items:flex-start}
+.it img{width:120px;height:68px;object-fit:cover;border-radius:10px;background:var(--line);flex:none}
+.it .nm{font-weight:800}
+.it .sg{color:var(--ink-2);font-size:15px}
+.it .wy{margin:10px 0 0;font-family:'Frank Ruhl Libre',serif;font-size:18px}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:99px;padding:2px 9px;margin-inline-start:6px}
+.pill.wait{background:var(--gold-soft);color:#8a5a22}.pill.ok{background:var(--teal-soft);color:#1f6b63}.pill.no{background:#f6e3e1;color:var(--red)}
+.pill.nolink{background:#eef0f4;color:var(--muted)}
+.acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.acts button{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 14px;font-weight:700}
+.acts .ok{background:var(--teal);border-color:var(--teal);color:#fff}
+.acts .no{color:var(--red)}
+.lk{display:flex;gap:8px;margin-top:10px}
+.lk input{padding:9px 12px;font-size:15px}
+.lk button{border:0;background:var(--ink);color:#fff;border-radius:10px;padding:0 14px;font-weight:700;white-space:nowrap}
+.yt{font-size:14px;color:var(--teal);font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- ======================= FORM ======================= -->
+<div id="vForm" class="hide">
+  <div class="top"><div class="wrap"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div></div>
+  <div class="wrap">
+    <div class="hero">
+      <span class="kicker"><svg class="i" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>כנס בתי הספר המקצועיים · 23.11</span>
+      <h1 id="hello">השיר שלי</h1>
+      <p>שיר אהוב אחד: שיר שמתחבר אצלך ל"למה בחרתי בתפקיד שלי" ולמנהיגות בחינוך, או פשוט שיר אישי שחשוב לך.</p>
+      <p>השירים יתנגנו באולם בהפסקות, יחד עם המשפט שכתבת ועם שמך.</p>
+      <svg class="wave" viewBox="0 0 560 34" preserveAspectRatio="none" aria-hidden="true"><path d="M0 17 C 40 2, 80 32, 120 17 S 200 2, 240 17 S 320 32, 360 17 S 440 2, 480 17 S 540 30, 560 17" stroke="#3a8f86" stroke-width="2" fill="none"/><path d="M0 22 C 50 10, 90 34, 140 22 S 230 8, 280 22 S 370 34, 420 22 S 510 10, 560 22" stroke="#c8955a" stroke-width="1.5" fill="none" opacity=".7"/></svg>
+    </div>
+
+    <form id="frm" class="card" novalidate>
+      <div class="f" id="nameF">
+        <label for="nm">השם שלך</label>
+        <input id="nm" autocomplete="name" maxlength="60">
+        <div class="hint">כך הוא יופיע על המסך, עם המשפט שלך.</div>
+      </div>
+      <div class="row2">
+        <div class="f"><label for="sg">שם השיר</label><input id="sg" maxlength="120"></div>
+        <div class="f"><label for="ar">זמר / זמרת</label><input id="ar" maxlength="120"></div>
+      </div>
+      <div class="f">
+        <label for="lk">קישור ליוטיוב <small>(רשות)</small></label>
+        <input id="lk" dir="ltr" inputmode="url" placeholder="https://youtu.be/..." maxlength="300">
+        <div class="hint">אין קישור? אפשר להשאיר ריק, ואנחנו נמצא.</div>
+      </div>
+      <div class="f">
+        <label for="wy">למה השיר הזה? <span class="count" id="cnt">0/200</span></label>
+        <textarea id="wy" maxlength="200" placeholder="משפט אחד או שניים"></textarea>
+      </div>
+      <button class="btn" id="go" type="submit"><svg class="i" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4 20-7z"/></svg><span>שליחה</span></button>
+      <p class="err hide" id="err"></p>
+    </form>
+
+    <div class="card done hide" id="ok">
+      <div class="disc"><svg class="i" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h2>תודה, השיר נקלט</h2>
+      <p style="margin:0;color:var(--ink-2)">נשמע אותו באולם ביום שני.</p>
+      <div class="prev" id="prev"></div>
+      <button class="link" type="button" id="again">לשנות את השיר</button>
+    </div>
+
+    <div class="helpbox"><a class="help" id="help" href="#"><svg class="i" viewBox="0 0 24 24" style="width:16px;height:16px"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>נתקלתם בבעיה? שלחו הודעה</a></div>
+    <div class="foot">המנהל להכשרה מקצועית · משרד העבודה</div>
+  </div>
+</div>
+
+<!-- ======================= SCREEN ======================= -->
+<div id="vScreen" class="hide">
+  <div class="scr" id="scr">
+    <svg class="dots" id="dots" aria-hidden="true"></svg>
+    <div class="scr-top">
+      <div class="logo"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div>
+      <div class="scr-title"><span class="eq"><i></i><i></i><i></i><i></i></span>הפלייליסט שלנו · השירים שבחרתם ולמה</div>
+    </div>
+    <div class="scr-mid" id="mid">
+      <div class="quote" id="q">
+        <span class="mark">&#8221;</span>
+        <p class="why" id="qWhy"></p>
+        <div class="who"><span class="bar"></span><div><div class="name" id="qName"></div><div class="role" id="qRole"></div></div></div>
+      </div>
+      <div class="side" id="side">
+        <div class="vid"><div id="yt"></div></div>
+        <div class="song">
+          <div class="note"><svg class="i" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+          <div><div class="t" id="sT"></div><div class="a" id="sA"></div></div>
+        </div>
+        <div class="prog"><i id="pg"></i></div>
+      </div>
+      <div class="empty hide" id="empty"><h2>הפלייליסט מתמלא</h2><p>סרקו את הברקוד והוסיפו את השיר שלכם</p></div>
+    </div>
+    <div class="scr-bot">
+      <div class="next" id="nx"></div>
+      <div class="qr"><div class="code" id="qr"></div><div class="txt">גם לך יש שיר?<span>סרקו והוסיפו</span></div></div>
+    </div>
+  </div>
+  <div class="ctl" id="ctl">
+    <button id="bPrev" title="הקודם"><svg class="i" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></button>
+    <button id="bPlay" title="עצירה / המשך"><svg class="i" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg></button>
+    <button id="bNext" title="הבא"><svg class="i" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>
+  </div>
+  <div class="start" id="start">
+    <div>
+      <h2>הפלייליסט שלנו</h2>
+      <p id="stInfo">טוען שירים...</p>
+      <button id="bStart"><svg class="i" viewBox="0 0 24 24"><path d="m6 4 14 8-14 8z" fill="currentColor"/></svg>התחלה</button>
+    </div>
+  </div>
+</div>
+
+<!-- ======================= ADMIN ======================= -->
+<div id="vAdmin" class="hide">
+  <div class="top"><div class="wrap"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"></div></div>
+  <div class="wrap">
+    <div class="hero" style="padding-bottom:0"><span class="kicker">אישור שירים · כנס 23.11</span><h1 style="font-size:28px">הפלייליסט</h1></div>
+    <div class="stat" id="st"></div>
+    <div class="tabs" id="tabs"></div>
+    <div id="list"></div>
+    <p class="err hide" id="aErr"></p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+var EXEC = "https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec";
+var PAGE = "https://tfasim.pedagogiamh.co.il/kenes-shir.html";
+var Q = new URLSearchParams(location.search);
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+function get(params){
+  var u = EXEC + "?" + new URLSearchParams(params).toString();
+  return fetch(u, { credentials: "omit", cache: "no-store" }).then(function(r){ return r.json(); });
+}
+function post(body){
+  return fetch(EXEC, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) })
+    .then(function(r){ return r.json(); });
+}
+function vid(s){
+  s = String(s || "").trim();
+  var m = s.match(/(?:youtu\.be\/|[?&]v=|\/shorts\/|\/embed\/|\/live\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : "");
+}
+
+/* ============================ FORM ============================ */
+function form(){
+  $("vForm").classList.remove("hide");
+  var c = Q.get("c") || "", known = "";
+  if (c === "klali") c = "";
+  var live = Q.has("live") || !c;
+  var help = "mailto:merhav@pedagogiamh.co.il?subject=" + encodeURIComponent("השיר שלי · כנס 23.11 · תקלה") +
+             "&body=" + encodeURIComponent("שלום,\nנתקלתי בבעיה בטופס השיר:\n\n" + (c ? "(קוד " + c + ")" : ""));
+  $("help").href = help;
+  $("wy").addEventListener("input", function(){ $("cnt").textContent = this.value.length + "/200"; });
+  if (c) {
+    $("nameF").classList.add("hide");
+    get({ mode: "me", c: c }).then(function(r){
+      if (r && r.name) {
+        known = r.name;
+        $("hello").textContent = "שלום " + r.name.split(" ")[0] + ", מה השיר שלך?";
+        if (r.song) {
+          $("sg").value = r.song.song; $("ar").value = r.song.artist; $("lk").value = r.song.link; $("wy").value = r.song.why;
+          $("cnt").textContent = r.song.why.length + "/200";
+          showDone();
+        }
+      } else { c = ""; $("nameF").classList.remove("hide"); }
+    }).catch(function(){ c = ""; $("nameF").classList.remove("hide"); });
+  }
+  function showDone(){
+    $("frm").classList.add("hide"); $("ok").classList.remove("hide");
+    $("prev").innerHTML = "<q>" + esc($("wy").value.trim()) + "</q><div class='by'>" + esc(known || $("nm").value.trim()) +
+      " · " + esc($("sg").value.trim()) + ($("ar").value.trim() ? " · " + esc($("ar").value.trim()) : "") + "</div>";
+    window.scrollTo(0, 0);
+  }
+  $("again").onclick = function(){ $("ok").classList.add("hide"); $("frm").classList.remove("hide"); };
+  $("frm").addEventListener("submit", function(e){
+    e.preventDefault();
+    var d = { action: "add", c: c, name: $("nm").value.trim(), song: $("sg").value.trim(), artist: $("ar").value.trim(),
+              link: $("lk").value.trim(), why: $("wy").value.trim(), live: live && !c };
+    var err = $("err"); err.classList.add("hide");
+    var miss = [];
+    if (!c && !d.name) miss.push("השם");
+    if (!d.song) miss.push("שם השיר");
+    if (!d.why) miss.push("למה השיר הזה");
+    if (miss.length) { err.textContent = "חסר: " + miss.join(", "); err.classList.remove("hide"); return; }
+    if (d.link && !vid(d.link)) { err.textContent = "הקישור לא נראה כמו קישור ליוטיוב. אפשר להשאיר ריק."; err.classList.remove("hide"); return; }
+    var b = $("go"); b.disabled = true; b.querySelector("span").textContent = "שולח...";
+    post(d).then(function(r){
+      if (!r || !r.ok) throw new Error((r && r.error) || "x");
+      showDone();
+    }).catch(function(){
+      err.textContent = "השליחה לא הצליחה. נסו שוב בעוד רגע."; err.classList.remove("hide");
+    }).then(function(){ b.disabled = false; b.querySelector("span").textContent = "שליחה"; });
+  });
+}
+
+/* ============================ SCREEN ============================ */
+function screen(){
+  document.body.classList.add("screen");
+  $("vScreen").classList.remove("hide");
+  var K = Q.get("k") || "", LEN = parseInt(Q.get("len"), 10) || 120;
+  var list = [], seen = {}, bad = {}, order = [], pos = -1, player = null, ready = false, started = false, timer = null, t0 = 0, playing = true;
+
+  new QRCode($("qr"), { text: PAGE + "?live=1", width: 256, height: 256, colorDark: "#0f2f52", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M });
+  drawDots();
+
+  function load(){
+    return get({ mode: "list", k: K }).then(function(r){
+      if (!r || !r.ok) { $("stInfo").textContent = "אין גישה (חסר מפתח בכתובת)"; return; }
+      var fresh = [];
+      r.songs.forEach(function(s){ if (!seen[s.id]) { seen[s.id] = 1; fresh.push(s); } });
+      if (!list.length) { list = r.songs.slice(); order = list.map(function(_, i){ return i; }); }
+      else if (fresh.length) {           // new songs play next, in the order they came in
+        fresh.forEach(function(s, j){ list.push(s); order.splice(pos + 1 + j, 0, list.length - 1); });
+      }
+      var still = {}; r.songs.forEach(function(s){ still[s.id] = 1; });   // a song taken off in admin leaves the loop
+      order = order.filter(function(i){ return !bad[list[i].id] && (still[list[i].id] || i === order[pos]); });
+      $("stInfo").textContent = list.length ? list.length + " שירים בפלייליסט" : "עוד אין שירים מאושרים";
+      if (started && !list.length) showEmpty(true);
+    }).catch(function(){});
+  }
+  load(); setInterval(load, 45000);
+
+  window.onYouTubeIframeAPIReady = function(){
+    player = new YT.Player("yt", { width: "100%", height: "100%",
+      playerVars: { controls: 0, rel: 0, modestbranding: 1, playsinline: 1, iv_load_policy: 3, disablekb: 1 },
+      events: {
+        onReady: function(){ ready = true; },
+        onStateChange: function(e){ if (e.data === 0) next(); if (e.data === 1) { playing = true; document.body.classList.remove("paused"); } },
+        onError: function(e){                       // blocked / removed: out of the loop for this session
+          window.__ytErr = (window.__ytErr || []).concat(e.data);
+          var cur = list[order[pos]]; if (cur) bad[cur.id] = 1;
+          order = order.filter(function(i){ return !bad[list[i].id]; });
+          pos = Math.min(pos, order.length) - 1;
+          setTimeout(next, 800);
+        }
+      } });
+  };
+  var s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s);
+
+  $("bStart").onclick = function(){
+    if (!ready) { $("stInfo").textContent = "הנגן נטען, עוד רגע..."; return; }
+    started = true; $("start").classList.add("hide");
+    if (!list.length) { showEmpty(true); waitForSongs(); return; }
+    next();
+  };
+  function waitForSongs(){ var w = setInterval(function(){ if (order.length) { clearInterval(w); showEmpty(false); next(); } }, 5000); }
+  function showEmpty(on){
+    $("empty").classList.toggle("hide", !on); $("q").classList.toggle("hide", on); $("side").classList.toggle("hide", on);
+  }
+  function play(i){
+    var song = list[order[i]]; if (!song) return;
+    pos = i;
+    $("q").classList.add("out"); $("side").classList.add("out");
+    setTimeout(function(){
+      $("qWhy").textContent = song.why; $("qWhy").classList.toggle("long", song.why.length > 130);
+      $("qName").textContent = song.name; $("qRole").textContent = song.role || "";
+      $("sT").textContent = song.song; $("sA").textContent = song.artist || "";
+      var nn = list[order[(i + 1) % order.length]];
+      $("nx").innerHTML = order.length > 1 && nn ? "הבא בתור: <b>" + esc(nn.song) + "</b> · " + esc(nn.name) : "";
+      $("q").classList.remove("out"); $("side").classList.remove("out");
+    }, 650);
+    player.setVolume(100);
+    player.loadVideoById({ videoId: song.vid, startSeconds: 0, endSeconds: LEN });
+    t0 = Date.now(); clearInterval(timer);
+    timer = setInterval(tick, 1000);
+  }
+  function tick(){
+    if (!playing) return;
+    var t = 0; try { t = player.getCurrentTime() || 0; } catch(e){}
+    var dur = 0; try { dur = player.getDuration() || 0; } catch(e){}
+    var end = dur ? Math.min(LEN, dur) : LEN;
+    $("pg").style.width = Math.min(100, t / end * 100) + "%";
+    if (end - t < 5 && t > 3) player.setVolume(Math.max(0, Math.round((end - t) / 5 * 100)));   // fade out
+    if (t >= end - 0.3 || Date.now() - t0 > (LEN + 25) * 1000) next();                          // safety net
+  }
+  function next(){ if (!order.length) { showEmpty(true); waitForSongs(); return; } play((pos + 1) % order.length); }
+  function prev(){ if (order.length) play((pos - 1 + order.length) % order.length); }
+  function toggle(){
+    if (!player) return;
+    if (playing) { player.pauseVideo(); playing = false; document.body.classList.add("paused"); }
+    else { player.playVideo(); playing = true; document.body.classList.remove("paused"); }
+  }
+  $("bNext").onclick = next; $("bPrev").onclick = prev; $("bPlay").onclick = toggle;
+  document.addEventListener("keydown", function(e){
+    if (!started) return;
+    if (e.key === "ArrowLeft" || e.key === "PageDown") next();
+    else if (e.key === "ArrowRight" || e.key === "PageUp") prev();
+    else if (e.key === " ") { e.preventDefault(); toggle(); }
+  });
+  var hideT; document.addEventListener("mousemove", function(){ $("ctl").classList.add("on"); clearTimeout(hideT); hideT = setTimeout(function(){ $("ctl").classList.remove("on"); }, 2500); });
+}
+function drawDots(){
+  var svg = $("dots"), w = innerWidth, h = innerHeight, out = "";
+  svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+  for (var i = 0; i < 40; i++) {
+    var x = (i * 137.5 % 100) / 100 * w, y = ((i * 61.8) % 100) / 100 * h, r = 2 + (i % 4);
+    out += "<circle cx='" + x.toFixed(0) + "' cy='" + y.toFixed(0) + "' r='" + r + "' fill='" + (i % 3 ? "#e4dfd4" : "#c8955a") + "' opacity='" + (i % 3 ? .9 : .35) + "'/>";
+  }
+  out += "<path d='M0 " + (h * .86) + " C " + w * .2 + " " + h * .8 + ", " + w * .4 + " " + h * .94 + ", " + w * .6 + " " + h * .87 + " S " + w * .9 + " " + h * .8 + ", " + w + " " + h * .86 + "' stroke='#3a8f86' stroke-width='2' fill='none' opacity='.35'/>";
+  svg.innerHTML = out;
+}
+
+/* ============================ ADMIN ============================ */
+function admin(){
+  $("vAdmin").classList.remove("hide");
+  var K = Q.get("k") || "", data = [], tab = "wait";
+  var TABS = [["wait", "ממתינים"], ["ok", "מאושרים"], ["no", "נדחו"], ["all", "הכול"]];
+  function load(){
+    return get({ mode: "admin", k: K }).then(function(r){
+      if (!r || !r.ok) { $("aErr").textContent = "אין גישה"; $("aErr").classList.remove("hide"); return; }
+      data = r.songs;
+      var c = { wait: 0, ok: 0, no: 0 };
+      data.forEach(function(s){ c[s.status === "מאושר" ? "ok" : s.status === "נדחה" ? "no" : "wait"]++; });
+      $("st").innerHTML = "<div><b>" + data.length + "</b>שירים</div><div><b>" + c.wait + "</b>ממתינים</div><div><b>" + c.ok +
+        "</b>מאושרים</div><div><b>" + r.sent + "/" + r.invited + "</b>קיבלו מייל</div>";
+      $("tabs").innerHTML = TABS.map(function(t){ return "<button data-t='" + t[0] + "' class='" + (t[0] === tab ? "on" : "") + "'>" + t[1] +
+        (t[0] !== "all" ? " (" + c[t[0]] + ")" : "") + "</button>"; }).join("");
+      draw();
+    }).catch(function(){ $("aErr").textContent = "הטעינה לא הצליחה, נסי לרענן"; $("aErr").classList.remove("hide"); });
+  }
+  function kind(s){ return s.status === "מאושר" ? "ok" : s.status === "נדחה" ? "no" : "wait"; }
+  function draw(){
+    var rows = data.filter(function(s){ return tab === "all" || kind(s) === tab; }).sort(function(a, b){ return b.at - a.at; });
+    if (!rows.length) { $("list").innerHTML = "<p style='color:var(--muted);margin-top:18px'>אין כאן שירים כרגע.</p>"; return; }
+    $("list").innerHTML = rows.map(function(s){
+      var k = kind(s), lab = { ok: "מאושר", no: "נדחה", wait: "ממתין" }[k];
+      var img = s.vid ? "<a href='https://youtu.be/" + s.vid + "' target='_blank' rel='noopener'><img src='https://i.ytimg.com/vi/" + s.vid + "/mqdefault.jpg' alt=''></a>" : "";
+      return "<div class='it' data-id='" + s.id + "'><div class='h'>" + img + "<div><div class='nm'>" + esc(s.name) +
+        "<span class='pill " + k + "'>" + lab + "</span>" + (s.vid ? "" : "<span class='pill nolink'>בלי קישור</span>") +
+        (s.vid && s.emb && s.emb !== "כן" ? "<span class='pill no'>" + (s.emb === "חסום" ? "חסום להטמעה, צריך קישור אחר" : "הסרטון לא נמצא") + "</span>" : "") +
+        (s.src === "בכנס" ? "<span class='pill nolink'>בכנס</span>" : "") + "</div><div class='sg'>" + esc(s.song) + (s.artist ? " · " + esc(s.artist) : "") +
+        "</div>" + (s.vid ? "<a class='yt' href='https://youtu.be/" + s.vid + "' target='_blank' rel='noopener'>לשמוע ביוטיוב</a>" : "") +
+        "</div></div><p class='wy'>" + esc(s.why) + "</p>" +
+        "<div class='lk'><input dir='ltr' placeholder='קישור יוטיוב' value='" + esc(s.link) + "'><button data-a='link'>שמירת קישור</button></div>" +
+        "<div class='acts'>" + (k !== "ok" ? "<button class='ok' data-a='מאושר'" + (s.vid ? "" : " disabled title='צריך קישור'") + ">אישור</button>" : "") +
+        (k !== "no" ? "<button class='no' data-a='נדחה'>דחייה</button>" : "") + (k !== "wait" ? "<button data-a='ממתין'>החזרה להמתנה</button>" : "") +
+        "</div></div>";
+    }).join("");
+  }
+  $("tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; tab = b.dataset.t; load(); });
+  $("list").addEventListener("click", function(e){
+    var b = e.target.closest("button[data-a]"); if (!b) return;
+    var it = b.closest(".it"), id = it.dataset.id, a = b.dataset.a, body = { action: "status", k: K, id: id };
+    if (a === "link") { body.link = it.querySelector("input").value.trim(); if (!vid(body.link)) { alert("הקישור לא נראה כמו קישור ליוטיוב"); return; } }
+    else body.status = a;
+    b.disabled = true;
+    post(body).then(function(r){ if (!r || !r.ok) throw 0; return load(); }).catch(function(){ alert("לא נשמר, נסי שוב"); b.disabled = false; });
+  });
+  load(); setInterval(load, 60000);
+}
+
+var V = Q.get("v");
+if (V === "screen") screen(); else if (V === "admin") admin(); else form();
+</script>
+</body>
+</html>
