@@ -470,6 +470,12 @@ body.screen{background:var(--paper);overflow:hidden}
 .talkc p b{color:var(--navy)}
 .talkc .row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .talkc .btn{margin:0}
+/* "finding people" opened in a break: the way in, above the screen */
+.mpill{display:flex;align-items:center;gap:10px;width:100%;margin:0 0 16px;padding:12px 16px;border:0;border-radius:16px;cursor:pointer;font:inherit;text-align:right;
+  background:var(--goldbg);color:var(--navy);box-shadow:inset 0 0 0 1.5px var(--gold)}
+.mpill svg{width:22px;height:22px;flex:0 0 22px;color:#8a5a26}
+.mpill span{flex:1;font-size:16px}
+.mpill b{font-weight:800}
 
 /* ---------- the letter from 2030 ---------- */
 .letter{position:relative;margin:14px 0 18px;padding:22px 20px 18px;background:#fffdf8;border-radius:6px 6px 18px 18px;
@@ -537,7 +543,7 @@ function pcol(p) { var i = POWERS.indexOf(p); return i < 0 ? "#8a97a6" : PCOL[i]
 
 var PH = {
   sagur:   {t:"לפני הכנס",          d:"מי שסורק.ת רואה \"הדף ייפתח בכנס\""},
-  kabala:  {t:"התכנסות",            d:"בוחרים כוח וכוח לאמץ, מוצאים אנשים ומבקרים בתערוכת הרשתות"},
+  kabala:  {t:"התכנסות",            d:"בוחרים כוח וכוח לאמץ ומבקרים בתערוכת הרשתות (מוצאים אנשים: לפי המתג למטה)"},
   school:  {t:"המיפוי",             d:"סיכום המיפוי של בית הספר (מפקחים: בתי הספר שלהם)"},
   lecture: {t:"ההרצאה",             d:"דבר אחד משמעותי שאני לוקח.ת"},
   muzeon:  {t:"המוזיאון",           d:"בהפסקה: סורקים מיצגים. שלט, רעיון, מילה טובה ושאלה למציגים, חותמת"},
@@ -598,6 +604,7 @@ var IC = {
   mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3.5 6.5l8.5 6.5 8.5-6.5"/></svg>',
   ask:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/><path d="M10 9a2 2 0 1 1 2.6 1.9c-.4.2-.6.5-.6.9v.4M12 14h.01"/></svg>',
   table:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><ellipse cx="12" cy="12" rx="5.5" ry="3.5"/><circle cx="12" cy="4" r="1.6"/><circle cx="12" cy="20" r="1.6"/><circle cx="3.5" cy="12" r="1.6"/><circle cx="20.5" cy="12" r="1.6"/></svg>',
+  camera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
   mic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8.5 21h7"/></svg>',
   rxinsp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg>',
   rxidea:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M9 18c0-2.5-3-4-3-8a6 6 0 0 1 12 0c0 4-3 5.5-3 8"/></svg>',
@@ -725,13 +732,13 @@ var Demo = (function () {
   var R = {}, U = {}, ph = Q.get("ph") || "kabala", MEETS = [], EXL = [], LEC = [], TB = {};
   R.demo0001 = {n:"מבקר.ת לדוגמה", f:"מבקר.ת", k:"p", label:"מנהל.ת · אורט אלון", s:"אורט אלון", t:7};
   for (var i = 0; i < 40; i++) R["demo" + String(1000 + i)] = {n:FN[i % FN.length] + " " + ["כהן","לוי","חסן","מזרחי","עזאם","פרץ"][i % 6], f:FN[i % FN.length], k:i % 3 ? "p" : "r", label:(i % 3 ? "מנהל.ת · " : "רכז.ת פדגוגי.ת · ") + SC[i % SC.length], s:SC[i % SC.length], t:(i % 12) + 1};
-  function u(c) { return U[c] || (U[c] = {pw:"", want:"", mt:[], ex:{}, lec:"", moto:"", net:{}, netf:{}, fb:{}, tin:[], tout:{}}); }
+  function u(c) { return U[c] || (U[c] = {pw:"", want:"", mt:[], ex:{}, lec:"", moto:"", net:{}, netf:{}, neti:{}, fb:{}, tin:[], tout:{}}); }
   /* demo: made-up flows between real school dots, and a few slider marks, so the museum screen isn't empty */
   var GK = Object.keys(GEO).filter(function (n) { return n !== "מרחביה/מעיינות"; }), DEXS = ["מצפה רמון","עמל אשדוד","אורט כרמל","קמ\"ג דימונה","אבו סנאן","עתיד באר שבע"];
   var FLW = {}, FRESH = [], FARS = {m01:[0,1,0,2], m02:[2,3,3], m03:[1,1,0]};
   function addFlow() { var a = GK[Math.floor(Math.random() * GK.length)], b = DEXS[Math.floor(Math.random() * DEXS.length)]; if (a === b) return; FLW[a + "|" + b] = (FLW[a + "|" + b] || 0) + 1; FRESH.unshift({a:a, b:b}); FRESH = FRESH.slice(0, 6); }
   for (var fi = 0; fi < 18; fi++) addFlow();
-  var DLT = {};
+  var DLT = {}, MO = false, NIDEAS = [{t:"להזמין בוגרים לספר על המסע שלהם", ex:"מסע שמשאיר חותם", net:"דרור בתי חינוך"}];
   Object.keys(R).slice(1, 31).forEach(function (c, i) { u(c).pw = POWERS[(i * 7) % 10]; u(c).want = POWERS[(i * 3 + 1) % 10]; });
   var EX = [
     {id:"m01", school:"עתיד הגליל", title:"מרכז מבקרים בהדרכת תלמידים", line:"תלמידי המגמה מדריכים קבוצות במרכז מבקרים לחינוך סביבתי", ch:["למידה משמעותית ומעורבות תלמידים","שייכות ומניעת נשירה"], changed:"התלמידים פיתחו ביטחון עצמי ויכולת ביטוי."},
@@ -795,9 +802,11 @@ var Demo = (function () {
     var tables = Object.keys(TB).map(Number).sort(function (x, y) { return x - y; }).filter(function (t) { var f = TB[t].f; return f.f2 || f.f3; })
       .map(function (t) { var f = TB[t].f; return {t:t, f2:f.f2, f3:f.f3}; });
     var motos = MOTO.slice(-60).reverse().map(function (c) { return {t:u(c).moto, n:R[c].n, s:R[c].s}; });
-    return {ok:true, ph:ph, joined:joined.length, total:Object.keys(R).length, powers:powers, wants:wants, pairs:pairs, mpairs:mpairs, meets:MEETS.length, matches:matches,
+    /* with "finding people" closed the demo screen shows no meetings (the made-up ones stay for when it opens) */
+    if (!MO) { pairs = {}; mpairs = {}; matches = 0; }
+    return {ok:true, ph:ph, mo:MO, netIdeas:NIDEAS.slice(0, 30), joined:joined.length, total:Object.keys(R).length, powers:powers, wants:wants, pairs:pairs, mpairs:mpairs, meets:MO ? MEETS.length : 0, matches:matches,
       feed:joined.slice(-14).reverse().map(function (c) { return {f:R[c].n, s:R[c].s, pw:U[c].pw}; }),
-      lastMeets:MEETS.slice(-8).reverse().map(function (m) { return {a:R[m[0]].n, b:R[m[1]].n, pa:u(m[0]).pw, pb:u(m[1]).pw}; }),
+      lastMeets:(MO ? MEETS : []).slice(-8).reverse().map(function (m) { return {a:R[m[0]].n, b:R[m[1]].n, pa:u(m[0]).pw, pb:u(m[1]).pw}; }),
       stamps:EXL.length, ideas:EXL.filter(function (x) { return x.i; }).slice(-40).reverse().map(function (x) { return {t:x.i, ex:x.title}; }),
       lec:LEC.slice(-60).reverse(), lecN:LEC.length, tables:tables, motos:motos,
       flows:Object.keys(FLW).map(function (k) { var ab = k.split("|"); return {a:ab[0], b:ab[1], n:FLW[k]}; }), fresh:FRESH.slice(), exs:DEXS,
@@ -814,7 +823,7 @@ var Demo = (function () {
   setInterval(function () {
     var cs = Object.keys(R).slice(1, 31), a = cs[Math.floor(Math.random() * cs.length)], b = cs[Math.floor(Math.random() * cs.length)];
     if (Math.random() < .35) { var hit = cs.filter(function (c) { return u(c).pw === u(a).want; }); if (hit.length) b = hit[Math.floor(Math.random() * hit.length)]; }
-    addMeet(a, b);
+    if (MO) addMeet(a, b);
     if (Math.random() < .4) EXL.push({i:["לתת לתלמידים להדריך ביום פתוח","ערב קהילתי עם מתכונים מהמשפחות","צוות רובוטיקה פתוח לכולם","לשאול מה ה-AI לא יכול לעשות במקום התלמיד"][Math.floor(Math.random() * 4)], title:EX[Math.floor(Math.random() * 3)].title});
     if (Math.random() < .3) LEC.push(["להתחיל מהאדם ולא מהכלי","להקשיב יותר לצוות","לנסות כלי אחד חדש החודש","המנהיגות היא אנושית"][Math.floor(Math.random() * 4)]);
     if (Math.random() < .3) addFlow();
@@ -824,7 +833,7 @@ var Demo = (function () {
     get: function (p) {
       if (p.a === "st") {
         var tt = p.c && R[p.c] && R[p.c].t, mu = p.c ? u(p.c) : null;
-        return {ok:true, ph:ph, mc:mu ? mu.mt.length : 0, tv:tt ? tb(tt).v : 0, tin:mu ? mu.tin.slice() : [],
+        return {ok:true, ph:ph, mo:MO, mc:mu ? mu.mt.length : 0, tv:tt ? tb(tt).v : 0, tin:mu ? mu.tin.slice() : [],
           ty:mu ? Object.keys(mu.tout).filter(function (k) { return mu.tout[k] === "yes"; }).length : 0};
       }
       if (p.a === "tw") {
@@ -836,12 +845,12 @@ var Demo = (function () {
         if (!R[p.c]) return {ok:false, error:"code"};
         var me = u(p.c), r = R[p.c], ex = {};
         Object.keys(me.ex).forEach(function (k) { ex[k] = Object.assign({}, me.ex[k]); });
-        return {ok:true, ph:ph, c:p.c, me:{n:r.n, f:r.f, k:r.k, label:r.label}, pw:me.pw, want:me.want, mt:list(me), ex:ex, lec:me.lec, moto:me.moto, exhibits:EX,
+        return {ok:true, ph:ph, mo:MO, c:p.c, me:{n:r.n, f:r.f, k:r.k, label:r.label}, pw:me.pw, want:me.want, mt:list(me), ex:ex, lec:me.lec, moto:me.moto, exhibits:EX,
           mipui:{kind:"one", list:[{s:r.s, d:MIP}]},
-          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout)};
+          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout)};
       }
       if (p.a === "scr") return scr();
-      if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
+      if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, mo:MO, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
       return {ok:false};
     },
     post: function (b) {
@@ -865,12 +874,17 @@ var Demo = (function () {
       if (b.a === "talkr") { var mt3 = u(b.c); mt3.tin = mt3.tin.filter(function (t) { return t.id !== b.id; }); return {ok:true, tin:mt3.tin.slice()}; }
       if (b.a === "letters") return {ok:true, done:0, ai:0, left:0};
       if (b.a === "ltoff") return {ok:true, on:!b.off};
+      if (b.a === "meeton") { MO = !!b.on; return {ok:true, mo:MO}; }
       if (b.a === "lec") { u(b.c).lec = b.t; LEC.push(b.t); return {ok:true}; }
       if (b.a === "moto") { motoAdd(b.c, String(b.t || "").slice(0, 200)); return {ok:true}; }
       if (b.a === "net") {
         var nu = u(b.c);
         if (b.on != null) { if (b.on) nu.net[b.id] = true; else delete nu.net[b.id]; }
         if (b.f != null) { if (b.f >= 0) nu.netf[b.id] = b.f; else delete nu.netf[b.id]; }
+        if (b.i != null || b.r != null || b.t != null) {
+          if (b.i || b.r || b.t) nu.neti[b.id] = {i:b.i || "", r:RX[b.r] ? b.r : "", t:b.t || ""}; else delete nu.neti[b.id];
+          if (b.i) { var hit = null; NETS.forEach(function (n) { n.items.forEach(function (x) { if (x.id === b.id) hit = {ex:x.title, net:n.name}; }); }); NIDEAS.unshift({t:b.i, ex:hit ? hit.ex : "", net:hit ? hit.net : ""}); }
+        }
         return {ok:true};
       }
       if (b.a === "fb") { if (!FBT[b.part]) return {ok:false}; u(b.c).fb[b.part] = String(b.t || "").slice(0, 300); return {ok:true}; }
@@ -954,9 +968,9 @@ var S = {c:null, me:null, ph:"sagur", pw:"", want:"", mt:[], ex:{}, lec:"", moto
          nets:[], net:{}, tbl:{t:0, rep:null, f:{}}, tv:null, fb:{},
          view:null, cur:null, step:null, pick:"", pick2:"",
          ktab:"meet", netOpen:null, lastQ:-1, dx:null, tstep:null, tdraft:null, fbDraft:"", open:{}, mailed:false,
-         netf:{}, draftF:null, tin:[], ty:null, letter:null};
+         netf:{}, neti:{}, netItem:null, nd:null, draftF:null, tin:[], ty:null, letter:null, meetOn:false};
 /* what is on screen inside a phase; cleared whenever the phase changes */
-function resetView() { S.view = null; S.pick = ""; S.pick2 = ""; S.draftI = null; S.draftF = null; S.ktab = "meet"; S.netOpen = null; S.dx = null; S.tstep = null; S.tdraft = null; S.fbDraft = ""; }
+function resetView() { S.view = null; S.pick = ""; S.pick2 = ""; S.draftI = null; S.draftF = null; S.ktab = "meet"; S.netOpen = null; S.netItem = null; S.nd = null; S.dx = null; S.tstep = null; S.tdraft = null; S.fbDraft = ""; }
 
 /* the day's stations: where I am and what opens next. Live = display only; the organiser switches phases. */
 var JR = {kabala:"התכנסות", school:"המיפוי", lecture:"הרצאה", muzeon:"מוזיאון", tables:"שולחנות", stage:"במה", end:"סיום"};
@@ -966,7 +980,7 @@ function journey() {
   return '<nav class="jr" aria-label="המסלול של היום"><b class="jr-t">מסלול היום</b><div class="jr-l">' + JR_ORDER.map(function (p, i) {
     var cls = i < at ? " done" : i === at ? " now" : "";
     return "<" + tag + ' class="st' + cls + '"' + (DEMO ? ' type="button" data-jr="' + p + '"' : "") + (i === at ? ' aria-current="step"' : "") + "><i>" + (i < at ? IC.check : "") + "</i><span>" + JR[p] + "</span>" + (i === at ? "<em>אתם כאן</em>" : "") + "</" + tag + ">";
-  }).join("") + "</div>" + (DEMO ? '<p class="jr-demo">בהדגמה בלבד: נוגעים בתחנה כדי לעבור אליה</p>' : "") + "</nav>";
+  }).join("") + "</div>" + (DEMO ? '<p class="jr-demo">בהדגמה בלבד: נוגעים בתחנה כדי לעבור אליה · <button type="button" class="link" id="demomo">' + (S.meetOn ? "לסגור" : "לפתוח") + " את מוצאים אנשים</button></p>" : "") + "</nav>";
 }
 function nextLine() {
   var n = PH_ORDER[PH_ORDER.indexOf(S.ph) + 1];
@@ -989,10 +1003,16 @@ function shell(inner, opts) {
     if (DEMO) {
       var t = document.createElement("div"); t.className = "demo-tag"; t.textContent = "הדגמה · שום דבר לא נשלח"; $("app").appendChild(t);
       document.querySelectorAll("[data-jr]").forEach(function (b) { b.onclick = function () { demoPhase(b.dataset.jr); }; });
+      if ($("demomo")) $("demomo").onclick = function () {
+        post({a:"meeton", on:!S.meetOn}).then(function (r) { S.meetOn = !!r.mo; S.view = null; draw(); toast(S.meetOn ? "בהדגמה: מוצאים אנשים פתוח" : "בהדגמה: מוצאים אנשים סגור"); });
+      };
     }
   }
   var key = opts.k || String(Math.random()), m = $("main");
-  m.innerHTML = inner;
+  /* "finding people" opened by the organiser outside the opening (e.g. in a break): a way in from any screen */
+  var pill = S.me && S.meetOn && S.pw && S.ph !== "kabala" && S.ph !== "sagur" && !S.view;
+  m.innerHTML = (pill ? '<button type="button" class="mpill" id="mpill">' + IC.people + "<span><b>מוצאים אנשים</b> · פתוח עכשיו</span>" + IC.next + "</button>" : "") + inner;
+  if (pill) $("mpill").onclick = function () { S.view = "meet"; draw(); };
   if (fresh || key !== SH.key) { m.classList.remove("enter"); void m.offsetWidth; m.classList.add("enter"); window.scrollTo(0, 0); }
   else m.classList.remove("enter");
   SH.key = key;
@@ -1057,7 +1077,8 @@ function take(r) {
   S.ph = r.ph; S.me = r.me; S.pw = r.pw; S.want = r.want; S.mt = r.mt || []; S.ex = r.ex || {}; S.lec = r.lec || ""; S.moto = r.moto || "";
   S.exhibits = r.exhibits || []; S.mipui = r.mipui; S.mc = S.mt.length;
   S.nets = r.nets || []; S.net = r.net || {}; S.tbl = r.tbl || {t:0, rep:null, f:{}}; S.tbl.f = S.tbl.f || {}; S.fb = r.fb || {};
-  S.netf = r.netf || {}; S.tin = r.tin || []; renderTalk();
+  S.netf = r.netf || {}; S.neti = r.neti || {}; S.tin = r.tin || []; renderTalk();
+  S.meetOn = !!r.mo; if (!S.meetOn && S.view === "meet") S.view = null;
 }
 /* quiet = a background refresh: keep the screen as is while someone is typing */
 function typing() { var a = document.activeElement; return !!a && (a.tagName === "TEXTAREA" || a.tagName === "INPUT"); }
@@ -1073,6 +1094,13 @@ function poll() {
       var changed = r.ph !== S.ph;
       if (changed) { S.ph = r.ph; resetView(); draw(); if (r.ph !== "sagur") toast(PH[r.ph] ? "עוברים לשלב: " + PH[r.ph].t : ""); }
       var again = false;
+      /* the organiser opened / closed "finding people" */
+      if (r.mo != null && !!r.mo !== S.meetOn) {
+        S.meetOn = !!r.mo;
+        if (!S.meetOn && S.view === "meet") S.view = null;
+        if (!changed && !typing() && S.view !== "ex") draw();
+        if (S.meetOn) toast("נפתח עכשיו: מוצאים אנשים לפי הכוח");
+      }
       if (r.mc != null && r.mc !== S.mc) { S.mc = r.mc; again = true; }
       /* the table's record changed (someone else is writing): refresh, unless I'm the one writing */
       if (r.tv != null && r.tv !== S.tv) { var first = S.tv == null; S.tv = r.tv; if (!first && S.ph === "tables" && !(S.tbl.rep && S.tbl.rep.c === S.c)) again = true; }
@@ -1117,10 +1145,12 @@ function draw() {
   if (!S.me) return;
   if (S.view === "ex") return drawEx();
   if (S.view === "powers" || (S.ph !== "sagur" && (!S.pw || !S.want))) return drawPowers();
+  if (S.view === "meet" && S.meetOn) return drawMeet();
   var fp = fbDue(); if (fp) return drawFb(fp);
   switch (S.ph) {
     case "sagur": return drawSagur();
-    case "kabala": return S.ktab === "nets" ? drawNets() : drawMeet();
+    /* "finding people" only when the organiser opened it; otherwise the opening is the networks exhibition */
+    case "kabala": return S.meetOn && S.ktab !== "nets" ? drawMeet() : drawNets();
     case "school": return drawSchool();
     case "lecture": return drawLecture();
     case "muzeon": return drawMap();
@@ -1151,8 +1181,8 @@ function drawPowers() {
     $("nx").onclick = function () { S.pick = S.pw; drawPowers(); };
     return;
   }
-  shell('<p class="kick">שלב 2 מתוך 2</p><h1>איזה כוח היית רוצה לאמץ?</h1><p class="muted">כוח שאין לך היום ושהיית רוצה לחזק. נחפש מי שבחר בו.</p>' + grid(S.pick2 || S.want, S.pw) +
-    '<button class="btn" id="ok"' + ((S.pick2 || S.want) && (S.pick2 || S.want) !== S.pw ? "" : " disabled") + '>' + IC.people + 'שמירה, ולמצוא אנשים</button><p class="center" style="margin:0"><button class="link" id="bk">חזרה לכוח שלי</button></p>', {k:"powers2"});
+  shell('<p class="kick">שלב 2 מתוך 2</p><h1>איזה כוח היית רוצה לאמץ?</h1><p class="muted">כוח שאין לך היום ושהיית רוצה לחזק.' + (S.meetOn ? " נחפש מי שבחר בו." : "") + "</p>" + grid(S.pick2 || S.want, S.pw) +
+    '<button class="btn" id="ok"' + ((S.pick2 || S.want) && (S.pick2 || S.want) !== S.pw ? "" : " disabled") + '>' + (S.meetOn ? IC.people + "שמירה, ולמצוא אנשים" : IC.check + "שמירה") + '</button><p class="center" style="margin:0"><button class="link" id="bk">חזרה לכוח שלי</button></p>', {k:"powers2"});
   document.querySelectorAll(".pw").forEach(function (b) { b.onclick = function () { S.pick2 = b.dataset.p; drawPowers(); }; });
   $("bk").onclick = function () { S.pick = ""; drawPowers(); };
   $("ok").onclick = function () {
@@ -1180,7 +1210,9 @@ function drawMeet() {
     nextLine() +
     (DEMO ? '<button class="btn demo" id="fake">בהדגמה: לדמות סריקה של תג</button>' : "") +
     (list ? '<div class="card" style="margin-top:16px"><p class="kick">פגשתי</p>' + list + "</div>" : "") +
-    '<p class="mine">הכוח שלי: ' + chip(S.pw) + ' <button class="link" id="ed">שינוי</button></p>', {k:"meet"});
+    '<p class="mine">הכוח שלי: ' + chip(S.pw) + ' <button class="link" id="ed">שינוי</button></p>' +
+    (S.view === "meet" ? '<p class="center" style="margin:6px 0 0"><button class="link" id="mbk">חזרה</button></p>' : ""), {k:"meet"});
+  if ($("mbk")) $("mbk").onclick = function () { S.view = null; draw(); };
   $("sc").onclick = scanSomeone;
   if ($("fake")) $("fake").onclick = function () { doMeet(Demo.otherCode()); };
   $("ed").onclick = function () { S.view = "powers"; S.pick = ""; S.pick2 = ""; draw(); };
@@ -1188,28 +1220,33 @@ function drawMeet() {
 }
 /* the two-way switch of the opening: people | networks exhibition */
 function kseg() {
+  if (!S.meetOn || S.ph !== "kabala") return "";
   return '<div class="seg" role="group" aria-label="מה פתוח עכשיו"><button type="button" data-kt="meet" aria-pressed="' + (S.ktab !== "nets") + '">' + IC.people + 'מוצאים אנשים</button>' +
     '<button type="button" data-kt="nets" aria-pressed="' + (S.ktab === "nets") + '">' + IC.net + "תערוכת הרשתות</button></div>";
 }
 function bindSeg() {
   document.querySelectorAll("[data-kt]").forEach(function (b) {
-    b.onclick = function () { if (S.ktab === b.dataset.kt) return; S.ktab = b.dataset.kt; S.netOpen = null; draw(); };
+    b.onclick = function () { if (S.ktab === b.dataset.kt) return; S.ktab = b.dataset.kt; S.netOpen = null; S.netItem = null; S.nd = null; draw(); };
   });
 }
 
-/* ---- networks exhibition: what I'd like to hear more about ---- */
+/* ---- networks exhibition: like the museum — an idea I take, how far it is from me, a good word to the network,
+   "hear more", and a selfie with the initiative (the photo page, task p03) ---- */
 function netById(id) { return S.nets.filter(function (n) { return n.id === id; })[0]; }
-function netMarks(n) { return (n.items || []).filter(function (x) { return S.net[x.id]; }).length; }
+function iniDone(id) { return !!(S.neti[id] || S.net[id] || S.netf[id] != null); }
+function netMarks(n) { return (n.items || []).filter(function (x) { return iniDone(x.id); }).length; }
+function iniById(id) { var hit = null; S.nets.forEach(function (n) { (n.items || []).forEach(function (x) { if (x.id === id) hit = {net:n, item:x}; }); }); return hit; }
 function drawNets() {
+  if (S.netItem && iniById(S.netItem)) return drawIni();
   var n = S.netOpen && netById(S.netOpen);
   if (!n) {
-    shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים רשת, ומסמנים יוזמות שרוצים לשמוע עליהן עוד.</p>' +
+    shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים רשת ויוזמה: לוקחים רעיון, כותבים מילה טובה לרשת, ומצטלמים עם היוזמה שאהבתם.</p>' +
       S.nets.map(function (x) {
         var c = (x.items || []).length, m = netMarks(x);
-        return '<button class="ex" data-net="' + esc(x.id) + '"><span class="ic">' + IC.net + "</span><span><b>" + esc(x.name) + "</b><small>" +
-          (c ? c + " יוזמות" + (m ? " · סימנת " + m : "") : "הפרטים יתעדכנו בקרוב") + '</small></span><span class="go">' + IC.next + "</span></button>";
+        return '<button class="ex' + (c && m === c ? " done" : "") + '" data-net="' + esc(x.id) + '"><span class="ic">' + IC.net + "</span><span><b>" + esc(x.name) + "</b><small>" +
+          (c ? c + " יוזמות" + (m ? " · ביקרת ב-" + m : "") : "הפרטים יתעדכנו בקרוב") + '</small></span><span class="go">' + IC.next + "</span></button>";
       }).join("") +
-      '<p class="center muted" style="margin-top:12px">מה שסימנת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
+      '<p class="center muted" style="margin-top:12px">הרעיונות עולים בלי שם למסך הגדול, וכל מה שכתבת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
     document.querySelectorAll("[data-net]").forEach(function (b) { b.onclick = function () { S.netOpen = b.dataset.net; draw(); }; });
     bindSeg();
     return;
@@ -1217,34 +1254,56 @@ function drawNets() {
   var items = n.items || [];
   shell(kseg() + '<p class="kick">תערוכת הרשתות</p><h1>' + esc(n.name) + "</h1>" +
     (items.length ? items.map(function (x) {
-      var on = !!S.net[x.id];
-      return '<div class="ini"><b>' + esc(x.title) + "</b><p>" + esc(x.line) + "</p>" + farPick(S.netf[x.id] != null ? S.netf[x.id] : -1, x.id) +
-        '<button type="button" class="tg" data-ini="' + esc(x.id) + '" aria-pressed="' + on + '">' + (on ? IC.check : IC.plus) + "<span>רוצה לשמוע עוד</span></button></div>";
+      var done = iniDone(x.id);
+      return '<button class="ex' + (done ? " done" : "") + '" data-ini-open="' + esc(x.id) + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" +
+        esc(x.line) + '</small></span><span class="go">' + IC.next + "</span></button>";
     }).join("") : '<div class="note" style="margin:14px 0">הפרטים יתעדכנו בקרוב</div>') +
     '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">לכל הרשתות</button></p>', {k:"net" + n.id});
   $("bk").onclick = function () { S.netOpen = null; draw(); };
-  bindFar(function (id, v, paint) {
-    var was = S.netf[id] != null ? S.netf[id] : -1;
-    if (v < 0) delete S.netf[id]; else S.netf[id] = v;
-    post({a:"net", c:S.c, id:id, f:v}).then(function (r) {
-      if (r.ok) return;
-      if (was < 0) delete S.netf[id]; else S.netf[id] = was;
-      paint(was); toast("לא נשמר. נסו שוב.");
-    }).catch(function () { if (was < 0) delete S.netf[id]; else S.netf[id] = was; paint(was); offline(); });
-  });
-  document.querySelectorAll("[data-ini]").forEach(function (b) {
+  document.querySelectorAll("[data-ini-open]").forEach(function (b) { b.onclick = function () { S.netItem = b.dataset.iniOpen; S.nd = null; draw(); }; });
+  bindSeg();
+}
+function drawIni() {
+  var h = iniById(S.netItem), x = h.item, n = h.net, id = x.id, mine = S.neti[id] || {};
+  var d = S.nd && S.nd.id === id ? S.nd : (S.nd = {id:id, i:mine.i || "", r:mine.r || "", t:mine.t || "", f:S.netf[id] != null ? S.netf[id] : -1, on:!!S.net[id], ot:!!mine.t});
+  var selfie = "kenes-tmunot/?t=p03" + (DEMO ? "" : "&c=" + encodeURIComponent(S.c));
+  shell(kseg() + '<p class="kick">' + esc(n.name) + "</p><h1>" + esc(x.title) + "</h1>" +
+    '<div class="sign fr">' + CORNERS + '<span class="pill tab"><span>היוזמה <b>במשפט</b></span></span><p style="margin:0">' + esc(x.line) + "</p></div>" +
+    '<h2 style="margin:18px 0 6px">מה מזה אפשר לעשות אצלך?</h2><p class="muted" style="margin:0 0 8px">משפט אחד. הוא יעלה בלי שם למסך הגדול.</p>' +
+    '<textarea id="ni" maxlength="300" placeholder="למשל: אצלנו אפשר להתחיל מ…">' + esc(d.i) + "</textarea>" +
+    farPick(d.f, "ni") +
+    '<span class="lab" style="margin-top:14px">מילה טובה לרשת</span><div class="rx" role="group" aria-label="מילה טובה לרשת">' + Object.keys(RX).map(function (k) {
+      return '<button type="button" data-rx="' + k + '" aria-pressed="' + (d.r === k) + '">' + IC["rx" + k] + "<span>" + RX[k] + "</span></button>";
+    }).join("") + "</div>" +
+    (d.ot ? '<div class="fold"><label for="nt">משפט לרשת</label><textarea id="nt" maxlength="400" placeholder="משפט אחד שיגיע לרשת">' + esc(d.t) + "</textarea></div>"
+      : '<button type="button" class="row" id="ntopen">' + IC.plus + "<span>להוסיף משפט למילה הטובה</span><small>לא חובה</small></button>") +
+    '<button type="button" class="sw" id="non" aria-pressed="' + d.on + '"><span><b>רוצה לשמוע עוד</b><small>השם שלך יועבר לרשת.</small></span><i></i></button>' +
+    '<a class="btn alt" href="' + selfie + '" target="_blank" rel="noopener" style="margin-top:10px">' + IC.camera + "סלפי עם היוזמה</a>" +
+    '<button class="btn gold" id="nok" style="margin-top:8px">' + IC.check + "שמירה</button>" +
+    '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">ליוזמות של ' + esc(n.name) + "</button></p>", {k:"ini" + id});
+  $("ni").oninput = function () { d.i = this.value; };
+  bindFar(function (k, v) { d.f = v; });
+  document.querySelectorAll("[data-rx]").forEach(function (b) {
     b.onclick = function () {
-      var id = b.dataset.ini, on = !S.net[id];
-      var paint = function (v) { b.setAttribute("aria-pressed", v); b.innerHTML = (v ? IC.check : IC.plus) + "<span>רוצה לשמוע עוד</span>"; };
-      if (on) S.net[id] = true; else delete S.net[id];
-      paint(on);
-      post({a:"net", c:S.c, id:id, on:on}).then(function (r) {
-        if (r.ok) return;
-        if (on) delete S.net[id]; else S.net[id] = true;
-        paint(!on); toast("לא נשמר. נסו שוב.");
-      }).catch(function () { if (on) delete S.net[id]; else S.net[id] = true; paint(!on); offline(); });
+      d.r = d.r === b.dataset.rx ? "" : b.dataset.rx;
+      document.querySelectorAll("[data-rx]").forEach(function (o) { o.setAttribute("aria-pressed", o.dataset.rx === d.r); });
     };
   });
+  if ($("ntopen")) $("ntopen").onclick = function () { d.ot = true; drawIni(); var t = $("nt"); if (t) t.focus(); };
+  if ($("nt")) $("nt").oninput = function () { d.t = this.value; };
+  $("non").onclick = function () { d.on = !d.on; this.setAttribute("aria-pressed", d.on); };
+  $("bk").onclick = function () { S.netItem = null; S.nd = null; draw(); };
+  $("nok").onclick = function () {
+    var btn = $("nok"); btn.disabled = true;
+    var body = {a:"net", c:S.c, id:id, i:String(d.i || "").trim(), r:d.r || "", t:String(d.t || "").trim(), f:d.f, on:!!d.on};
+    post(body).then(function (r) {
+      if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
+      if (body.i || body.r || body.t) S.neti[id] = {i:body.i, r:body.r, t:body.t}; else delete S.neti[id];
+      if (body.f >= 0) S.netf[id] = body.f; else delete S.netf[id];
+      if (body.on) S.net[id] = true; else delete S.net[id];
+      S.netItem = null; S.nd = null; draw(); toast(body.i ? "נשמר. הרעיון עלה למסך הגדול" : "נשמר");
+    }).catch(function () { btn.disabled = false; offline(); });
+  };
   bindSeg();
 }
 function scanSomeone() {
@@ -1258,10 +1317,11 @@ function scanSomeone() {
 function doMeet(o) {
   if (DEMO && o === "demo") o = Demo.otherCode();
   if (o === S.c) { toast("זה הברקוד שלך :) סרקו תג של מישהו אחר."); return; }
+  if (!S.meetOn) { toast("זה ברקוד של תג. מציאת אנשים לא פתוחה כרגע."); return; }
   post({a:"meet", c:S.c, o:o}).then(function (r) {
     if (!r.ok) { toast(r.error === "code" ? "הברקוד לא מוכר" : "לא נשמר. נסו שוב."); return; }
     S.mt = r.mt; S.mc = r.mt.length;
-    if (S.ph !== "kabala") { toast("נרשם: פגשת את " + r.other.n); return; }
+    if (S.ph !== "kabala" && S.view !== "meet") { toast("נרשם: פגשת את " + r.other.n); return; }
     var qi; do { qi = Math.floor(Math.random() * ASKQ.length); } while (qi === S.lastQ);
     S.lastQ = qi; S.ktab = "meet";
     shell('<div class="met center"><p class="kick center">' + (r.fresh ? "פגישה חדשה" : "כבר נפגשתם") + "</p>" + linkArt(S.pw, r.other.pw, r.match) +
@@ -1640,7 +1700,13 @@ function drawEnd() {
   var pwBox = function (lab, p) { return '<div style="--c:' + scol(p) + '"><small>' + lab + "</small>" + sico(p) + "<b>" + esc(p) + "</b></div>"; };
   var item = function (main, sub) { return '<div class="item">' + main + (sub ? "<small>" + sub + "</small>" : "") + "</div>"; };
   var netItems = [];
-  S.nets.forEach(function (n) { (n.items || []).forEach(function (x) { if (S.net[x.id]) netItems.push(item("<b>" + esc(x.title) + "</b>", esc(n.name))); }); });
+  S.nets.forEach(function (n) { (n.items || []).forEach(function (x) {
+    if (!iniDone(x.id)) return;
+    var ni = S.neti[x.id] || {}, sub = [esc(n.name)];
+    if (ni.r && RX[ni.r]) sub.push(RX[ni.r]);
+    if (S.net[x.id]) sub.push("רוצה לשמוע עוד");
+    netItems.push(item("<b>" + esc(x.title) + "</b>" + (ni.i ? "<br>" + esc(ni.i) : ""), sub.join(" · ")));
+  }); });
   var words = ids.filter(function (id) { var e = S.ex[id]; return e.q || e.r || e.t; }).map(function (id) {
     var e = S.ex[id], x = ex(id), h = "";
     if (e.r || e.t) h += (e.r && RX[e.r] ? "<b>" + RX[e.r] + "</b>" + (e.t ? " · " : "") : "") + esc(e.t || "");
@@ -1664,7 +1730,8 @@ function drawEnd() {
   var sent = S.mailed === true;
   shell('<p class="kick center">סוף היום</p><h1 class="center">מה ' + esc(S.me.f) + " לוקח.ת הביתה</h1>" +
     '<div class="letter"><span class="yr">מכתב מ-2030</span><div id="ltx">' + (S.letter ? '<p class="lt">' + esc(S.letter) + "</p>" : '<p class="wait">המכתב שלך נכתב עכשיו, מתוך מה שבחרת וכתבת היום…</p>') + "</div></div>" +
-    '<div class="tots"><div><span class="tnum">' + S.mt.length + '</span><small>אנשים שפגשתי</small></div><div><span class="tnum">' + ids.length + "</span><small>חותמות במוזיאון</small></div></div>" +
+    /* "people I met" only if finding people was opened at some point */
+    '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>חותמות במוזיאון</small></div></div>" +
     '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs +
     '<button class="btn" id="ml"' + (S.mailed ? " disabled" : "") + ">" + IC.mail + "לשלוח לי את הסיכום למייל</button>" +
     (sent ? '<p class="sentok">' + IC.check + "הבקשה נרשמה. הסיכום יישלח למייל שנרשמת איתו</p>" : "") + TAGLINE,
@@ -1808,11 +1875,17 @@ function drawScreen(r) {
     if (r.ph === "sagur" && !r.joined) {
       h = scrHead("כנס בתי הספר המקצועיים", "מנהיגות אנושית בעידן הבינה המלאכותית") + '<div class="calm"><div class="big">סורקים את הברקוד שעל התג</div><p class="sub">ובוחרים את הכוח שלכם</p></div>';
     } else {
-      h = scrHead("הכוחות בחדר", "כל קו הוא מפגש בין שני כוחות. <b style=\"color:#a8743a\">קו זהב</b> = התאמה", r.joined + " <small>כבר כאן</small>") +
+      /* without "finding people" (switched off, nobody met yet): the powers only, no meeting counters */
+      var meetsOn = !!r.mo || !!r.meets;
+      h = scrHead("הכוחות בחדר", meetsOn ? "כל קו הוא מפגש בין שני כוחות. <b style=\"color:#a8743a\">קו זהב</b> = התאמה" : "הכוחות שבחרתם היום, וכמה בחרו בכל אחד", r.joined + " <small>כבר כאן</small>") +
         '<div class="body"><div class="ring">' + ring(r) + '</div><div class="feed">' +
-        '<div class="ctr"><div><b>' + (r.meets || 0) + '</b><small>מפגשים</small></div><div class="g"><b>' + (r.matches || 0) + "</b><small>התאמות</small></div></div>" +
+        (meetsOn ? '<div class="ctr"><div><b>' + (r.meets || 0) + '</b><small>מפגשים</small></div><div class="g"><b>' + (r.matches || 0) + "</b><small>התאמות</small></div></div>" : "") +
         '<h3 style="margin-top:4px">מי הצטרף.ה</h3>' +
-        r.feed.slice(0, r.lastMeets.length ? 4 : 6).map(function (f) { return '<div class="fi"><div><b>' + esc(f.f) + "</b><br><small>" + esc(f.s) + "</small></div>" + chip(f.pw) + "</div>"; }).join("") +
+        r.feed.slice(0, !meetsOn && (r.netIdeas || []).length ? 3 : r.lastMeets.length ? 4 : 6).map(function (f) { return '<div class="fi"><div><b>' + esc(f.f) + "</b><br><small>" + esc(f.s) + "</small></div>" + chip(f.pw) + "</div>"; }).join("") +
+        /* ideas taken from the networks exhibition, without names */
+        (!meetsOn && (r.netIdeas || []).length ? '<h3 style="margin-top:8px">רעיונות מתערוכת הרשתות</h3>' + r.netIdeas.slice(0, 4).map(function (w) {
+          return '<div class="fi"><div><b>' + esc(w.t) + "</b><br><small>בעקבות " + esc(w.ex) + " · " + esc(w.net) + "</small></div></div>";
+        }).join("") : "") +
         (r.lastMeets.length ? '<h3 style="margin-top:8px">מפגשים אחרונים</h3>' + r.lastMeets.slice(0, 2).map(function (m) { return '<div class="fi"><b>' + esc(m.a) + '</b><small>פגש.ה את</small><b>' + esc(m.b) + "</b></div>"; }).join("") : "") +
         "</div></div>";
     }
@@ -1860,6 +1933,9 @@ function adminStart() {
       '<div class="phs">' + PH_ORDER.map(function (p, i) {
         return '<button class="ph' + (r.ph === p ? " on" : "") + '" data-p="' + p + '"><span class="num">' + i + "</span><span><b>" + esc(PH[p].t) + "</b><small>" + esc(PH[p].d) + "</small></span></button>";
       }).join("") + "</div>" +
+      '<div class="card" style="margin:14px 0"><p class="kick">מוצאים אנשים</p><p style="margin:0 0 8px">' +
+        (r.mo ? "<b>פתוח.</b> בכל הטלפונים יש כפתור \"מוצאים אנשים\" וסריקת תגים." : "<b>סגור.</b> המשתתפים בוחרים כוח, אבל לא מחפשים אנשים ולא סורקים תגים.") + "</p>" +
+        '<button class="btn ' + (r.mo ? "alt" : "") + '" id="mosw">' + (r.mo ? "לסגור את מוצאים אנשים" : "לפתוח עכשיו את מוצאים אנשים") + "</button></div>" +
       ltCard(r.lt) +
       '<a class="btn navy" href="?v=screen' + (DEMO ? "&demo=1" : "") + '" target="_blank" rel="noopener">לפתוח את המסך הגדול</a>' +
       (r.sheet ? '<a class="btn alt" href="' + esc(r.sheet) + '" target="_blank" rel="noopener">הגיליון עם כל התשובות</a>' : "") +
@@ -1874,6 +1950,9 @@ function adminStart() {
         }).catch(offline);
       };
     });
+    $("mosw").onclick = function () {
+      post({a:"meeton", k:k, on:!r.mo}).then(function (x) { toast(x.ok ? (x.mo ? "נפתח. הטלפונים יתעדכנו תוך כ-10 שניות" : "נסגר") : "לא עודכן"); refresh(); }).catch(offline);
+    };
     if ($("ltgo")) $("ltgo").onclick = runLetters;
     if ($("ltsw")) $("ltsw").onclick = function () {
       post({a:"ltoff", k:k, off:r.lt.on}).then(function (x) { toast(x.ok ? (x.on ? "המכתבים פעילים" : "המכתבים כבויים: בסיום יופיע מכתב מתבנית") : "לא עודכן"); refresh(); }).catch(offline);
