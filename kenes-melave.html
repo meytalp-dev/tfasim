@@ -264,6 +264,12 @@ label{display:block;font-weight:700;font-size:15px;color:var(--navy);margin-top:
 .sup:first-of-type{border-top:0}
 .sup b{color:var(--navy)}
 .sup small{display:block;color:var(--muted);font-size:14px}
+.names{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.names span{background:#fff;border-radius:99px;padding:4px 12px;font-size:14.5px;font-weight:600;color:var(--navy);box-shadow:0 0 0 1px rgba(200,149,90,.45)}
+.stat b .of{font-size:16px;font-weight:700;color:var(--muted)}
+.mq{margin:8px 0;padding-right:10px;border-right:3px solid var(--gold2);font-size:15.5px;line-height:1.45}
+.mi{display:flex;gap:8px;align-items:flex-start;margin:8px 0;font-size:15.5px;line-height:1.45}
+.mi svg{flex:none;width:18px;height:18px;margin-top:3px;color:var(--teal)}
 .note{background:var(--goldbg);border-radius:12px;padding:8px 12px;font-size:14px;color:#7a5524;margin:8px 0}
 .item{border-top:1px solid var(--line);padding:9px 0}
 .item small{display:block;color:var(--muted);font-size:13px}
@@ -764,7 +770,12 @@ var Demo = (function () {
       {id:"ati2", title:"אולימפיאדת היזמות", line:"תלמידי המגמות מפתחים ומציגים פתרונות לאתגרים מהעולם האמיתי"}]},
     {id:"amal", name:"עמל", items:[]}
   ];
-  var MIP = {n:24, staff:30, reg:67, never:17, tools:[["ChatGPT",70],["Gemini",65],["Canva",35]], block:[["אין זמן ללמוד את זה",42],["לא יודעים מאיפה להתחיל",38]]};
+  var MIP = {n:24, staff:30, reg:67, never:17, cls:29, inn:13, tools:[["ChatGPT",70],["Gemini",65],["Canva",35]],
+    block:[["אין זמן ללמוד את זה",42],["לא יודעים מאיפה להתחיל",38],["חשש שתלמידים יעתיקו",25],["לא ברור מה מותר בבית הספר",21],["שאלות של אתיקה ופרטיות",13]],
+    sc:{help:46, together:38, encourage:71, rules:33}, ready:4.1, conf:3.2,
+    learn:[["עמית/ה ליד המחשב",50],["סרטון קצר שאפשר לחזור אליו",42],["בישיבת צוות, כולנו יחד",29]],
+    yes:["נועה לוי","אחמד סלאמה","דנה כהן","יוסי מזרחי"], maybe:["רונית אבו","מוחמד חסן"],
+    q:["דוגמאות לשיעור שלם עם AI במקצוע שלי","הנחיות ברורות מה מותר עם תלמידים","זמן קבוע בישיבת צוות לתרגל ביחד"]};
   function list(me) { return me.mt.map(function (o) { return {c:o, n:R[o].n, s:R[o].label, pw:u(o).pw}; }); }
   /* round tables: one shared record per table */
   function tb(t) { return TB[t] || (TB[t] = {rep:null, f:{f1:"", f2:"", f3:""}, v:0}); }
@@ -1538,11 +1549,60 @@ function schoolBlock(d, full) {
     (d.tools.length ? '<div class="card"><p class="kick">הכלים שהכי משתמשים בהם</p>' + bars(d.tools) + "</div>" : "") +
     (d.block.length ? '<div class="card"><p class="kick">מה הכי מעכב</p>' + bars(d.block) + "</div>" : "");
 }
+/* the full picture for a principal / pedagogical coordinator: 5 cards, one at a time */
+var MCARDS = ["איפה אנחנו", "מה מעכב", "האם יש מסגרת", "על מי נשענים", "מה זה אומר לכם"];
+function mBars(arr) { return arr.map(function (t) { return '<div class="barrow"><span><b>' + esc(t[0]) + "</b><span>" + t[1] + '%</span></span><div class="tr"><i style="width:' + t[1] + '%"></i></div></div>'; }).join(""); }
+function mInsights(d) {
+  var out = [], sc = d.sc || {}, yes = d.yes || [];
+  if (d.cls != null && d.reg - d.cls >= 25) out.push("רוב הצוות כבר משתמש ב-AI בעצמו (" + d.reg + "%), אבל רק " + d.cls + "% הביאו אותו לכיתה בחודש האחרון. הצעד הבא: משימה אחת עם תלמידים בכל מגמה.");
+  else if (d.cls >= 50) out.push(d.cls + "% מהמורים כבר עבדו עם תלמידים עם AI. כדאי לאסוף את הדוגמאות ולשתף בישיבת צוות.");
+  if (sc.rules != null && sc.rules < 50) out.push("רק " + sc.rules + "% יודעים מה מותר ומה אסור בבית הספר בנושא AI. נוהל בית־ספרי קצר יענה על זה.");
+  if (sc.help != null && sc.help < 50) out.push("רק " + sc.help + "% יודעים למי לפנות כשנתקעים. כדאי לקבוע כתובת אחת בצוות.");
+  if (yes.length) out.push(yes.length + (yes.length === 1 ? " מורה כבר אמר.ה" : " מורים כבר אמרו") + ' "כן" לצוות ראשון. אפשר להתחיל מהם.');
+  if (d.learn && d.learn[0]) out.push('הדרך שהכי נוחה לצוות ללמוד: "' + d.learn[0][0] + '".');
+  return out.slice(0, 4);
+}
+function mCard(d, i) {
+  var sc = d.sc || {};
+  if (i === 0) return '<div class="stat"><div><b>' + d.reg + "%</b><small>משתמשים בעצמם כל שבוע או כמעט כל יום</small></div><div><b>" + (d.cls == null ? "–" : d.cls + "%") + "</b><small>עבדו עם תלמידים עם AI בחודש האחרון</small></div></div>" +
+    '<div class="stat"><div><b>' + d.n + "</b><small>מורים ענו" + (d.staff ? " מתוך " + d.staff : "") + "</small></div><div><b>" + d.never + "%</b><small>עוד לא השתמשו בחודש האחרון</small></div></div>" +
+    (d.tools.length ? '<div class="card"><p class="kick">הכלים שהכי משתמשים בהם</p>' + mBars(d.tools) + "</div>" : "");
+  if (i === 1) return (d.block.length ? '<div class="card"><p class="kick">מה מעכב את המורים</p>' + mBars(d.block) + "</div>" : "") +
+    (d.inn ? '<div class="note">' + d.inn + '% ענו "שום דבר, אני כבר בפנים".</div>' : "") +
+    (d.q && d.q.length ? '<div class="card"><p class="kick">מה הכי היה עוזר להם השנה</p>' + d.q.map(function (t) { return '<p class="mq">' + esc(t) + "</p>"; }).join("") + '<small class="muted">מתוך תשובות המורים, בלי שמות</small></div>' : "");
+  if (i === 2) {
+    var rows = [["יש לי למי לפנות כשאני נתקע.ת", sc.help], ["בצוות משתפים ולומדים יחד", sc.together], ["אני יודע.ת מה מותר בבית הספר", sc.rules], ["בית הספר מעודד לנסות דרכים חדשות", sc.encourage]].filter(function (r) { return r[1] != null; });
+    return '<div class="card"><p class="kick">כמה מסכימים עם המשפט</p>' + mBars(rows) + "</div>";
+  }
+  if (i === 3) {
+    var chips = function (a) { return '<div class="names">' + a.map(function (n) { return "<span>" + esc(n) + "</span>"; }).join("") + "</div>"; };
+    return '<div class="stat"><div><b>' + (d.ready == null ? "–" : d.ready) + '<span class="of">/5</span></b><small>מוכנות לנסות משהו חדש השנה</small></div><div><b>' + (d.conf == null ? "–" : d.conf) + '<span class="of">/5</span></b><small>ביטחון בשימוש ב-AI</small></div></div>' +
+      '<div class="card"><p class="kick">אמרו "כן" לצוות ראשון (' + (d.yes || []).length + ")</p>" + ((d.yes || []).length ? chips(d.yes) : '<small class="muted">עוד אין</small>') +
+      ((d.maybe || []).length ? '<p class="kick" style="margin-top:12px">"אולי, ספרו לי עוד" (' + d.maybe.length + ")</p>" + chips(d.maybe) : "") + "</div>" +
+      (d.learn && d.learn.length ? '<div class="card"><p class="kick">איך הכי נוח להם ללמוד כלי חדש</p>' + mBars(d.learn) + "</div>" : "");
+  }
+  var ins = mInsights(d);
+  return '<div class="card">' + (ins.length ? ins.map(function (t) { return '<p class="mi">' + IC.check + "<span>" + esc(t) + "</span></p>"; }).join("") : "<p>התמונה מאוזנת. שווה להציג אותה לצוות בישיבה הקרובה.</p>") + "</div>";
+}
 function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
   var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
   if (m.kind === "one" && m.list.length) {
-    h += "<h1>" + esc(m.list[0].s) + "</h1><p class=\"muted\">כך ענו המורים בבית הספר במיפוי הצוות של שגרירי החדשנות.</p>" + schoolBlock(m.list[0].d, true);
+    var d = m.list[0].d;
+    h += "<h1>" + esc(m.list[0].s) + "</h1>";
+    if (!d || !d.n || d.n < 5 || d.cls === undefined) {
+      h += '<p class="muted">כך ענו המורים בבית הספר במיפוי הצוות של שגרירי החדשנות.</p>' + schoolBlock(d, true);
+    } else {
+      var i = Math.max(0, Math.min(MCARDS.length - 1, S.mstep || 0));
+      h += '<p class="muted">' + (i + 1) + " מתוך " + MCARDS.length + " · <b>" + MCARDS[i] + "</b></p>" + (d.n < 10 ? '<div class="note">מבוסס על ' + d.n + " תשובות. התמונה תתחדד כשיענו עוד מורים.</div>" : "") +
+        mCard(d, i) +
+        (i < MCARDS.length - 1 ? '<button class="btn" id="mnx">' + IC.next + "הבא: " + MCARDS[i + 1] + "</button>" : "") +
+        (i > 0 ? '<button class="btn alt" id="mpv">הקודם</button>' : "");
+      shell(h, {k:"school" + i});
+      if ($("mnx")) $("mnx").onclick = function () { S.mstep = i + 1; drawSchool(); window.scrollTo(0, 0); };
+      if ($("mpv")) $("mpv").onclick = function () { S.mstep = i - 1; drawSchool(); window.scrollTo(0, 0); };
+      return;
+    }
   } else if (m.kind === "sup" && m.list.length) {
     var ready = m.list.filter(function (x) { return x.d && x.d.n >= 5; }).length;
     h += "<h1>בתי הספר שלך</h1><p class=\"muted\">" + ready + " מתוך " + m.list.length + " בתי ספר עם תמונה מהמיפוי.</p><div class=\"card\">" +
