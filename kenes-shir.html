@@ -276,7 +276,7 @@ function form(){
   $("wy").addEventListener("input", function(){ $("cnt").textContent = this.value.length + "/200"; });
   if (c) {
     $("nameF").classList.add("hide");
-    get({ mode: "me", c: c }).then(function(r){
+    get({ mode: "me", code: c }).then(function(r){
       if (r && r.name) {
         known = r.name;
         $("hello").textContent = "שלום " + r.name.split(" ")[0] + ", מה השיר שלך?";
