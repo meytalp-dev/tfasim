@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>הפעלת הכנס · 23.11</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;800&family=Frank+Ruhl+Libre:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#fbfaf7;--ink:#0f2f52;--ink-2:#3b5373;--muted:#6b7a90;--line:#e4dfd4;--teal:#3a8f86;--teal-soft:#e6f2f0;--gold:#c8955a;--gold-soft:#f7eee2;--red:#b4463c;--red-soft:#f6e3e1}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:'Heebo','Segoe UI',Arial,sans-serif;font-size:16px;line-height:1.5}
+[dir=ltr]{direction:ltr;unicode-bidi:embed}
+.hide{display:none!important}
+button{font:inherit;cursor:pointer}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{background:#fff;border-bottom:1px solid var(--line)}
+.top .in{max-width:760px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top img{height:38px;display:block}
+.top .when{font-size:14px;color:var(--muted);text-align:right}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 48px}
+h1{font-family:'Frank Ruhl Libre',serif;font-size:30px;margin:22px 0 4px}
+.sub{color:var(--ink-2);margin:0 0 10px}
+details{background:#fff;border:1px solid var(--line);border-radius:18px;margin-top:14px;overflow:hidden}
+summary{list-style:none;display:flex;align-items:center;gap:12px;padding:16px 18px;cursor:pointer;font-weight:800;font-size:18px}
+summary::-webkit-details-marker{display:none}
+summary .ic{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:var(--teal-soft);color:var(--teal);flex:none}
+summary .badge{margin-inline-start:auto;font-size:13px;font-weight:700;border-radius:99px;padding:3px 10px;background:var(--gold-soft);color:#8a5a22}
+summary .badge.ok{background:var(--teal-soft);color:#1f6b63}
+summary .chev{transition:transform .2s;color:var(--muted)}
+details[open] summary .chev{transform:rotate(180deg)}
+.body{padding:0 18px 18px}
+.row{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .t{flex:1;min-width:0}
+.row .t b{display:block}
+.row .t span{font-size:14px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1.5px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:9px 14px;font-weight:700;text-decoration:none;white-space:nowrap}
+.btn.pri{background:var(--ink);border-color:var(--ink);color:#fff}
+.btn.teal{background:var(--teal);border-color:var(--teal);color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+.now{display:flex;align-items:center;gap:14px;background:var(--ink);color:#fff;border-radius:16px;padding:16px 18px;margin-bottom:14px}
+.now .dot{width:12px;height:12px;border-radius:50%;background:#7fe0c9;box-shadow:0 0 0 6px rgba(127,224,201,.2);flex:none;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 10px rgba(127,224,201,.05)}}
+.now small{display:block;opacity:.75;font-size:13px}
+.now b{font-size:20px}
+.now .cnt{margin-inline-start:auto;text-align:right;font-size:13px;opacity:.85}
+.st{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:560px){.st{grid-template-columns:repeat(4,1fr)}}
+.st button{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:right;border:1.5px solid var(--line);background:var(--paper);border-radius:14px;padding:12px;color:var(--ink);min-height:84px}
+.st button .n{font-size:12px;color:var(--muted);font-weight:700}
+.st button .l{font-weight:800;line-height:1.25}
+.st button.on{background:var(--teal);border-color:var(--teal);color:#fff}
+.st button.on .n{color:#dff3ef}
+.st button.done{opacity:.6}
+.note{font-size:14px;color:var(--muted);margin:10px 0 0}
+.warn{background:var(--red-soft);color:var(--red);border-radius:12px;padding:10px 12px;font-size:14px;font-weight:500;margin-top:10px}
+.prog{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-top:10px}
+.prog i{display:block;height:100%;width:0;background:var(--teal);transition:width .4s}
+.res{font-size:14px;color:var(--ink-2);margin-top:8px}
+.keyin{display:flex;gap:8px;margin-top:10px}
+.keyin input{flex:1;min-width:0;font:inherit;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px}
+.foot{text-align:center;color:var(--muted);font-size:13px;margin-top:28px}
+</style>
+</head>
+<body>
+<div class="top"><div class="in"><img src="chanichut/logo-minhal.png" alt="משרד העבודה · מינהל הכשרה מקצועית"><div class="when">כנס בתי הספר המקצועיים<br>יום שני 23.11 · ג׳ייקובס חדרה</div></div></div>
+<div class="wrap">
+  <h1>הפעלת הכנס</h1>
+  <p class="sub">כל מה שמפעילים, במקום אחד. כפתור שמשנה משהו יבקש קודם אישור.</p>
+
+  <!-- ============ stations ============ -->
+  <details open id="dSt">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/></svg></span>התחנות בדף המלווה<span class="badge" id="bSt">...</span><svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="now" id="now"><span class="dot"></span><div><small>פעיל עכשיו בכל הטלפונים</small><b id="nowL">...</b></div><div class="cnt" id="nowC"></div></div>
+      <div class="st" id="st"></div>
+      <p class="note">לחיצה על תחנה מעבירה אליה את כל הטלפונים תוך כ-10 שניות. התחנה הבאה מחליפה את הקודמת.</p>
+      <div class="keyin hide" id="mkBox"><input id="mkIn" dir="ltr" placeholder="מפתח הלוח של הדף המלווה"><button class="btn pri" id="mkGo">שמירה</button></div>
+      <div class="warn hide" id="stErr"></div>
+      <div class="row" style="margin-top:8px"><div class="t"><b>לוח ההפעלה המלא של המשחק</b><span>מכתבים מ-2030, נתונים, הגיליון</span></div><a class="btn" id="lnMelAdm" target="_blank" rel="noopener">פתיחה</a></div>
+    </div>
+  </details>
+
+  <!-- ============ screens ============ -->
+  <details id="dScr">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>מסכים באולם<svg class="i chev" viewBox="0 0 24 24" style="margin-inline-start:auto"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="row"><div class="t"><b>הפלייליסט</b><span>ברקע ובהפסקות · לוחצים "התחלה" פעם אחת</span></div><a class="btn pri" target="_blank" rel="noopener" id="lnShirScr" href="#">פתיחה</a></div>
+      <div class="row"><div class="t"><b>מסך המשחק המלווה</b><span>משתנה לבד לפי התחנה הפעילה</span></div><a class="btn pri" target="_blank" rel="noopener" href="kenes-melave.html?v=screen">פתיחה</a></div>
+      <div class="row"><div class="t"><b>המצגת המלווה</b><span>לפי לוח הזמנים</span></div><a class="btn pri" target="_blank" rel="noopener" href="kenes-matzeget-m7q4/">פתיחה</a></div>
+      <div class="row"><div class="t"><b>מסע ההישגים</b><span>הישגי בתי הספר והמנהל</span></div><a class="btn pri" target="_blank" rel="noopener" href="hesegim-kenes-tqd3xg/">פתיחה</a></div>
+    </div>
+  </details>
+
+  <!-- ============ playlist ============ -->
+  <details id="dShir">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>הפלייליסט "השיר שלי"<span class="badge" id="bShir">...</span><svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="row"><div class="t"><b>אישור שירים</b><span id="shirCnt">...</span></div><a class="btn pri" target="_blank" rel="noopener" id="lnShirAdm" href="#">פתיחה</a></div>
+      <div class="row"><div class="t"><b>מייל לנרשמים</b><span id="mailCnt">...</span></div><button class="btn teal" id="bSend">שליחה לכולם</button></div>
+      <div class="prog hide" id="mailProg"><i></i></div>
+      <div class="res" id="mailRes"></div>
+      <div class="row"><div class="t"><b>מייל תצוגה מקדימה</b><span>נשלח ל-merhav בלבד</span></div><button class="btn" id="bPrev">שליחה</button></div>
+    </div>
+  </details>
+
+  <!-- ============ prep ============ -->
+  <details id="dPrep">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>הכנות ורשימות<svg class="i chev" viewBox="0 0 24 24" style="margin-inline-start:auto"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="row"><div class="t"><b>דף ההכנות המשותף</b><span>מיטל, רויטל ועידית</span></div><a class="btn" target="_blank" rel="noopener" href="kenes-hachanot.html">פתיחה</a></div>
+      <div class="row"><div class="t"><b>רשימת הנרשמים</b><span>דף המעקב</span></div><a class="btn" target="_blank" rel="noopener" href="kenes-nirshamim.html">פתיחה</a></div>
+    </div>
+  </details>
+
+  <div class="foot">המנהל להכשרה מקצועית · משרד העבודה</div>
+</div>
+
+<script>
+var MEL = "https://script.google.com/macros/s/AKfycbwgHwCUeqNF0LH2XmbWWnhpsi7DdLgyhBgkIw-X65cUafEJfaum3CpYYaGSizPBLGSieg/exec";
+var SHIR = "https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec";
+/* no keys in this file (the repo is public): they come once in Meytal's link (?sk= &sc= &mk=) and stay in this browser */
+var Q0 = new URLSearchParams(location.search);
+function keep(name){ var v = Q0.get(name); try { if (v) localStorage.setItem("kenes_" + name, v); return v || localStorage.getItem("kenes_" + name) || ""; } catch(e){ return v || ""; } }
+var SHIR_K = keep("sk"), SCR_K = keep("sc");
+if (Q0.has("sk") || Q0.has("mk") || Q0.has("sc")) history.replaceState(null, "", location.pathname);
+var PH = [
+  ["sagur",   "לפני הכנס",                    "הטלפון מציג \"ייפתח בכנס\""],
+  ["kabala",  "התכנסות ותערוכת הרשתות",       ""],
+  ["school",  "המיפוי הבית־ספרי",             ""],
+  ["lecture", "הרצאה",                         ""],
+  ["muzeon",  "מוזיאון",                       ""],
+  ["tables",  "שולחנות עגולים",                ""],
+  ["stage",   "במה ניהולית",                   ""],
+  ["end",     "סיום",                          ""]
+];
+function $(id){ return document.getElementById(id); }
+function store(k, v){ try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch(e){ return null; } }
+function get(base, params){
+  return fetch(base + "?" + new URLSearchParams(params).toString(), { credentials: "omit", cache: "no-store" }).then(function(r){ return r.json(); });
+}
+function post(base, body){
+  return fetch(base, { method: "POST", credentials: "omit", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) }).then(function(r){ return r.json(); });
+}
+
+/* ---------- stations ---------- */
+var MK = keep("mk");
+document.getElementById("lnShirScr").href = "kenes-shir.html?v=screen&k=" + encodeURIComponent(SCR_K);
+document.getElementById("lnShirAdm").href = "kenes-shir.html?v=admin&k=" + encodeURIComponent(SHIR_K);
+var cur = "";
+function lab(ph){ for (var i = 0; i < PH.length; i++) if (PH[i][0] === ph) return PH[i][1]; return ph; }
+function drawSt(){
+  var idx = -1; PH.forEach(function(p, i){ if (p[0] === cur) idx = i; });
+  $("st").innerHTML = PH.map(function(p, i){
+    return "<button data-ph='" + p[0] + "' class='" + (p[0] === cur ? "on" : i < idx ? "done" : "") + "'><span class='n'>" + (i ? "תחנה " + i : "") +
+      (p[0] === cur ? " · פעיל" : "") + "</span><span class='l'>" + p[1] + "</span></button>";
+  }).join("");
+  $("nowL").textContent = cur ? lab(cur) : "...";
+  $("bSt").textContent = cur ? lab(cur) : "לא מחובר";
+  $("bSt").className = "badge" + (cur && cur !== "sagur" ? " ok" : "");
+  $("lnMelAdm").href = "kenes-melave.html?v=admin&k=" + encodeURIComponent(MK);
+}
+function stErr(t){ $("stErr").textContent = t; $("stErr").classList.toggle("hide", !t); }
+function loadSt(){
+  if (!MK) { $("mkBox").classList.remove("hide"); stErr("חסר מפתח הלוח של הדף המלווה. מדביקים אותו פעם אחת, והוא נשמר בטלפון הזה."); drawSt(); return; }
+  get(MEL, { a: "adm", k: MK }).then(function(r){
+    if (!r || !r.ok) { $("mkBox").classList.remove("hide"); stErr("המפתח לא התקבל. בדקי אותו והדביקי שוב."); return; }
+    $("mkBox").classList.add("hide"); stErr("");
+    cur = r.ph; drawSt();
+    $("nowC").innerHTML = (r.joined != null ? r.joined + " מתוך " + r.total + "<br>נכנסו למשחק" : "");
+  }).catch(function(){ stErr("אין חיבור לשרת של הדף המלווה. מנסה שוב..."); });
+}
+$("st").addEventListener("click", function(e){
+  var b = e.target.closest("button[data-ph]"); if (!b) return;
+  var ph = b.dataset.ph; if (ph === cur) return;
+  if (!MK) { loadSt(); return; }
+  if (!confirm("להעביר את כל הטלפונים לתחנה \"" + lab(ph) + "\"?")) return;
+  b.disabled = true;
+  post(MEL, { a: "ph", k: MK, ph: ph }).then(function(r){
+    if (!r || !r.ok) throw 0;
+    cur = r.ph; drawSt(); loadSt();
+  }).catch(function(){ stErr("המעבר לא נשמר. נסי שוב."); b.disabled = false; });
+});
+$("mkGo").onclick = function(){ MK = $("mkIn").value.trim(); store("kenes_mk", MK); loadSt(); };
+loadSt(); setInterval(loadSt, 20000);
+
+/* ---------- playlist ---------- */
+var SENT = 0, INV = 0;
+function loadShir(){
+  get(SHIR, { mode: "admin", k: SHIR_K }).then(function(r){
+    if (!r || !r.ok) return;
+    var w = 0, ok = 0;
+    r.songs.forEach(function(s){ if (s.status === "מאושר") ok++; else if (s.status !== "נדחה") w++; });
+    SENT = r.sent; INV = r.invited;
+    $("shirCnt").textContent = w + " ממתינים לאישור · " + ok + " מאושרים · " + r.songs.length + " בסך הכול";
+    $("mailCnt").textContent = r.sent + " מתוך " + r.invited + " קיבלו";
+    $("bShir").textContent = w ? w + " ממתינים" : ok + " בפלייליסט";
+    $("bShir").className = "badge" + (w ? "" : " ok");
+    $("bSend").textContent = r.sent >= r.invited ? "כולם קיבלו" : r.sent ? "המשך שליחה" : "שליחה לכולם";
+    $("bSend").disabled = r.sent >= r.invited;
+  }).catch(function(){});
+}
+$("bPrev").onclick = function(){
+  var b = this; b.disabled = true;
+  get(SHIR, { mode: "send", k: SHIR_K, preview: 1 }).then(function(r){
+    $("mailRes").textContent = r && r.ok ? "תצוגה מקדימה נשלחה ל-merhav." : "השליחה לא הצליחה.";
+  }).catch(function(){ $("mailRes").textContent = "השליחה לא הצליחה."; }).then(function(){ b.disabled = false; });
+};
+$("bSend").onclick = function(){
+  var left = INV - SENT;
+  if (!confirm("לשלוח את מייל \"השיר שלי\" ל-" + left + " נרשמים?\nמי שכבר קיבל לא יקבל שוב.")) return;
+  var b = this; b.disabled = true; $("mailProg").classList.remove("hide");
+  var tot = 0, fails = [];
+  (function batch(){
+    $("mailRes").textContent = "שולח... " + (SENT + tot) + " מתוך " + INV;
+    $("mailProg").firstElementChild.style.width = Math.round((SENT + tot) / INV * 100) + "%";
+    get(SHIR, { mode: "send", k: SHIR_K, go: 1, n: 40 }).then(function(r){
+      if (!r || !r.ok) throw new Error((r && r.error) || "x");
+      tot += r.sent; fails = fails.concat(r.failed || []);
+      if (r.left > 0 && r.sent > 0) return batch();
+      $("mailProg").firstElementChild.style.width = "100%";
+      $("mailRes").textContent = "נשלחו " + tot + " מיילים." + (fails.length ? " לא נשלחו " + fails.length + ": " + fails.join(" · ") : "");
+      loadShir();
+    }).catch(function(e){
+      $("mailRes").textContent = "השליחה נעצרה אחרי " + tot + " (" + e.message + "). אפשר ללחוץ שוב להמשך."; b.disabled = false; loadShir();
+    });
+  })();
+};
+loadShir(); setInterval(loadShir, 30000);
+</script>
+</body>
+</html>
