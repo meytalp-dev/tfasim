@@ -86,6 +86,17 @@ h1{font-size:25px;line-height:1.2;font-weight:900;color:var(--navy);margin:6px 0
 .note{font-size:13.5px;color:var(--muted);text-align:center;margin:14px 0 0}
 .err{background:#fff4f1;border:1px solid #efc9bf;color:var(--no);border-radius:14px;padding:14px;text-align:center;font-weight:600}
 
+/* station sheet */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(15,47,82,.38);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .2s}
+.sheet.in{opacity:1}
+.sheet .pane{position:relative;width:100%;max-width:560px;background:var(--paper);border-radius:22px 22px 0 0;padding:20px 16px calc(18px + env(safe-area-inset-bottom));display:grid;gap:10px;transform:translateY(30px);transition:transform .25s var(--ease)}
+.sheet.in .pane{transform:none}
+.sheet .k{margin:0;text-align:center;font-size:12.5px;font-weight:800;letter-spacing:.08em;color:var(--gold)}
+.sheet h3{margin:-4px 0 6px;text-align:center;font-size:23px;font-weight:900;color:var(--navy)}
+.sheet .btn.alt{margin-top:0}
+.sheet .x{position:absolute;top:10px;left:10px;border:0;background:none;color:var(--muted);padding:8px;cursor:pointer}
+.sheet .hint{margin:2px 0 0;text-align:center;font-size:13.5px;color:var(--muted)}
+
 /* thank-you */
 .thx{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:16px;padding:14px;border-radius:16px;background:var(--tealbg);color:var(--teal);font-weight:800;text-align:center}
 .thx svg{width:34px;height:34px}
@@ -104,6 +115,17 @@ h1{font-size:25px;line-height:1.2;font-weight:900;color:var(--navy);margin:6px 0
 <main id="app"></main>
 <input type="file" id="fGal" class="hide" multiple>
 <input type="file" id="fCam" class="hide" accept="image/*">
+<input type="file" id="fVid" class="hide" accept="video/*">
+<div class="sheet hide" id="sheet" role="dialog" aria-modal="true">
+  <div class="pane">
+    <button class="x" id="shX" aria-label="סגירה"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <p class="k">תחנה</p><h3></h3>
+    <button class="btn" id="shPhoto"><svg class="i" viewBox="0 0 24 24"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.6"/></svg>תמונה עכשיו</button>
+    <button class="btn" id="shVideo"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3"/></svg>סרטון עכשיו</button>
+    <button class="btn alt" id="shGal"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg>מהגלריה (כמה קבצים)</button>
+    <p class="hint">רצפים וסרטונים ארוכים: לצלם במצלמה הרגילה ולהעלות מהגלריה בסוף התחנה.</p>
+  </div>
+</div>
 <script>
 "use strict";
 var EXEC = "https://script.google.com/macros/s/AKfycby5WbU4bpkcZi_GB0wA6IYm_i7W5uja5PYt4hUsIegoMQU-eBN6E5QQIY2jX9xodBq5/exec";
@@ -161,7 +183,7 @@ function apiGet(q) {
 
 /* ---------- screens ---------- */
 function renderCrew() {
-  var h = '<h1>מצלמים את הכנס</h1><p class="sub">בוחרים תחנה, ואז את התמונות והסרטונים. מעלים בסוף כל תחנה.</p><div class="grid">';
+  var h = '<h1>מצלמים את הכנס</h1><p class="sub">בוחרים תחנה, ואז מצלמים ישר מכאן או מעלים מהגלריה.</p><div class="grid">';
   CREW.forEach(function (s, i) {
     h += '<button class="stn' + (CUR === s[0] ? " on" : "") + '" data-st="' + s[0] + '"><span class="n">' + String(i + 1).padStart(2, "0") + '</span><span class="l">' + esc(s[1]) + '</span><span class="c" id="c_' + s[0] + '"></span></button>';
   });
@@ -172,11 +194,29 @@ function renderCrew() {
     b.onclick = function () {
       CUR = b.getAttribute("data-st");
       [].forEach.call(document.querySelectorAll(".stn"), function (x) { x.classList.toggle("on", x === b); });
-      var f = $("fGal"); f.setAttribute("accept", "image/*,video/*"); f.value = ""; f.click();
+      openSheet();
     };
   });
   refreshCounts(); setInterval(refreshCounts, 30000);
 }
+// בחירה אחרי לחיצה על תחנה: תמונה עכשיו / סרטון עכשיו / מהגלריה
+function openSheet() {
+  var sh = $("sheet");
+  sh.querySelector("h3").textContent = stName(CUR);
+  sh.classList.remove("hide");
+  requestAnimationFrame(function () { sh.classList.add("in"); });
+}
+function closeSheet() { var sh = $("sheet"); sh.classList.remove("in"); setTimeout(function () { sh.classList.add("hide"); }, 200); }
+function pick(id, accept, capture) {
+  var f = $(id); f.setAttribute("accept", accept);
+  if (capture) f.setAttribute("capture", capture); else f.removeAttribute("capture");
+  f.value = ""; closeSheet(); f.click();
+}
+$("shPhoto").onclick = function () { pick("fCam", "image/*", "environment"); };
+$("shVideo").onclick = function () { pick("fVid", "video/*", "environment"); };
+$("shGal").onclick = function () { pick("fGal", "image/*,video/*", ""); };
+$("shX").onclick = closeSheet;
+$("sheet").onclick = function (e) { if (e.target === this) closeSheet(); };
 function refreshCounts() {
   apiGet("a=counts&k=" + encodeURIComponent(KEY)).then(function (j) {
     if (!j || !j.counts) return;
@@ -203,6 +243,7 @@ function renderTask() {
 /* ---------- files ---------- */
 $("fGal").onchange = function () { take(this.files); };
 $("fCam").onchange = function () { take(this.files); };
+$("fVid").onchange = function () { take(this.files); };
 
 function isVideo(f) { return /^video\//.test(f.type) || /\.(mov|mp4|m4v|3gp|webm|avi|mkv)$/i.test(f.name); }
 function isImage(f) { return /^image\//.test(f.type) || /\.(jpe?g|png|heic|heif|webp|gif)$/i.test(f.name); }
