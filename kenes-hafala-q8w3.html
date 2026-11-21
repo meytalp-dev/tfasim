@@ -96,6 +96,17 @@ details[open] summary .chev{transform:rotate(180deg)}
     </div>
   </details>
 
+  <!-- ============ the end-of-day summary mail (21.11) ============ -->
+  <details id="dMl" class="hide">
+    <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/><path d="M15 17l2 2 4-4"/></svg></span>סיכום היום במייל<span class="badge" id="bMl">...</span><svg class="i chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary>
+    <div class="body">
+      <div class="row"><div class="t"><b id="mlN">...</b><span id="mlSt"></span></div><button class="btn teal" id="mlGo" disabled>לשלוח עכשיו</button></div>
+      <div class="res" id="mlMsg"></div>
+      <div class="row"><div class="t"><b>דוגמה</b><span>מייל אחד ל-merhav, כדי לראות איך זה נראה</span></div><button class="btn" id="mlPv">שליחת דוגמה</button></div>
+      <p class="note">נשלח רק למי שלחץ בטלפון "לשלוח לי את הסיכום", מ-merhav ("המרחב הפדגוגי · משרד העבודה"), למייל שאיתו נרשם. מי שכבר קיבל לא יקבל שוב. בשישי אחר הצהריים ובשבת השליחה חסומה.</p>
+    </div>
+  </details>
+
   <!-- ============ screens ============ -->
   <details id="dScr">
     <summary><span class="ic"><svg class="i" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></span>מסכים באולם<svg class="i chev" viewBox="0 0 24 24" style="margin-inline-start:auto"><path d="m6 9 6 6 6-6"/></svg></summary>
@@ -213,6 +224,7 @@ function loadSt(){
     $("mkBox").classList.add("hide"); stErr("");
     cur = r.ph; drawSt();
     if (r.lt && !LT.busy) { LT.on = r.lt.on; LT.key = r.lt.key; LT.n = r.lt.n; drawLt(); }
+    if (r.mail && !ML.busy) { ML.st = r.mail; drawMl(); }
     /* the lecture's sentences reach the big screen only on this button (end of the lecture) */
     if (r.lo != null) {
       LO = !!r.lo; $("loRow").classList.remove("hide");
@@ -236,6 +248,40 @@ $("st").addEventListener("click", function(e){
     if (r.ph === "stage" && LT.on && LT.key) runLetters();
   }).catch(function(){ stErr("המעבר לא נשמר. נסי שוב."); b.disabled = false; });
 });
+/* ---------- the summary mail ---------- */
+var ML = { st: null, busy: false };
+function drawMl(){
+  var m = ML.st; if (!m) return;
+  $("dMl").classList.remove("hide");
+  $("mlN").textContent = m.req + " ביקשו · " + m.sent + " נשלחו";
+  $("mlSt").textContent = m.shabbat ? "שבת: השליחה חסומה עד מוצאי שבת" : (m.left ? m.left + " ממתינים" : "אין ממתינים") + (m.quota >= 0 ? " · נשארו היום " + m.quota + " מיילים בחשבון merhav" : " · עוד לא אושרה הרשאת שליחה");
+  $("bMl").textContent = m.left ? m.left + " ממתינים" : m.sent ? m.sent + " נשלחו" : "—";
+  $("bMl").className = "badge" + (m.sent && !m.left ? " ok" : "");
+  $("mlGo").disabled = ML.busy || !m.left || m.shabbat || m.quota < 1;
+  $("mlGo").textContent = m.left ? "לשלוח עכשיו (" + m.left + ")" : "לשלוח עכשיו";
+  $("mlPv").disabled = ML.busy;
+}
+function mlErr(e){ return e === "shabbat" ? "שבת: לא שולחים" : e === "busy" ? "שליחה כבר רצה, רגע" : e === "key" ? "המפתח לא התקבל" : "שגיאה: " + (e || "לא ידוע"); }
+$("mlGo").onclick = function(){
+  var m = ML.st; if (!m || !m.left) return;
+  if (!confirm("לשלוח עכשיו " + m.left + " סיכומים מ-merhav?\nנשארו היום " + m.quota + " מיילים בחשבון. מי שכבר קיבל לא יקבל שוב.")) return;
+  ML.busy = true; drawMl(); $("mlMsg").textContent = "שולחים...";
+  var tot = 0, skip = 0, bad = 0;
+  (function step(){
+    post(MEL, { a: "mailsend", k: MK }).then(function(x){
+      if (!x || !x.ok) { ML.busy = false; $("mlMsg").textContent = mlErr(x && x.error); loadSt(); return; }
+      tot += x.done; skip += x.skipped; bad += x.failed;
+      $("mlMsg").textContent = "נשלחו " + tot + (skip ? " · " + skip + " בלי כתובת" : "") + (bad ? " · " + bad + " שגיאות (בגיליון)" : "") + (x.left ? " · נשארו " + x.left + "..." : " · הכול נשלח");
+      if (x.left && (x.done || x.skipped || x.failed)) step(); else { ML.busy = false; loadSt(); }
+    }).catch(function(){ ML.busy = false; $("mlMsg").textContent = "אין חיבור. אפשר ללחוץ שוב, מי שקיבל לא יקבל שוב"; drawMl(); });
+  })();
+};
+$("mlPv").onclick = function(){
+  var b = this; b.disabled = true; $("mlMsg").textContent = "שולחים דוגמה ל-merhav...";
+  post(MEL, { a: "mailsend", k: MK, preview: true }).then(function(x){
+    $("mlMsg").textContent = x && x.ok ? "הדוגמה נשלחה ל-" + x.to : mlErr(x && x.error);
+  }).catch(function(){ $("mlMsg").textContent = "אין חיבור"; }).then(function(){ b.disabled = false; });
+};
 var LO = false;
 $("loSw").onclick = function(){
   if (!MK) { loadSt(); return; }

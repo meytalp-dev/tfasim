@@ -596,7 +596,8 @@ var PH = {
 var PH_ORDER = ["sagur","kabala","school","lecture","muzeon","tables","stage","end"];
 /* one-sentence feedback: entering this phase asks about the part that just ended */
 var FBAT = {school:"kabala", tables:"muzeon", stage:"tables", end:"stage"};
-var FBT = {kabala:"ההתכנסות: הכוחות ותערוכת הרשתות", muzeon:"המוזיאון", tables:"השולחנות העגולים", stage:"הבמה הניהולית"};
+/* 21.11 (Meytal): after the opening, the sentence asks about the networks exhibition only */
+var FBT = {kabala:"תערוכת הרשתות", muzeon:"המוזיאון", tables:"השולחנות העגולים", stage:"הבמה הניהולית"};
 /* after a meeting: one of these, never the same twice in a row */
 var ASKQ = ["איך הכוח הזה עוזר לך בחיי היום־יום?","במה הכוח הזה מקדם אותך?","מה עשית כדי לחזק את הכוח הזה?"];
 /* a good word for the presenting principal */
@@ -902,7 +903,7 @@ var Demo = (function () {
         Object.keys(me.ex).forEach(function (k) { ex[k] = Object.assign({}, me.ex[k]); });
         return {ok:true, ph:ph, mo:MO, c:p.c, me:{n:r.n, f:r.f, k:r.k, label:r.label}, pw:me.pw, want:me.want, mt:list(me), ex:ex, lec:me.lec, moto:me.moto, exhibits:EX,
           mipui:r.g ? {kind:"none", list:[]} : {kind:"one", list:[{s:r.s, d:MIP}]},
-          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout)};
+          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout), he:!r.g, mr:!!me.mr};
       }
       if (p.a === "scr") return scr();
       if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, mo:MO, lo:LO, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
@@ -961,7 +962,7 @@ var Demo = (function () {
         }
         return {ok:true, tbl:tblOf(b.c)};
       }
-      if (b.a === "mail") return {ok:true, demo:true};
+      if (b.a === "mail") { if (R[b.c] && R[b.c].g && !/@/.test(b.em || "")) return {ok:false, error:"email"}; return {ok:true, demo:true}; }
       if (b.a === "ph") { ph = b.ph; return {ok:true, ph:ph}; }
       if (b.a === "reset") return {ok:true};
       return {ok:false};
@@ -1180,6 +1181,7 @@ function take(r) {
   S.ph = r.ph; S.me = r.me; S.pw = r.pw; S.want = r.want; S.mt = r.mt || []; S.ex = r.ex || {}; S.lec = r.lec || ""; S.moto = r.moto || "";
   S.exhibits = (r.exhibits || []).map(mzOf); S.mipui = r.mipui; S.mc = S.mt.length;
   S.nets = r.nets || []; S.net = r.net || {}; S.tbl = r.tbl || {t:0, rep:null, f:{}}; S.tbl.f = S.tbl.f || {}; S.fb = r.fb || {};
+  S.mailed = !!r.mr; S.he = r.he !== false;
   S.netf = r.netf || {}; S.neti = r.neti || {}; S.tin = r.tin || []; renderTalk();
   S.meetOn = !!r.mo; if (!S.meetOn && S.view === "meet") S.view = null;
 }
@@ -1888,15 +1890,19 @@ function drawEnd() {
     /* "people I met" only if finding people was opened at some point */
     '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>מיצגים שביקרתי</small></div></div>" +
     '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs +
+    /* no address on file (blank badge): type one. Otherwise it goes to the registered address, which the phone never sees */
+    (!sent && S.he === false ? '<label class="lab" for="mle">לאיזה מייל לשלוח?</label><input type="text" id="mle" inputmode="email" autocomplete="email" dir="ltr" maxlength="120" placeholder="name@example.com">' : "") +
     '<button class="btn" id="ml"' + (S.mailed ? " disabled" : "") + ">" + IC.mail + "לשלוח לי את הסיכום למייל</button>" +
-    (sent ? '<p class="sentok">' + IC.check + "הבקשה נרשמה. הסיכום יישלח למייל שנרשמת איתו</p>" : "") + TAGLINE,
+    (sent ? '<p class="sentok">' + IC.check + (S.he === false ? "הבקשה נרשמה. הסיכום יישלח בסוף היום מהמרחב הפדגוגי" : "הבקשה נרשמה. הסיכום יישלח בסוף היום למייל שנרשמת איתו, מהמרחב הפדגוגי") + "</p>" : "") + TAGLINE,
     {credit:true, k:"end"});
   document.querySelectorAll("[data-sec]").forEach(function (d) { d.ontoggle = function () { S.open[d.dataset.sec] = d.open; }; });
   if (!S.letter) loadLetter(0);
   $("ml").onclick = function () {
-    var btn = $("ml"); btn.disabled = true;
-    post({a:"mail", c:S.c}).then(function (r) {
-      if (!r.ok) { btn.disabled = false; toast("לא נשלח. נסו שוב."); return; }
+    var btn = $("ml"), em = $("mle") ? $("mle").value.trim() : "";
+    if ($("mle") && !/^[^\s@<>"',;]+@[^\s@<>"',;]+\.[a-z]{2,}$/i.test(em)) { toast("כתבו כתובת מייל"); $("mle").focus(); return; }
+    btn.disabled = true;
+    post({a:"mail", c:S.c, em:em}).then(function (r) {
+      if (!r.ok) { btn.disabled = false; toast(r.error === "email" ? "כתובת המייל לא תקינה" : "לא נשלח. נסו שוב."); return; }
       if (DEMO) { S.mailed = "demo"; toast("בהדגמה לא נשלח מייל"); return; }
       S.mailed = true; drawEnd();
     }).catch(function () { btn.disabled = false; offline(); });
