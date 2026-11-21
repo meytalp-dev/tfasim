@@ -254,17 +254,17 @@ function drawMl(){
   var m = ML.st; if (!m) return;
   $("dMl").classList.remove("hide");
   $("mlN").textContent = m.req + " ביקשו · " + m.sent + " נשלחו";
-  $("mlSt").textContent = m.shabbat ? "שבת: השליחה חסומה עד מוצאי שבת" : (m.left ? m.left + " ממתינים" : "אין ממתינים") + (m.quota >= 0 ? " · נשארו היום " + m.quota + " מיילים בחשבון merhav" : " · עוד לא אושרה הרשאת שליחה");
+  $("mlSt").textContent = m.shabbat ? "שבת: השליחה חסומה עד מוצאי שבת" : (m.left ? m.left + " ממתינים" : "אין ממתינים") + " · נשלח דרך הממסר של merhav";
   $("bMl").textContent = m.left ? m.left + " ממתינים" : m.sent ? m.sent + " נשלחו" : "—";
   $("bMl").className = "badge" + (m.sent && !m.left ? " ok" : "");
-  $("mlGo").disabled = ML.busy || !m.left || m.shabbat || m.quota < 1;
+  $("mlGo").disabled = ML.busy || !m.left || m.shabbat;
   $("mlGo").textContent = m.left ? "לשלוח עכשיו (" + m.left + ")" : "לשלוח עכשיו";
   $("mlPv").disabled = ML.busy;
 }
 function mlErr(e){ return e === "shabbat" ? "שבת: לא שולחים" : e === "busy" ? "שליחה כבר רצה, רגע" : e === "key" ? "המפתח לא התקבל" : "שגיאה: " + (e || "לא ידוע"); }
 $("mlGo").onclick = function(){
   var m = ML.st; if (!m || !m.left) return;
-  if (!confirm("לשלוח עכשיו " + m.left + " סיכומים מ-merhav?\nנשארו היום " + m.quota + " מיילים בחשבון. מי שכבר קיבל לא יקבל שוב.")) return;
+  if (!confirm("לשלוח עכשיו " + m.left + " סיכומים מ-merhav?\nמי שכבר קיבל לא יקבל שוב.")) return;
   ML.busy = true; drawMl(); $("mlMsg").textContent = "שולחים...";
   var tot = 0, skip = 0, bad = 0;
   (function step(){
