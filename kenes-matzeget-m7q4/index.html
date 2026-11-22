@@ -424,6 +424,7 @@ const DECK = {
     { id:'summary',  from:'14:40', to:'15:00', title:'סיכום היום' },
   ],
 
+  noStageDecks:true,   // 23.11 מיטל: להוריד את כל המצגות של הבמה הניהולית (נשארים שקפי השם). false = להחזיר
   // הפלייליסט "השיר שלי" (kenes-shir): רק שירים שאושרו בדף האישור עולים. len = כמה שניות מכל שיר.
   // 23.11 מיטל: קיר חי מהדף המלווה (שרת המשחק, a=scr — ציבורי, בלי מפתח): מילים טובות לרשתות / למיצגים, ומה שכותבים בשולחנות
   live: { url:'https://script.google.com/macros/s/AKfycbwgHwCUeqNF0LH2XmbWWnhpsi7DdLgyhBgkIw-X65cUafEJfaum3CpYYaGSizPBLGSieg/exec' },
@@ -489,8 +490,8 @@ const DECK = {
     { type:'section',  at:'workshop', title:'למידת עמיתים בשולחנות עגולים', sub:'מנהיגות אנושית בעידן הבינה המלאכותית' },
     // מפת השולחנות (מיטל 23.11): matzeget-img/mapat/index.html = העתק של kenes-itzuvim/mapat-shulchanot.html; מנחה מודגש + משתתפים לכל שולחן
     { type:'hesegim',  at:'workshop', src:'matzeget-img/mapat/index.html' },
-    { type:'wall',     at:'workshop', src:'tables', title:'מה כותבים בשולחנות', sub:'מתעדכן חי מהדף המלווה' },   // 23.11 מיטל: מה שהשולחנות כותבים + המוטו האישי
-    { type:'hold',     at:'lunch', label:'בתיאבון', title:'ארוחת צהריים' },
+    { type:'section',  at:'workshop', title:'שולחנות עגולים' },   // 23.11 מיטל: במקום 'מה כותבים בשולחנות' (הקיר החי) — רק כותרת. היה: { type:'wall', at:'workshop', src:'tables', title:'מה כותבים בשולחנות', sub:'מתעדכן חי מהדף המלווה' }   // 23.11 מיטל: מה שהשולחנות כותבים + המוטו האישי
+    { type:'hold',     at:'lunch', title:'ארוחת צהריים בתאבון!' },   // 23.11 מיטל
     // דוברי הבמה הניהולית: כל שורה { name:'…', role:'…' } יוצרת שקף דובר מיד אחרי השקף הזה, לפי הסדר.
     // שני דוברים בשקף אחד: names:['שם ראשון','ושם שני'] — כל שם בשורה משלו.
     { type:'section',  at:'stage', title:'במה ניהולית', sub:'מנהלים משתפים, מעוררים השראה ומובילים שינוי', speakers:[
@@ -532,7 +533,7 @@ const ARROW='<svg viewBox="0 0 80 40" fill="none" stroke="#c8955a" stroke-width=
 /* ---------- בניית רשימת השקפים (כולל דוברי במה ניהולית) ---------- */
 const SL=[];
 D.slides.forEach(s=>{SL.push(s);(s.speakers||[]).forEach(p=>{if(p&&(p.name||(p.names&&p.names.length))){SL.push({type:'speaker',at:s.at,label:p.label||s.title,name:p.name||'',names:p.names,role:p.role||''});
-  for(let i=1;i<=(p.deck?p.n:0);i++)SL.push({type:'img',at:s.at,src:`matzeget-img/${p.deck}/${String(i).padStart(2,'0')}.jpg`,vid:(v=>v?{src:`matzeget-img/${p.deck}/${v.src}`,box:v.box}:null)((p.vids||(p.vid?[p.vid]:[])).find(v=>v.at===i))});}});});
+  for(let i=1;i<=(p.deck&&!D.noStageDecks?p.n:0);i++)SL.push({type:'img',at:s.at,src:`matzeget-img/${p.deck}/${String(i).padStart(2,'0')}.jpg`,vid:(v=>v?{src:`matzeget-img/${p.deck}/${v.src}`,box:v.box}:null)((p.vids||(p.vid?[p.vid]:[])).find(v=>v.at===i))});}});});
 
 /* ---------- תבניות ---------- */
 const T={
