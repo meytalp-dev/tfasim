@@ -1749,7 +1749,7 @@ function mCard(d, i) {
   var ins = mInsights(d);
   return '<div class="card">' + (ins.length ? ins.map(function (t) { return '<p class="mi">' + IC.check + "<span>" + esc(t) + "</span></p>"; }).join("") : "<p>התמונה מאוזנת. שווה להציג אותה לצוות בישיבה הקרובה.</p>") + "</div>";
 }
-/* 22.11.26 (Meytal): the school's compass tool + its booklet, before the mapping (first screen of the stage only).
+/* 22.11.26 (Meytal): the school's compass tool + its booklet, in the end-of-day summary (moved there from the mapping stage).
    A principal/coordinator of one school gets the tool with their school already picked (?s=). */
 var MZ_URL = "https://pedagogiamh.co.il/matzpen/";
 function matzpenCard(m) {
@@ -1761,7 +1761,7 @@ function matzpenCard(m) {
 }
 function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
-  var h = (S.msch == null && !(S.mstep > 0) ? matzpenCard(m) : "") + '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
+  var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
   /* supervisors / networks: a list of their schools; tapping a school opens the same 5 cards */
   var many = m.kind === "many" && m.list.length;
   /* the summary of all my schools (S.msch "all"), or one school of the list */
@@ -1963,7 +1963,7 @@ function drawEnd() {
     '<div class="letter"><span class="yr">מכתב מ-2030</span><div id="ltx">' + (S.letter ? '<p class="lt">' + esc(S.letter) + "</p>" : '<p class="wait">המכתב שלך נכתב עכשיו, מתוך מה שבחרת וכתבת היום…</p>') + "</div></div>" +
     /* "people I met" only if finding people was opened at some point */
     '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>מיצגים שביקרתי</small></div></div>" +
-    '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs +
+    '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs + matzpenCard(S.mipui || {kind:"none", list:[]}) +
     /* no address on file (blank badge): type one. Otherwise it goes to the registered address, which the phone never sees */
     (!sent && S.he === false ? '<label class="lab" for="mle">לאיזה מייל לשלוח?</label><input type="text" id="mle" inputmode="email" autocomplete="email" dir="ltr" maxlength="120" placeholder="name@example.com">' : "") +
     '<button class="btn" id="ml"' + (S.mailed ? " disabled" : "") + ">" + IC.mail + "לשלוח לי את הסיכום למייל</button>" +
