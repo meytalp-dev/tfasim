@@ -473,6 +473,7 @@ const DECK = {
     { type:'title',    at:'greet', title:'מדריך החינוך היוצר', sub:'מחזון למעשה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
     // סרטון החינוך היוצר (טיוטה 4, 19.11): מתחיל לבד כשנכנסים לשקף, נעצר כשיוצאים. K = עצירה/המשך.
     { type:'video',    at:'greet', src:'matzeget-img/hinuch-yotzer.mp4' },
+    { type:'welcome',  at:'greet', noStart:true },   // 23.11 מיטל: מסך הבית (שקף הפתיחה) שוב אחרי הסרטון ולפני המיפוי, בלי 'מתחילים ב־'
     // מדדי מיפוי ה-AI של כל בתי הספר יחד — אותם מדדים כמו בכרטיסי בית הספר בדף המלווה. נמשך מ-mipui-gas ב-22.11.26.
     { type:'mipui',    at:'greet', label:'רויטל אמיר · המפקחת הפדגוגית הארצית', title:'מיפוי השימוש ב-AI בצוותי ההוראה', m:{
       n:898, schools:54, reg:76, cls:58, never:8, tools:[['ChatGPT',82],['Gemini',69],['Canva',23]],
@@ -539,7 +540,7 @@ const T={
     <div class="w-left">
       <div class="in w-date">${esc(D.day)}<span>·</span>${L(D.date)}</div>
       <div class="in w-clock clock" dir="ltr"></div>
-      <div class="in w-start">מתחילים ב־${L(ag(s.at).to)}</div>
+      ${s.noStart?"":`<div class="in w-start">מתחילים ב־${L(ag(s.at).to)}</div>`}
     </div>
     <div class="in w-theme theme">${THEME}</div>
     <div class="w-right">
