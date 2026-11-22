@@ -152,6 +152,8 @@ em{font-style:normal}
 .pl-top h2{display:inline;font-size:92px;font-weight:900;color:var(--navy);letter-spacing:-.01em;line-height:1}
 .pl-top .pb{display:inline;margin-right:34px;font-size:56px;font-weight:700;color:var(--teal)}
 .pl-top .cd{display:inline;margin:0 22px 0 0;font-size:38px;font-weight:500;color:var(--muted);min-height:0}
+.pl-top.mid{text-align:center;left:120px}
+.pl-top.mid h2{color:var(--teal)}
 .pl-top .pn{margin-top:10px;font-size:42px;font-weight:600;color:var(--navy2)}
 .pl-info{position:absolute;right:120px;width:720px;top:300px;height:560px;display:flex;flex-direction:column;justify-content:center;text-align:right;transition:opacity .6s,transform .6s var(--ease)}
 .pl-info.out,.pl-nx.out{opacity:0;transform:translateY(14px)}
@@ -461,9 +463,9 @@ const DECK = {
 
   // השקפים, לפי הסדר
   slides: [
-    { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'מתחילים ב־', wall:'net' },   // הפלייליסט בזמן ההתכנסות; 23.11: מסך מפוצל — השיר (בלי וידאו, רק צליל) + המילים הטובות לרשתות
+    { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'', wall:'net' },   // הפלייליסט בזמן ההתכנסות; 23.11: מסך מפוצל — השיר (בלי וידאו, רק צליל) + המילים הטובות לרשתות
     { type:'welcome',  at:'gather' },
-    { type:'schedule', at:'gather' },
+    // { type:'schedule', at:'gather' },   // 23.11 מיטל: להוריד את שקף לוח הזמנים
     // 22.11.26 מיטל: הוסרו שקף "ברכות", אמיר מדינה ורויטל אמיר (ברכות); "ספר ההפעלה" → "מדריך החינוך היוצר"
     { type:'speaker',  at:'greet', label:'ברכות', name:'אורית וקנין־שילה', role:'ממונת חניכות ונוער, המנהל להכשרה מקצועית' },   // מיטל 23.11
     // מסע ההישגים (22.11 מיטל: אחרי אורית): matzeget-img/hesegim/index.html = העתק של hesegim-deckהישגי-בתי-הספר-כנס-מנהלים.html. רץ לבד עם מוזיקה; חץ קדימה = ממשיכים. שני חלקים (מיטל 22.11): חלק א' כאן, חלק ב' לפני עוז.
@@ -583,16 +585,16 @@ const T={
       <p class="in back">חוזרים ב־${L(ag(s.at).to)}</p>
       <p class="in cd" data-to="${esc(ag(s.at).to)}"></p></div>
     <div class="in hclock clock" dir="ltr"></div>`,
-  playlist:s=>{const to=ag(s.at).to,back=s.back||'חוזרים ב־';
+  playlist:s=>{const to=ag(s.at).to,back=s.back!=null?s.back:'חוזרים ב־';   /* back:'' = בלי שעה (23.11 מיטל: ברוכים הבאים במרכז, בטורקיז) */
     return `<div class="cen">
       ${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}
       <h2 class="in big fit"${s.note?' style="font-size:170px"':''}>${esc(s.title)}</h2>
       ${s.note?`<p class="in note">${esc(s.note)}</p>`:''}
-      <p class="in back">${esc(back)}${L(to)}</p>
-      <p class="in cd" data-to="${esc(to)}"></p></div>
+      ${back?`<p class="in back">${esc(back)}${L(to)}</p>
+      <p class="in cd" data-to="${esc(to)}"></p>`:""}</div>
     <div class="in hclock clock" dir="ltr"></div>
     <div class="pl">
-      <div class="pl-top"><h2>${esc(s.title)}</h2><span class="pb">${esc(back)}${L(to)}</span><span class="cd" data-to="${esc(to)}"></span>
+      <div class="pl-top${back?"":" mid"}"><h2>${esc(s.title)}</h2>${back?`<span class="pb">${esc(back)}${L(to)}</span><span class="cd" data-to="${esc(to)}"></span>`:""}
         ${s.note?`<p class="pn">${esc(s.note)}</p>`:''}</div>
       <div class="pl-info"><div class="pl-k">הפלייליסט שלנו · השיר שלי</div><h3 class="pl-song"></h3><p class="pl-art"></p><i class="rule"></i>
         <p class="pl-why"></p><p class="pl-who"><span class="pl-name"></span><span class="pl-role"></span></p></div>
