@@ -231,34 +231,100 @@ em{font-style:normal}
 .t-video{background:#0f2f52}
 .t-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0f2f52}
 /* שקף ממצגת של מציג — תמונה על כל הבמה */
+/* מסע ההישגים — מצגת מוטמעת על כל הבמה */
+.t-hesegim{background:#fbfaf7}
+.t-hesegim iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fbfaf7}
 .t-img{background:#fff}
 .t-img .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .t-img .inset{position:absolute;object-fit:cover;background:#000}
 
-/* מיפוי ה-AI — כל בתי הספר */
-.mp{position:absolute;left:90px;right:90px;top:70px;bottom:60px;display:flex;flex-direction:column}
+/* מיפוי ה-AI — כל בתי הספר: לוח נתונים חזותי (טבעות, רשת נקודות, קשתות, אנשים, מדי מוכנות) */
+@property --v{syntax:'<integer>';inherits:false;initial-value:0}
+.mp{position:absolute;left:84px;right:84px;top:60px;bottom:46px;display:flex;flex-direction:column}
 .mp-h{text-align:center}
-.mp-h .lbl{margin-bottom:6px}
-.mp-h h2{font-size:92px;font-weight:900;color:var(--navy);line-height:1.04;letter-spacing:-.01em}
-.mp-h .sub{margin-top:8px;font-size:42px;font-weight:600;color:var(--teal)}
+.mp-h .lbl{margin-bottom:2px;font-size:36px}
+.mp-h h2{font-size:84px;font-weight:900;color:var(--navy);line-height:1.04;letter-spacing:-.01em}
+.mp-h .sub{margin-top:4px;font-size:38px;font-weight:600;color:var(--teal)}
 .mp-h .sub b{font-weight:900;color:var(--navy)}
-.mp-c{flex:1;margin-top:38px;display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
-.mc{position:relative;display:flex;flex-direction:column;padding:30px 34px 30px;border-radius:26px;background:rgba(255,255,255,.84);
-  box-shadow:inset 0 0 0 2px rgba(58,143,134,.22),0 24px 44px -34px rgba(15,47,82,.4)}
-.mc::before{content:"";position:absolute;right:34px;left:34px;top:0;height:5px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--gold2),var(--gold))}
-.mc .k{font-size:38px;font-weight:800;color:var(--gold);margin-bottom:18px}
-.mc .num{font-size:96px;font-weight:900;color:var(--navy);line-height:.95;font-variant-numeric:tabular-nums}
-.mc .num .of{font-size:44px;font-weight:600;color:var(--navy2)}
-.mc .cap{margin-top:4px;font-size:29px;font-weight:500;color:var(--ink);line-height:1.25}
-.mc .num+.cap{margin-bottom:22px}
-.mc .tl{margin-top:auto;padding-top:16px;border-top:2px solid rgba(200,149,90,.35);font-size:28px;font-weight:600;color:var(--navy2);line-height:1.35}
-.mc .tl b{color:var(--navy);font-weight:800}
-.bars{display:flex;flex-direction:column;gap:18px}
-.br .l{display:flex;justify-content:space-between;gap:12px;font-size:28px;font-weight:600;color:var(--navy);line-height:1.2}
-.br .l b{font-weight:900;color:var(--teal);font-variant-numeric:tabular-nums}
-.br .t{margin-top:8px;height:14px;border-radius:7px;background:rgba(226,184,134,.3);overflow:hidden}
-.br .t i{display:block;height:100%;border-radius:7px;background:linear-gradient(to left,var(--teal2),var(--teal));transform-origin:right center}
-.slide.on .br .t i{animation:draw 1.2s cubic-bezier(.7,0,.2,1) both;animation-delay:calc(.9s + var(--k)*.12s)}
+.mp-c{flex:1;min-height:0;margin-top:28px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.mc{position:relative;display:flex;flex-direction:column;padding:26px 30px;border-radius:30px;background:rgba(255,255,255,.9);overflow:hidden;
+  box-shadow:inset 0 0 0 2px rgba(58,143,134,.18),0 34px 54px -38px rgba(15,47,82,.5)}
+.mc .k{display:flex;align-items:center;gap:16px;font-size:36px;font-weight:800;color:var(--gold);margin-bottom:12px}
+.mc .k::before{content:"";flex:none;width:12px;height:12px;border-radius:50%;background:currentColor;box-shadow:0 0 0 7px rgba(200,149,90,.2)}
+.cnt{--v:var(--to);counter-reset:v var(--v);font-variant-numeric:tabular-nums}
+.cnt::before{content:counter(v)}
+.slide.on .cnt{animation:cnt 1.9s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,.9s)}
+@keyframes cnt{from{--v:0}}
+@keyframes pop{from{transform:scale(0);opacity:0}}
+@keyframes arc{from{stroke-dasharray:0 100}}
+/* איפה אנחנו — טבעות + בועות כלים */
+.ring{display:flex;align-items:center;gap:22px;margin-top:10px}
+.ring .rv{position:relative;flex:none;width:150px;height:150px}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:15}
+.ring .tr{stroke:rgba(58,143,134,.13)}
+.ring .ar{stroke-linecap:round}
+.slide.on .ring .ar{animation:arc 1.9s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d,.9s)}
+.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:48px;font-weight:900;color:var(--navy);letter-spacing:-.02em}
+.ring b small{font-size:26px;font-weight:800}
+.ring p{font-size:27px;font-weight:600;color:var(--ink);line-height:1.25}
+.tools{margin-top:auto;padding-top:14px;border-top:2px dashed rgba(200,149,90,.45)}
+.tools h4{font-size:24px;font-weight:700;color:var(--navy2);margin-bottom:12px}
+.bub{display:flex;align-items:flex-end;justify-content:space-around}
+.bub div{display:flex;flex-direction:column;align-items:center;gap:8px}
+.bub i{display:grid;place-items:center;border-radius:50%;color:#fff;font-style:normal;font-weight:900;box-shadow:0 16px 26px -14px rgba(15,47,82,.65)}
+.bub span{font-size:23px;font-weight:700;color:var(--navy)}
+.slide.on .bub i{animation:pop .9s cubic-bezier(.3,1.5,.5,1) both;animation-delay:calc(1.5s + var(--k)*.16s)}
+/* מה מעכב — כרטיס כהה בולט + רשת 100 נקודות */
+.mc.hero{background:radial-gradient(130% 80% at 85% 0%,#22527d 0%,var(--navy) 58%,#0a2440 100%);box-shadow:0 44px 64px -34px rgba(15,47,82,.8)}
+.mc.hero .k{color:var(--gold2)}
+.mc.hero .k::before{box-shadow:0 0 0 7px rgba(226,184,134,.22)}
+.hero .big{font-size:150px;font-weight:900;line-height:.86;color:#fff;letter-spacing:-.03em;text-shadow:0 0 46px rgba(226,184,134,.4)}
+.hero .big small{font-size:84px;color:var(--gold2)}
+.hero .cap{margin-top:10px;font-size:28px;font-weight:600;color:rgba(255,255,255,.9);line-height:1.25}
+.waf{margin:20px 0 4px;display:grid;grid-template-rows:repeat(5,1fr);grid-auto-flow:column;grid-auto-columns:1fr;gap:5px}
+.waf i{aspect-ratio:1;border-radius:50%;background:rgba(255,255,255,.13)}
+.waf i.on{background:var(--gold2);box-shadow:0 0 12px rgba(226,184,134,.65)}
+.slide.on .waf i.on{animation:pop .5s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(1s + var(--k)*.028s)}
+.waf+.wn{font-size:20px;font-weight:500;color:rgba(255,255,255,.6)}
+.lol{margin-top:auto;display:flex;flex-direction:column;gap:13px}
+.lol h4{font-size:23px;font-weight:600;color:var(--gold2)}
+.lol .r{display:grid;grid-template-columns:1fr auto;gap:5px 12px;font-size:24px;font-weight:600;color:#fff;line-height:1.2}
+.lol .r b{color:var(--gold2);font-weight:800;font-variant-numeric:tabular-nums}
+.lol .t{grid-column:1/-1;position:relative;height:3px;border-radius:2px;background:rgba(255,255,255,.14)}
+.lol .t i{position:absolute;right:0;top:0;height:3px;border-radius:2px;background:var(--gold2);transform-origin:right center}
+.lol .t i::after{content:"";position:absolute;left:-7px;top:-5px;width:13px;height:13px;border-radius:50%;background:var(--gold2);box-shadow:0 0 10px rgba(226,184,134,.7)}
+.slide.on .lol .t i{animation:draw 1.1s cubic-bezier(.7,0,.2,1) both;animation-delay:calc(2s + var(--k)*.12s)}
+/* האם יש מסגרת — קשתות מעגליות */
+.rad{position:relative;width:310px;height:310px;margin:4px auto 0}
+.rad svg{width:100%;height:100%;overflow:visible}
+.rad circle{fill:none;stroke-width:20;stroke-linecap:round}
+.rad .tr{stroke:rgba(58,143,134,.1)}
+.slide.on .rad .ar{animation:arc 1.7s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(1s + var(--k)*.15s)}
+.rad text{font:800 21px Heebo,sans-serif}
+.leg{display:flex;flex-direction:column;gap:11px;margin-top:12px}
+.leg div{display:flex;align-items:flex-start;gap:12px;font-size:24px;font-weight:600;color:var(--navy);line-height:1.22}
+.leg i{flex:none;width:16px;height:16px;border-radius:50%;margin-top:6px}
+.leg b{margin-right:auto;font-weight:900;font-variant-numeric:tabular-nums}
+.fn{margin-top:auto;font-size:21px;font-weight:500;color:var(--muted)}
+/* איך ממשיכים — אנשים כנקודות + מדי מוכנות */
+.big2{font-size:120px;font-weight:900;color:var(--navy);line-height:.88;letter-spacing:-.02em}
+.mc .cap2{margin-top:8px;font-size:27px;font-weight:600;color:var(--ink);line-height:1.25}
+.dots{margin:16px 0 10px;display:grid;grid-template-columns:repeat(15,1fr);gap:6px}
+.dots i{aspect-ratio:1;border-radius:50%;background:rgba(15,47,82,.09)}
+.dots i.y{background:var(--gold)}
+.dots i.m{background:var(--teal2)}
+.slide.on .dots i{animation:pop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:calc(1s + var(--k)*.016s)}
+.dk{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:21px;font-weight:600;color:var(--navy2)}
+.dk span::before{content:"";display:inline-block;width:13px;height:13px;border-radius:50%;margin-left:7px;background:var(--c)}
+.meter{margin-top:18px}
+.meter .l{display:flex;align-items:baseline;justify-content:space-between;gap:10px;font-size:24px;font-weight:700;color:var(--navy)}
+.meter .l b{font-size:36px;font-weight:900;color:var(--teal);font-variant-numeric:tabular-nums}
+.meter .l b small{font-size:21px;font-weight:600;color:var(--muted)}
+.meter .s{margin-top:8px;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.meter .s i{position:relative;height:16px;border-radius:5px;background:rgba(58,143,134,.13);overflow:hidden}
+.meter .s i::after{content:"";position:absolute;top:0;bottom:0;right:0;width:var(--f);background:linear-gradient(to left,var(--teal2),var(--teal));transform-origin:right center}
+.slide.on .meter .s i::after{animation:draw .45s linear both;animation-delay:calc(1.7s + var(--k)*.12s)}
 
 /* פתקי המטריות — בסיכום */
 .pk{position:absolute;left:110px;right:110px;top:64px;bottom:64px;display:flex;flex-direction:column;align-items:center}
@@ -362,6 +428,8 @@ const DECK = {
     { type:'schedule', at:'gather' },
     // 22.11.26 מיטל: הוסרו שקף "ברכות", אמיר מדינה ורויטל אמיר (ברכות); "ספר ההפעלה" → "מדריך החינוך היוצר"
     { type:'speaker',  at:'greet', label:'ברכות', name:'אורית וקנין־שילה', role:'ממונת נוער, המנהל להכשרה מקצועית' },
+    // מסע ההישגים (22.11 מיטל: אחרי אורית): matzeget-img/hesegim/index.html = העתק של hesegim-deckהישגי-בתי-הספר-כנס-מנהלים.html. רץ לבד עם מוזיקה; חץ קדימה = ממשיכים.
+    { type:'hesegim',  at:'greet', src:'matzeget-img/hesegim/index.html?embed=1' },
     { type:'title',    at:'greet', title:'מדריך החינוך היוצר', sub:'מחזון למעשה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
     // סרטון החינוך היוצר (טיוטה 4, 19.11): מתחיל לבד כשנכנסים לשקף, נעצר כשיוצאים. K = עצירה/המשך.
     { type:'video',    at:'greet', src:'matzeget-img/hinuch-yotzer.mp4' },
@@ -516,24 +584,44 @@ const T={
       ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
       ${s.name?`<p class="in who">${esc(s.name)}${s.role?`<i>·</i><span>${esc(s.role)}</span>`:''}</p>`:''}</div>
     <div class="in film"><div class="reel" style="--dur:${n*7}s">${imgs}${imgs}</div></div>`;},
+  hesegim:s=>`<iframe data-src="${esc(s.src)}" allow="autoplay; fullscreen" title="מסע ההישגים" tabindex="-1"></iframe>`,
   video:s=>`<video src="${esc(s.src)}" preload="auto" playsinline></video>`,
   img:s=>`<img class="full" src="${esc(s.src)}" alt="" decoding="async">${s.vid?`<video class="inset" src="${esc(s.vid.src)}" preload="auto" playsinline style="left:${s.vid.box[0]}%;top:${s.vid.box[1]}%;width:${s.vid.box[2]}%;height:${s.vid.box[3]}%"></video>`:''}`,
-  mipui:s=>{const m=s.m,bars=a=>`<div class="bars">${a.map(([l,v],k)=>`<div class="br"><div class="l"><span>${esc(l)}</span><b>${v}%</b></div><div class="t"><i style="--k:${k};width:${v}%"></i></div></div>`).join('')}</div>`;
+  mipui:s=>{const m=s.m,C=['var(--teal)','var(--teal2)','var(--gold)','var(--gold2)'];
+    const cnt=(v,d)=>`<span class="cnt" style="--to:${v}${d?';--d:'+d:''}"></span>`;
+    const ring=(v,c,t,d)=>`<div class="ring"><div class="rv"><svg viewBox="0 0 150 150"><circle class="tr" cx="75" cy="75" r="62"/><circle class="ar" cx="75" cy="75" r="62" pathLength="100" stroke="${c}" stroke-dasharray="${v} 100" style="--d:${d}"/></svg><b><span>${cnt(v,d)}<small>%</small></span></b></div><p>${esc(t)}</p></div>`;
+    const TB=['var(--navy)','var(--teal)','var(--gold)'];
+    const bub=m.tools.map(([t,v],k)=>{const d=Math.round(Math.sqrt(v)*13.5);return `<div><i style="--k:${k};width:${d}px;height:${d}px;font-size:${Math.max(18,Math.round(d*.27))}px;background:${TB[k]}">${v}%</i><span dir="ltr">${esc(t)}</span></div>`;}).join('');
+    const waf=[...Array(100)].map((_,k)=>k<m.inn?`<i class="on" style="--k:${k}"></i>`:'<i></i>').join('');
+    const lol=m.block.map(([l,v],k)=>`<div class="r"><span>${esc(l)}</span><b>${v}%</b><div class="t"><i style="--k:${k};width:${Math.min(100,v*3.5)}%"></i></div></div>`).join('');
+    const R=[140,112,84,56];
+    const rad=m.sc.map(([l,v],k)=>`<circle class="tr" cx="155" cy="155" r="${R[k]}" pathLength="100" stroke-dasharray="75 100" transform="rotate(-90 155 155)"/><circle class="ar" cx="155" cy="155" r="${R[k]}" pathLength="100" stroke="${C[k]}" stroke-dasharray="${(v*.75).toFixed(1)} 100" transform="rotate(-90 155 155)" style="--k:${k}"/><text x="145" y="${155-R[k]+7}" direction="ltr" text-anchor="end" fill="${C[k]}">${v}%</text>`).join('');
+    const leg=m.sc.map(([l,v],k)=>`<div><i style="background:${C[k]}"></i><span>${esc(l)}</span><b style="color:${C[k]}">${v}%</b></div>`).join('');
+    const ny=Math.round(m.yes/10),nm=Math.round(m.maybe/10),nt=Math.round(m.n/10);
+    const dots=[...Array(nt)].map((_,k)=>`<i class="${k<ny?'y':k<ny+nm?'m':''}" style="--k:${k}"></i>`).join('');
+    const meter=(t,v)=>`<div class="meter"><div class="l"><span>${esc(t)}</span><b>${v}<small>/5</small></b></div><div class="s">${[0,1,2,3,4].map(k=>`<i style="--k:${k};--f:${Math.max(0,Math.min(1,v-k))*100}%"></i>`).join('')}</div></div>`;
     return `<div class="mp">
       <div class="mp-h">${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}<h2 class="in">${esc(s.title)}</h2>
         <p class="in sub"><b>${m.n}</b> מורים ענו · <b>${m.schools}</b> בתי ספר</p></div>
       <div class="mp-c">
         <div class="in mc"><p class="k">איפה אנחנו</p>
-          <div class="num">${m.reg}%</div><p class="cap">משתמשים ב-AI כל שבוע או כמעט כל יום</p>
-          <div class="num">${m.cls}%</div><p class="cap">עבדו עם תלמידים עם AI בחודש האחרון</p>
-          <p class="tl">הכלים המובילים: ${m.tools.map(([t,v])=>`<span dir="ltr" style="display:inline-block;white-space:nowrap"><b>${esc(t)}</b> ${v}%</span>`).join(' · ')}</p></div>
-        <div class="in mc"><p class="k">מה מעכב</p>
-          <div class="num">${m.inn}%</div><p class="cap">ענו: "שום דבר, אני כבר בפנים"</p>${bars(m.block)}</div>
-        <div class="in mc"><p class="k">האם יש מסגרת</p>${bars(m.sc)}
-          <p class="tl">אחוז המסכימים (4–5 מתוך 5)</p></div>
+          ${ring(m.reg,'var(--teal)','משתמשים ב-AI כל שבוע או כמעט כל יום','.9s')}
+          ${ring(m.cls,'var(--gold)','עבדו עם תלמידים עם AI בחודש האחרון','1.15s')}
+          <div class="tools"><h4>הכלים המובילים</h4><div class="bub">${bub}</div></div></div>
+        <div class="in mc hero"><p class="k">מה מעכב</p>
+          <div class="big">${cnt(m.inn)}<small>%</small></div><p class="cap">ענו: "שום דבר, אני כבר בפנים"</p>
+          <div class="waf">${waf}</div><p class="wn">כל נקודה = 1% מהמורים</p>
+          <div class="lol"><h4>ומה מעכב את השאר</h4>${lol}</div></div>
+        <div class="in mc"><p class="k">האם יש מסגרת</p>
+          <div class="rad"><svg viewBox="0 0 310 310">${rad}</svg></div>
+          <div class="leg">${leg}</div>
+          <p class="fn">אחוז המסכימים (4–5 מתוך 5)</p></div>
         <div class="in mc"><p class="k">איך ממשיכים</p>
-          <div class="num">${m.yes}</div><p class="cap">מורים אמרו "כן" לצוות מוביל, ועוד ${m.maybe} "אולי"</p>
-          <div class="num">${m.ready}<span class="of">/5</span></div><p class="cap">מוכנות לנסות משהו חדש השנה · ביטחון ${m.conf}/5</p></div>
+          <div class="big2">${cnt(m.yes)}</div><p class="cap2">מורים אמרו "כן" לצוות מוביל</p>
+          <div class="dots">${dots}</div>
+          <div class="dk"><span style="--c:var(--gold)">כן · ${m.yes}</span><span style="--c:var(--teal2)">אולי · ${m.maybe}</span><span style="--c:rgba(15,47,82,.15)">כל נקודה = 10 מורים</span></div>
+          ${meter('מוכנות לנסות משהו חדש השנה',m.ready)}
+          ${meter('ביטחון',m.conf)}</div>
       </div></div>`;},
   petakim:s=>{const imgs=[...Array(s.n||5)].map((_,i)=>`<img class="in" src="matzeget-img/petek-${String(i+1).padStart(2,'0')}.jpg" alt="">`).join('');
     return `<div class="pk">
@@ -556,7 +644,7 @@ const SCENE={
   closing: {cx:960, cy:572,s:.64,a:0,   b:1920,o:1},
   off:     {cx:960, cy:1300,s:.46,a:0,  b:1920,o:0},
 };
-const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off',video:'off',mipui:'off',img:'off'};
+const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off',video:'off',hesegim:'off',mipui:'off',img:'off'};
 const LOGO={big:{x:1173,y:50,s:1},closing:{x:744,y:52,s:.88},corner:{x:64,y:58,s:.5}};
 
 /* ---------- איור ההזמנה (מבוסס על הרולאפ) ---------- */
@@ -706,18 +794,19 @@ function go(n,dir){n=Math.max(0,Math.min(slides.length-1,n));if(n===cur)return;
   const lg=LOGO[s.type==='welcome'?'big':s.type==='closing'?'closing':'corner'];
   logo.style.transform=`translate(${lg.x}px,${lg.y}px) scale(${lg.s})`;
   const a=ag(s.at),p=a?pos(toMin(a.from)):0;
-  const bare=s.type==='video'||s.type==='img';
+  const bare=s.type==='video'||s.type==='img'||s.type==='hesegim';
   prog.style.opacity=(s.type==='welcome'||s.type==='closing'||bare)?0:1;
   logo.style.opacity=bare?0:1;
   /* סרטון: מתחיל מההתחלה כשנכנסים קדימה, נעצר כשיוצאים */
-  if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}}
+  if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}const f=slides[cur].querySelector('iframe[data-src]');if(f)f.src='about:blank';}
+  {const f=slides[n].querySelector('iframe[data-src]');if(f){hush();f.src=f.dataset.src;}}  /* מסע ההישגים: נטען מההתחלה בכל כניסה, נעצר ביציאה */
   if(slides[n].querySelector('video')){hush();const v=slides[n].querySelector('video');try{if(d>0)v.currentTime=0;const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;v.play().catch(()=>{});flash('הסרטון מושתק · K להפעלה עם צליל');});}catch(e){}}
   pf.style.width=(p*100)+'%';ph.style.right=(p*100)+'%';
   ticks.forEach((t,i)=>t.classList.toggle('done',pos(toMin(D.agenda[i].from))<=p+1e-6));
   if(cur>=0&&!bare)swing(d);
   if(cur>=0&&SL[cur].type==='playlist')PL.leave();
   if(s.type==='playlist'){hush();PL.enter(slides[n]);}
-  else if(s.type!=='video'&&cur>=0&&d>0&&(SL[n].at!==SL[cur].at||SL[n].at==='greet')&&SL[cur].type!=='video')sting();
+  else if(s.type!=='video'&&s.type!=='hesegim'&&cur>=0&&d>0&&(SL[n].at!==SL[cur].at||SL[n].at==='greet')&&SL[cur].type!=='video'&&SL[cur].type!=='hesegim')sting();
   cur=n;
   try{history.replaceState(null,'','#'+(n+1));}catch(e){}
   tick();}
