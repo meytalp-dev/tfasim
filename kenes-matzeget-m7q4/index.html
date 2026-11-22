@@ -174,6 +174,41 @@ em{font-style:normal}
 #plv.show{opacity:1;visibility:visible;transition:opacity .8s ease .2s,visibility 0s}
 #plv iframe,#plv>div{position:absolute;inset:0;width:100%;height:100%;border:0;pointer-events:none}
 
+/* 23.11 מסך מפוצל: בשקף פלייליסט עם wall — הסרטון שקוף (רק צליל), השיר מימין והקיר החי משמאל; נראה גם בלי שיר */
+#plv.aud{opacity:0!important}
+.t-playlist.wl .cen,.t-playlist.wl .hclock{display:none}
+.t-playlist.wl .pl{opacity:1;visibility:visible}
+.t-playlist.wl:not(.live) .pl-info,.t-playlist.wl:not(.live) .pl-bar,.t-playlist.wl:not(.live) .pl-nx{opacity:0}
+.t-playlist.wl .pl-bar{left:auto;right:120px;width:720px;top:880px}
+.t-playlist.wl .pl-nx{left:auto;width:720px;top:910px}
+.t-playlist.wl .pl-clk{display:none}
+.lw{position:absolute;left:120px;width:900px;top:290px;height:760px;display:flex;flex-direction:column;text-align:right}
+.lw-list{overflow:hidden}
+.lw-h{display:flex;align-items:baseline;gap:20px}
+.lw-h b{font-size:32px;font-weight:700;color:var(--gold);letter-spacing:.08em}
+.lw-h span{font-size:30px;font-weight:500;color:var(--muted)}
+.lw-list{margin-top:18px;flex:1;display:flex;flex-direction:column;gap:18px;transition:opacity .45s,transform .45s var(--ease)}
+.lw-list.out{opacity:0;transform:translateY(12px)}
+.lw-c{background:#fff;border-radius:22px;padding:16px 26px 14px;border-right:7px solid var(--gold);box-shadow:0 16px 40px -26px rgba(15,47,82,.55)}
+.lw-r{display:inline-block;font-size:27px;font-weight:800;color:#fff;background:var(--teal);border-radius:40px;padding:3px 18px 5px;margin-bottom:8px}
+.lw-t{font-size:34px;font-weight:500;color:var(--ink);line-height:1.28;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lw-w{margin-top:8px;font-size:28px;font-weight:800;color:var(--navy)}
+.lw-w small{font-size:26px;font-weight:500;color:var(--navy2)}
+.lw-x{margin-top:2px;font-size:25px;font-weight:500;color:var(--muted)}
+.lw-e{margin-top:40px;font-size:44px;font-weight:700;color:var(--navy);line-height:1.3}
+.lw-e small{display:block;margin-top:14px;font-size:32px;font-weight:500;color:var(--teal)}
+/* שקף wall מלא (השולחנות) */
+.t-wall .lw{left:120px;right:120px;width:auto;top:96px;bottom:110px;height:auto}
+.t-wall .lw-top h2{font-size:92px;font-weight:900;color:var(--navy);line-height:1;letter-spacing:-.01em;display:inline}
+.t-wall .lw-top .lw-h{display:inline-flex;margin-right:30px}
+.t-wall .lw-list{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:min-content;gap:24px;margin-top:34px;align-content:start}
+.t-wall .lw-c{padding:22px 28px}
+.lw-c h4{font-size:38px;font-weight:900;color:var(--navy);margin-bottom:6px}
+.lw-c .tf{font-size:28px;line-height:1.3;color:var(--ink);margin-top:8px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.lw-c .tf small{display:block;font-size:22px;font-weight:700;color:var(--teal);letter-spacing:.02em}
+.lw-c.mq{border-right-color:var(--teal)}
+.lw-c.mq .lw-t{font-size:34px;font-weight:700;color:var(--navy)}
+
 /* שקפי סדנה */
 .wrap{position:absolute;left:140px;right:140px;top:96px;bottom:126px;display:flex;flex-direction:column;text-align:right}
 .wrap .chip{align-self:flex-start;margin-bottom:22px}
@@ -388,6 +423,8 @@ const DECK = {
   ],
 
   // הפלייליסט "השיר שלי" (kenes-shir): רק שירים שאושרו בדף האישור עולים. len = כמה שניות מכל שיר.
+  // 23.11 מיטל: קיר חי מהדף המלווה (שרת המשחק, a=scr — ציבורי, בלי מפתח): מילים טובות לרשתות / למיצגים, ומה שכותבים בשולחנות
+  live: { url:'https://script.google.com/macros/s/AKfycbwgHwCUeqNF0LH2XmbWWnhpsi7DdLgyhBgkIw-X65cUafEJfaum3CpYYaGSizPBLGSieg/exec' },
   playlist: { url:'https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec', k:'scN3p8wQ5zH2', len:120,
     // סדר הניגון (מיטל 22.11): פותחים בשיר של עתיד מגשימים, ואחריו השירים המוכרים. שיר שלא ברשימה מתנגן אחריה, לפי סדר ההגעה.
     order:[
@@ -424,7 +461,7 @@ const DECK = {
 
   // השקפים, לפי הסדר
   slides: [
-    { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'מתחילים ב־' },   // הפלייליסט בזמן ההתכנסות
+    { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'מתחילים ב־', wall:'net' },   // הפלייליסט בזמן ההתכנסות; 23.11: מסך מפוצל — השיר (בלי וידאו, רק צליל) + המילים הטובות לרשתות
     { type:'welcome',  at:'gather' },
     { type:'schedule', at:'gather' },
     // 22.11.26 מיטל: הוסרו שקף "ברכות", אמיר מדינה ורויטל אמיר (ברכות); "ספר ההפעלה" → "מדריך החינוך היוצר"
@@ -442,13 +479,14 @@ const DECK = {
       yes:494, maybe:225, ready:4.4, conf:3.6, learn:[['סרטון קצר שאפשר לחזור אליו',36],['השתלמות מסודרת',34],['לבד, בקצב שלי',28]] } },
     { type:'hesegim',  at:'lecture', src:'matzeget-img/hesegim/index.html?embed=1&part=2' },   // מסע ההישגים — חלק ב', לפני עוז
     { type:'lecture',  at:'lecture' },   // שם המרצה ושם ההרצאה נלקחים משורת 'lecture' בלו"ז (title / sub)
-    { type:'playlist', at:'break', title:'מוזיאון החדשנות', note:'כנסו לאפליקציה, כתבו מילה טובה, בחרו מיצג שאתם רוצים לאמץ ועוד' },   // 22.11 מיטל: במקום "הפסקה"                          // הפלייליסט בהפסקה; "חוזרים ב־" = שעת הסיום של ההפסקה
+    { type:'playlist', at:'break', title:'מוזיאון החדשנות', note:'כנסו לאפליקציה, כתבו מילה טובה, בחרו מיצג שאתם רוצים לאמץ ועוד', wall:'ex' },   // 23.11: מסך מפוצל — השיר + המילים הטובות למיצגים   // 22.11 מיטל: במקום "הפסקה"                          // הפלייליסט בהפסקה; "חוזרים ב־" = שעת הסיום של ההפסקה
     // תעודות הוקרה (אחרי ההפסקה, לפני השולחנות): רויטל מודה לרשתות; ברקע סרט נע של כל התעודות — רשתות ואז בתי ספר.
     // התמונות: matzeget-img/tuda-r-01..05.jpg (רשתות), tuda-s-01..17.jpg (בתי ספר) — צריך להעתיק את התיקייה יחד עם המצגת.
     { type:'tudot',    at:'workshop', label:'תודה והוקרה', title:'תעודות הוקרה', sub:'לרשתות ולבתי הספר', r:5, s:17 },   // 22.11 מיטל: בלי רויטל, תעודות גדולות
     { type:'section',  at:'workshop', title:'למידת עמיתים בשולחנות עגולים', sub:'מנהיגות אנושית בעידן הבינה המלאכותית' },
     // מפת השולחנות (מיטל 23.11): matzeget-img/mapat/index.html = העתק של kenes-itzuvim/mapat-shulchanot.html; מנחה מודגש + משתתפים לכל שולחן
     { type:'hesegim',  at:'workshop', src:'matzeget-img/mapat/index.html' },
+    { type:'wall',     at:'workshop', src:'tables', title:'מה כותבים בשולחנות', sub:'מתעדכן חי מהדף המלווה' },   // 23.11 מיטל: מה שהשולחנות כותבים + המוטו האישי
     { type:'hold',     at:'lunch', label:'בתיאבון', title:'ארוחת צהריים' },
     // דוברי הבמה הניהולית: כל שורה { name:'…', role:'…' } יוצרת שקף דובר מיד אחרי השקף הזה, לפי הסדר.
     // שני דוברים בשקף אחד: names:['שם ראשון','ושם שני'] — כל שם בשורה משלו.
@@ -561,7 +599,9 @@ const T={
       <div class="pl-bar"><i></i></div>
       <p class="pl-nx"></p>
       <div class="pl-clk clock" dir="ltr"></div>
+      ${s.wall?`<div class="lw"><div class="lw-h"><b>${s.wall==='net'?'מילים טובות לרשתות':'מילים טובות למציגים'}</b><span class="lw-n"></span></div><div class="lw-list"></div></div>`:''}
     </div>`;},
+  wall:s=>`<div class="lw"><div class="lw-top"><h2>${esc(s.title)}</h2><div class="lw-h"><span class="lw-n">${esc(s.sub||'')}</span></div></div><div class="lw-list"></div></div>`,
   quote:s=>`${s.bg?`<div class="bgnum">${esc(s.bg)}</div>`:''}<div class="wrap">
       ${s.chip?`<div class="in chip">${clockIc}${esc(s.chip)}</div>`:''}
       <h2 class="in">${esc(s.title)}</h2>
@@ -650,7 +690,7 @@ const SCENE={
   closing: {cx:960, cy:572,s:.64,a:0,   b:1920,o:1},
   off:     {cx:960, cy:1300,s:.46,a:0,  b:1920,o:0},
 };
-const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off',video:'off',hesegim:'off',mipui:'off',img:'off'};
+const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',wall:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off',video:'off',hesegim:'off',mipui:'off',img:'off'};
 const LOGO={big:{x:1173,y:50,s:1},closing:{x:744,y:52,s:.88},corner:{x:64,y:58,s:.5}};
 
 /* ---------- איור ההזמנה (מבוסס על הרולאפ) ---------- */
@@ -697,7 +737,7 @@ function swing(dir){if(RM)return;ang+=(dir>=0?1:-1)*(38+Math.random()*26);}
 
 /* ---------- בניית השקפים ---------- */
 const host=document.getElementById('slides');
-SL.forEach((s,i)=>{const el=document.createElement('section');el.className='slide t-'+s.type+(s.type==='section'&&String(s.title).length>8?' long':'');
+SL.forEach((s,i)=>{const el=document.createElement('section');el.className='slide t-'+s.type+(s.type==='section'&&String(s.title).length>8?' long':'')+(s.wall?' wl':'');
   el.innerHTML=(T[s.type]||T.section)(s);
   el.querySelectorAll('.in,.draw').forEach((e,j)=>e.style.setProperty('--i',j));
   host.append(el);});
@@ -747,7 +787,7 @@ const PL=(()=>{
             if(song)bad[song.id]=1;order=order.filter(i=>!bad[list[i].id]);pos=Math.min(pos,order.length)-1;song=null;
             if(want)setTimeout(next,800);}}});};
     const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';s.onerror=()=>{};document.head.appendChild(s);}
-  function show(on){if(el)el.classList.toggle('live',on);box.classList.toggle('show',on);}
+  function show(on){if(el)el.classList.toggle('live',on);box.classList.toggle('show',on);box.classList.toggle('aud',!!(el&&el.classList.contains('wl')));}
   function fill(s){
     const nn=order.length>1?list[order[(pos+1)%order.length]]:null;
     const inf=q('.pl-info'),nx=q('.pl-nx');if(!inf)return;
@@ -787,6 +827,40 @@ const PL=(()=>{
   function skip(){if(!want||!song)return;flash('השיר הבא');next();}                                       // N = לדלג לשיר הבא
   return {enter,leave,unmute,setOn,skip,get on(){return want;}};
 })();
+/* ---------- הקיר החי (23.11) ----------
+   נמשך משרת המשחק (a=scr) כל 8 שניות, רק כשהשקף מוצג. net = מילים טובות לרשתות, ex = למציגים במוזיאון,
+   tables = מה שהשולחנות כתבו + המוטו האישי. החדש ראשון; כשיש יותר ממה שנכנס — מתחלף כל 10 שניות. בלי רשת: הודעת הזמנה. */
+const LW=(()=>{
+  const U=(D.live||{}).url;let el=null,kind='',data=null,pg=0,ft=null,tm=null,top='',sig='';
+  function pull(){if(!U)return;fetch(U+'?a=scr&_='+Date.now(),{credentials:'omit',cache:'no-store'})
+    .then(r=>r.json()).then(r=>{if(r&&r.ok&&el){data=r;draw(false);}}).catch(()=>{});}
+  function items(){if(!data)return[];
+    if(kind==='net')return data.netWords||[];
+    if(kind==='ex')return data.exWords||[];
+    return (data.tables||[]).map(t=>Object.assign({k:'t'},t)).concat((data.motos||[]).map(m=>Object.assign({k:'m'},m)));}
+  const who=w=>`<p class="lw-w">${esc(w.n)}${w.s?` <small>· ${esc(w.s)}</small>`:''}</p>`;
+  function card(w){
+    if(kind==='tables'){
+      if(w.k==='m')return `<div class="lw-c mq"><span class="lw-r" style="background:var(--navy2)">המוטו הניהולי שלי</span><p class="lw-t">${esc(w.t)}</p>${who(w)}</div>`;
+      const f=(l,v)=>v?`<p class="tf"><small>${l}</small>${esc(v)}</p>`:'';
+      return `<div class="lw-c"><h4>שולחן ${esc(w.t)}</h4>${f('מושג מההרצאה',w.f1)}${f('שינויים ל־2030',w.f2)}${f('מתחילים מחר בבוקר',w.f3)}</div>`;}
+    return `<div class="lw-c">${w.r?`<span class="lw-r">${esc(w.r)}</span>`:''}${w.t?`<p class="lw-t">${esc(w.t)}</p>`:''}${who(w)}
+      <p class="lw-x">${kind==='net'?`ל${esc(w.net)} · ${esc(w.ex)}`:`ל${esc(w.ex)}${w.sc?` · ${esc(w.sc)}`:''}`}</p></div>`;}
+  function draw(adv){if(!el)return;
+    const L=items(),per=kind==='tables'?6:3,pages=Math.max(1,Math.ceil(L.length/per)),box=el.querySelector('.lw-list'),n=el.querySelector('.lw-n');if(!box)return;
+    const t1=L.length?JSON.stringify(L[0]):'';
+    if(t1!==top){top=t1;pg=0;}else if(adv){if(pages<2)return;pg=(pg+1)%pages;}else if(pg>=pages)pg=0;
+    if(n)n.textContent=kind==='tables'?((data&&data.tables||[]).length+' שולחנות · '+(data&&data.motos||[]).length+' מוטו'):(L.length?L.length+' עד עכשיו':'');
+    const h=L.length?L.slice(pg*per,pg*per+per).map(card).join(''):
+      (kind==='tables'?'<p class="lw-e">כאן יופיע מה שהשולחנות כותבים<small>נציג.ת השולחן כותב.ת בדף המלווה, וכל אחד.ת את המוטו הניהולי שלו</small></p>':
+       kind==='net'?'<p class="lw-e">כתבו מילה טובה לרשת<small>סורקים את הברקוד שעל התג ← תערוכת הרשתות ← מילה טובה</small></p>':
+       '<p class="lw-e">כתבו מילה טובה למציגים<small>בדף המלווה ← המוזיאון ← בוחרים מיצג ← מילה טובה</small></p>');
+    if(h===sig)return;sig=h;
+    box.classList.add('out');setTimeout(()=>{box.innerHTML=h;box.classList.remove('out');},450);}
+  function enter(slide,k){el=slide;kind=k;pg=0;top='';sig='';draw(false);pull();clearInterval(ft);ft=setInterval(pull,8000);clearInterval(tm);tm=setInterval(()=>draw(true),10000);}
+  function leave(){el=null;clearInterval(ft);clearInterval(tm);}
+  return {enter,leave};
+})();
 /* ---------- ניווט ---------- */
 const ill=document.getElementById('ill'),logo=document.getElementById('logo');
 let cur=-1;
@@ -811,6 +885,8 @@ function go(n,dir){n=Math.max(0,Math.min(slides.length-1,n));if(n===cur)return;
   ticks.forEach((t,i)=>t.classList.toggle('done',pos(toMin(D.agenda[i].from))<=p+1e-6));
   if(cur>=0&&!bare)swing(d);
   if(cur>=0&&SL[cur].type==='playlist')PL.leave();
+  if(cur>=0&&(SL[cur].wall||SL[cur].type==='wall'))LW.leave();
+  if(s.wall||s.type==='wall')LW.enter(slides[n],s.wall||s.src);
   if(s.type==='playlist'){hush();PL.enter(slides[n]);}
   else if(s.type!=='video'&&s.type!=='hesegim'&&cur>=0&&d>0&&(SL[n].at!==SL[cur].at||SL[n].at==='greet')&&SL[cur].type!=='video'&&SL[cur].type!=='hesegim')sting();
   cur=n;
