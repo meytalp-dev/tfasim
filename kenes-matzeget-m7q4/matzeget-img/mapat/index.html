@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>מפת השולחנות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0f2f52;--navy2:#2b5a7a;--teal:#3a8f86;--teal2:#5fb3a6;--gold:#c8955a;--gold2:#e2b886;--paper:#fbfaf7;--ink:#1d2b3a;--muted:#5a6b7c}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#1b2430;overflow:hidden}
+body{font-family:'Heebo',sans-serif;color:var(--ink)}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;margin:-540px 0 0 -960px;overflow:hidden;transform-origin:50% 50%;
+  background:radial-gradient(ellipse 42% 46% at 94% 2%,rgba(95,179,166,.17),transparent 70%),
+             radial-gradient(ellipse 46% 50% at 3% 99%,rgba(226,184,134,.22),transparent 70%),var(--paper)}
+#logo{position:absolute;left:28px;top:18px;width:200px;mix-blend-mode:multiply}
+h1{position:absolute;right:28px;top:16px;font-size:52px;font-weight:900;color:var(--navy);line-height:1}
+h1 small{font-size:26px;font-weight:700;color:var(--gold);margin-right:14px}
+.bama{position:absolute;left:660px;width:600px;top:24px;height:46px;border-radius:23px;background:var(--navy);color:#fff;font-size:26px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.card{position:absolute;width:226px;height:300px;background:#fff;border-radius:14px;box-shadow:0 0 0 2px rgba(200,149,90,.55),0 6px 16px rgba(15,47,82,.07);padding:8px 12px 8px;overflow:hidden}
+.card .hd{display:flex;align-items:center;gap:10px;padding-bottom:7px;margin-bottom:6px;border-bottom:2px solid var(--gold2)}
+.card .no{flex:0 0 auto;width:52px;height:52px;border-radius:50%;background:var(--navy);color:#fff;font-size:30px;font-weight:900;display:flex;align-items:center;justify-content:center}
+.card .mn{flex:1;min-width:0;font-size:20px;font-weight:900;color:var(--teal);line-height:1.1}
+.card .mn div{white-space:nowrap}
+.card ul{list-style:none;font-size:20px;font-weight:500;line-height:1.24;color:var(--ink)}
+.card li{white-space:nowrap}
+.card.empty{background:transparent;box-shadow:0 0 0 2px rgba(200,149,90,.35);border:0}
+.card.empty .mn{color:var(--muted);font-weight:500}
+.card.empty .no{background:#c9d3dc}
+.buf{position:absolute;left:360px;right:360px;bottom:8px;height:26px;border:2px dashed var(--gold2);border-radius:13px;font-size:17px;font-weight:700;color:var(--navy2);display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+<div id="stage">
+  <img id="logo" src="logo.png" alt="המנהל להכשרה מקצועית · משרד העבודה">
+  <h1>מפת השולחנות</h1>
+  <div class="bama">במה · מסך</div>
+  <div class="buf">מזנון</div>
+</div>
+<script>
+const TABLES={"1":{"m":["יששכר חפץ"],"p":["ופיק אגבאריה","שלמה אזרף","ארז בנדטוביץ","מאהר ג'מאל","מוחמד גדיר","בנימין ועקנין","פיני טובול","מנחם מענדל דורון","יצחק שבתאי"]},"2":{"m":["יעקוב תומא"],"p":["שאקר בטיחאת","מנחם בן מעש","נהוראי דרין","ליאור חזן","ידידיה חרבש","הרב אלי טובול","אסף יוסף ימיני","עדיאל שרעבי"]},"3":{"m":["עאמר אומימה"],"p":["שרית גולדרינג","ברכה וולף","אלישבע מונסונגו","אליזבת קינלה","מירב קמחי","צליל רחמינוב ראובני","אסתי שלקובסקי","קלרה שניצר","הדס שרון"]},"4":{"m":["אסתי רייפר"],"p":["הילה אורן קנדרו","ירדנה זאדה","חגית כהן שמסיאן","גילה כהנא","ג'אד מחאג'נה","אינאס מחאגנה","תמי פלנר","אנדרי צייזלר","מגי רביבו"]},"5":{"m":["שלומי ג'רופי"],"p":["יורם בן שטרית","בנימין זיזו","נועם טויזר","רותם לצטר","אמיר מדינה","אריה סיטבון","אסנת פרויד","תמר צרפתי","מוטי שגיא"]},"6":{"m":["תחיה ווקנין כהן"],"p":["מאהר אלפראונה","עינב בלוקה","לירז גולן","מאגד דנפירי","אוהד להב","דרור לוי","עדנה מרום","דליה צ'ישנבסקי","יפית שפירא"]},"7":{"m":["ליאת צבר"],"p":["אורן אלון","עלי אלחואגרה","סלימאן אלקיש","סלאם אעסם","שרון בצר","עופר ירושלמי","איימן ספדי","וליד עבד אל ולי","חן קהתי סולשטיין"]},"8":{"m":["ד\"ר ויסאם איוב"],"p":["ציפורה וייס","הילה זוהר","אורפז חן","יוסי לוי","ליאת ליכטמן","רמי מיכאלה","אבי סנדלר","תומר פרידמן","עידית תדהר"]},"9":{"m":["ויסאם סואלחה"],"p":["מאיר אבן שימול","שרונה בלוך","רות גרין אטיאס","חנה דוקרקר","ראיד הוזייל","אסתר ליליאן","שוש מזוז","מחמוד עבד אלחמיד","חנה פנחס","שרי שמבורסקי"]},"10":{"m":["יסמין אמון"],"p":["אמרי אביטן","אודליה גלנוס איטח","עינב גפן יגר","אמיר זירעיני","אפרת חיים","נעה ספוזניק","רמה ספיר","עלי עדווי","ויגדאן שתיוי"]},"11":{"m":["עירית אלדד"],"p":["אתי אבן חיים","אבי בז'ה","חכם דעיס","עינת וינברן","רחלי טימסטיט","איתי יבין","מיה משעול","מוסטפא סמום","סאגידה קאוואסמי"]},"12":{"m":["קתרינה ברברשטיין"],"p":["מנאל אבו זיד","ורד אזולאי יהב","נעה בן יוסף","תהל חלאוי","ד\"ר שי חן גל","אביטל טויטו","סיגל כהן","עלים עלואן","אליזבת שושן"]},"13":{"m":["יהודה פלדמן"],"p":["רחל בן זקן","וליד דאו","חנאן חלאילה","דימה טאהא","חיתאם יאסין","אדי מדמוני","נסרין נבואני","אשואק סעד","הדס שרעבי"]},"14":{"m":["עידית שמעוני"],"p":["עומר בדארנה","איריס גנון","חני זוהר","נורה מחאגנה","סוהא מרזוק","יולי מרים פטל","סמואיל סעיד","כבת פואד"]},"15":{"m":["יוסי בן יעקב"],"p":["חוה בנימין","הילה גיל","רווית גל","דניאל חרבריי","אתי יצחק","שאדיה נבואני","מונא עאמר","שיראל פרץ","גליה רז כרמל"]},"16":{"m":["שרה כרמון רדיד"],"p":["עבד אבו אלקיעאן","אופיר אלמלח כרמל","ענבל לוי","סמירה עאסי","נביל עטאר","מיה שאול","שהד שיבלי","רתם שעני","אורן תמם"]},"17":{"m":["שרית תורגמן יפה"],"p":["ענת דובר","שאדה ותד","מוקי זמברג","זיאד חאג יחיא","רשאד חוסיין","לימור חורש אולברג","יאסין מחמוד","יאסמין עונאללה","שרה פריזרוביץ'"]},"18":{"m":["ד\"ר מיכל גלסר"],"p":["סעיד אבו ריא","ד\"ר יוסף בריק","מוחמד גזאל","עליה ורטה","מוחמד עזב","סוהא ערדה","רות פתאל","נדב שגיא כרמל","גל שמיר"]},"19":{"m":["אירית גיחז"],"p":["איריס אבינועם","פרדאוס אלבאז","יוליה ארגמן","יוסף בן חמו","נועה יעיש","שי סודרי","חגי עטה","מיי פלאח","חגאזי שבאני"]},"20":{"m":["רביב שורץ"],"p":["רימונדה בבאר שחאדה","נאיף בוטו","אורית וקנין שילה","אחמד חמזה","לימור יעקבי","איריס לוי","שרונה מן","מונא ניגם","סלימאן שחאדה"]}};
+/* מבנה האולם (מיטל, 22.11): ליד הבמה 3 שולחנות מימין + 3 משמאל (מעבר באמצע), ואחריהם שתי שורות של 8.
+   מספור לפי טורים: הטור הימני מהבמה לכיוון המזנון, ואז הטור הבא משמאלו.
+   המנחה בראש כל כרטיס (מודגש), מתחתיו המשתתפים. מקור: tag-data.js (חלוקת שולחנות סופי, 19.11). */
+const CW=226, GAP=8, RIGHT=1920-28-CW;
+const ROWS=[{y:94,c:[0,1,2,5,6,7]},{y:410,c:[0,1,2,3,4,5,6,7]},{y:726,c:[0,1,2,3,4,5,6,7]}];
+const SPOTS=[];ROWS.forEach((row,r)=>row.c.forEach(c=>SPOTS.push({c,r,y:row.y})));
+SPOTS.sort((a,b)=>a.c-b.c||a.r-b.r);
+const st=document.getElementById('stage');
+SPOTS.forEach((s,i)=>{
+  const n=i+1, d=TABLES[n];
+  const el=document.createElement('div');el.className='card'+(d?'':' empty');
+  el.style.left=(RIGHT-s.c*(CW+GAP))+'px';el.style.top=s.y+'px';
+  el.innerHTML='<div class="hd"><div class="no">'+n+'</div><div class="mn">'+(d?d.m.map(x=>'<div>'+x+'</div>').join(''):'<div>ללא שיבוץ</div>')+'</div></div>'
+    +(d?'<ul>'+d.p.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'');
+  st.appendChild(el);
+});
+// שם ארוך מדי → מקטינים רק אותו
+function shrink(){document.querySelectorAll('.card li,.card .mn div').forEach(e=>{let f=parseFloat(getComputedStyle(e).fontSize);e.style.fontSize='';f=parseFloat(getComputedStyle(e).fontSize);while(e.scrollWidth>e.clientWidth&&f>12){f-=.5;e.style.fontSize=f+'px';}});
+  // כרטיס עם יותר שמות מהמקום → מצמצמים את הרווח בין השורות
+  document.querySelectorAll('.card').forEach(c=>{const u=c.querySelector('ul');if(!u)return;let lh=1.24;while(c.scrollHeight>c.clientHeight&&lh>1){lh-=.02;u.style.lineHeight=lh;}});}
+function fit(){const s=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform='scale('+s+')';}
+addEventListener('resize',fit);fit();
+(document.fonts?document.fonts.ready:Promise.resolve()).then(shrink);
+// בתוך המצגת המלווה (iframe): כל מקש עובר למצגת, כדי שהקליקר ימשיך לעבוד גם אם הפוקוס נתקע כאן
+if(window.parent!==window)addEventListener('keydown',e=>{e.preventDefault();try{window.parent.dispatchEvent(new KeyboardEvent('keydown',{key:e.key,code:e.code}));}catch(_){}});
+else addEventListener('keydown',e=>{if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
+</script>
+</body>
+</html>
