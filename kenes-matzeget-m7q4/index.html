@@ -209,32 +209,6 @@ em{font-style:normal}
 .seg .l b{display:block;font-weight:700;color:var(--navy)}
 .slide.on .seg .b{animation:draw 1s cubic-bezier(.7,0,.2,1) both;animation-delay:calc(.9s + var(--k)*.22s)}
 
-/* תעודות הוקרה — כותרת למעלה, סרט נע של כל התעודות למטה (התמונות ב-matzeget-img/) */
-.tt{position:absolute;left:120px;right:120px;top:84px;height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.tt .lbl{margin-bottom:14px}
-.tt .big{font-size:150px;font-weight:900;color:var(--navy);line-height:1;letter-spacing:-.015em;white-space:nowrap}
-.tt .sub{margin-top:14px;font-size:52px;font-weight:500;color:var(--teal);line-height:1.2}
-.tt .who{margin-top:22px;font-size:46px;font-weight:700;color:var(--navy)}
-.tt .who span{font-weight:400;color:var(--navy2)}
-.tt .who i{font-style:normal;color:var(--gold);margin:0 16px}
-.film{position:absolute;left:0;right:0;top:500px;height:560px;background:var(--navy);overflow:hidden;
-  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent)}
-.film::before,.film::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:2;
-  background:radial-gradient(circle at 50% 50%,rgba(251,250,247,.9) 0 7px,transparent 7.5px) 0 0/44px 22px repeat-x}
-.film::before{top:14px}.film::after{bottom:14px}
-.reel{position:absolute;right:0;top:60px;height:440px;display:flex;width:max-content;will-change:transform}
-.slide.on .reel{animation:reel var(--dur,140s) linear infinite}
-.reel img{display:block;height:440px;width:auto;margin-left:30px;border-radius:4px;box-shadow:0 0 0 3px rgba(226,184,134,.55),0 18px 40px -16px rgba(0,0,0,.6)}
-@keyframes reel{from{transform:translateX(0)}to{transform:translateX(50%)}}
-
-/* פתקי המטריות — בסיכום */
-.pk{position:absolute;left:110px;right:110px;top:64px;bottom:64px;display:flex;flex-direction:column;align-items:center}
-.pk .lbl{margin-bottom:8px}
-.pk h2{font-size:96px;font-weight:900;color:var(--navy);line-height:1.05;letter-spacing:-.01em}
-.pk .grid{flex:1;margin-top:34px;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:34px 40px}
-.pk .grid img{display:block;width:536px;height:auto;border-radius:10px;box-shadow:0 0 0 2px rgba(200,149,90,.45),0 26px 46px -28px rgba(15,47,82,.55)}
-.pk .grid img:nth-child(odd){rotate:-1.2deg}.pk .grid img:nth-child(even){rotate:1.2deg}
-
 /* סיום */
 .cl{position:absolute;left:100px;right:100px;top:190px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .cl .rule{width:120px;height:4px}
@@ -249,7 +223,7 @@ em{font-style:normal}
   .slide.on .in,.slide.on .draw,.slide.on .seg .b{animation:none}
   .slide,.slide.on{transition:opacity .3s}
   #art,#logo,#ill,#prog .fl,#prog .hd{transition:none}
-  #art .halo,#art .ln,#art .spin,.clock .c,.slide.on .reel{animation:none}
+  #art .halo,#art .ln,#art .spin,.clock .c{animation:none}
 }
 </style>
 </head>
@@ -295,14 +269,13 @@ const DECK = {
     { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'מתחילים ב־' },   // הפלייליסט בזמן ההתכנסות
     { type:'welcome',  at:'gather' },
     { type:'schedule', at:'gather' },
-    // 22.11.26 מיטל: הוסרו שקף "ברכות", אמיר מדינה ורויטל אמיר (ברכות); "ספר ההפעלה" → "מדריך החינוך היוצר"
+    { type:'section',  at:'greet', title:'ברכות' },
+    { type:'speaker',  at:'greet', label:'ברכות', name:'אמיר מדינה',        role:'ראש המנהל להכשרה מקצועית' },
     { type:'speaker',  at:'greet', label:'ברכות', name:'אורית וקנין־שילה', role:'ממונת נוער, המנהל להכשרה מקצועית' },
-    { type:'title',    at:'greet', title:'מדריך החינוך היוצר', sub:'מחזון למעשה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
+    { type:'speaker',  at:'greet', label:'ברכות', name:'רויטל אמיר',        role:'המפקחת הפדגוגית הארצית' },
+    { type:'title',    at:'greet', title:'הצגת ספר ההפעלה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
     { type:'lecture',  at:'lecture' },   // שם המרצה ושם ההרצאה נלקחים משורת 'lecture' בלו"ז (title / sub)
     { type:'playlist', at:'break', title:'הפסקה', note:'אתם מוזמנים לבקר במוזיאון החדשנות' },                          // הפלייליסט בהפסקה; "חוזרים ב־" = שעת הסיום של ההפסקה
-    // תעודות הוקרה (אחרי ההפסקה, לפני השולחנות): רויטל מודה לרשתות; ברקע סרט נע של כל התעודות — רשתות ואז בתי ספר.
-    // התמונות: matzeget-img/tuda-r-01..05.jpg (רשתות), tuda-s-01..17.jpg (בתי ספר) — צריך להעתיק את התיקייה יחד עם המצגת.
-    { type:'tudot',    at:'workshop', label:'תודה והוקרה', title:'תעודות הוקרה', sub:'לרשתות ולבתי הספר', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית', r:5, s:17 },
     { type:'section',  at:'workshop', title:'סדנה בשולחנות עגולים', sub:'מנהיגות אנושית בעידן הבינה המלאכותית' },
     { type:'hold',     at:'lunch', label:'בתיאבון', title:'ארוחת צהריים' },
     // דוברי הבמה הניהולית: כל שורה { name:'…', role:'…' } יוצרת שקף דובר מיד אחרי השקף הזה, לפי הסדר.
@@ -315,7 +288,6 @@ const DECK = {
       // { name:'שם הדובר/ת', role:'תפקיד ובית ספר' },
     ] },
     { type:'section',  at:'summary', title:'סיכום היום' },
-    { type:'petakim',  at:'summary', label:'סיכום היום', title:'הפתקים שעל המטריות', n:5 },   // matzeget-img/petek-01..05.jpg
     { type:'closing' },
   ],
 };
@@ -376,7 +348,6 @@ const T={
   title:s=>`<div class="cen">
       <div class="in chip">${clockIc}${range(ag(s.at))}</div>
       <h2 class="in big fit">${esc(s.title)}</h2>
-      ${s.sub?`<p class="in sub" style="margin-top:14px;font-size:76px;font-weight:700">${esc(s.sub)}</p>`:''}
       <i class="rule draw"></i>
       ${s.name?`<p class="in pname fit">${esc(s.name)}</p>`:''}
       ${s.role?`<p class="in role">${esc(s.role)}</p>`:''}</div>`,
@@ -429,21 +400,6 @@ const T={
       ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
       <div class="moves">${s.moves.map((m,i)=>`${i?`<div class="in arrow">${ARROW}</div>`:''}<div class="in move"><span class="n">${i+1}</span><p>${esc(m)}</p></div>`).join('')}</div>
       <div class="in bar">${s.parts.map((p,i)=>`<div class="seg" style="flex:${p.min} 1 0"><div class="b" style="--k:${i};background:${cols[i%4]};${i===0?'color:#0f2f52':''}">${p.min} דק׳</div><div class="l">${p.b?`<b>${esc(p.a)}</b>${esc(p.b)}`:`<b>${esc(p.a)}</b>`}</div></div>`).join('')}</div></div>`;},
-  tudot:s=>{const two=n=>String(n).padStart(2,'0');
-    const imgs=[...Array(s.r||0)].map((_,i)=>`tuda-r-${two(i+1)}`).concat([...Array(s.s||0)].map((_,i)=>`tuda-s-${two(i+1)}`))
-      .map(f=>`<img src="matzeget-img/${f}.jpg" alt="" decoding="async">`).join('');
-    const n=(s.r||0)+(s.s||0);
-    return `<div class="tt">
-      ${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}
-      <h2 class="in big fit">${esc(s.title)}</h2>
-      ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
-      ${s.name?`<p class="in who">${esc(s.name)}${s.role?`<i>·</i><span>${esc(s.role)}</span>`:''}</p>`:''}</div>
-    <div class="in film"><div class="reel" style="--dur:${n*7}s">${imgs}${imgs}</div></div>`;},
-  petakim:s=>{const imgs=[...Array(s.n||5)].map((_,i)=>`<img class="in" src="matzeget-img/petek-${String(i+1).padStart(2,'0')}.jpg" alt="">`).join('');
-    return `<div class="pk">
-      ${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}
-      <h2 class="in">${esc(s.title)}</h2>
-      <div class="grid">${imgs}</div></div>`;},
   closing:s=>`<div class="cl"><i class="rule draw"></i><h2 class="in fit">תודה <em>שהייתם איתנו</em></h2></div>
     <div class="in theme">${THEME}</div>
     <div class="in tag">${TAG}</div>
@@ -458,9 +414,8 @@ const SCENE={
   hold:    {cx:960, cy:745,s:.72,a:0,   b:1920,o:1},
   low:     {cx:960, cy:1040,s:.46,a:0,  b:1920,o:.5},
   closing: {cx:960, cy:572,s:.64,a:0,   b:1920,o:1},
-  off:     {cx:960, cy:1300,s:.46,a:0,  b:1920,o:0},
 };
-const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off'};
+const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing'};
 const LOGO={big:{x:1173,y:50,s:1},closing:{x:744,y:52,s:.88},corner:{x:64,y:58,s:.5}};
 
 /* ---------- איור ההזמנה (מבוסס על הרולאפ) ---------- */
