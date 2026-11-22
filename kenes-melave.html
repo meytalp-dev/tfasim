@@ -345,6 +345,18 @@ main.enter>*:nth-child(5){animation-delay:.2s}main.enter>*:nth-child(6){animatio
 .row{display:flex;align-items:center;gap:10px;width:100%;min-height:46px;padding:8px 2px;border:0;border-top:1px solid var(--line);background:none;color:var(--navy2);font-weight:700;font-size:15px;text-align:right;cursor:pointer}
 .row svg{width:18px;height:18px;flex:0 0 auto;color:var(--gold)}
 .row small{margin-inline-start:auto;color:var(--muted);font-weight:500;font-size:13px}
+/* the conference playlist */
+.plrow{margin-top:18px}
+.pls{list-style:none;margin:0;padding:0}
+.plc{padding:14px 16px}
+.pls-s{margin:0;line-height:1.3}
+.pls-s b{display:block;font-size:18px;font-weight:900;color:var(--navy)}
+.pls-s span{display:block;font-size:14.5px;font-weight:600;color:var(--teal)}
+.pls-w{margin:8px 0 0;font-size:15px;line-height:1.55;color:var(--ink)}
+.pls-n{margin:8px 0 0;font-size:14px;font-weight:800;color:var(--navy)}
+.pls-n span{font-weight:500;color:var(--muted)}
+.pls-yt{display:inline-flex;align-items:center;gap:6px;margin-top:10px;min-height:40px;padding:6px 14px;border-radius:99px;background:var(--goldbg);color:var(--navy);font-weight:700;font-size:14px;text-decoration:none;box-shadow:inset 0 0 0 1.5px var(--gold2)}
+.pls-yt svg{width:16px;height:16px;color:#8a5a26}
 .fold{border-top:1px solid var(--line);padding-top:6px}
 .fold textarea{min-height:64px;margin-bottom:4px}
 .sw{display:flex;align-items:center;gap:12px;width:100%;padding:9px 2px;border:0;border-top:1px solid var(--line);background:none;text-align:right;cursor:pointer;color:var(--ink)}
@@ -628,6 +640,8 @@ var GEO = {
 
 /* ============ icons (line) ============ */
 var IC = {
+  music:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>',
+  play:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M8 5.5v13l10.5-6.5z"/></svg>',
   scan:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg>',
   people:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6M14.5 14.2c3 .2 5.5 2.6 5.5 5.8"/></svg>',
   star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6 .7-4.5 4.1 1.2 6L12 16.4 6.7 19.4l1.2-6L3.4 9.3l6-.7z"/></svg>',
@@ -1074,8 +1088,13 @@ function shell(inner, opts) {
   var key = opts.k || String(Math.random()), m = $("main");
   /* "finding people" opened by the organiser outside the opening (e.g. in a break): a way in from any screen */
   var pill = S.me && S.meetOn && S.pw && S.ph !== "kabala" && S.ph !== "sagur" && !S.view;
-  m.innerHTML = (pill ? '<button type="button" class="mpill" id="mpill">' + IC.people + "<span><b>מוצאים אנשים</b> · פתוח עכשיו</span>" + IC.next + "</button>" : "") + inner;
+  /* the conference playlist: a quiet way in at the bottom of every screen (not in the demo: the list is real people) */
+  var plr = S.me && !S.view && !DEMO;
+  if (plr) plLoad();
+  m.innerHTML = (pill ? '<button type="button" class="mpill" id="mpill">' + IC.people + "<span><b>מוצאים אנשים</b> · פתוח עכשיו</span>" + IC.next + "</button>" : "") + inner +
+    (plr ? '<button type="button" class="row plrow" id="plrow">' + IC.music + "<span>הפלייליסט של הכנס</span><small>" + (PLS.songs ? PLS.songs.length + " שירים" : "השירים שבחרתם") + "</small></button>" : "");
   if (pill) $("mpill").onclick = function () { S.view = "meet"; draw(); };
+  if (plr) $("plrow").onclick = function () { S.view = "playlist"; draw(); };
   if (fresh || key !== SH.key) { m.classList.remove("enter"); void m.offsetWidth; m.classList.add("enter"); window.scrollTo(0, 0); }
   else m.classList.remove("enter");
   SH.key = key;
@@ -1251,6 +1270,7 @@ function draw() {
   if (S.view === "ex") return drawEx();
   if (S.view === "powers" || (S.ph !== "sagur" && (!S.pw || !S.want))) return drawPowers();
   if (S.view === "meet" && S.meetOn) return drawMeet();
+  if (S.view === "playlist") return drawPlaylist();
   var fp = fbDue(); if (fp) return drawFb(fp);
   switch (S.ph) {
     case "sagur": return drawSagur();
@@ -1264,6 +1284,35 @@ function draw() {
     case "end": return drawEnd();
   }
   drawMeet();
+}
+
+/* ---- the conference playlist ("השיר שלי", kenes-shir): only songs approved for the big screen ---- */
+var SHIR = {url:"https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec", k:"scN3p8wQ5zH2"};
+var PLS = {songs:null, at:0, busy:false, err:false};
+function plLoad() {
+  if (PLS.busy || (PLS.songs && Date.now() - PLS.at < 60000)) return;
+  PLS.busy = true;
+  fetch(SHIR.url + "?mode=list&k=" + SHIR.k + "&_=" + Date.now(), {credentials:"omit", cache:"no-store"})
+    .then(function (r) { return r.json(); })
+    .then(function (r) { if (r && r.ok && r.songs) { PLS.songs = r.songs; PLS.at = Date.now(); PLS.err = false; } else PLS.err = true; })
+    .catch(function () { PLS.err = true; })
+    .then(function () { PLS.busy = false; if (S.view === "playlist" && !typing()) draw(); });
+}
+function drawPlaylist() {
+  plLoad();
+  var L = PLS.songs, body;
+  if (!L) body = '<p class="muted center">' + (PLS.err && !PLS.busy ? "הרשימה לא נטענה. נסו שוב בעוד רגע." : "טוען את השירים…") + "</p>";
+  else if (!L.length) body = '<p class="muted center">עוד אין שירים ברשימה.</p>';
+  else body = '<ol class="pls">' + L.map(function (s) {
+    return '<li class="card plc"><p class="pls-s"><b>' + esc(s.song) + "</b>" + (s.artist ? "<span>" + esc(s.artist) + "</span>" : "") + "</p>" +
+      (s.why ? '<p class="pls-w">' + esc(s.why) + "</p>" : "") +
+      '<p class="pls-n">' + esc(s.name) + (s.role ? " · <span>" + esc(s.role) + "</span>" : "") + "</p>" +
+      '<a class="pls-yt" href="https://youtu.be/' + encodeURIComponent(s.vid) + '" target="_blank" rel="noopener">' + IC.play + "להאזנה ביוטיוב</a></li>";
+  }).join("") + "</ol>";
+  shell('<div class="hero"><div class="ic">' + IC.music + '</div><p class="kick">השיר שלי</p><h1>הפלייליסט של הכנס</h1>' +
+    '<p class="muted">' + (L && L.length ? L.length + " שירים שבחרתם, והסיפור שמאחורי כל אחד. מתנגנים על המסך הגדול בהתכנסות ובהפסקה." : "השירים שבחרתם, והסיפור שמאחורי כל אחד.") + "</p></div>" +
+    body + '<p class="center" style="margin:6px 0 0"><button class="link" id="plbk">חזרה</button></p>', {k:"playlist"});
+  $("plbk").onclick = function () { S.view = null; draw(); };
 }
 
 function drawSagur() {
