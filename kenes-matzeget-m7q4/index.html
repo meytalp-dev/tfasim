@@ -229,6 +229,7 @@ em{font-style:normal}
 
 /* סרטון — על כל הבמה */
 .t-video{background:#0f2f52}
+.t-video .vfb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:900;color:#fff;text-align:center}
 .t-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0f2f52}
 /* שקף ממצגת של מציג — תמונה על כל הבמה */
 /* מסע ההישגים — מצגת מוטמעת על כל הבמה */
@@ -456,10 +457,12 @@ const DECK = {
       { name:'הרב שלמה אזרף', role:'מנהל ישיבת חנוך לנער' },
       { name:'אופיר אלמלח כרמל', role:'מנהל דרור נווה מדבר', deck:'ted-ofir', n:8 },
       { name:'נורה מחאגנה',  role:'מנהלת אום אל פחם בנות', deck:'ted-nora', n:14, vid:{at:14, src:'video.mp4', box:[6.25,7.41,26.95,85.19]} },
-      { name:'רמי מיכאלה',   role:'מנהל אורט אורמת' },
+      { name:'רמי מיכאלה',   role:'מנהל אורט אורמת', deck:'ted-rami', n:17, vids:[{at:5, src:'v05.mp4', box:[44.64,15.93,52.19,52.13]}, {at:6, src:'v06.mp4', box:[20.63,5,28.49,90.09]}, {at:7, src:'v07.mp4', box:[35.78,5,28.49,90.09]}, {at:8, src:'v08.mp4', box:[7.03,23.33,52.6,52.59]}, {at:13, src:'v13.mp4', box:[3.28,29.35,58.23,58.33]}, {at:14, src:'v14.mp4', box:[11.61,2.31,55.26,55.37]}] },   // מצגת Canva (22.11), 6 סרטונים שמתחילים לבד
       // { name:'שם הדובר/ת', role:'תפקיד ובית ספר' },
     ] },
     { type:'section',  at:'summary', title:'סיכום היום' },
+    // סרטון סיכום הכנס (מיטל 22.11): נערך ביום הכנס (kenes-sikum-video → out/sikum.mp4) ומועתק ל-matzeget-img/sikum.mp4. עד שהקובץ קיים — כותרת על רקע כחול.
+    { type:'video',    at:'summary', src:'matzeget-img/sikum.mp4', title:'סרטון סיכום הכנס' },
     { type:'petakim',  at:'summary', label:'סיכום היום', title:'הפתקים שעל המטריות', n:5 },   // matzeget-img/petek-01..05.jpg
     { type:'closing' },
   ],
@@ -486,7 +489,7 @@ const ARROW='<svg viewBox="0 0 80 40" fill="none" stroke="#c8955a" stroke-width=
 /* ---------- בניית רשימת השקפים (כולל דוברי במה ניהולית) ---------- */
 const SL=[];
 D.slides.forEach(s=>{SL.push(s);(s.speakers||[]).forEach(p=>{if(p&&(p.name||(p.names&&p.names.length))){SL.push({type:'speaker',at:s.at,label:p.label||s.title,name:p.name||'',names:p.names,role:p.role||''});
-  for(let i=1;i<=(p.deck?p.n:0);i++)SL.push({type:'img',at:s.at,src:`matzeget-img/${p.deck}/${String(i).padStart(2,'0')}.jpg`,vid:p.vid&&p.vid.at===i?{src:`matzeget-img/${p.deck}/${p.vid.src}`,box:p.vid.box}:null});}});});
+  for(let i=1;i<=(p.deck?p.n:0);i++)SL.push({type:'img',at:s.at,src:`matzeget-img/${p.deck}/${String(i).padStart(2,'0')}.jpg`,vid:(v=>v?{src:`matzeget-img/${p.deck}/${v.src}`,box:v.box}:null)((p.vids||(p.vid?[p.vid]:[])).find(v=>v.at===i))});}});});
 
 /* ---------- תבניות ---------- */
 const T={
@@ -586,7 +589,7 @@ const T={
       ${s.name?`<p class="in who">${esc(s.name)}${s.role?`<i>·</i><span>${esc(s.role)}</span>`:''}</p>`:''}</div>
     <div class="in film"><div class="reel" style="--dur:${n*7}s">${imgs}${imgs}</div></div>`;},
   hesegim:s=>`<iframe data-src="${esc(s.src)}" allow="autoplay; fullscreen" title="מסע ההישגים" tabindex="-1"></iframe>`,
-  video:s=>`<video src="${esc(s.src)}" preload="auto" playsinline></video>`,
+  video:s=>`${s.title?`<div class="vfb">${esc(s.title)}</div>`:""}<video src="${esc(s.src)}" preload="auto" playsinline${s.title?" onerror=\"this.remove()\"":""}></video>`,
   img:s=>`<img class="full" src="${esc(s.src)}" alt="" decoding="async">${s.vid?`<video class="inset" src="${esc(s.vid.src)}" preload="auto" playsinline style="left:${s.vid.box[0]}%;top:${s.vid.box[1]}%;width:${s.vid.box[2]}%;height:${s.vid.box[3]}%"></video>`:''}`,
   mipui:s=>{const m=s.m,C=['var(--teal)','var(--teal2)','var(--gold)','var(--gold2)'];
     const cnt=(v,d)=>`<span class="cnt" style="--to:${v}${d?';--d:'+d:''}"></span>`;
