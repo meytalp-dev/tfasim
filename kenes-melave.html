@@ -1392,9 +1392,8 @@ function netMarks(n) { return (n.items || []).filter(function (x) { return iniDo
 function iniById(id) { var hit = null; S.nets.forEach(function (n) { (n.items || []).forEach(function (x) { if (x.id === id) hit = {net:n, item:x}; }); }); return hit; }
 function drawNets() {
   if (S.netItem && iniById(S.netItem)) return drawIni();
-  /* one list (Meytal, 20.11): every initiative under its network's name, one tap away; or scan the barcode at the stand */
-  shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">ליד כל יוזמה יש ברקוד: סורקים ונכנסים. אפשר גם לבחור מהרשימה.</p>' +
-    '<button class="btn" id="nsc">' + IC.scan + "לסרוק ברקוד של יוזמה</button>" +
+  /* one list (Meytal, 20.11): every initiative under its network's name, one tap away. No scan button (Meytal, 22.11) */
+  shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים יוזמה מהרשימה ונכנסים.</p>' +
     S.nets.map(function (n) {
       var items = n.items || [];
       return '<h3 class="lh">' + esc(n.name) + "</h3>" + (items.length ? items.map(function (x) {
@@ -1404,12 +1403,6 @@ function drawNets() {
       }).join("") : '<div class="note" style="margin:8px 0">הפרטים יתעדכנו בקרוב</div>');
     }).join("") +
     '<p class="center muted" style="margin-top:12px">הרעיונות עולים בלי שם למסך הגדול, וכל מה שכתבת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
-  $("nsc").onclick = function () {
-    Scanner.open("מכוונים אל הברקוד שליד היוזמה", function (txt) {
-      var h = codeFrom(txt);
-      if (h && h.n) openIni(h.n); else if (h && h.c && h.c !== KLALI) doMeet(h.c); else toast("זה לא ברקוד של יוזמה. נסו שוב.");
-    });
-  };
   document.querySelectorAll("[data-ini-open]").forEach(function (b) { b.onclick = function () { S.netItem = b.dataset.iniOpen; S.nd = null; draw(); }; });
   bindSeg();
 }
@@ -1759,23 +1752,28 @@ function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
   var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
   /* supervisors / networks: a list of their schools; tapping a school opens the same 5 cards */
-  var many = m.kind === "many" && m.list.length, pick = many && S.msch != null ? m.list[S.msch] : null;
+  var many = m.kind === "many" && m.list.length;
+  /* the summary of all my schools (S.msch "all"), or one school of the list */
+  var pick = many && S.msch === "all" && m.all && m.all.n ? {s:"סיכום " + (m.title || "בתי הספר שלך"), d:m.all, sum:true}
+    : many && S.msch != null && S.msch !== "all" ? m.list[S.msch] : null;
+  if (m.kind === "all" && m.all) pick = {s:m.title || "כל בתי הספר במיפוי", d:m.all, sum:true, top:true};
   if (many && !pick) {
     var ready = m.list.filter(function (x) { return x.d && x.d.n >= 5; }).length;
     h += "<h1>" + esc(m.title || "בתי הספר שלך") + "</h1><p class=\"muted\">" + ready + " מתוך " + m.list.length + " בתי ספר עם תמונה מהמיפוי. בוחרים בית ספר ורואים את התמונה שלו.</p>" +
+      (m.all && m.all.n ? '<button class="btn msch" data-j="all" style="text-align:right;justify-content:space-between"><span><b>סיכום כל בתי הספר</b></span><small>' + m.all.n + " מורים · " + m.all.schools + " בתי ספר</small></button>" : "") +
       m.list.map(function (x, j) {
         var ok = x.d && x.d.n >= 5;
         return ok ? '<button class="btn alt msch" data-j="' + j + '" style="text-align:right;justify-content:space-between"><span><b>' + esc(x.s) + "</b></span><small>" + x.d.n + " ענו · " + x.d.reg + "% בקביעות</small></button>"
           : '<div class="card sup" style="opacity:.75"><b>' + esc(x.s) + "</b><small>המיפוי עוד פתוח" + (x.d && x.d.n ? " (" + x.d.n + " תשובות)" : "") + "</small></div>";
       }).join("");
     shell(h, {k:"schoollist"});
-    document.querySelectorAll(".msch").forEach(function (b) { b.onclick = function () { S.msch = +b.getAttribute("data-j"); S.mstep = 0; drawSchool(); window.scrollTo(0, 0); }; });
+    document.querySelectorAll(".msch").forEach(function (b) { var j = b.getAttribute("data-j"); b.onclick = function () { S.msch = j === "all" ? "all" : +j; S.mstep = 0; drawSchool(); window.scrollTo(0, 0); }; });
     return;
   }
   if ((m.kind === "one" && m.list.length) || pick) {
     var it = pick || m.list[0], d = it.d;
-    var back = pick ? '<button class="btn alt" id="mbk">חזרה לבתי הספר</button>' : "";
-    h += "<h1>" + esc(it.s) + "</h1>";
+    var back = pick && !pick.top ? '<button class="btn alt" id="mbk">חזרה לבתי הספר</button>' : "";
+    h += "<h1>" + esc(it.s) + "</h1>" + (it.sum && d && d.n ? '<p class="muted">' + d.n + " מורים ענו ב-" + d.schools + " בתי ספר" + (d.of > d.schools ? " (מתוך " + d.of + ")" : "") + ". כל בית ספר נספר לפי מספר העונים בו.</p>" : "");
     if (!d || !d.n || d.n < 5 || d.cls === undefined) {
       h += '<p class="muted">כך ענו המורים בבית הספר במיפוי הצוות של שגרירי החדשנות.</p>' + schoolBlock(d, true) + back;
     } else {
