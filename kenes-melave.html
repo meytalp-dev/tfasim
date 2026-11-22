@@ -1721,7 +1721,7 @@ function schoolBlock(d, full) {
 var MCARDS = ["איפה אנחנו", "מה מעכב", "האם יש מסגרת", "על מי נשענים", "מה זה אומר לכם"];
 function mBars(arr) { return arr.map(function (t) { return '<div class="barrow"><span><b>' + esc(t[0]) + "</b><span>" + t[1] + '%</span></span><div class="tr"><i style="width:' + t[1] + '%"></i></div></div>'; }).join(""); }
 function mInsights(d) {
-  var out = [], sc = d.sc || {}, yes = d.yes || [];
+  var out = [], sc = d.sc || {}, yes = d.yes || new Array(d.yesN || 0);
   if (d.cls != null && d.reg - d.cls >= 25) out.push("רוב הצוות כבר משתמש ב-AI בעצמו (" + d.reg + "%), אבל רק " + d.cls + "% הביאו אותו לכיתה בחודש האחרון. הצעד הבא: משימה אחת עם תלמידים בכל מגמה.");
   else if (d.cls >= 50) out.push(d.cls + "% מהמורים כבר עבדו עם תלמידים עם AI. כדאי לאסוף את הדוגמאות ולשתף בישיבת צוות.");
   if (sc.rules != null && sc.rules < 50) out.push("רק " + sc.rules + "% יודעים מה מותר ומה אסור בבית הספר בנושא AI. נוהל בית־ספרי קצר יענה על זה.");
@@ -1744,9 +1744,12 @@ function mCard(d, i) {
   }
   if (i === 3) {
     var chips = function (a) { return '<div class="names">' + a.map(function (n) { return "<span>" + esc(n) + "</span>"; }).join("") + "</div>"; };
+    /* supervisors and networks get counts only (the server sends yesN/maybeN, no names) */
+    var team = d.yes ? '<div class="card"><p class="kick">אמרו "כן" לצוות ראשון (' + d.yes.length + ")</p>" + (d.yes.length ? chips(d.yes) : '<small class="muted">עוד אין</small>') +
+      ((d.maybe || []).length ? '<p class="kick" style="margin-top:12px">"אולי, ספרו לי עוד" (' + d.maybe.length + ")</p>" + chips(d.maybe) : "") + "</div>"
+      : '<div class="card"><p class="kick">צוות ראשון</p><div class="stat"><div><b>' + (d.yesN || 0) + '</b><small>אמרו "כן"</small></div><div><b>' + (d.maybeN || 0) + '</b><small>"אולי, ספרו לי עוד"</small></div></div><small class="muted">השמות מוצגים למנהל.ת ולרכז.ת הפדגוגי.ת של בית הספר</small></div>';
     return '<div class="stat"><div><b>' + (d.ready == null ? "–" : d.ready) + '<span class="of">/5</span></b><small>מוכנות לנסות משהו חדש השנה</small></div><div><b>' + (d.conf == null ? "–" : d.conf) + '<span class="of">/5</span></b><small>ביטחון בשימוש ב-AI</small></div></div>' +
-      '<div class="card"><p class="kick">אמרו "כן" לצוות ראשון (' + (d.yes || []).length + ")</p>" + ((d.yes || []).length ? chips(d.yes) : '<small class="muted">עוד אין</small>') +
-      ((d.maybe || []).length ? '<p class="kick" style="margin-top:12px">"אולי, ספרו לי עוד" (' + d.maybe.length + ")</p>" + chips(d.maybe) : "") + "</div>" +
+      team +
       (d.learn && d.learn.length ? '<div class="card"><p class="kick">איך הכי נוח להם ללמוד כלי חדש</p>' + mBars(d.learn) + "</div>" : "");
   }
   var ins = mInsights(d);
@@ -1755,30 +1758,43 @@ function mCard(d, i) {
 function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
   var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
-  if (m.kind === "one" && m.list.length) {
-    var d = m.list[0].d;
-    h += "<h1>" + esc(m.list[0].s) + "</h1>";
+  /* supervisors / networks: a list of their schools; tapping a school opens the same 5 cards */
+  var many = m.kind === "many" && m.list.length, pick = many && S.msch != null ? m.list[S.msch] : null;
+  if (many && !pick) {
+    var ready = m.list.filter(function (x) { return x.d && x.d.n >= 5; }).length;
+    h += "<h1>" + esc(m.title || "בתי הספר שלך") + "</h1><p class=\"muted\">" + ready + " מתוך " + m.list.length + " בתי ספר עם תמונה מהמיפוי. בוחרים בית ספר ורואים את התמונה שלו.</p>" +
+      m.list.map(function (x, j) {
+        var ok = x.d && x.d.n >= 5;
+        return ok ? '<button class="btn alt msch" data-j="' + j + '" style="text-align:right;justify-content:space-between"><span><b>' + esc(x.s) + "</b></span><small>" + x.d.n + " ענו · " + x.d.reg + "% בקביעות</small></button>"
+          : '<div class="card sup" style="opacity:.75"><b>' + esc(x.s) + "</b><small>המיפוי עוד פתוח" + (x.d && x.d.n ? " (" + x.d.n + " תשובות)" : "") + "</small></div>";
+      }).join("");
+    shell(h, {k:"schoollist"});
+    document.querySelectorAll(".msch").forEach(function (b) { b.onclick = function () { S.msch = +b.getAttribute("data-j"); S.mstep = 0; drawSchool(); window.scrollTo(0, 0); }; });
+    return;
+  }
+  if ((m.kind === "one" && m.list.length) || pick) {
+    var it = pick || m.list[0], d = it.d;
+    var back = pick ? '<button class="btn alt" id="mbk">חזרה לבתי הספר</button>' : "";
+    h += "<h1>" + esc(it.s) + "</h1>";
     if (!d || !d.n || d.n < 5 || d.cls === undefined) {
-      h += '<p class="muted">כך ענו המורים בבית הספר במיפוי הצוות של שגרירי החדשנות.</p>' + schoolBlock(d, true);
+      h += '<p class="muted">כך ענו המורים בבית הספר במיפוי הצוות של שגרירי החדשנות.</p>' + schoolBlock(d, true) + back;
     } else {
       var i = Math.max(0, Math.min(MCARDS.length - 1, S.mstep || 0));
       h += '<p class="muted">' + (i + 1) + " מתוך " + MCARDS.length + " · <b>" + MCARDS[i] + "</b></p>" + (d.n < 10 ? '<div class="note">מבוסס על ' + d.n + " תשובות. התמונה תתחדד כשיענו עוד מורים.</div>" : "") +
         mCard(d, i) +
         (i < MCARDS.length - 1 ? '<button class="btn" id="mnx">' + IC.next + "הבא: " + MCARDS[i + 1] + "</button>" : "") +
-        (i > 0 ? '<button class="btn alt" id="mpv">הקודם</button>' : "");
-      shell(h, {k:"school" + i});
+        (i > 0 ? '<button class="btn alt" id="mpv">הקודם</button>' : "") + back;
+      shell(h, {k:(pick ? "s" + S.msch + "_" : "school") + i});
       if ($("mnx")) $("mnx").onclick = function () { S.mstep = i + 1; drawSchool(); window.scrollTo(0, 0); };
       if ($("mpv")) $("mpv").onclick = function () { S.mstep = i - 1; drawSchool(); window.scrollTo(0, 0); };
+      if ($("mbk")) $("mbk").onclick = function () { S.msch = null; S.mstep = 0; drawSchool(); window.scrollTo(0, 0); };
       return;
     }
-  } else if (m.kind === "sup" && m.list.length) {
-    var ready = m.list.filter(function (x) { return x.d && x.d.n >= 5; }).length;
-    h += "<h1>בתי הספר שלך</h1><p class=\"muted\">" + ready + " מתוך " + m.list.length + " בתי ספר עם תמונה מהמיפוי.</p><div class=\"card\">" +
-      m.list.map(function (x) { return '<div class="sup"><b>' + esc(x.s) + "</b>" + (x.d && x.d.n >= 5 ? schoolBlock(x.d, false) : "<small>המיפוי עוד פתוח</small>") + "</div>"; }).join("") + "</div>";
   } else {
-    h += "<h1>נתוני בתי הספר</h1><p>בשלב הזה המנהלים והרכזים הפדגוגיים רואים בטלפון את סיכום המיפוי של בית הספר שלהם.</p>";
+    h += "<h1>נתוני בתי הספר</h1><p>בשלב הזה המנהלים, הרכזים הפדגוגיים, המפקחים והרשתות רואים בטלפון את סיכום המיפוי של בתי הספר שלהם.</p>";
   }
   shell(h, {k:"school"});
+  if ($("mbk")) $("mbk").onclick = function () { S.msch = null; S.mstep = 0; drawSchool(); window.scrollTo(0, 0); };
 }
 
 /* ---- the lecture ---- */
