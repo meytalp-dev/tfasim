@@ -1749,9 +1749,19 @@ function mCard(d, i) {
   var ins = mInsights(d);
   return '<div class="card">' + (ins.length ? ins.map(function (t) { return '<p class="mi">' + IC.check + "<span>" + esc(t) + "</span></p>"; }).join("") : "<p>התמונה מאוזנת. שווה להציג אותה לצוות בישיבה הקרובה.</p>") + "</div>";
 }
+/* 22.11.26 (Meytal): the school's compass tool + its booklet, before the mapping (first screen of the stage only).
+   A principal/coordinator of one school gets the tool with their school already picked (?s=). */
+var MZ_URL = "https://pedagogiamh.co.il/matzpen/";
+function matzpenCard(m) {
+  var one = m.kind === "one" && m.list.length === 1 ? m.list[0].s : "";
+  return '<div class="card"><p class="kick">מצפן החינוך היוצר</p>' +
+    "<p>כלי עבודה לצוות המוביל: מיקום, דיאלוג ותוכנית פעולה. כל בית ספר עובד במרחב משלו וקובע קוד בכניסה הראשונה.</p>" +
+    '<a class="btn" href="' + MZ_URL + (one ? "?s=" + encodeURIComponent(one) : "") + '" target="_blank" rel="noopener">' + (one ? "כניסה למצפן של " + esc(one) : "כניסה למצפן") + "</a>" +
+    '<a class="btn alt" href="' + MZ_URL + 'hasipur-habeit-sifri.pdf" target="_blank" rel="noopener">החוברת: הסיפור הבית ספרי (PDF)</a></div>';
+}
 function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
-  var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
+  var h = (S.msch == null && !(S.mstep > 0) ? matzpenCard(m) : "") + '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
   /* supervisors / networks: a list of their schools; tapping a school opens the same 5 cards */
   var many = m.kind === "many" && m.list.length;
   /* the summary of all my schools (S.msch "all"), or one school of the list */
