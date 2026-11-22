@@ -1243,6 +1243,7 @@ function poll() {
 function fbSkips() { try { return JSON.parse(lsGet("km-fbskip") || "{}") || {}; } catch (e) { return {}; } }
 function fbSkip(part) { var s = fbSkips(); s[part] = 1; lsSet("km-fbskip", JSON.stringify(s)); }
 function fbDue() {
+  return "";   /* no feedback sentence between the parts (Meytal, 22.11.26) */
   var part = FBAT[S.ph];
   if (!part || !S.pw || S.fb[part] || fbSkips()[part]) return "";
   return part;
@@ -1393,7 +1394,7 @@ function iniById(id) { var hit = null; S.nets.forEach(function (n) { (n.items ||
 function drawNets() {
   if (S.netItem && iniById(S.netItem)) return drawIni();
   /* one list (Meytal, 20.11): every initiative under its network's name, one tap away. No scan button (Meytal, 22.11) */
-  shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">בוחרים יוזמה מהרשימה ונכנסים.</p>' +
+  shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">כשאתם מגיעים לדוכן של רשת, היכנסו כאן לרשת וליוזמות שלה.</p>' +
     S.nets.map(function (n) {
       var items = n.items || [];
       return '<h3 class="lh">' + esc(n.name) + "</h3>" + (items.length ? items.map(function (x) {
