@@ -2,8 +2,8 @@
 <html lang="he" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="robots" content="noindex,nofollow">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
 <title>מצגת מלווה · כנס בתי הספר המקצועיים</title>
 <style>
 /* מצגת מלווה לכנס · במה 1920×1080 שמתכווננת לכל מסך · עובדת בלי אינטרנט (הגופן מוטמע בסוף הקובץ) */
@@ -209,6 +209,65 @@ em{font-style:normal}
 .seg .l b{display:block;font-weight:700;color:var(--navy)}
 .slide.on .seg .b{animation:draw 1s cubic-bezier(.7,0,.2,1) both;animation-delay:calc(.9s + var(--k)*.22s)}
 
+/* תעודות הוקרה — כותרת למעלה, סרט נע של כל התעודות למטה (התמונות ב-matzeget-img/) */
+.tt{position:absolute;left:120px;right:120px;top:40px;height:280px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.tt .lbl{margin-bottom:14px}
+.tt .big{font-size:128px;font-weight:900;color:var(--navy);line-height:1;letter-spacing:-.015em;white-space:nowrap}
+.tt .sub{margin-top:14px;font-size:52px;font-weight:500;color:var(--teal);line-height:1.2}
+.tt .who{margin-top:22px;font-size:46px;font-weight:700;color:var(--navy)}
+.tt .who span{font-weight:400;color:var(--navy2)}
+.tt .who i{font-style:normal;color:var(--gold);margin:0 16px}
+.film{position:absolute;left:0;right:0;top:350px;height:730px;background:var(--navy);overflow:hidden;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(to right,transparent,#000 9%,#000 91%,transparent)}
+.film::before,.film::after{content:"";position:absolute;left:0;right:0;height:22px;z-index:2;
+  background:radial-gradient(circle at 50% 50%,rgba(251,250,247,.9) 0 7px,transparent 7.5px) 0 0/44px 22px repeat-x}
+.film::before{top:14px}.film::after{bottom:14px}
+.reel{position:absolute;right:0;top:60px;height:610px;display:flex;width:max-content;will-change:transform}
+.slide.on .reel{animation:reel var(--dur,140s) linear infinite}
+.reel img{display:block;height:610px;width:auto;margin-left:30px;border-radius:4px;box-shadow:0 0 0 3px rgba(226,184,134,.55),0 18px 40px -16px rgba(0,0,0,.6)}
+@keyframes reel{from{transform:translateX(0)}to{transform:translateX(50%)}}
+
+/* סרטון — על כל הבמה */
+.t-video{background:#0f2f52}
+.t-video video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#0f2f52}
+/* שקף ממצגת של מציג — תמונה על כל הבמה */
+.t-img{background:#fff}
+.t-img .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.t-img .inset{position:absolute;object-fit:cover;background:#000}
+
+/* מיפוי ה-AI — כל בתי הספר */
+.mp{position:absolute;left:90px;right:90px;top:70px;bottom:60px;display:flex;flex-direction:column}
+.mp-h{text-align:center}
+.mp-h .lbl{margin-bottom:6px}
+.mp-h h2{font-size:92px;font-weight:900;color:var(--navy);line-height:1.04;letter-spacing:-.01em}
+.mp-h .sub{margin-top:8px;font-size:42px;font-weight:600;color:var(--teal)}
+.mp-h .sub b{font-weight:900;color:var(--navy)}
+.mp-c{flex:1;margin-top:38px;display:grid;grid-template-columns:repeat(4,1fr);gap:30px}
+.mc{position:relative;display:flex;flex-direction:column;padding:30px 34px 30px;border-radius:26px;background:rgba(255,255,255,.84);
+  box-shadow:inset 0 0 0 2px rgba(58,143,134,.22),0 24px 44px -34px rgba(15,47,82,.4)}
+.mc::before{content:"";position:absolute;right:34px;left:34px;top:0;height:5px;border-radius:0 0 4px 4px;background:linear-gradient(90deg,var(--gold2),var(--gold))}
+.mc .k{font-size:38px;font-weight:800;color:var(--gold);margin-bottom:18px}
+.mc .num{font-size:96px;font-weight:900;color:var(--navy);line-height:.95;font-variant-numeric:tabular-nums}
+.mc .num .of{font-size:44px;font-weight:600;color:var(--navy2)}
+.mc .cap{margin-top:4px;font-size:29px;font-weight:500;color:var(--ink);line-height:1.25}
+.mc .num+.cap{margin-bottom:22px}
+.mc .tl{margin-top:auto;padding-top:16px;border-top:2px solid rgba(200,149,90,.35);font-size:28px;font-weight:600;color:var(--navy2);line-height:1.35}
+.mc .tl b{color:var(--navy);font-weight:800}
+.bars{display:flex;flex-direction:column;gap:18px}
+.br .l{display:flex;justify-content:space-between;gap:12px;font-size:28px;font-weight:600;color:var(--navy);line-height:1.2}
+.br .l b{font-weight:900;color:var(--teal);font-variant-numeric:tabular-nums}
+.br .t{margin-top:8px;height:14px;border-radius:7px;background:rgba(226,184,134,.3);overflow:hidden}
+.br .t i{display:block;height:100%;border-radius:7px;background:linear-gradient(to left,var(--teal2),var(--teal));transform-origin:right center}
+.slide.on .br .t i{animation:draw 1.2s cubic-bezier(.7,0,.2,1) both;animation-delay:calc(.9s + var(--k)*.12s)}
+
+/* פתקי המטריות — בסיכום */
+.pk{position:absolute;left:110px;right:110px;top:64px;bottom:64px;display:flex;flex-direction:column;align-items:center}
+.pk .lbl{margin-bottom:8px}
+.pk h2{font-size:96px;font-weight:900;color:var(--navy);line-height:1.05;letter-spacing:-.01em}
+.pk .grid{flex:1;margin-top:34px;display:flex;flex-wrap:wrap;justify-content:center;align-content:center;gap:34px 40px}
+.pk .grid img{display:block;width:536px;height:auto;border-radius:10px;box-shadow:0 0 0 2px rgba(200,149,90,.45),0 26px 46px -28px rgba(15,47,82,.55)}
+.pk .grid img:nth-child(odd){rotate:-1.2deg}.pk .grid img:nth-child(even){rotate:1.2deg}
+
 /* סיום */
 .cl{position:absolute;left:100px;right:100px;top:190px;display:flex;flex-direction:column;align-items:center;text-align:center}
 .cl .rule{width:120px;height:4px}
@@ -223,7 +282,7 @@ em{font-style:normal}
   .slide.on .in,.slide.on .draw,.slide.on .seg .b{animation:none}
   .slide,.slide.on{transition:opacity .3s}
   #art,#logo,#ill,#prog .fl,#prog .hd{transition:none}
-  #art .halo,#art .ln,#art .spin,.clock .c{animation:none}
+  #art .halo,#art .ln,#art .spin,.clock .c,.slide.on .reel{animation:none}
 }
 </style>
 </head>
@@ -255,39 +314,84 @@ const DECK = {
     { id:'greet',    from:'9:30',  to:'10:30', title:'ברכות ודברי פתיחה' },
     { id:'lecture',  from:'10:30', to:'11:30', label:'הרצאה', title:'פרופ׳ עוז גוטרמן', sub:'"מפתחות ההצלחה בעידן טכנולוגי סוער"' },
     { id:'break',    from:'11:30', to:'12:00', title:'הפסקה', soft:true },
-    { id:'workshop', from:'12:00', to:'13:00', title:'סדנה בשולחנות עגולים' },
+    { id:'workshop', from:'12:00', to:'13:00', title:'למידת עמיתים בשולחנות עגולים' },
     { id:'lunch',    from:'13:00', to:'13:40', title:'ארוחת צהריים', soft:true },
     { id:'stage',    from:'13:40', to:'14:40', title:'במה ניהולית', sub:'מנהלים משתפים, מעוררים השראה ומובילים שינוי' },
     { id:'summary',  from:'14:40', to:'15:00', title:'סיכום היום' },
   ],
 
   // הפלייליסט "השיר שלי" (kenes-shir): רק שירים שאושרו בדף האישור עולים. len = כמה שניות מכל שיר.
-  playlist: { url:'https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec', k:'scN3p8wQ5zH2', len:120 },
+  playlist: { url:'https://script.google.com/macros/s/AKfycbyj0AGcgkb8EMh0hyf226DuoDn3Wd9k3xFcchtQVaOJSToMkAep-2dvGRdtI03G47qoVw/exec', k:'scN3p8wQ5zH2', len:120,
+    // סדר הניגון (מיטל 22.11): פותחים בשיר של עתיד מגשימים, ואחריו השירים המוכרים. שיר שלא ברשימה מתנגן אחריה, לפי סדר ההגעה.
+    order:[
+      'sf1f67b9823', // קח אותו לאט את הזמן — עתיד מגשימים (שיראל פרץ)
+      'se9e0581763', // יש בך הכל — עקיבא (רמי מיכאלה)
+      's88b7e45662', // שווים — עילי בוטנר ורן דנקר (אשואק סעד)
+      's0553beaea5', // תפילה — עפרה חזה (רויטל אמיר)
+      's8f3a145f0b', // שהשמש תעבור עלי — ירדנה ארזי (מוטי שגיא)
+      's33c43ec102', // לא תנצחו אותי — יהורם גאון (גילה כהנא)
+      'sec509bb7c2', // הלוואי — פאר טסי וחנן בן ארי (לימור חורש אולברג)
+      's2d0fd27986', // עוף גוזל — אריק איינשטיין (סלימאן שחאדה)
+      's9b504e188a', // דור — חנן בן ארי (יששכר חפץ)
+      's2ea818e844', // נסם עלינא אל-הווא — פיירוז (מוסטפא סמום)
+      's498ea4033a', // מחר — אביב גפן (ג'אד מחאג'נה)
+      'sa6f17d769c', // בת 60 — הגבעטרון (שרונה בלוך)
+      's7ec6cd1a68', // מקום בלב — דוכין, שבת, שרעבי (תומר פרידמן)
+      'sa71ed16c03', // סוס עץ — אריק איינשטיין (תחיה ווקנין כהן)
+      's888ae39388', // פגישה לאין קץ — אריק איינשטיין (עינת וינברן)
+      's28e0642ae2', // תחלום איתי — חמזה נמרה (מוחמד עזב)
+      's44e2e4e65e', // Wonderful Life — Katie Melua (ענבל לוי)
+      's77c6b908c8', // אדם צעיר אדם זקן — הגבעטרון (מוקי זמברג)
+      's919e5861cc', // על גבול האור — אריק איינשטיין (מאהר אלפראונה)
+      'sc753bb7f65', // Have It All — Jason Mraz (אליזבת קינלה)
+      'sa0e2e6188f', // גחליליות — אסתר שמיר (רחל בן זקן)
+      's1a63870b4b', // באש ובמים — אברהם פריד (יצחק שבתאי)
+      'sf211ed7d31', // لا مستحيلا — صناع الأمل (עלי עדווי)
+      'sc9e97113c9', // זה מתחיל בצעד — עדי אברהמי (ציפורה וייס)
+      's08ec93de32', // תודה לך, המורה — Nedaa Shrara (חגאזי שבאני)
+      // שירים שנבחרו פעמיים — בסוף, כדי שאותו שיר לא יחזור מוקדם
+      's0c9909d9ea', // יש בך הכל — עקיבא (סיגל כהן)
+      'se51d4994da', // שווים (תמר צרפתי)
+      's5174be2a6c', // הלוואי (חגית כהן שמסיאן)
+    ] },
 
   // השקפים, לפי הסדר
   slides: [
     { type:'playlist', at:'gather', title:'ברוכים הבאים', back:'מתחילים ב־' },   // הפלייליסט בזמן ההתכנסות
     { type:'welcome',  at:'gather' },
     { type:'schedule', at:'gather' },
-    { type:'section',  at:'greet', title:'ברכות' },
-    { type:'speaker',  at:'greet', label:'ברכות', name:'אמיר מדינה',        role:'ראש המנהל להכשרה מקצועית' },
+    // 22.11.26 מיטל: הוסרו שקף "ברכות", אמיר מדינה ורויטל אמיר (ברכות); "ספר ההפעלה" → "מדריך החינוך היוצר"
     { type:'speaker',  at:'greet', label:'ברכות', name:'אורית וקנין־שילה', role:'ממונת נוער, המנהל להכשרה מקצועית' },
-    { type:'speaker',  at:'greet', label:'ברכות', name:'רויטל אמיר',        role:'המפקחת הפדגוגית הארצית' },
-    { type:'title',    at:'greet', title:'הצגת ספר ההפעלה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
+    { type:'title',    at:'greet', title:'מדריך החינוך היוצר', sub:'מחזון למעשה', name:'רויטל אמיר', role:'המפקחת הפדגוגית הארצית' },   // שם ותפקיד המציג/ה (אפשר להשאיר '')
+    // סרטון החינוך היוצר (טיוטה 4, 19.11): מתחיל לבד כשנכנסים לשקף, נעצר כשיוצאים. K = עצירה/המשך.
+    { type:'video',    at:'greet', src:'matzeget-img/hinuch-yotzer.mp4' },
+    // מדדי מיפוי ה-AI של כל בתי הספר יחד — אותם מדדים כמו בכרטיסי בית הספר בדף המלווה. נמשך מ-mipui-gas ב-22.11.26.
+    { type:'mipui',    at:'greet', label:'רויטל אמיר · המפקחת הפדגוגית הארצית', title:'מיפוי השימוש ב-AI בצוותי ההוראה', m:{
+      n:898, schools:54, reg:76, cls:58, never:8, tools:[['ChatGPT',82],['Gemini',69],['Canva',23]],
+      block:[['לא יודעים מאיפה להתחיל',20],['אין זמן ללמוד את זה',18],['חשש שתלמידים יעתיקו',14],['שאלות של אתיקה ופרטיות',14]], inn:40,
+      sc:[['בית הספר מעודד לנסות דרכים חדשות',70],['יש לי למי לפנות כשאני נתקע.ת',55],['אני יודע.ת מה מותר בבית הספר',47],['בצוות משתפים ולומדים יחד',38]],
+      yes:494, maybe:225, ready:4.4, conf:3.6, learn:[['סרטון קצר שאפשר לחזור אליו',36],['השתלמות מסודרת',34],['לבד, בקצב שלי',28]] } },
     { type:'lecture',  at:'lecture' },   // שם המרצה ושם ההרצאה נלקחים משורת 'lecture' בלו"ז (title / sub)
-    { type:'playlist', at:'break', title:'הפסקה', note:'אתם מוזמנים לבקר במוזיאון החדשנות' },                          // הפלייליסט בהפסקה; "חוזרים ב־" = שעת הסיום של ההפסקה
-    { type:'section',  at:'workshop', title:'סדנה בשולחנות עגולים', sub:'מנהיגות אנושית בעידן הבינה המלאכותית' },
+    { type:'playlist', at:'break', title:'מוזיאון החדשנות', note:'כנסו לאפליקציה, כתבו מילה טובה, בחרו מיצג שאתם רוצים לאמץ ועוד' },   // 22.11 מיטל: במקום "הפסקה"                          // הפלייליסט בהפסקה; "חוזרים ב־" = שעת הסיום של ההפסקה
+    // תעודות הוקרה (אחרי ההפסקה, לפני השולחנות): רויטל מודה לרשתות; ברקע סרט נע של כל התעודות — רשתות ואז בתי ספר.
+    // התמונות: matzeget-img/tuda-r-01..05.jpg (רשתות), tuda-s-01..17.jpg (בתי ספר) — צריך להעתיק את התיקייה יחד עם המצגת.
+    { type:'tudot',    at:'workshop', label:'תודה והוקרה', title:'תעודות הוקרה', sub:'לרשתות ולבתי הספר', r:5, s:17 },   // 22.11 מיטל: בלי רויטל, תעודות גדולות
+    { type:'section',  at:'workshop', title:'למידת עמיתים בשולחנות עגולים', sub:'מנהיגות אנושית בעידן הבינה המלאכותית' },
     { type:'hold',     at:'lunch', label:'בתיאבון', title:'ארוחת צהריים' },
     // דוברי הבמה הניהולית: כל שורה { name:'…', role:'…' } יוצרת שקף דובר מיד אחרי השקף הזה, לפי הסדר.
     // שני דוברים בשקף אחד: names:['שם ראשון','ושם שני'] — כל שם בשורה משלו.
     { type:'section',  at:'stage', title:'במה ניהולית', sub:'מנהלים משתפים, מעוררים השראה ומובילים שינוי', speakers:[
-      { name:'ד״ר ורד אזולאי', role:'מנהלת עתיד פלמחים' },
-      { name:'נורה מחאגנה',  role:'מנהלת אום אל פחם בנות' },
-      { names:['עבד אבו אלקיעאן','ואופיר אלמלח כרמל'], role:'מנהלי דרור נווה מדבר' },
+      // 22.11 מיטל: 5 טדים לפי הסדר; 4 עם מצגת, הרב אזרף בלי מצגת.
+      // מצגת של מציג: deck = תיקייה ב-matzeget-img (01.jpg, 02.jpg… מיוצא מ-PowerPoint), n = מספר השקפים; vid = סרטון בתוך שקף (box באחוזים: שמאל, למעלה, רוחב, גובה)
+      { name:'ד״ר ורד אזולאי', role:'מנהלת עתיד פלמחים', deck:'ted-vered', n:12 },
       { name:'הרב שלמה אזרף', role:'מנהל ישיבת חנוך לנער' },
+      { name:'אופיר אלמלח כרמל', role:'מנהל דרור נווה מדבר', deck:'ted-ofir', n:8 },
+      { name:'נורה מחאגנה',  role:'מנהלת אום אל פחם בנות', deck:'ted-nora', n:14, vid:{at:14, src:'video.mp4', box:[6.25,7.41,26.95,85.19]} },
+      { name:'רמי מיכאלה',   role:'מנהל אורט אורמת' },
       // { name:'שם הדובר/ת', role:'תפקיד ובית ספר' },
     ] },
     { type:'section',  at:'summary', title:'סיכום היום' },
+    { type:'petakim',  at:'summary', label:'סיכום היום', title:'הפתקים שעל המטריות', n:5 },   // matzeget-img/petek-01..05.jpg
     { type:'closing' },
   ],
 };
@@ -312,7 +416,8 @@ const ARROW='<svg viewBox="0 0 80 40" fill="none" stroke="#c8955a" stroke-width=
 
 /* ---------- בניית רשימת השקפים (כולל דוברי במה ניהולית) ---------- */
 const SL=[];
-D.slides.forEach(s=>{SL.push(s);(s.speakers||[]).forEach(p=>{if(p&&(p.name||(p.names&&p.names.length)))SL.push({type:'speaker',at:s.at,label:p.label||s.title,name:p.name||'',names:p.names,role:p.role||''});});});
+D.slides.forEach(s=>{SL.push(s);(s.speakers||[]).forEach(p=>{if(p&&(p.name||(p.names&&p.names.length))){SL.push({type:'speaker',at:s.at,label:p.label||s.title,name:p.name||'',names:p.names,role:p.role||''});
+  for(let i=1;i<=(p.deck?p.n:0);i++)SL.push({type:'img',at:s.at,src:`matzeget-img/${p.deck}/${String(i).padStart(2,'0')}.jpg`,vid:p.vid&&p.vid.at===i?{src:`matzeget-img/${p.deck}/${p.vid.src}`,box:p.vid.box}:null});}});});
 
 /* ---------- תבניות ---------- */
 const T={
@@ -348,6 +453,7 @@ const T={
   title:s=>`<div class="cen">
       <div class="in chip">${clockIc}${range(ag(s.at))}</div>
       <h2 class="in big fit">${esc(s.title)}</h2>
+      ${s.sub?`<p class="in sub" style="margin-top:14px;font-size:76px;font-weight:700">${esc(s.sub)}</p>`:''}
       <i class="rule draw"></i>
       ${s.name?`<p class="in pname fit">${esc(s.name)}</p>`:''}
       ${s.role?`<p class="in role">${esc(s.role)}</p>`:''}</div>`,
@@ -400,6 +506,40 @@ const T={
       ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
       <div class="moves">${s.moves.map((m,i)=>`${i?`<div class="in arrow">${ARROW}</div>`:''}<div class="in move"><span class="n">${i+1}</span><p>${esc(m)}</p></div>`).join('')}</div>
       <div class="in bar">${s.parts.map((p,i)=>`<div class="seg" style="flex:${p.min} 1 0"><div class="b" style="--k:${i};background:${cols[i%4]};${i===0?'color:#0f2f52':''}">${p.min} דק׳</div><div class="l">${p.b?`<b>${esc(p.a)}</b>${esc(p.b)}`:`<b>${esc(p.a)}</b>`}</div></div>`).join('')}</div></div>`;},
+  tudot:s=>{const two=n=>String(n).padStart(2,'0');
+    const imgs=[...Array(s.r||0)].map((_,i)=>`tuda-r-${two(i+1)}`).concat([...Array(s.s||0)].map((_,i)=>`tuda-s-${two(i+1)}`))
+      .map(f=>`<img src="matzeget-img/${f}.jpg" alt="" decoding="async">`).join('');
+    const n=(s.r||0)+(s.s||0);
+    return `<div class="tt">
+      ${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}
+      <h2 class="in big fit">${esc(s.title)}</h2>
+      ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
+      ${s.name?`<p class="in who">${esc(s.name)}${s.role?`<i>·</i><span>${esc(s.role)}</span>`:''}</p>`:''}</div>
+    <div class="in film"><div class="reel" style="--dur:${n*7}s">${imgs}${imgs}</div></div>`;},
+  video:s=>`<video src="${esc(s.src)}" preload="auto" playsinline></video>`,
+  img:s=>`<img class="full" src="${esc(s.src)}" alt="" decoding="async">${s.vid?`<video class="inset" src="${esc(s.vid.src)}" preload="auto" playsinline style="left:${s.vid.box[0]}%;top:${s.vid.box[1]}%;width:${s.vid.box[2]}%;height:${s.vid.box[3]}%"></video>`:''}`,
+  mipui:s=>{const m=s.m,bars=a=>`<div class="bars">${a.map(([l,v],k)=>`<div class="br"><div class="l"><span>${esc(l)}</span><b>${v}%</b></div><div class="t"><i style="--k:${k};width:${v}%"></i></div></div>`).join('')}</div>`;
+    return `<div class="mp">
+      <div class="mp-h">${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}<h2 class="in">${esc(s.title)}</h2>
+        <p class="in sub"><b>${m.n}</b> מורים ענו · <b>${m.schools}</b> בתי ספר</p></div>
+      <div class="mp-c">
+        <div class="in mc"><p class="k">איפה אנחנו</p>
+          <div class="num">${m.reg}%</div><p class="cap">משתמשים ב-AI כל שבוע או כמעט כל יום</p>
+          <div class="num">${m.cls}%</div><p class="cap">עבדו עם תלמידים עם AI בחודש האחרון</p>
+          <p class="tl">הכלים המובילים: ${m.tools.map(([t,v])=>`<span dir="ltr" style="display:inline-block;white-space:nowrap"><b>${esc(t)}</b> ${v}%</span>`).join(' · ')}</p></div>
+        <div class="in mc"><p class="k">מה מעכב</p>
+          <div class="num">${m.inn}%</div><p class="cap">ענו: "שום דבר, אני כבר בפנים"</p>${bars(m.block)}</div>
+        <div class="in mc"><p class="k">האם יש מסגרת</p>${bars(m.sc)}
+          <p class="tl">אחוז המסכימים (4–5 מתוך 5)</p></div>
+        <div class="in mc"><p class="k">איך ממשיכים</p>
+          <div class="num">${m.yes}</div><p class="cap">מורים אמרו "כן" לצוות מוביל, ועוד ${m.maybe} "אולי"</p>
+          <div class="num">${m.ready}<span class="of">/5</span></div><p class="cap">מוכנות לנסות משהו חדש השנה · ביטחון ${m.conf}/5</p></div>
+      </div></div>`;},
+  petakim:s=>{const imgs=[...Array(s.n||5)].map((_,i)=>`<img class="in" src="matzeget-img/petek-${String(i+1).padStart(2,'0')}.jpg" alt="">`).join('');
+    return `<div class="pk">
+      ${s.label?`<div class="in lbl">${esc(s.label)}</div>`:''}
+      <h2 class="in">${esc(s.title)}</h2>
+      <div class="grid">${imgs}</div></div>`;},
   closing:s=>`<div class="cl"><i class="rule draw"></i><h2 class="in fit">תודה <em>שהייתם איתנו</em></h2></div>
     <div class="in theme">${THEME}</div>
     <div class="in tag">${TAG}</div>
@@ -414,8 +554,9 @@ const SCENE={
   hold:    {cx:960, cy:745,s:.72,a:0,   b:1920,o:1},
   low:     {cx:960, cy:1040,s:.46,a:0,  b:1920,o:.5},
   closing: {cx:960, cy:572,s:.64,a:0,   b:1920,o:1},
+  off:     {cx:960, cy:1300,s:.46,a:0,  b:1920,o:0},
 };
-const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing'};
+const SCENE_OF={welcome:'welcome',schedule:'schedule',section:'band',speaker:'band',title:'band',lecture:'band',hold:'hold',playlist:'low',quote:'low',cards:'low',overview:'low',closing:'closing',tudot:'off',petakim:'off',video:'off',mipui:'off',img:'off'};
 const LOGO={big:{x:1173,y:50,s:1},closing:{x:744,y:52,s:.88},corner:{x:64,y:58,s:.5}};
 
 /* ---------- איור ההזמנה (מבוסס על הרולאפ) ---------- */
@@ -492,7 +633,8 @@ const PL=(()=>{
       .then(r=>r.json()).then(r=>{
         if(!r||!r.ok||!Array.isArray(r.songs))return;
         const fresh=[];r.songs.forEach(s=>{if(!seen[s.id]){seen[s.id]=1;fresh.push(s);}});
-        if(!list.length){list=r.songs.slice();order=list.map((_,i)=>i);}
+        if(!list.length){list=r.songs.slice();const O=P.order||[],rk=i=>{const j=O.indexOf(list[i].id);return j<0?1000+i:j;};   // הסדר שמיטל קבעה, ואחריו השאר
+          order=list.map((_,i)=>i).sort((a,b)=>rk(a)-rk(b));}
         else if(fresh.length){fresh.forEach((s,j)=>{list.push(s);order.splice(pos+1+j,0,list.length-1);});}   // שיר חדש מתנגן הבא בתור
         const still={};r.songs.forEach(s=>still[s.id]=1);                                                        // שיר שהוסר באישור יוצא מהסבב
         order=order.filter(i=>!bad[list[i].id]&&(still[list[i].id]||i===order[pos]));
@@ -548,7 +690,8 @@ const PL=(()=>{
       if(v<=0){clearInterval(fadeT);try{player.pauseVideo();}catch(e){}}},90);}
   function unmute(){if(!muted||!player||!MUSIC.on)return;muted=false;try{player.unMute();player.setVolume(100);}catch(e){}}
   function setOn(on){if(!player)return;try{on&&!muted?player.unMute():player.mute();}catch(e){}}
-  return {enter,leave,unmute,setOn,get on(){return want;}};
+  function skip(){if(!want||!song)return;flash('השיר הבא');next();}                                       // N = לדלג לשיר הבא
+  return {enter,leave,unmute,setOn,skip,get on(){return want;}};
 })();
 /* ---------- ניווט ---------- */
 const ill=document.getElementById('ill'),logo=document.getElementById('logo');
@@ -563,13 +706,18 @@ function go(n,dir){n=Math.max(0,Math.min(slides.length-1,n));if(n===cur)return;
   const lg=LOGO[s.type==='welcome'?'big':s.type==='closing'?'closing':'corner'];
   logo.style.transform=`translate(${lg.x}px,${lg.y}px) scale(${lg.s})`;
   const a=ag(s.at),p=a?pos(toMin(a.from)):0;
-  prog.style.opacity=(s.type==='welcome'||s.type==='closing')?0:1;
+  const bare=s.type==='video'||s.type==='img';
+  prog.style.opacity=(s.type==='welcome'||s.type==='closing'||bare)?0:1;
+  logo.style.opacity=bare?0:1;
+  /* סרטון: מתחיל מההתחלה כשנכנסים קדימה, נעצר כשיוצאים */
+  if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}}
+  if(slides[n].querySelector('video')){hush();const v=slides[n].querySelector('video');try{if(d>0)v.currentTime=0;const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;v.play().catch(()=>{});flash('הסרטון מושתק · K להפעלה עם צליל');});}catch(e){}}
   pf.style.width=(p*100)+'%';ph.style.right=(p*100)+'%';
   ticks.forEach((t,i)=>t.classList.toggle('done',pos(toMin(D.agenda[i].from))<=p+1e-6));
-  if(cur>=0)swing(d);
+  if(cur>=0&&!bare)swing(d);
   if(cur>=0&&SL[cur].type==='playlist')PL.leave();
   if(s.type==='playlist'){hush();PL.enter(slides[n]);}
-  else if(cur>=0&&d>0&&(SL[n].at!==SL[cur].at||SL[n].at==='greet'))sting();
+  else if(s.type!=='video'&&cur>=0&&d>0&&(SL[n].at!==SL[cur].at||SL[n].at==='greet')&&SL[cur].type!=='video')sting();
   cur=n;
   try{history.replaceState(null,'','#'+(n+1));}catch(e){}
   tick();}
@@ -580,16 +728,18 @@ addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;
   const k=e.key;
   PL.unmute();                                                    // כל לחיצה מפעילה את צליל הפלייליסט אם הדפדפן השתיק אותו
   if(PL.on&&e.code==='KeyP'){e.preventDefault();return;}         // בשקף הפלייליסט P לא מנגן את הנעימה מעל השיר
+  if(PL.on&&e.code==='KeyN'){e.preventDefault();PL.skip();return;}   // בשקף הפלייליסט N מדלג לשיר הבא
   if(['PageDown','ArrowLeft','ArrowDown',' ','Enter','Spacebar'].includes(k)){e.preventDefault();next();}
   else if(['PageUp','ArrowRight','ArrowUp','Backspace'].includes(k)){e.preventDefault();prev();}
   else if(k==='Home'){e.preventDefault();go(0,-1);}
   else if(k==='End'){e.preventDefault();go(slides.length-1,1);}
   else if(e.code==='KeyF'){e.preventDefault();toggleFs();if(pend&&SL[cur].type==='welcome'){pend=false;sting();}}
+  else if(e.code==='KeyK'&&slides[cur].querySelector('video')){e.preventDefault();const v=slides[cur].querySelector('video');v.muted=false;v.paused?v.play().catch(()=>{}):v.pause();}
   else if(e.code==='KeyP'){e.preventDefault();pend=false;sting();}
   else if(e.code==='KeyM'){e.preventDefault();MUSIC.on=!MUSIC.on;if(!MUSIC.on)hush();PL.setOn(MUSIC.on);flash(MUSIC.on?'מוזיקה פועלת':'מוזיקה מושתקת');}});
 
 /* ===== מוזיקת מעבר בין חלקי היום =====
-   מתנגנת כשמתקדמים לחלק חדש בלו"ז, וגם בין דובר לדובר בברכות (לא כשחוזרים אחורה).
+   מתנגנת כשמתקדמים לחלק חדש בלו"ז, וגם בין שקף לשקף בפתיחה (לא כשחוזרים אחורה, ולא לפני הסרטון או אחריו).
    נוצרת בדפדפן עצמו, בלי קובץ ובלי רשת. M = השתקה/הפעלה. volume = עוצמה (0–1). */
 const MUSIC={on:true,volume:.5};
 let AC=null,bus=null,cut=null,pend=false;
@@ -616,26 +766,36 @@ function key(f,t,len,vol){const g=AC.createGain(),lp=AC.createBiquadFilter();lp.
 function warm(f,t,len,vol){const o=AC.createOscillator(),g=AC.createGain(),lp=AC.createBiquadFilter();o.type='triangle';o.frequency.value=f;lp.type='lowpass';lp.frequency.value=700;
   g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+.8);g.gain.setValueAtTime(vol,t+Math.max(.9,len-.6));g.gain.linearRampToValueAtTime(0,t+len+.4);
   o.connect(lp);lp.connect(g);g.connect(cut);o.start(t);o.stop(t+len+.5);}
-/* נעימה רכה, כ־14 שניות: מנגינה בפסנתר מעל ליווי מתגלגל (רה מז'ור: I–vi–IV–V–I) */
+/* 22.11.26 מיטל: "מוזיקה שמתאימה לכנס, לא ילדותית" — מעבר של כ־7 שניות בלי מנגינה:
+   משב אוויר עולה, אקורד מיתרים רחב (Gmaj9) שנפתח לאקורד הבית (Dmaj9), פסנתר נמוך ובס עמוק. הגרסה הקודמת: matzeget-melava-v-22-lifnei-musika.html */
+function pad(f,t,len,vol){const lp=AC.createBiquadFilter(),g=AC.createGain();lp.type='lowpass';lp.Q.value=.6;
+  lp.frequency.setValueAtTime(500,t);lp.frequency.linearRampToValueAtTime(1600,t+len*.45);lp.frequency.linearRampToValueAtTime(700,t+len);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+1.1);g.gain.setValueAtTime(vol,t+Math.max(1.2,len-1.6));g.gain.linearRampToValueAtTime(0,t+len);
+  [-7,0,7].forEach(dt=>{const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=f;o.detune.value=dt;o.connect(lp);o.start(t);o.stop(t+len+.1);});
+  lp.connect(g);g.connect(cut);}
+function air(t,len,vol){const n=AC.createBufferSource(),buf=AC.createBuffer(1,AC.sampleRate*len,AC.sampleRate),d=buf.getChannelData(0);
+  for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;n.buffer=buf;
+  const bp=AC.createBiquadFilter(),g=AC.createGain();bp.type='bandpass';bp.Q.value=.9;
+  bp.frequency.setValueAtTime(300,t);bp.frequency.exponentialRampToValueAtTime(2800,t+len*.8);
+  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+len*.8);g.gain.linearRampToValueAtTime(0,t+len);
+  n.connect(bp);bp.connect(g);g.connect(cut);n.start(t);n.stop(t+len);}
 function sting(){if(!MUSIC.on)return;const ac=audio();if(!ac)return;
   try{if(ac.state==='suspended')ac.resume();}catch(e){}
   const t=ac.currentTime+.05;bus.gain.cancelScheduledValues(t);bus.gain.setValueAtTime(MUSIC.volume,t);
-  /* נעימה חדשה משתיקה את הקודמת, כדי שלא יתנגנו שתיים יחד */
+  /* מעבר חדש משתיק את הקודם, כדי שלא יתנגנו שניים יחד */
   if(cut){const old=cut;old.gain.setTargetAtTime(0,t,.06);setTimeout(()=>{try{old.disconnect();}catch(e){}},1500);}
   cut=AC.createGain();cut.connect(bus);
-  const B=.6,bar=4*B;
-  const G2=98,A2=110,B2=123.47,D3=146.83,E3=164.81,Fs3=185,G3=196,A3=220,B3=246.94,Cs4=277.18,D4=293.66,Fs4=369.99,A4=440,Fs5=739.99,G5=783.99,A5=880,B5=987.77,Cs6=1108.73,D6=1174.66;
-  /* ליווי: שמיניות מתגלגלות */
-  [[D3,A3,Fs4,A3,D4,A3,Fs4,A3],[B2,Fs3,D4,Fs3,B3,Fs3,D4,Fs3],[G2,D3,B3,D3,G3,D3,B3,D3],[A2,E3,Cs4,E3,A3,E3,Cs4,E3]]
-    .forEach((ch,b)=>{ch.forEach((f,i)=>key(f,t+b*bar+i*B/2,1.5,i?.07:.1));warm(ch[0],t+b*bar,bar,.035);warm(ch[2],t+b*bar,bar,.02);});
-  /* מנגינה: [תו, פעמה בתיבה, אורך בפעמות] */
-  [[[Fs5,0,1.5],[A5,1.5,.5],[D6,2,1],[A5,3,1]],
-   [[B5,0,1.5],[A5,1.5,.5],[Fs5,2,2]],
-   [[G5,0,1],[B5,1,1],[D6,2,1],[B5,3,1]],
-   [[A5,0,1],[B5,1,1],[Cs6,2,2]]]
-    .forEach((m,b)=>m.forEach(([f,a,l])=>key(f,t+b*bar+a*B,l*B+1.1,.16)));
-  /* אקורד סיום מתגלגל ומתפוגג */
-  const e=t+4*bar;[D3,A3,D4,Fs4,A4].forEach((f,i)=>key(f,e+i*.07,4,.09));key(D6,e+.1,4.2,.17);key(A5,e+.1,4,.07);warm(D3,e,3.6,.04);warm(A3,e,3.6,.025);}
+  const D2=73.42,G2=98,A2=110,D3=146.83,Fs3=185,G3=196,A3=220,B3=246.94,Cs4=277.18,D4=293.66,E4=329.63,Fs4=369.99,A4=440;
+  air(t,1.3,.05);
+  const c1=t+1.0,c2=t+3.4;
+  /* אקורד ראשון — Gmaj9 */
+  [G2,D3].forEach(f=>warm(f,c1,2.6,.05));
+  [B3,D4,Fs4,A4].forEach(f=>pad(f,c1,2.9,.018));
+  [G3,B3,D4,A4].forEach((f,i)=>key(f,c1+i*.09,2.4,.06));
+  /* אקורד הבית — Dmaj9, נשאר ומתפוגג */
+  [D2,A2].forEach(f=>warm(f,c2,4,.055));
+  [A3,Cs4,E4,Fs4].forEach(f=>pad(f,c2,4.2,.018));
+  [D3,A3,Cs4,E4,Fs4].forEach((f,i)=>key(f,c2+i*.11,3.6,.055));}
 function flash(txt){const h=document.getElementById('hint');h.textContent=txt;h.classList.add('show');clearTimeout(flash.t);flash.t=setTimeout(()=>h.classList.remove('show'),1800);}
 function toggleFs(){try{if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});}
   else{const r=document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen();if(r&&r.catch)r.catch(()=>{});}}catch(e){}}
