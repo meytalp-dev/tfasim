@@ -161,6 +161,8 @@ label{display:block;font-weight:700;font-size:15px;color:var(--navy);margin-top:
 .pw.on svg{animation:pop .45s var(--ease)}
 .pw.on::after{content:"";position:absolute;top:6px;left:6px;width:18px;height:18px;border-radius:50%;background:var(--c) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 12l4 4 8-9'/%3E%3C/svg%3E") center/12px no-repeat;animation:pop .35s var(--ease)}
 .pw:disabled{opacity:.3;cursor:default}
+.pwo{grid-column:1 / -1;justify-content:center}
+.pwt{display:block;width:100%;box-sizing:border-box;margin:4px 0 6px;padding:12px 14px;border-radius:14px;border:2px solid #8a97a6;background:#fff;font:inherit;font-size:17px;font-weight:700;color:var(--navy);text-align:right}
 @keyframes pop{from{transform:scale(.4);opacity:0}}
 .chip{display:inline-flex;align-items:center;gap:5px;padding:2px 10px 2px 9px;border-radius:99px;background:color-mix(in srgb,var(--c,var(--teal)) 13%,#fff);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c,var(--teal)) 35%,transparent);color:var(--navy);font-weight:700;font-size:14px;white-space:nowrap;vertical-align:middle}
 .chip svg{width:16px;height:16px;fill:none;stroke:var(--c,var(--teal));stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
@@ -1392,26 +1394,41 @@ function drawSagur() {
 }
 
 /* ---- my power + the power I want to adopt ---- */
+/* "אחר" with free text, in both steps (Meytal, 23.11) */
+function isOwnPw(p) { return !!p && POWERS.indexOf(p) < 0; }
 function drawPowers() {
   var step = S.pick ? 2 : 1;
-  var grid = function (sel, dis) {
+  var grid = function (sel, dis, oth) {
+    var on = oth || isOwnPw(sel);
     return '<div class="powers">' + POWERS.map(function (p) {
       return '<button class="pw' + (sel === p ? " on" : "") + '" style="--c:' + scol(p) + '" data-p="' + esc(p) + '"' + (dis === p ? " disabled" : "") + ">" + sico(p) + "<span>" + esc(p) + "</span></button>";
-    }).join("") + "</div>";
+    }).join("") + '<button class="pw pwo' + (on ? " on" : "") + '" style="--c:#8a97a6" data-o="1">' + IC.pen + "<span>אחר</span></button></div>" +
+      (on ? '<input id="pwt" class="pwt" maxlength="30" placeholder="כתבו כאן את הכוח" value="' + esc(isOwnPw(sel) ? sel : "") + '">' : "");
+  };
+  var bindOwn = function (set, btn) {
+    var t = $("pwt"); if (!t) return;
+    t.oninput = function () { set(t.value.trim()); btn(); };
   };
   if (step === 1) {
-    shell('<p class="kick">שלב 1 מתוך 2</p><h1>איזה כוח בחרת לתג?</h1><p class="muted">בחרו את הכוח שעל המדבקה שהדבקתם על התג.</p>' + grid(S.pw) +
+    shell('<p class="kick">שלב 1 מתוך 2</p><h1>איזה כוח בחרת לתג?</h1><p class="muted">בחרו את הכוח שעל המדבקה שהדבקתם על התג.</p>' + grid(S.pw, "", S.o1) +
       '<button class="btn" id="nx"' + (S.pw ? "" : " disabled") + ">המשך" + IC.next + "</button>", {k:"powers1"});
-    document.querySelectorAll(".pw").forEach(function (b) { b.onclick = function () { S.pw = b.dataset.p; drawPowers(); }; });
-    $("nx").onclick = function () { S.pick = S.pw; drawPowers(); };
+    document.querySelectorAll(".pw").forEach(function (b) { b.onclick = function () {
+      if (b.dataset.o) { S.o1 = true; if (!isOwnPw(S.pw)) S.pw = ""; drawPowers(); var t = $("pwt"); if (t) t.focus(); return; }
+      S.o1 = false; S.pw = b.dataset.p; drawPowers(); }; });
+    bindOwn(function (v) { S.pw = v; }, function () { $("nx").disabled = !S.pw; });
+    $("nx").onclick = function () { if (!S.pw) return; S.pick = S.pw; drawPowers(); };
     return;
   }
-  shell('<p class="kick">שלב 2 מתוך 2</p><h1>איזה כוח היית רוצה לאמץ?</h1><p class="muted">כוח שאין לך היום ושהיית רוצה לחזק.' + (S.meetOn ? " נחפש מי שבחר בו." : "") + "</p>" + grid(S.pick2 || S.want, S.pw) +
-    '<button class="btn" id="ok"' + ((S.pick2 || S.want) && (S.pick2 || S.want) !== S.pw ? "" : " disabled") + '>' + (S.meetOn ? IC.people + "שמירה, ולמצוא אנשים" : IC.check + "שמירה") + '</button><p class="center" style="margin:0"><button class="link" id="bk">חזרה לכוח שלי</button></p>', {k:"powers2"});
-  document.querySelectorAll(".pw").forEach(function (b) { b.onclick = function () { S.pick2 = b.dataset.p; drawPowers(); }; });
+  var w2 = function () { return S.o2 ? S.pick2 : (S.pick2 || S.want); };
+  shell('<p class="kick">שלב 2 מתוך 2</p><h1>איזה כוח היית רוצה לאמץ?</h1><p class="muted">כוח שאין לך היום ושהיית רוצה לחזק.' + (S.meetOn ? " נחפש מי שבחר בו." : "") + "</p>" + grid(w2(), S.pw, S.o2) +
+    '<button class="btn" id="ok"' + (w2() && w2() !== S.pw ? "" : " disabled") + '>' + (S.meetOn ? IC.people + "שמירה, ולמצוא אנשים" : IC.check + "שמירה") + '</button><p class="center" style="margin:0"><button class="link" id="bk">חזרה לכוח שלי</button></p>', {k:"powers2"});
+  document.querySelectorAll(".pw").forEach(function (b) { b.onclick = function () {
+    if (b.dataset.o) { S.o2 = true; S.pick2 = isOwnPw(w2()) ? w2() : ""; drawPowers(); var t = $("pwt"); if (t) t.focus(); return; }
+    S.o2 = false; S.pick2 = b.dataset.p; drawPowers(); }; });
+  bindOwn(function (v) { S.pick2 = v; }, function () { $("ok").disabled = !(w2() && w2() !== S.pw); });
   $("bk").onclick = function () { S.pick = ""; drawPowers(); };
   $("ok").onclick = function () {
-    var want = S.pick2 || S.want, btn = $("ok"), first = !S.want; btn.disabled = true;
+    var want = w2(), btn = $("ok"), first = !S.want; if (!want || want === S.pw) return; btn.disabled = true;
     post({a:"join", c:S.c, pw:S.pw, want:want}).then(function (r) {
       if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
       /* joined late (after the opening): don't ask about a part they weren't in */
