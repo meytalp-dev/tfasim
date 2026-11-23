@@ -956,7 +956,7 @@ function go(n,dir){n=Math.max(0,Math.min(slides.length-1,n));if(n===cur)return;
   logo.style.opacity=bare?0:1;
   /* סרטון: מתחיל מההתחלה כשנכנסים קדימה, נעצר כשיוצאים */
   if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}const f=slides[cur].querySelector('iframe[data-src]');if(f){f.classList.remove('ok');f.src='about:blank';}}
-  {const f=slides[n].querySelector('iframe[data-src]');if(f){hush();f.src=f.dataset.src;}}  /* מסע ההישגים: נטען מההתחלה בכל כניסה, נעצר ביציאה */
+  {const f=slides[n].querySelector('iframe[data-src]');if(f){hush();f.src=HES[f.dataset.src]||f.dataset.src;}}  /* מסע ההישגים: נטען מההתחלה בכל כניסה, נעצר ביציאה */
   if(slides[n].querySelector('video')){hush();const v=slides[n].querySelector('video');try{if(d>0)v.currentTime=0;const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;v.play().catch(()=>{});flash('הסרטון מושתק · K להפעלה עם צליל');});}catch(e){}}
   pf.style.width=(p*100)+'%';ph.style.right=(p*100)+'%';
   ticks.forEach((t,i)=>t.classList.toggle('done',pos(toMin(D.agenda[i].from))<=p+1e-6));
@@ -1077,15 +1077,22 @@ function hint(){let seen=false;try{seen=sessionStorage.getItem('deckHint')==='1'
   if(seen)return;const h=document.getElementById('hint');h.classList.add('show');setTimeout(()=>h.classList.remove('show'),4500);}
 
 /* פתיחה: מחכים לגופן ואז מציגים */
+const HES={};   // מסע ההישגים מהזיכרון (ראו warmHes)
 function start(){fitAll();go(fromHash(),1);hint();welcomeMusic();setTimeout(warmHes,2500);}
-/* מסע ההישגים כבד (~21MB): מורידים אותו ברקע כבר בפתיחה, כדי שכשמגיעים לשקף הוא נפתח מיד מהזיכרון של הדפדפן */
 /* מציגים את המסע רק אחרי שהוא התמקם במסך (אחרת רואים מלבן לבן זז לרגע) */
 function hesOk(f){if(!f.src||f.src==='about:blank')return;let n=0;const t=setInterval(()=>{let ok=n++>40;
   try{const st=f.contentDocument.getElementById('stage');if(!st||st.style.transform)ok=true;}catch(e){ok=true;}
   if(ok){clearInterval(t);setTimeout(()=>{if(f.src!=='about:blank')f.classList.add('ok');},250);}},100);}
 window.hesOk=hesOk;
-function warmHes(){const u=[...new Set([...document.querySelectorAll('iframe[data-src]')].map(f=>new URL(f.dataset.src,location.href).href))];
-  (async()=>{for(const x of u){try{await fetch(x,{priority:'low'}).then(r=>r.blob());}catch(e){}}})();}
+/* מסע ההישגים כבד (~21MB): מורידים אותו פעם אחת ברקע כבר בפתיחה ושומרים בזיכרון המצגת (עותק לכל חלק),
+   כך שכשמגיעים לשקף הוא נפתח מיד בלי להוריד שוב. עד שההורדה נגמרת — נטען כרגיל מהכתובת. */
+function warmHes(){const fr=[...document.querySelectorAll('iframe[data-src]')].filter(f=>/matzeget-img\/hesegim\/index\.html/.test(f.dataset.src));   // רק מסע ההישגים (לא המפה וכו')if(!fr.length||location.protocol==='file:')return;
+  const base=new URL(fr[0].dataset.src,location.href);base.search='';
+  fetch(base.href).then(r=>r.ok?r.text():Promise.reject()).then(t=>{if(t.split('<head>').length!==2)return;
+    const body=t.replace(/location\.search/g,'(window.__Q||location.search)');
+    for(const f of fr){if(HES[f.dataset.src])continue;const q=new URL(f.dataset.src,location.href).search;
+      const h=body.replace('<head>','<head><scr'+'ipt>window.__Q='+JSON.stringify(q)+';</scr'+'ipt>');
+      HES[f.dataset.src]=URL.createObjectURL(new Blob([h],{type:'text/html;charset=utf-8'}));}}).catch(()=>{});}
 const ready=()=>Promise.all(['400 40px Heebo','700 40px Heebo','900 40px Heebo','300 40px Heebo'].map(f=>document.fonts.load(f,'אב 09'))).catch(()=>{});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>ready().then(start));else ready().then(start);
 })();
