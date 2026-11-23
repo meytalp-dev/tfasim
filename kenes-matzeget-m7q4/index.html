@@ -213,6 +213,11 @@ em{font-style:normal}
 .lw-q .q{flex:none;font-size:42px;font-weight:700;line-height:1.24;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .lw-q .by{margin-top:12px;font-size:30px;font-weight:800;color:var(--gold2)}
 .lw-q .by small{font-size:26px;font-weight:500;color:rgba(255,255,255,.8)}
+.lw-q .nt{display:flex;align-items:center;gap:18px;margin-bottom:8px;font-size:56px;font-weight:900;color:var(--gold2);line-height:1.05}
+.lw-q .nt small{font-size:28px;font-weight:600;color:rgba(255,255,255,.75)}
+.lw-q .nt .lw-r{margin:0}
+.lw-m .nt{font-size:30px;font-weight:900;color:var(--navy);line-height:1.15;margin-bottom:2px}
+.lw-m .nt small{font-size:19px;font-weight:600;color:var(--muted)}
 .lw-q .to{margin-top:4px;font-size:25px;font-weight:500;color:rgba(255,255,255,.7)}
 .lw-river{margin-top:18px;flex:1;min-height:0;overflow:hidden;-webkit-mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 86%,transparent);mask-image:linear-gradient(to bottom,transparent,#000 10%,#000 86%,transparent)}
 .lw-rv{display:grid;grid-template-columns:1fr 1fr;column-gap:14px;padding-top:12px}
@@ -905,7 +910,7 @@ const LW=(()=>{
   const RXL=['מעורר השראה','רעיון מבריק','כל הכבוד','נגע בי'];let hi=0,rsig='';
   const dest=w=>kind==='net'?`ל${esc(w.net)}${w.ex?' · '+esc(w.ex):''}`:`ל${esc(w.ex)}${w.sc?' · '+esc(w.sc):''}`;
   function hero(w){const b=el.querySelector('.lw-hero');if(!b)return;const q=document.createElement('div');q.className='lw-q hid';
-    q.innerHTML=w?`${w.r?`<span class="lw-r">${esc(w.r)}</span>`:''}<p class="q">${esc(w.t||w.r)}</p><p class="by">${esc(w.n)}${w.s?` <small>· ${esc(w.s)}</small>`:''}</p><p class="to">${dest(w)}</p>`:
+    q.innerHTML=w?`${kind==='net'?`<p class="nt"><span><small>לרשת </small>${esc(w.net)}</span>${w.r?`<span class="lw-r">${esc(w.r)}</span>`:''}</p>`:(w.r?`<span class="lw-r">${esc(w.r)}</span>`:'')}<p class="q">${esc(w.t||w.r)}</p><p class="by">${esc(w.n)}${w.s?` <small>· ${esc(w.s)}</small>`:''}</p><p class="to">${kind==='net'?esc(w.ex||''):dest(w)}</p>`:
       (kind==='net'?'<p class="q">כתבו מילה טובה לרשת</p><p class="to">סורקים את הברקוד שעל התג ← תערוכת הרשתות ← מילה טובה</p>':'<p class="q">כתבו מילה טובה למציגים</p><p class="to">בדף המלווה ← המוזיאון ← בוחרים מיצג ← מילה טובה</p>');
     b.querySelectorAll('.lw-q').forEach(o=>{o.classList.add('gone');setTimeout(()=>o.remove(),750);});
     b.appendChild(q);requestAnimationFrame(()=>requestAnimationFrame(()=>q.classList.remove('hid')));}
@@ -921,7 +926,7 @@ const LW=(()=>{
     else if(adv&&L.length>1){hi=(hi+1)%L.length;hero(L[hi]);}
     const rv=el.querySelector('.lw-rv');
     if(rv){const s=JSON.stringify(L);if(s!==rsig){rsig=s;
-      const card=w=>`<div class="lw-m">${w.r?`<p class="r">${esc(w.r)}</p>`:''}${w.t?`<p class="t">${esc(w.t)}</p>`:''}<p class="w">${esc(w.n)} <small>${dest(w)}</small></p></div>`;
+      const card=w=>`<div class="lw-m">${kind==='net'?`<p class="nt"><small>לרשת </small>${esc(w.net)}</p>`:''}${w.r?`<p class="r">${esc(w.r)}</p>`:''}${w.t?`<p class="t">${esc(w.t)}</p>`:''}<p class="w">${esc(w.n)} <small>${kind==='net'?(w.ex?'· '+esc(w.ex):''):dest(w)}</small></p></div>`;
       const mv=L.length>=5,A=L.length%2?L.concat(L):L;
       rv.innerHTML=(mv?A.concat(A):L).map(card).join('');rv.classList.toggle('mv',mv);rv.style.setProperty('--d',Math.max(24,A.length*3.5)+'s');}}}
   function draw(adv){if(!el)return;if(kind!=='tables'&&el.querySelector('.lw-hero')){draw2(adv);return;}
