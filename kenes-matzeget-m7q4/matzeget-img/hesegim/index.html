@@ -1901,6 +1901,8 @@ body.muted #nav #musicbtn .i-off{display:block}
   var mid = function (n) { return 440 * Math.pow(2, (n - 69) / 12); };
   var R = Math.random, pick = function (a) { return a[Math.floor(R() * a.length)]; };
   var VOL = .5;
+  /* 23.11.26 (מיטל, ביום הכנס): בחלק ב' במצגת המלווה (&part=2) — נעימה אחרת: מז'ור, מהירה יותר ובלי הד */
+  var P2 = /[?&]part=2/.test(location.search);
 
   function audio() {
     if (AC) return AC; var X = window.AudioContext || window.webkitAudioContext; if (!X) return null;
@@ -1909,7 +1911,7 @@ body.muted #nav #musicbtn .i-off{display:block}
     var wet = AC.createGain(), dl = AC.createDelay(1), fb = AC.createGain(), lp = AC.createBiquadFilter();
     dl.delayTime.value = .31; fb.gain.value = .3; lp.type = 'lowpass'; lp.frequency.value = 2200;
     wet.connect(dl); dl.connect(lp); lp.connect(fb); fb.connect(dl); lp.connect(cmp);
-    out = AC.createGain(); out.connect(master); out.connect(wet);
+    out = AC.createGain(); out.connect(master); if (!P2) out.connect(wet);
     return AC;
   }
   var NOISE = null;
@@ -1952,9 +1954,17 @@ body.muted #nav #musicbtn .i-off{display:block}
   /* מבנה: כל מקטע 8 תיבות. העוצמה (0 שקט מאוד … 3 מלא) נעה בהדרגה ולא חוזרת על סדר קבוע */
   var BASE = 50 /* רה */, key = 0, lvl = 0, sec = -1, barInSec = 8, prog = PROGS[0], arp = ARPS[0], mel = null, melOn = false, lastNote = 7, nextT = 0, sinceMod = 0;
 
+  if (P2) {   /* חלק ב': פה מז'ור (תמיד אותה טוניקה), מהלכים אופטימיים, טמפו מהיר יותר */
+    B = .36; BAR = 4 * B; BASE = 53; SCALE = [0, 2, 4, 5, 7, 9, 11];
+    CH = { I: [0, 24, 28, 31, 36], V: [7, 26, 31, 35, 38], vi: [-3, 24, 28, 33, 36], IV: [5, 24, 29, 33, 36],
+      ii: [2, 26, 29, 33, 38], iii: [4, 23, 28, 31, 35], Isus: [0, 24, 29, 31, 36], IV2: [5, 24, 28, 33, 36] };
+    PROGS = [['I', 'V', 'vi', 'IV'], ['I', 'IV', 'vi', 'V'], ['vi', 'IV', 'I', 'V'], ['I', 'iii', 'IV', 'V'],
+      ['IV', 'V', 'iii', 'vi'], ['I', 'Isus', 'IV', 'IV2'], ['ii', 'V', 'I', 'vi']];
+    prog = PROGS[0];
+  }
   function newSection() {
     sec++; barInSec = 0; sinceMod++;
-    if (sec === 0) lvl = 0;
+    if (sec === 0) lvl = P2 ? 1 : 0;
     else {
       var moves = lvl === 0 ? [1, 1, 0] : lvl === 3 ? [-1, -1, -2, 0] : [1, 1, -1, 0];
       lvl = Math.max(0, Math.min(3, lvl + pick(moves)));
