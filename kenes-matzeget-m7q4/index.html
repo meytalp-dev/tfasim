@@ -312,7 +312,11 @@ em{font-style:normal}
 /* שקף ממצגת של מציג — תמונה על כל הבמה */
 /* מסע ההישגים — מצגת מוטמעת על כל הבמה */
 .t-hesegim{background:#fbfaf7}
-.t-hesegim iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fbfaf7}
+.t-hesegim iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fbfaf7;opacity:0;transition:opacity .5s}
+.t-hesegim iframe.ok{opacity:1}
+/* בזמן הטעינה: כותרת נקייה במקום מסך חצי־טעון */
+.t-hesegim .hfb{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:110px;font-weight:900;color:var(--teal);animation:hfb 1.6s ease-in-out infinite alternate}
+@keyframes hfb{from{opacity:.55}to{opacity:1}}
 .t-img{background:#fff}
 .t-img .full{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
 .t-img .inset{position:absolute;object-fit:cover;background:#000}
@@ -675,7 +679,7 @@ const T={
       ${s.sub?`<p class="in sub">${esc(s.sub)}</p>`:''}
       ${s.name?`<p class="in who">${esc(s.name)}${s.role?`<i>·</i><span>${esc(s.role)}</span>`:''}</p>`:''}</div>
     <div class="in film"><div class="reel" style="--dur:${n*7}s">${imgs}${imgs}</div></div>`;},
-  hesegim:s=>`<iframe data-src="${esc(s.src)}" allow="autoplay; fullscreen" title="מסע ההישגים" tabindex="-1"></iframe>`,
+  hesegim:s=>`<div class="hfb">מסע ההישגים</div><iframe data-src="${esc(s.src)}" allow="autoplay; fullscreen" title="מסע ההישגים" tabindex="-1" onload="window.hesOk&&hesOk(this)"></iframe>`,
   video:s=>`${s.title?`<div class="vfb">${esc(s.title)}</div>`:""}<video src="${esc(s.src)}" preload="auto" playsinline${s.title?" onerror=\"this.remove()\"":""}></video>`,
   img:s=>`<img class="full" src="${esc(s.src)}" alt="" decoding="async">${s.vid?`<video class="inset" src="${esc(s.vid.src)}" preload="auto" playsinline style="left:${s.vid.box[0]}%;top:${s.vid.box[1]}%;width:${s.vid.box[2]}%;height:${s.vid.box[3]}%"></video>`:''}`,
   mipui:s=>{const m=s.m,C=['var(--teal)','var(--teal2)','var(--gold)','var(--gold2)'];
@@ -703,7 +707,7 @@ const T={
           <div class="big">${cnt(m.inn)}<small>%</small></div><p class="cap">ענו: "שום דבר, אני כבר בפנים"</p>
           <div class="waf">${waf}</div><p class="wn">כל נקודה = 1% מהמורים</p>
           <div class="lol"><h4>ומה מעכב את השאר</h4>${lol}</div></div>
-        <div class="in mc"><p class="k">האם יש מסגרת</p>
+        <div class="in mc"><p class="k">תמיכה וליווי</p>
           <div class="rad"><svg viewBox="0 0 310 310">${rad}</svg></div>
           <div class="leg">${leg}</div>
           <p class="fn">אחוז המסכימים (4–5 מתוך 5)</p></div>
@@ -847,7 +851,7 @@ const PL=(()=>{
       inf.classList.remove('out');nx.classList.remove('out');},600);}
   function play(i){
     const s=list[order[i]];if(!s||!player)return;
-    pos=i;song=s;fill(s);show(true);
+    pos=i;song=s;paused=false;fill(s);show(true);
     clearInterval(fadeT);
     try{player.setVolume(100);if(muted||!MUSIC.on)player.mute();else player.unMute();
       player.loadVideoById({videoId:s.vid,startSeconds:0,endSeconds:LEN});}catch(e){}
@@ -863,14 +867,19 @@ const PL=(()=>{
     if(t>=end-.3||Date.now()-t0>(LEN+25)*1000)next();}                                                    // רשת ביטחון
   function next(){if(!want)return;if(!order.length||!player||!ready){song=null;show(false);return;}play((pos+1)%order.length);}
   function enter(slide){el=slide;want=true;boot();if(ready&&order.length)next();}
-  function leave(){want=false;clearInterval(timer);clearTimeout(chk);show(false);song=null;
+  function leave(){want=false;paused=false;clearInterval(timer);clearTimeout(chk);show(false);song=null;
     if(!player)return;let v=100;try{v=player.getVolume();}catch(e){}
     clearInterval(fadeT);fadeT=setInterval(()=>{v-=10;try{player.setVolume(Math.max(0,v));}catch(e){}
       if(v<=0){clearInterval(fadeT);try{player.pauseVideo();}catch(e){}}},90);}
   function unmute(){if(!muted||!player||!MUSIC.on)return;muted=false;try{player.unMute();player.setVolume(100);}catch(e){}}
   function setOn(on){if(!player)return;try{on&&!muted?player.unMute():player.mute();}catch(e){}}
+  /* K = עצירה/המשך של השיר (מאותו מקום) */
+  let paused=false,pAt=0;
+  function pause(){if(!want||!song||!player)return;
+    if(!paused){paused=true;pAt=Date.now();clearInterval(timer);try{player.pauseVideo();}catch(e){}flash('השיר נעצר · K להמשך');}
+    else{paused=false;t0+=Date.now()-pAt;try{player.playVideo();}catch(e){}timer=setInterval(tickP,1000);flash('השיר ממשיך');}}
   function skip(){if(!want||!song)return;flash('השיר הבא');next();}                                       // N = לדלג לשיר הבא
-  return {enter,leave,unmute,setOn,skip,get on(){return want;}};
+  return {enter,leave,unmute,setOn,skip,pause,get on(){return want;}};
 })();
 /* ---------- הקיר החי (23.11) ----------
    נמשך משרת המשחק (a=scr) כל 8 שניות, רק כשהשקף מוצג. net = מילים טובות לרשתות, ex = למציגים במוזיאון,
@@ -946,7 +955,7 @@ function go(n,dir){n=Math.max(0,Math.min(slides.length-1,n));if(n===cur)return;
   prog.style.opacity=(s.type==='welcome'||s.type==='closing'||bare)?0:1;
   logo.style.opacity=bare?0:1;
   /* סרטון: מתחיל מההתחלה כשנכנסים קדימה, נעצר כשיוצאים */
-  if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}const f=slides[cur].querySelector('iframe[data-src]');if(f)f.src='about:blank';}
+  if(cur>=0){const v=slides[cur].querySelector('video');if(v)try{v.pause();}catch(e){}const f=slides[cur].querySelector('iframe[data-src]');if(f){f.classList.remove('ok');f.src='about:blank';}}
   {const f=slides[n].querySelector('iframe[data-src]');if(f){hush();f.src=f.dataset.src;}}  /* מסע ההישגים: נטען מההתחלה בכל כניסה, נעצר ביציאה */
   if(slides[n].querySelector('video')){hush();const v=slides[n].querySelector('video');try{if(d>0)v.currentTime=0;const p=v.play();if(p&&p.catch)p.catch(()=>{v.muted=true;v.play().catch(()=>{});flash('הסרטון מושתק · K להפעלה עם צליל');});}catch(e){}}
   pf.style.width=(p*100)+'%';ph.style.right=(p*100)+'%';
@@ -968,6 +977,7 @@ addEventListener('keydown',e=>{if(e.ctrlKey||e.altKey||e.metaKey)return;
   PL.unmute();                                                    // כל לחיצה מפעילה את צליל הפלייליסט אם הדפדפן השתיק אותו
   if(PL.on&&e.code==='KeyP'){e.preventDefault();return;}         // בשקף הפלייליסט P לא מנגן את הנעימה מעל השיר
   if(PL.on&&e.code==='KeyN'){e.preventDefault();PL.skip();return;}   // בשקף הפלייליסט N מדלג לשיר הבא
+  if(PL.on&&e.code==='KeyK'){e.preventDefault();PL.pause();return;}   // בשקף הפלייליסט K עוצר/ממשיך את השיר
   if(['PageDown','ArrowLeft','ArrowDown',' ','Enter','Spacebar'].includes(k)){e.preventDefault();next();}
   else if(['PageUp','ArrowRight','ArrowUp','Backspace'].includes(k)){e.preventDefault();prev();}
   else if(k==='Home'){e.preventDefault();go(0,-1);}
@@ -1067,7 +1077,15 @@ function hint(){let seen=false;try{seen=sessionStorage.getItem('deckHint')==='1'
   if(seen)return;const h=document.getElementById('hint');h.classList.add('show');setTimeout(()=>h.classList.remove('show'),4500);}
 
 /* פתיחה: מחכים לגופן ואז מציגים */
-function start(){fitAll();go(fromHash(),1);hint();welcomeMusic();}
+function start(){fitAll();go(fromHash(),1);hint();welcomeMusic();setTimeout(warmHes,2500);}
+/* מסע ההישגים כבד (~21MB): מורידים אותו ברקע כבר בפתיחה, כדי שכשמגיעים לשקף הוא נפתח מיד מהזיכרון של הדפדפן */
+/* מציגים את המסע רק אחרי שהוא התמקם במסך (אחרת רואים מלבן לבן זז לרגע) */
+function hesOk(f){if(!f.src||f.src==='about:blank')return;let n=0;const t=setInterval(()=>{let ok=n++>40;
+  try{const st=f.contentDocument.getElementById('stage');if(!st||st.style.transform)ok=true;}catch(e){ok=true;}
+  if(ok){clearInterval(t);setTimeout(()=>{if(f.src!=='about:blank')f.classList.add('ok');},250);}},100);}
+window.hesOk=hesOk;
+function warmHes(){const u=[...new Set([...document.querySelectorAll('iframe[data-src]')].map(f=>new URL(f.dataset.src,location.href).href))];
+  (async()=>{for(const x of u){try{await fetch(x,{priority:'low'}).then(r=>r.blob());}catch(e){}}})();}
 const ready=()=>Promise.all(['400 40px Heebo','700 40px Heebo','900 40px Heebo','300 40px Heebo'].map(f=>document.fonts.load(f,'אב 09'))).catch(()=>{});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>ready().then(start));else ready().then(start);
 })();
