@@ -334,6 +334,16 @@ main.enter>*:nth-child(5){animation-delay:.2s}main.enter>*:nth-child(6){animatio
 .tg[aria-pressed=true] svg{color:#fff;animation:pop .35s var(--ease)}
 .ex .bm{flex:0 0 auto;display:flex;color:var(--gold)}
 .ex .bm svg{width:19px;height:19px}
+/* the conference feedback (end of the day, before the summary) */
+.sq{background:#fff;border-radius:14px;padding:13px 14px 12px;margin:0 0 10px;box-shadow:inset 0 0 0 1px rgba(200,149,90,.45)}
+.sq p{margin:0 0 9px;font-weight:700;color:var(--navy);line-height:1.35;font-size:16px}
+.sq .n{color:var(--gold);font-weight:900;margin-left:6px}
+.sqr{display:flex;gap:6px;direction:rtl}
+.sqr button{flex:1 1 0;min-width:0;min-height:44px;border:0;border-radius:12px;background:var(--paper);color:var(--navy);font-weight:800;font-size:17px;cursor:pointer;
+  box-shadow:inset 0 0 0 1px rgba(200,149,90,.45);transition:background .2s,color .2s}
+.sqr button[aria-pressed=true]{background:var(--navy);color:#fff;box-shadow:0 6px 14px -8px rgba(15,47,82,.7)}
+.sqs{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:5px 2px 0}
+.sqh{margin:18px 0 8px;color:var(--navy2);font-weight:800;font-size:15px}
 /* museum: "for the presenters" */
 .rx{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 10px}
 .rx button{display:flex;align-items:center;gap:8px;min-height:46px;padding:6px 10px;border:0;border-radius:14px;background:var(--paper);color:var(--navy);font-weight:700;font-size:15px;line-height:1.15;text-align:right;cursor:pointer;
@@ -917,7 +927,7 @@ var Demo = (function () {
         Object.keys(me.ex).forEach(function (k) { ex[k] = Object.assign({}, me.ex[k]); });
         return {ok:true, ph:ph, mo:MO, c:p.c, me:{n:r.n, f:r.f, k:r.k, label:r.label}, pw:me.pw, want:me.want, mt:list(me), ex:ex, lec:me.lec, moto:me.moto, exhibits:EX,
           mipui:r.g ? {kind:"none", list:[]} : {kind:"one", list:[{s:r.s, d:MIP}]},
-          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout), he:!r.g, mr:!!me.mr};
+          nets:NETS, net:Object.assign({}, me.net), netf:Object.assign({}, me.netf), neti:JSON.parse(JSON.stringify(me.neti)), tbl:tblOf(p.c), fb:Object.assign({}, me.fb), tin:me.tin.slice(), tout:Object.assign({}, me.tout), he:!r.g, mr:!!me.mr, sq:!!me.sq};
       }
       if (p.a === "scr") return scr();
       if (p.a === "adm") { var s = scr(); return {ok:true, ph:ph, mo:MO, lo:LO, phases:PH_ORDER, joined:s.joined, total:s.total, meets:s.meets, stamps:s.stamps, lecN:s.lecN, sheet:"", lt:{on:true, key:true, n:0}}; }
@@ -976,6 +986,7 @@ var Demo = (function () {
         }
         return {ok:true, tbl:tblOf(b.c)};
       }
+      if (b.a === "svy") { if (!R[b.c]) return {ok:false, error:"code"}; u(b.c).sq = true; return {ok:true}; }
       if (b.a === "mail") { if (R[b.c] && R[b.c].g && !/@/.test(b.em || "")) return {ok:false, error:"email"}; return {ok:true, demo:true}; }
       if (b.a === "ph") { ph = b.ph; return {ok:true, ph:ph}; }
       if (b.a === "reset") return {ok:true};
@@ -1200,7 +1211,7 @@ function take(r) {
   S.ph = r.ph; S.me = r.me; S.pw = r.pw; S.want = r.want; S.mt = r.mt || []; S.ex = r.ex || {}; S.lec = r.lec || ""; S.moto = r.moto || "";
   S.exhibits = (r.exhibits || []).map(mzOf); S.mipui = r.mipui; S.mc = S.mt.length;
   S.nets = r.nets || []; S.net = r.net || {}; S.tbl = r.tbl || {t:0, rep:null, f:{}}; S.tbl.f = S.tbl.f || {}; S.fb = r.fb || {};
-  S.mailed = !!r.mr; S.he = r.he !== false;
+  S.mailed = !!r.mr; S.he = r.he !== false; S.sq = S.sq || !!r.sq;
   S.netf = r.netf || {}; S.neti = r.neti || {}; S.tin = r.tin || []; renderTalk();
   S.meetOn = !!r.mo; if (!S.meetOn && S.view === "meet") S.view = null;
 }
@@ -1282,9 +1293,47 @@ function draw() {
     case "muzeon": return drawMap();
     case "tables": return drawTables();
     case "stage": return drawStage();
-    case "end": return drawEnd();
+    case "end": return S.sq ? drawEnd() : drawSvy();
   }
   drawMeet();
+}
+
+/* ---- 23.11.26 (Meytal): the conference feedback, on the way to the summary and the letter from 2030 ---- */
+var SVQ = ["הכנס היה משמעותי ורלוונטי עבורי.","הכנס הצליח לשלב בין מנהיגות אנושית לבינה מלאכותית.",
+  "התכנים וההרצאות העניקו לי כלים, רעיונות ונקודות למחשבה.","מוזיאון החדשנות והיוזמות שהוצגו בו היו מעוררי השראה.",
+  "השיח בשולחנות העגולים תרם ללמידת עמיתים ולחשיבה משותפת.",
+  "מיקום הכנס ונוחות ההגעה","התנאים הפיזיים ונוחות הישיבה","האוכל והכיבוד","הארגון, לוח הזמנים וההתנהלות לאורך היום"];
+function drawSvy() {
+  var a = S.svA || (S.svA = []);
+  function q(i) {
+    var b = "";
+    for (var n = 1; n <= 5; n++) b += '<button type="button" data-q="' + i + '" data-v="' + n + '" aria-pressed="' + (a[i] === n) + '">' + n + "</button>";
+    return '<div class="sq"><p>' + (i < 5 ? '<span class="n">' + (i + 1) + "</span>" : "") + esc(SVQ[i]) + '</p><div class="sqr">' + b + '</div><div class="sqs"><span>במידה מועטה</span><span>במידה רבה מאוד</span></div></div>';
+  }
+  var h = "";
+  for (var i = 0; i < 5; i++) h += q(i);
+  h += '<p class="sqh"><span style="color:var(--gold)">6</span> · ארגון ותנאים פיזיים</p>';
+  for (i = 5; i < SVQ.length; i++) h += q(i);
+  shell('<p class="kick center">רגע לפני הסיכום</p><h1 class="center">איך היה לך היום?</h1>' +
+    '<p class="center">אחרי המשוב מחכים לך הסיכום של היום והמכתב שכתבת לעצמך מ-2030.</p>' + h +
+    '<button class="btn" id="ok">' + IC.check + "שליחה וקבלת הסיכום</button>", {k:"svy"});
+  document.querySelectorAll(".sqr button").forEach(function (el) {
+    el.onclick = function () {
+      var i = +el.dataset.q, v = +el.dataset.v;
+      a[i] = a[i] === v ? 0 : v;
+      el.parentNode.querySelectorAll("button").forEach(function (o) { o.setAttribute("aria-pressed", String(+o.dataset.v === a[i])); });
+    };
+  });
+  $("ok").onclick = function () {
+    var btn = $("ok"), v = [];
+    for (var i = 0; i < SVQ.length; i++) v.push(a[i] || 0);
+    if (!v.some(function (x) { return x; })) { toast("סמנו לפחות שאלה אחת"); return; }
+    btn.disabled = true;
+    post({a:"svy", c:S.c, v:v}).then(function (r) {
+      if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
+      S.sq = true; toast("תודה על המשוב"); window.scrollTo(0, 0); draw();
+    }).catch(function () { btn.disabled = false; offline(); });
+  };
 }
 
 /* ---- the conference playlist ("השיר שלי", kenes-shir): only songs approved for the big screen ---- */
