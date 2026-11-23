@@ -467,6 +467,27 @@ body.screen{background:var(--paper);overflow:hidden}
 .chs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .chq{font-size:15px;font-weight:700;line-height:1.3;padding:10px 8px}
 .lh{margin:20px 0 8px;font-size:17px;color:var(--navy)}
+/* networks exhibition: pick a network by its logo, like the networks' caps (Meytal, 23.11) */
+/* all five in two rows (3 + 2), Meytal 23.11 */
+.npick{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin:12px 0 6px}
+.npick button{grid-column:span 2;position:relative;display:flex;flex-direction:column;align-items:center;gap:7px;background:#fff;border:0;border-radius:16px;padding:12px 4px 10px;cursor:pointer;font:inherit;color:var(--navy);
+  box-shadow:0 0 0 1px rgba(200,149,90,.35),0 10px 22px -16px rgba(15,47,82,.45)}
+.npick button:nth-child(4):nth-last-child(2){grid-column:2 / span 2}
+.npick button:nth-child(5):last-child{grid-column:4 / span 2}
+.nmed{width:74px;height:74px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  box-shadow:0 0 0 2px var(--gold),0 0 0 5px #fff,0 0 0 6px rgba(200,149,90,.55)}
+.nmed img{width:80%;max-height:64%;object-fit:contain}
+.npick b{font-size:14px;line-height:1.2;text-align:center}
+.npick small{font-size:12px;color:#6b7785}
+@media (min-width:700px){.nmed{width:96px;height:96px}.npick b{font-size:16px}}
+.npick .vis{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:var(--goldbg);color:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.5px var(--gold)}
+.npick .vis svg{width:14px;height:14px}
+.nhead{display:flex;flex-direction:column;align-items:center;gap:10px;margin:6px 0 4px;text-align:center}
+.nhead .nmed{width:118px;height:118px}
+.nhead h1{margin:6px 0 0}
+.backtop{display:inline-flex;align-items:center;gap:6px;margin:4px 0 12px;padding:9px 16px 9px 18px;border:0;border-radius:99px;background:var(--navy);color:#fff;font:inherit;font-size:15px;font-weight:700;cursor:pointer;
+  box-shadow:0 8px 18px -10px rgba(15,47,82,.6)}
+.backtop svg{width:18px;height:18px}
 /* the museum as in the leaflet */
 .wing{display:flex;align-items:center;gap:8px;margin:22px 0 6px;font-size:16px;font-weight:800;color:var(--wc)}
 .wing i{flex:0 0 10px;height:10px;border-radius:2px;background:var(--wc);transform:rotate(45deg)}
@@ -1440,28 +1461,47 @@ function netById(id) { return S.nets.filter(function (n) { return n.id === id; }
 function iniDone(id) { return !!(S.neti[id] || S.net[id] || S.netf[id] != null); }
 function netMarks(n) { return (n.items || []).filter(function (x) { return iniDone(x.id); }).length; }
 function iniById(id) { var hit = null; S.nets.forEach(function (n) { (n.items || []).forEach(function (x) { if (x.id === id) hit = {net:n, item:x}; }); }); return hit; }
+/* the networks' logos, as on their caps (kenes-itzuvim\logos) */
+var NET_LOGO = {ort:"net-ort.svg", amal:"net-amal.svg", atid:"net-atid.svg", dror:"net-dror.jpg", sakhnin:"net-sakhnin.jpg"};
+function netMed(n) {
+  var f = NET_LOGO[n.id];
+  return '<span class="nmed">' + (f ? '<img src="kenes-melave-img/' + f + '" alt="' + esc(n.name) + '">' : "<b>" + esc(n.name) + "</b>") + "</span>";
+}
 function drawNets() {
   if (S.netItem && iniById(S.netItem)) return drawIni();
-  /* one list (Meytal, 20.11): every initiative under its network's name, one tap away. No scan button (Meytal, 22.11) */
+  if (S.netOpen && netById(S.netOpen)) return drawNet(netById(S.netOpen));
+  /* first the network, by its logo; then its initiatives (Meytal, 23.11). No scan button (Meytal, 22.11) */
   shell(kseg() + '<p class="kick">התכנסות</p><h1>תערוכת הרשתות</h1><p class="muted">כשאתם מגיעים לדוכן של רשת, היכנסו כאן לרשת וליוזמות שלה.</p>' +
-    S.nets.map(function (n) {
-      var items = n.items || [];
-      return '<h3 class="lh">' + esc(n.name) + "</h3>" + (items.length ? items.map(function (x) {
-        var done = iniDone(x.id);
-        return '<button class="ex' + (done ? " done" : "") + '" data-ini-open="' + esc(x.id) + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" +
-          esc(x.line) + (done ? " · ביקרת" : "") + '</small></span><span class="go">' + IC.next + "</span></button>";
-      }).join("") : '<div class="note" style="margin:8px 0">הפרטים יתעדכנו בקרוב</div>');
-    }).join("") +
+    '<div class="npick">' + S.nets.map(function (n) {
+      var cnt = (n.items || []).length, seen = netMarks(n);
+      return '<button type="button" data-net-open="' + esc(n.id) + '">' + (seen ? '<span class="vis" aria-label="ביקרת">' + IC.check + "</span>" : "") + netMed(n) +
+        "<b>" + esc(n.name) + "</b><small>" + (cnt ? cnt + " יוזמות" : "הפרטים יתעדכנו בקרוב") + "</small></button>";
+    }).join("") + "</div>" +
     '<p class="center muted" style="margin-top:12px">הרעיונות עולים בלי שם למסך הגדול, וכל מה שכתבת יופיע בסיכום היום שלך.</p>' + nextLine(), {k:"nets"});
-  document.querySelectorAll("[data-ini-open]").forEach(function (b) { b.onclick = function () { S.netItem = b.dataset.iniOpen; S.nd = null; draw(); }; });
+  document.querySelectorAll("[data-net-open]").forEach(function (b) { b.onclick = function () { S.netOpen = b.dataset.netOpen; S.nd = null; draw(); window.scrollTo(0, 0); }; });
+  bindSeg();
+}
+function drawNet(n) {
+  var items = n.items || [];
+  shell(kseg() + '<div class="nhead">' + netMed(n) + '<p class="kick" style="margin:0">תערוכת הרשתות</p><h1>' + esc(n.name) + "</h1></div>" +
+    (items.length ? items.map(function (x) {
+      var done = iniDone(x.id);
+      return '<button class="ex' + (done ? " done" : "") + '" data-ini-open="' + esc(x.id) + '"><span class="ic">' + (done ? IC.check : IC.pin) + "</span><span><b>" + esc(x.title) + "</b><small>" +
+        esc(x.line) + (done ? " · ביקרת" : "") + '</small></span><span class="go">' + IC.next + "</span></button>";
+    }).join("") : '<div class="note" style="margin:8px 0">הפרטים יתעדכנו בקרוב</div>') +
+    '<p class="center" style="margin:10px 0 0"><button class="link" id="nbk">לכל הרשתות</button></p>', {k:"net" + n.id});
+  document.querySelectorAll("[data-ini-open]").forEach(function (b) { b.onclick = function () { S.netItem = b.dataset.iniOpen; S.nd = null; draw(); window.scrollTo(0, 0); }; });
+  $("nbk").onclick = function () { S.netOpen = null; S.nd = null; draw(); window.scrollTo(0, 0); };
   bindSeg();
 }
 function drawIni() {
   var h = iniById(S.netItem), x = h.item, n = h.net, id = x.id, mine = S.neti[id] || {};
+  S.netOpen = n.id;   /* back / save return to this network's initiatives */
   var d = S.nd && S.nd.id === id ? S.nd : (S.nd = {id:id, i:mine.i || "", r:mine.r || "", t:mine.t || "", f:S.netf[id] != null ? S.netf[id] : -1, on:!!S.net[id], ot:!!mine.t});
-  shell(kseg() + '<p class="kick">' + esc(n.name) + "</p><h1>" + esc(x.title) + "</h1>" +
+  shell(kseg() + '<button type="button" class="backtop" id="bkt">' + IC.back + "ליוזמות של " + esc(n.name) + "</button>" +
+    '<p class="kick">' + esc(n.name) + "</p><h1>" + esc(x.title) + "</h1>" +
     '<div class="sign fr">' + CORNERS + '<span class="pill tab"><span>היוזמה <b>במשפט</b></span></span><p style="margin:0">' + esc(x.line) + "</p></div>" +
-    '<h2 style="margin:18px 0 6px">מה מזה אפשר לעשות אצלך?</h2><p class="muted" style="margin:0 0 8px">משפט אחד. הוא יעלה בלי שם למסך הגדול.</p>' +
+    '<h2 style="margin:18px 0 6px">רעיון שמדבר אליכם</h2><p class="muted" style="margin:0 0 8px">רעיון שתרצו לקחת איתכם מהפרויקט, במשפט אחד. הוא יעלה בלי שם למסך הגדול.</p>' +
     '<textarea id="ni" maxlength="300" placeholder="למשל: אצלנו אפשר להתחיל מ…">' + esc(d.i) + "</textarea>" +
     farPick(d.f, "ni") +
     '<span class="lab" style="margin-top:14px">מילה טובה לרשת</span><div class="rx" role="group" aria-label="מילה טובה לרשת">' + Object.keys(RX).map(function (k) {
@@ -1471,7 +1511,7 @@ function drawIni() {
       : '<button type="button" class="row" id="ntopen">' + IC.plus + "<span>להוסיף משפט למילה הטובה</span><small>לא חובה</small></button>") +
     '<button type="button" class="sw" id="non" aria-pressed="' + d.on + '"><span><b>רוצה לשמוע עוד</b><small>השם שלך יועבר לרשת.</small></span><i></i></button>' +
     '<button class="btn gold" id="nok" style="margin-top:12px">' + IC.check + "שמירה</button>" +
-    '<p class="center" style="margin:2px 0 0"><button class="link" id="bk">לכל היוזמות</button></p>', {k:"ini" + id});
+    '<button class="btn alt" id="bk" style="margin-top:8px">' + IC.back + "ליוזמות של " + esc(n.name) + "</button>", {k:"ini" + id});
   $("ni").oninput = function () { d.i = this.value; };
   bindFar(function (k, v) { d.f = v; });
   document.querySelectorAll("[data-rx]").forEach(function (b) {
@@ -1483,7 +1523,7 @@ function drawIni() {
   if ($("ntopen")) $("ntopen").onclick = function () { d.ot = true; drawIni(); var t = $("nt"); if (t) t.focus(); };
   if ($("nt")) $("nt").oninput = function () { d.t = this.value; };
   $("non").onclick = function () { d.on = !d.on; this.setAttribute("aria-pressed", d.on); };
-  $("bk").onclick = function () { S.netItem = null; S.nd = null; draw(); };
+  $("bk").onclick = $("bkt").onclick = function () { S.netItem = null; S.nd = null; draw(); window.scrollTo(0, 0); };
   $("nok").onclick = function () {
     var btn = $("nok"); btn.disabled = true;
     var body = {a:"net", c:S.c, id:id, i:String(d.i || "").trim(), r:d.r || "", t:String(d.t || "").trim(), f:d.f, on:!!d.on};
@@ -1642,7 +1682,7 @@ function drawEx() {
     $("nx").onclick = function () { S.step = "idea"; drawEx(); };
   } else if (S.step === "idea") {
     shell(bar("idea") + '<p class="kick">' + esc(x.title) + "</p>" + (x.changed ? '<div class="reveal"><b>מה השתנה בבית הספר?</b><br>' + esc(x.changed) + "</div>" : "") +
-      '<h1>מה מזה אפשר לעשות אצלך?</h1><p class="muted">משפט אחד. הוא יעלה בלי שם לקיר הרעיונות במסך הגדול.</p>' +
+      '<h1>רעיון שמדבר אליכם</h1><p class="muted">רעיון שתרצו לקחת איתכם מהפרויקט, במשפט אחד. הוא יעלה בלי שם לקיר הרעיונות במסך הגדול.</p>' +
       '<textarea id="idea" maxlength="300" placeholder="למשל: אצלנו אפשר להתחיל מ…">' + esc(S.draftI != null ? S.draftI : mine.i || "") + "</textarea>" +
       farPick(S.draftF != null ? S.draftF : (mine.f != null ? mine.f : -1), "ex") +
       '<button class="btn" id="nx">המשך' + IC.next + "</button>" + back, K);
@@ -1761,7 +1801,7 @@ function schoolBlock(d, full) {
     (d.block.length ? '<div class="card"><p class="kick">מה הכי מעכב</p>' + bars(d.block) + "</div>" : "");
 }
 /* the full picture for a principal / pedagogical coordinator: 5 cards, one at a time */
-var MCARDS = ["איפה אנחנו", "מה מעכב", "האם יש מסגרת", "על מי נשענים", "מה זה אומר לכם"];
+var MCARDS = ["איפה אנחנו", "חסמים אפשריים", "תמיכה וליווי", "יוצאים לדרך", "תובנות"];   /* Meytal 23.11: was "מה מעכב" / "האם יש מסגרת" / "על מי נשענים" / "מה זה אומר לכם" */
 function mBars(arr) { return arr.map(function (t) { return '<div class="barrow"><span><b>' + esc(t[0]) + "</b><span>" + t[1] + '%</span></span><div class="tr"><i style="width:' + t[1] + '%"></i></div></div>'; }).join(""); }
 function mInsights(d) {
   var out = [], sc = d.sc || {}, yes = d.yes || new Array(d.yesN || 0);
@@ -1778,7 +1818,7 @@ function mCard(d, i) {
   if (i === 0) return '<div class="stat"><div><b>' + d.reg + "%</b><small>משתמשים בעצמם כל שבוע או כמעט כל יום</small></div><div><b>" + (d.cls == null ? "–" : d.cls + "%") + "</b><small>עבדו עם תלמידים עם AI בחודש האחרון</small></div></div>" +
     '<div class="stat"><div><b>' + d.n + "</b><small>מורים ענו" + (d.staff ? " מתוך " + d.staff : "") + "</small></div><div><b>" + d.never + "%</b><small>עוד לא השתמשו בחודש האחרון</small></div></div>" +
     (d.tools.length ? '<div class="card"><p class="kick">הכלים שהכי משתמשים בהם</p>' + mBars(d.tools) + "</div>" : "");
-  if (i === 1) return (d.block.length ? '<div class="card"><p class="kick">מה מעכב את המורים</p>' + mBars(d.block) + "</div>" : "") +
+  if (i === 1) return (d.block.length ? '<div class="card"><p class="kick">חסמים אפשריים</p>' + mBars(d.block) + "</div>" : "") +
     (d.inn ? '<div class="note">' + d.inn + '% ענו "שום דבר, אני כבר בפנים".</div>' : "") +
     (d.q && d.q.length ? '<div class="card"><p class="kick">מה הכי היה עוזר להם השנה</p>' + d.q.map(function (t) { return '<p class="mq">' + esc(t) + "</p>"; }).join("") + '<small class="muted">מתוך תשובות המורים, בלי שמות</small></div>' : "");
   if (i === 2) {
