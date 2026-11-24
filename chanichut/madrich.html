@@ -99,7 +99,7 @@ figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
       <li>מעסיקים: מוסיפים מעסיק ומשייכים אליו תלמידים</li>
       <li>בתיק כל תלמיד.ה: ימי העבודה הקבועים ושעות ביום</li>
       <li><span class="ui">דיווח נוכחות</span>: מסמנים ✓ או ✗ בכל יום עבודה</li>
-      <li>מה שחורג: הערה, היעדרות באישור, שעות אחרות, יום נוסף, יום בלי תעסוקה</li>
+      <li>מה שחורג: הערה, היעדרות באישור, שעות אחרות, יום נוסף, ימים משתנים, יום בלי תעסוקה</li>
       <li><span class="ui">שליחת הדיווח</span> לכל מגמה, עד ה-15 בחודש הבא</li>
       <li>מעקב: 150 השעות ודוחות</li>
     </ol>
@@ -171,7 +171,7 @@ figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
   <!-- 4 -->
   <section class="step" id="s4" data-nav="ימי עבודה ושעות">
     <div class="step-h"><span class="num">4</span><h2>ימי עבודה ושעות בתיק התלמיד.ה</h2></div>
-    <p>המערכת בונה את ימי הדיווח מהימים הקבועים של כל תלמיד.ה. בלי ימי עבודה אין מה לסמן.</p>
+    <p>המערכת בונה את ימי הדיווח מהימים הקבועים של כל תלמיד.ה. תלמיד.ה שעובד.ת בימים משתנים? משאירים בלי ימים קבועים ומדווחים לפי תאריכים (<a href="#s7b">שלב 7</a>).</p>
     <ol>
       <li>לוחצים על שם התלמיד.ה (מ"תלמידים" או מכל רשימה) ונפתח התיק.</li>
       <li>בכרטיס <span class="ui">ימי עבודה ונוכחות</span> מקישים על הימים הקבועים בשבוע, למשל א׳ וג׳. כל ימי א׳ וג׳ בחודש נוצרים לבד ומוכנים לסימון.</li>
@@ -228,7 +228,7 @@ figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
   </section>
 
   <!-- 7 -->
-  <section class="step" id="s7" data-nav="יום נוסף">
+  <section class="step" id="s7" data-nav="יום נוסף וימים משתנים">
     <div class="step-h"><span class="num">7</span><h2>יום עבודה נוסף, שאינו קבוע</h2></div>
     <p>תלמיד.ה עבד.ה ביום שאינו מהימים הקבועים? מוסיפים אותו כך שייספר בשעות:</p>
     <ol>
@@ -238,10 +238,23 @@ figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
       <li><span class="ui">שמירה</span>, ואז <span class="ui">סיום</span>. אפשר להוסיף כמה ימים באותה כניסה.</li>
     </ol>
     <p>היום הנוסף מופיע בשורת התלמיד.ה במסגרת מקווקוות. טעות? פותחים אותו ולוחצים <span class="ui">הסרת היום</span>.</p>
+    <h3 id="s7b">תלמיד.ה בלי ימים קבועים: דיווח בימים משתנים</h3>
+    <p>יש תלמידים שעובדים כל שבוע בימים אחרים. אצלם לא מסמנים ימים קבועים בתיק, וכל יום עבודה מדווחים לפי תאריך:</p>
+    <ol>
+      <li>בתיק התלמיד.ה משאירים את הימים בשבוע לא מסומנים.</li>
+      <li>במסך <span class="ui">דיווח נוכחות</span> כתוב בשורה שלו.ה "אין ימי עבודה". זה תקין.</li>
+      <li>לוחצים <span class="ui">הוספת יום עבודה</span>, ובלוח החודש מקישים על התאריך שבו עבד.ה.</li>
+      <li>מוסיפים את השעות של אותו יום ולוחצים <span class="ui">שמירה</span>.</li>
+      <li>חוזרים על זה לכל יום שבו עבד.ה, ובסוף לוחצים <span class="ui">סיום</span>.</li>
+    </ol>
+    <div class="note"><b>חשוב:</b> חייבים לבחור תאריכים. בלי תאריך היום לא נספר, לא בנוכחות ולא ב-150 השעות. לכל תאריך מוסיפים את השעות.</div>
+    <div class="tip">סרטון: <a href="https://tfasim.pedagogiamh.co.il/chanichut/hadracha.html#yamim">דיווח בימים משתנים</a>, בעברית ובערבית.</div>
     <details class="shot"><summary><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m21 16-5-5-8 8"/></svg>צילומי מסך · 2<svg class="i chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></summary>
       <div class="shots">
         <figure><img src="madrich/17-cal.png" alt="לוח החודש עם ימי העבודה הקבועים מסומנים" loading="lazy"><figcaption>לוח החודש: מקישים על יום שאינו קבוע</figcaption></figure>
         <figure><img src="madrich/18-extra-day.png" alt="פרטי היום הנוסף: שדה שעות" loading="lazy"><figcaption>השעות של היום הנוסף</figcaption></figure>
+        <figure><img src="madrich/25-row-nodays.png" alt="שורת תלמידה בלי ימים קבועים: אין ימי עבודה, והכפתור הוספת יום עבודה" loading="lazy"><figcaption>בלי ימים קבועים: "אין ימי עבודה" ← "הוספת יום עבודה"</figcaption></figure>
+        <figure><img src="madrich/26-row-varied.png" alt="אותה שורה אחרי הוספת שלושה תאריכים עם שעות" loading="lazy"><figcaption>אחרי שלושה תאריכים: 3 ימים · 15.5 שעות</figcaption></figure>
       </div>
     </details>
   </section>
@@ -302,7 +315,7 @@ figcaption{font-size:.9em;color:var(--muted);margin-top:4px;text-align:center}
   </section>
 
   <section class="videos" aria-labelledby="vidH">
-    <div><h2 id="vidH">סרטוני הדרכה</h2><p>10 סרטונים קצרים לפי סדר העבודה, בעברית ובערבית.</p></div>
+    <div><h2 id="vidH">סרטוני הדרכה</h2><p>סרטונים קצרים לפי סדר העבודה, בעברית ובערבית.</p></div>
     <a class="btn" href="https://tfasim.pedagogiamh.co.il/chanichut/hadracha.html"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5z"/></svg>לדף הסרטונים</a>
   </section>
 
