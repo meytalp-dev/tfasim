@@ -1147,6 +1147,8 @@ function demoPhase(ph) {
 function phoneStart() {
   var urlC = (Q.get("c") || "").toLowerCase(), urlM = Q.get("m"), urlN = Q.get("n");
   var stored = lsGet("km-c");
+  /* 24.11.26: the personal link in the mail after the conference (&e=1): it is this person, on whatever device */
+  if (Q.get("e") === "1" && /^[a-z0-9]{6,14}$/.test(urlC) && urlC !== KLALI) { lsSet("km-c", urlC); stored = urlC; }
   if (DEMO && !stored && !urlC) stored = Demo.demoCode;
   /* an exhibit / an initiative scanned with the camera app: kept until the phone is in the game, then opened */
   if (urlM) { var mm = String(urlM).match(/^m?(\d{2})/); lsSet("km-open", mm ? "m" + mm[1] : null); }
@@ -1234,7 +1236,7 @@ function take(r) {
   S.ph = r.ph; S.me = r.me; S.pw = r.pw; S.want = r.want; S.mt = r.mt || []; S.ex = r.ex || {}; S.lec = r.lec || ""; S.moto = r.moto || "";
   S.exhibits = (r.exhibits || []).map(mzOf); S.mipui = r.mipui; S.mc = S.mt.length;
   S.nets = r.nets || []; S.net = r.net || {}; S.tbl = r.tbl || {t:0, rep:null, f:{}}; S.tbl.f = S.tbl.f || {}; S.fb = r.fb || {};
-  S.mailed = !!r.mr; S.he = r.he !== false; S.sq = S.sq || !!r.sq;
+  S.mailed = !!r.mr; S.he = r.he !== false; S.sq = S.sq || !!r.sq; S.stx = S.stx || !!r.stx;
   S.netf = r.netf || {}; S.neti = r.neti || {}; S.tin = r.tin || []; renderTalk();
   S.meetOn = !!r.mo; if (!S.meetOn && S.view === "meet") S.view = null;
 }
@@ -1337,9 +1339,12 @@ function drawSvy() {
   for (var i = 0; i < 5; i++) h += q(i);
   h += '<p class="sqh"><span style="color:var(--gold)">6</span> · ארגון ותנאים פיזיים</p>';
   for (i = 5; i < SVQ.length; i++) h += q(i);
+  /* 24.11.26 (Meytal): free text at the end, not required */
+  h += '<label class="lab" for="svtx">הארות והערות — נשמח לשמוע</label><textarea id="svtx" rows="4" maxlength="1500">' + esc(S.svT || "") + "</textarea>";
   shell('<p class="kick center">רגע לפני הסיכום</p><h1 class="center">חשוב לנו לשמוע את דעתך</h1>' +
     '<p class="center">אחרי המשוב מחכים לך הסיכום של היום והמכתב שכתבת לעצמך מ-2030.</p>' + h +
     '<button class="btn" id="ok">' + IC.check + "שליחה וקבלת הסיכום</button>", {k:"svy"});
+  $("svtx").oninput = function () { S.svT = this.value; };
   document.querySelectorAll(".sqr button").forEach(function (el) {
     el.onclick = function () {
       var i = +el.dataset.q, v = +el.dataset.v;
@@ -1350,11 +1355,12 @@ function drawSvy() {
   $("ok").onclick = function () {
     var btn = $("ok"), v = [];
     for (var i = 0; i < SVQ.length; i++) v.push(a[i] || 0);
-    if (!v.some(function (x) { return x; })) { toast("סמנו לפחות שאלה אחת"); return; }
+    var tx = ($("svtx").value || "").trim();
+    if (!v.some(function (x) { return x; }) && !tx) { toast("סמנו לפחות שאלה אחת"); return; }
     btn.disabled = true;
-    post({a:"svy", c:S.c, v:v}).then(function (r) {
+    post({a:"svy", c:S.c, v:v, tx:tx}).then(function (r) {
       if (!r.ok) { btn.disabled = false; toast("לא נשמר. נסו שוב."); return; }
-      S.sq = true; toast("תודה על המשוב"); window.scrollTo(0, 0); draw();
+      S.sq = true; if (tx) S.stx = true; toast("תודה על המשוב"); window.scrollTo(0, 0); draw();
     }).catch(function () { btn.disabled = false; offline(); });
   };
 }
@@ -2069,7 +2075,10 @@ function drawEnd() {
     '<div class="letter"><span class="yr">מכתב מ-2030</span><div id="ltx">' + (S.letter ? '<p class="lt">' + esc(S.letter) + "</p>" : '<p class="wait">המכתב שלך נכתב עכשיו, מתוך מה שבחרת וכתבת היום…</p>') + "</div></div>" +
     /* "people I met" only if finding people was opened at some point */
     '<div class="tots">' + (S.mt.length || S.meetOn ? '<div><span class="tnum">' + S.mt.length + "</span><small>אנשים שפגשתי</small></div>" : "") + '<div><span class="tnum">' + ids.length + "</span><small>מיצגים שביקרתי</small></div></div>" +
-    '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs + matzpenCard(S.mipui || {kind:"none", list:[]}) +
+    '<div class="duo">' + pwBox("הכוח שלי", S.pw) + pwBox("הכוח שאני רוצה לאמץ", S.want) + "</div>" + secs +
+    /* 24.11.26: whoever answered the feedback before the free text existed can still add remarks */
+    (S.sq && !S.stx ? '<div class="card"><label class="lab" for="etx" style="margin-top:0">הארות והערות — נשמח לשמוע</label><textarea id="etx" rows="4" maxlength="1500">' + esc(S.svT || "") + '</textarea><button class="btn alt" id="etxok">שליחה</button></div>' : "") +
+    matzpenCard(S.mipui || {kind:"none", list:[]}) +
     /* no address on file (blank badge): type one. Otherwise it goes to the registered address, which the phone never sees */
     (!sent && S.he === false ? '<label class="lab" for="mle">לאיזה מייל לשלוח?</label><input type="text" id="mle" inputmode="email" autocomplete="email" dir="ltr" maxlength="120" placeholder="name@example.com">' : "") +
     '<button class="btn" id="ml"' + (S.mailed ? " disabled" : "") + ">" + IC.mail + "לשלוח לי את הסיכום למייל</button>" +
@@ -2077,6 +2086,18 @@ function drawEnd() {
     {credit:true, k:"end"});
   document.querySelectorAll("[data-sec]").forEach(function (d) { d.ontoggle = function () { S.open[d.dataset.sec] = d.open; }; });
   if (!S.letter) loadLetter(0);
+  if ($("etx")) {
+    $("etx").oninput = function () { S.svT = this.value; };
+    $("etxok").onclick = function () {
+      var tx = ($("etx").value || "").trim(), b = $("etxok");
+      if (!tx) { toast("כתבו כמה מילים"); $("etx").focus(); return; }
+      b.disabled = true;
+      post({a:"svy", c:S.c, tx:tx, txOnly:true}).then(function (r) {
+        if (!r.ok) { b.disabled = false; toast("לא נשמר. נסו שוב."); return; }
+        S.stx = true; toast("תודה, נשמר"); drawEnd();
+      }).catch(function () { b.disabled = false; offline(); });
+    };
+  }
   $("ml").onclick = function () {
     var btn = $("ml"), em = $("mle") ? $("mle").value.trim() : "";
     if ($("mle") && !/^[^\s@<>"',;]+@[^\s@<>"',;]+\.[a-z]{2,}$/i.test(em)) { toast("כתבו כתובת מייל"); $("mle").focus(); return; }
@@ -2282,7 +2303,7 @@ function adminStart() {
       '<div class="card" style="margin:14px 0"><p class="kick">המשפטים מההרצאה</p><p style="margin:0 0 8px">' +
         (r.lo ? "<b>על המסך.</b> " + r.lecN + " משפטים מוצגים במסך הגדול." : "<b>מוסתרים.</b> " + r.lecN + " משפטים נכתבו. המסך מציג רק כותרת, כדי לא להפריע להרצאה.") + "</p>" +
         '<button class="btn ' + (r.lo ? "alt" : "") + '" id="losw">' + (r.lo ? "להסתיר מהמסך" : "להציג את המשפטים על המסך") + "</button></div>" +
-      ltCard(r.lt) +
+      ltCard(r.lt) + invCard(r.inv) +
       '<a class="btn navy" href="?v=screen' + (DEMO ? "&demo=1" : "") + '" target="_blank" rel="noopener">לפתוח את המסך הגדול</a>' +
       (r.sheet ? '<a class="btn alt" href="' + esc(r.sheet) + '" target="_blank" rel="noopener">הגיליון עם כל התשובות</a>' : "") +
       '<button class="link" id="rs" style="margin-top:22px;color:var(--no)">איפוס כל הנתונים (רק לפני הכנס, לחזרות)</button></main>';
@@ -2303,6 +2324,17 @@ function adminStart() {
       post({a:"lecon", k:k, on:!r.lo}).then(function (x) { toast(x.ok ? (x.lo ? "המשפטים עולים למסך" : "הוסתרו מהמסך") : "לא עודכן"); refresh(); }).catch(offline);
     };
     if ($("ltgo")) $("ltgo").onclick = runLetters;
+    if ($("invpv")) $("invpv").onclick = function () {
+      var b = $("invpv"); b.disabled = true;
+      post({a:"invsend", k:k, preview:true, c:($("invc") && $("invc").value.trim().toLowerCase()) || ""}).then(function (x) {
+        b.disabled = false; toast(x.ok ? "נשלחה דוגמה (" + (x.who || "") + ") ל-" + x.to : "לא נשלח: " + (x.error || ""));
+      }).catch(function () { b.disabled = false; offline(); });
+    };
+    if ($("invgo")) $("invgo").onclick = function () {
+      var s = r.inv || {};
+      if (!confirm("לשלוח עכשיו את המייל ל-" + s.left + " משתתפים?")) return;
+      runInvite();
+    };
     if ($("ltsw")) $("ltsw").onclick = function () {
       post({a:"ltoff", k:k, off:r.lt.on}).then(function (x) { toast(x.ok ? (x.on ? "המכתבים פעילים" : "המכתבים כבויים: בסיום יופיע מכתב מתבנית") : "לא עודכן"); refresh(); }).catch(offline);
     };
@@ -2312,7 +2344,34 @@ function adminStart() {
       post({a:"reset", k:k, sure:"yes"}).then(function (x) { toast(x.ok ? "אופס" : "לא אופס"); refresh(); });
     };
   };
-  var refresh = function () { if (!LT.busy || !$("ltst")) get({a:"adm", k:k}).then(draw).catch(offline); };
+  var refresh = function () { if (typing()) return; if ((!LT.busy || !$("ltst")) && (!IV.busy || !$("invst"))) get({a:"adm", k:k}).then(draw).catch(offline); };
+  /* 24.11.26: the mail after the conference (summary + letter + a link to the feedback), to everyone who joined */
+  var IV = {busy:false, msg:""};
+  var invCard = function (s) {
+    if (!s) return "";
+    return '<div class="card" style="margin:14px 0"><p class="kick">המייל אחרי הכנס: סיכום, מכתב ומשוב</p>' +
+      '<p style="margin:0 0 8px"><b>' + s.sent + "</b> נשלחו מתוך " + s.all + " שנכנסו למשחק · <b>" + s.left + "</b> מוכנים לשליחה" +
+      (s.noLetter ? " · " + s.noLetter + " ממתינים למכתב" : "") + (s.noMail ? " · " + s.noMail + " בלי כתובת מייל" : "") + "</p>" +
+      '<p class="muted" id="invst" style="margin:0 0 8px">' + esc(IV.msg) + "</p>" +
+      '<label class="lab" for="invc">דוגמה לפי קוד תג (לא חובה)</label><input type="text" id="invc" dir="ltr" maxlength="14" placeholder="2u21es3e6l">' +
+      '<button class="btn alt" id="invpv">לשלוח לי דוגמה ל-merhav</button>' +
+      '<button class="btn" id="invgo"' + (s.left && !IV.busy ? "" : " disabled") + ">לשלוח לכולם (" + s.left + ")</button></div>";
+  };
+  var runInvite = function () {
+    if (IV.busy) return;
+    IV.busy = true; IV.msg = "שולחים…"; if ($("invst")) $("invst").textContent = IV.msg; if ($("invgo")) $("invgo").disabled = true;
+    var total = 0, bad = 0;
+    var step = function () {
+      post({a:"invsend", k:k}).then(function (x) {
+        if (!x.ok) { IV.busy = false; IV.msg = x.error === "shabbat" ? "שבת: לא שולחים" : x.error === "busy" ? "שליחה אחרת רצה. נסו שוב בעוד דקה" : "שגיאה: " + (x.error || ""); refresh(); return; }
+        total += x.done; bad += x.skipped + x.failed;
+        IV.msg = "נשלחו " + total + (bad ? " · " + bad + " לא נשלחו (בגיליון)" : "") + (x.left ? " · נשארו " + x.left + "…" : " · הכול נשלח");
+        if ($("invst")) $("invst").textContent = IV.msg;
+        if (x.left && (x.done || x.skipped)) step(); else { IV.busy = false; refresh(); }
+      }).catch(function () { IV.busy = false; IV.msg = "אין חיבור. אפשר ללחוץ שוב"; refresh(); });
+    };
+    step();
+  };
   /* the letters card. While letters are being written the board doesn't redraw (the status line would jump). */
   var LT = {busy:false, msg:""};
   var ltCard = function (lt) {
