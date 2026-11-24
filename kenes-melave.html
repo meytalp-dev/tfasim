@@ -1149,6 +1149,11 @@ function phoneStart() {
   var stored = lsGet("km-c");
   /* 24.11.26: the personal link in the mail after the conference (&e=1): it is this person, on whatever device */
   if (Q.get("e") === "1" && /^[a-z0-9]{6,14}$/.test(urlC) && urlC !== KLALI) { lsSet("km-c", urlC); stored = urlC; }
+  /* 24.11.26: the mail after the conference links principals/coordinators/supervisors/networks straight to the AI mapping (&mp=1) */
+  if (Q.get("mp") === "1") {
+    S.view = "mipui";
+    document.addEventListener("click", function (e) { if (e.target.closest && e.target.closest("#mpx")) { S.view = null; draw(); window.scrollTo(0, 0); } });
+  }
   if (DEMO && !stored && !urlC) stored = Demo.demoCode;
   /* an exhibit / an initiative scanned with the camera app: kept until the phone is in the game, then opened */
   if (urlM) { var mm = String(urlM).match(/^m?(\d{2})/); lsSet("km-open", mm ? "m" + mm[1] : null); }
@@ -1304,6 +1309,7 @@ function drawFb(part) {
 
 function draw() {
   if (!S.me) return;
+  if (S.view === "mipui") return drawSchool();
   if (S.view === "ex") return drawEx();
   if (S.view === "powers" || (S.ph !== "sagur" && (!S.pw || !S.want))) return drawPowers();
   if (S.view === "meet" && S.meetOn) return drawMeet();
@@ -1874,6 +1880,7 @@ function matzpenCard(m) {
 function drawSchool() {
   var m = S.mipui || {kind:"none", list:[]};
   var h = '<p class="kick">מיפוי השימוש בבינה מלאכותית</p>';
+  if (S.view === "mipui") h = '<button class="btn alt" id="mpx" style="margin-bottom:10px">לסיכום שלי מהכנס</button>' + h;
   /* supervisors / networks: a list of their schools; tapping a school opens the same 5 cards */
   var many = m.kind === "many" && m.list.length;
   /* the summary of all my schools (S.msch "all"), or one school of the list */
