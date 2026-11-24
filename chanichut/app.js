@@ -465,6 +465,8 @@ window.startApp = function (R) {
       <div class="sec-head"><h2>עוד</h2></div>
       <div class="rows">
         ${NAV.filter(([v]) => !TABS.includes(v)).map(([v, i, l]) => `<a class="rowbtn" href="#${v}">${ic(i)}<b>${l}</b><span></span>${chev}</a>`).join('')}
+        <a class="rowbtn" href="madrich.html" target="_blank" rel="noopener">${ic('file')}<b>איך מדווחים</b><span>הסבר על המערכת, שלב אחרי שלב</span>${chev}</a>
+        <a class="rowbtn" href="hadracha.html" target="_blank" rel="noopener">${ic('play')}<b>סרטוני הדרכה</b><span>עברית וערבית</span>${chev}</a>
         <button class="rowbtn" data-act="logout">${ic('out')}<b>יציאה</b><span></span>${chev}</button>
       </div>
     </section>
@@ -475,7 +477,7 @@ window.startApp = function (R) {
     </section>
     </div>
   </main>
-  <footer class="foot"><a class="btn quiet" id="helpLink" href="mailto:merhav@pedagogiamh.co.il?subject=${encodeURIComponent('מערכת רכזי החניכות · ' + SCHOOL + ' · תקלה')}&amp;body=${encodeURIComponent('שלום,\nנתקלתי בבעיה במערכת רכזי החניכות.\n\nבית הספר: ' + SCHOOL + '\nבאיזה מסך: \nמה קרה: \n')}">${ic('mail')}נתקלתם בבעיה?</a> <a class="btn quiet" href="hadracha.html" target="_blank" rel="noopener">${ic('play')}סרטוני הדרכה</a><br>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
+  <footer class="foot"><a class="btn quiet" id="helpLink" href="mailto:merhav@pedagogiamh.co.il?subject=${encodeURIComponent('מערכת רכזי החניכות · ' + SCHOOL + ' · תקלה')}&amp;body=${encodeURIComponent('שלום,\nנתקלתי בבעיה במערכת רכזי החניכות.\n\nבית הספר: ' + SCHOOL + '\nבאיזה מסך: \nמה קרה: \n')}">${ic('mail')}נתקלתם בבעיה?</a> <a class="btn quiet" href="madrich.html" target="_blank" rel="noopener">${ic('file')}איך מדווחים</a> <a class="btn quiet" href="hadracha.html" target="_blank" rel="noopener">${ic('play')}סרטוני הדרכה</a><br>המרחב הפדגוגי · המנהל להכשרה מקצועית · משרד העבודה<br><a href="https://impactos.co.il/" dir="ltr">impactos</a> נבנה על ידי</footer>
   <nav class="tabbar" id="tabbar">${TABS.map(v => { const [, i, l] = NAV.find(n => n[0] === v); return `<a href="#${v}" data-tab="${v}">${ic(i)}<span>${l}</span></a>`; }).join('')}<a href="#more" data-tab="more">${ic('dots')}<span>עוד</span></a></nav>
   <div class="toast" id="toast" hidden></div>`;
 
