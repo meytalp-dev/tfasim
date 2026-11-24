@@ -13,8 +13,8 @@
   const STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'stage', 'stageManual', 'why', 'created', 'hy'];
   /* hrs = שעות ביום עבודה, hrsMan = {חודש: סה"כ ידני} (3.11.26) — מוצפנים בתיק, בלי שינוי בשרת.
      rate = תעריף לשעה, work = {חודש: {יום: {w: במה עבדו, r: תעריף ליום}}} (15.11.26) — מוצפנים */
-  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor', 'hrs', 'hrsMan', 'rate', 'work'];
-  const EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
+  const STU_PRIV = ['name', 'phone', 'phone2', 'tz', 'birth', 'sex', 'act', 'note', 'log', 'hist', 'forms', 'susp', 'mentor', 'mid', 'hrs', 'hrsMan', 'rate', 'work'];
+  const EMP_PLAIN = ['name', 'mentor', 'mentors', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
   /* טקסט חופשי של מעסיק — עלול לכלול שמות, ולכן מוצפן */
   const EMP_PRIV = ['studsTxt', 'masNotes', 'hpd', 'rate'];   /* hpd = שעות ביום עבודה, rate = תעריף לשעה — ברירות מחדל לתלמידים אצל המעסיק */
   /* ריכוז שמירות: ממתינים 2.5 שניות אחרי הפעולה האחרונה. אחרי כשל — המתנה גוברת עם פיזור */

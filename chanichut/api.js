@@ -83,7 +83,7 @@
   function ymOf(back) { var t = today().split('-'), y = +t[0], m = +t[1] - (back || 0); while (m < 1) { m += 12; y--; } return y + '-' + (m < 10 ? '0' : '') + m; }
   function okCipher(v) { return v === '' || /^v1\.[A-Za-z0-9+/=]+\.[A-Za-z0-9+/=]+$/.test(String(v || '')); }
   var STU_PLAIN = ['id', 'mg', 'mgc', 'cls', 'track', 'emp', 'days', 'dayHist', 'status', 'statusSrc', 'start', 'docs', 'stage', 'stageManual', 'why', 'formsMeta', 'created', 'hy'];
-  var EMP_PLAIN = ['name', 'mentor', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
+  var EMP_PLAIN = ['name', 'mentor', 'mentors', 'manager', 'phone', 'mail', 'addr', 'slots', 'slotsRaw', 'mg', 'mas', 'recheck', 'visit', 'talk', 'contact', 'lead', 'status', 'kind', 'client', 'hours', 'min'];
   var MON_PLAIN = ['sub', 'off', 'conf'];
   function pick(o, keys) { var r = {}; keys.forEach(function (k) { if (o && o[k] !== undefined) r[k] = o[k]; }); return r; }
   function nn(s) { return String(s == null ? '' : s).replace(/\s+/g, ' ').trim(); }
@@ -226,7 +226,7 @@
   var MENTOR_CAP = 400, LOCK_DAY = 15;
   function mTok(k) { return /^[A-Za-z0-9_-]{20,40}$/.test(String(k || '')); }
   function mId(v) { return /^[A-Za-z0-9]{2,24}$/.test(String(v || '')); }
-  function mLink(p) { return { emp: String(p.emp || ''), ids: Array.isArray(p.ids) ? p.ids.map(String) : [], created: String(p.created || ''), revoked: String(p.revoked || ''), wrap: String(p.wrap || '') }; }
+  function mLink(p) { return { emp: String(p.emp || ''), mid: String(p.mid || ''), ids: Array.isArray(p.ids) ? p.ids.map(String) : [], created: String(p.created || ''), revoked: String(p.revoked || ''), wrap: String(p.wrap || '') }; }
   /* ההקשר של קישור: בית הספר, המעסיק, התלמידים המותרים (גלוי בלבד, בלי e של stu:) */
   function mCtx(d, k) {
     var school = Object.keys(d.schools).filter(function (n) { return d.schools[n].recs['ml:' + k]; })[0];
@@ -284,14 +284,15 @@
     if (EDIT.indexOf(s.role) < 0) return { ok: false, error: KEYED.indexOf(s.role) >= 0 ? 'readonly' : 'forbidden' };
     var t = d.schools[s.school] = d.schools[s.school] || { keys: {}, recovery: null, recs: {} }, recs = t.recs, day = today();
     var links = function () { return Object.keys(recs).filter(function (key) { return key.indexOf('ml:') === 0; }).map(function (key) { var L = mLink(recs[key].p); L.k = key.slice(3); return L; }); };
-    var revoke = function (L) { recs['ml:' + L.k] = { p: { emp: L.emp, ids: L.ids, created: L.created, revoked: day, wrap: L.wrap }, e: recs['ml:' + L.k].e }; };
+    var revoke = function (L) { recs['ml:' + L.k] = { p: { emp: L.emp, mid: L.mid || '', ids: L.ids, created: L.created, revoked: day, wrap: L.wrap }, e: recs['ml:' + L.k].e }; };
     if (q.action === 'mentorCreate') {
-      var emp = String(q.emp || ''), k = String(q.k || ''), ids = Array.isArray(q.ids) ? q.ids.map(String) : [], roster = String(q.roster || ''), wrap = String(q.wrap || '');
+      var emp = String(q.emp || ''), mid = String(q.mid || ''), k = String(q.k || ''), ids = Array.isArray(q.ids) ? q.ids.map(String) : [], roster = String(q.roster || ''), wrap = String(q.wrap || '');
       if (!mId(emp) || !mTok(k) || !ids.length || ids.length > 200 || !ids.every(mId) || !roster || !okCipher(roster) || !wrap || !okCipher(wrap)) return { ok: false, error: 'bad' };
+      if (mid && !mId(mid)) return { ok: false, error: 'bad' };
       if (!recs['emp:' + emp]) return { ok: false, error: 'noemp' };
       if (recs['ml:' + k]) return { ok: false, error: 'bad' };
-      var replaced = 0; links().forEach(function (L) { if (L.emp === emp && !L.revoked) { revoke(L); replaced++; } });
-      recs['ml:' + k] = { p: { emp: emp, ids: ids, created: day, revoked: '', wrap: wrap }, e: roster }; save(d);
+      var replaced = 0; links().forEach(function (L) { if (L.emp === emp && (!mid || !L.mid || L.mid === mid) && !L.revoked) { revoke(L); replaced++; } });
+      recs['ml:' + k] = { p: { emp: emp, mid: mid, ids: ids, created: day, revoked: '', wrap: wrap }, e: roster }; save(d);
       return { ok: true, k: k, replaced: replaced };
     }
     if (q.action === 'mentorRevoke') {
