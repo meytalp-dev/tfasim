@@ -133,6 +133,7 @@
   $('gCode').onkeydown = e => { if (e.key === 'Enter') $('gEnter').click(); };
 
   /* ---------- 3. ההצפנה ---------- */
+  let USED_SAVED = false;   /* נכנסו עם המפתח השמור במכשיר, בלי סיסמה */
   const rid = () => API.canon(ME.school) + '|' + ME.email;   /* המפתח השמור במכשיר — לפי השם בשרת (מעיינות/עתיד זוקו, 25.11.26) */
   async function afterLogin() {
     ME = API.session().me;
@@ -140,12 +141,12 @@
     if (noKey(ME)) return mabat();
     show('gBusy');
     const saved = await CK.recall(rid());
-    if (saved && ME.role !== 'rakaz') { SKEY = saved; EXTRACT = false; return enter(); }
+    if (saved && ME.role !== 'rakaz') { SKEY = saved; EXTRACT = false; USED_SAVED = true; return enter(); }
     const r = await API.call('keys');
     /* רכז.ת עם מפתח שמור: נכנסים ישר, אלא אם מנהל.ת מחכה לגישה. המפתח השמור לא ניתן לעטיפה, ולכן פעם אחת סיסמה (11.11.26) */
-    if (saved && r.ok && r.me && r.me.wrapped && !waiting(r).length) { SKEY = saved; EXTRACT = false; return enter(); }
+    if (saved && r.ok && r.me && r.me.wrapped && !waiting(r).length) { SKEY = saved; EXTRACT = false; USED_SAVED = true; return enter(); }
     if (saved && r.ok && r.me && r.me.wrapped) { KEYS = r; $('gHello').textContent = 'שלום' + (ME.name ? ' ' + ME.name.split(' ')[0] : ''); show('gPass'); return msg('mPass', 'מנהל.ת בית הספר מחכה לגישה. הקלדת הסיסמה פעם אחת פותחת אותה'); }
-    if (saved && !r.ok && r.error !== 'badsession') { SKEY = saved; EXTRACT = false; return enter(); }
+    if (saved && !r.ok && r.error !== 'badsession') { SKEY = saved; EXTRACT = false; USED_SAVED = true; return enter(); }
     if (!r.ok) { if (r.error === 'badsession') return logout(); show('gLogin'); return msg('mLogin', err(r), true); }
     KEYS = r;
     $('gHello').textContent = 'שלום' + (ME.name ? ' ' + ME.name.split(' ')[0] : '');
@@ -233,6 +234,7 @@
     const r = await API.call('keysActivate', { pub: uk.pub, encPriv: uk.encPriv, wrapped: await CK.wrapFor(uk.pub, sk), recovery: await CK.wrapRecovery(REC, sk) });
     busy(b, false);
     if (!r.ok) return msg('mAct', err(r), true);
+    await CK.forget(rid());   /* מפתח ישן שנשמר במכשיר לפני האיפוס כבר לא פותח את הרשימה החדשה */
     SKEY = sk; EXTRACT = true; $('aCode').value = '';
     $('iRec').textContent = REC; $('iStep1').hidden = true; $('iStep2').hidden = false; show('gInit');
   };
@@ -263,6 +265,7 @@
       const uk = await CK.newUserKeys(p1);
       const r = await API.call('keysSet', { pub: uk.pub, encPriv: uk.encPriv, wrapped: await CK.wrapFor(uk.pub, sk) });
       if (!r.ok) throw new Error(err(r));
+      await CK.forget(rid());
       SKEY = sk; EXTRACT = true; busy(b, false); enter();
     } catch (e) { busy(b, false); msg('mRec', 'קוד השחזור לא נכון', true); }
   };
@@ -273,6 +276,8 @@
     let back = 0; try { localStorage.removeItem(BACK_KEY); back = Math.max(0, +(sessionStorage.getItem(BACK_KEY) || 0) || 0); back = Math.min(back, Store.monthsBack()); } catch (e) {}   /* כמה חודשים אחורה. רק בלשונית הזו: פתיחה חדשה חוזרת לחודש הנוכחי (מאסטרו F-001) */
     try {
       const R = await Store.load(SKEY, ME, back);
+      /* מפתח שמור במכשיר מלפני איפוס/הפעלה מחדש: אף תלמיד.ה לא נפתח. מוחקים אותו ומבקשים סיסמה, לא מציגים רשימה ריקה (דרור נווה מדבר, 25.11.26) */
+      if (USED_SAVED && R.bad && !R.STU.length) { await CK.forget(rid()); location.reload(); return; }
       R.canGrant = EXTRACT;
       R.hooks = { logout, users, grant, setBack };
       window.startApp(R);
