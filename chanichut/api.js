@@ -12,19 +12,37 @@
   var MOCK = !EXEC;
   var TOKEN_KEY = 'chanichut2-session';
 
-  function session() { try { return JSON.parse(localStorage.getItem(TOKEN_KEY) || 'null'); } catch (e) { return null; } }
+  function session() { var s; try { s = JSON.parse(localStorage.getItem(TOKEN_KEY) || 'null'); } catch (e) { return null; } return s && !MOCK ? walk(s, function (n) { return ALIAS[n] || n; }) : s; }   /* כניסה שנשמרה לפני 25.11 עם השם הישן */
   function setSession(s) { try { s ? localStorage.setItem(TOKEN_KEY, JSON.stringify(s)) : localStorage.removeItem(TOKEN_KEY); } catch (e) {} }
+
+  /* מיטל 25.11.26:
+     (1) בתי ספר שלא בחניכות כרגע — לא מופיעים בכלל (לא ברשימות, לא ב"טרם דיווחו", לא בספירות).
+     (2) שמות נכונים במסך: "מעיינות", "עתיד זוקו". בשרת ובגיליונות השם הישן הוא המפתח, ולכן מתרגמים רק כאן, בגבול שבין הדף לשרת. */
+  var RAW = /\/hachana\//.test(location.pathname);   /* כלי ההכנה המקומיים של מיטל עובדים עם כל 64 ובשמות של השרת */
+  var HIDE = RAW ? [] : ['כפר עקב', 'אור דניאל', 'סור באהר'];
+  var ALIAS = RAW ? {} : { 'מרחביה/מעיינות': 'מעיינות', 'תיכון עוצמ"ה עתיד זוקו': 'עתיד זוקו' }, CANON = {};
+  Object.keys(ALIAS).forEach(function (k) { CANON[ALIAS[k]] = k; });
+  if (root.SCHOOLS) root.SCHOOLS = root.SCHOOLS.filter(function (x) { return HIDE.indexOf(x.name) < 0; }).map(function (x) { return ALIAS[x.name] ? Object.assign({}, x, { name: ALIAS[x.name] }) : x; });
+  function canon(n) { return MOCK ? n : CANON[n] || n; }   /* שם במסך → השם בשרת */
+  function walk(o, f) { if (Array.isArray(o)) return o.map(function (v) { return walk(v, f); }); if (o && typeof o === 'object') { var r = {}; Object.keys(o).forEach(function (k) { r[k] = k === 'school' && typeof o[k] === 'string' ? f(o[k]) : walk(o[k], f); }); return r; } return o; }
+  function fromServer(r) {
+    if (!r || typeof r !== 'object') return r;
+    var hid = function (x) { return x && HIDE.indexOf(x.school) >= 0; };
+    if (Array.isArray(r.schools)) r.schools = r.schools.filter(function (x) { return !hid(x); });
+    if (Array.isArray(r.rows)) r.rows = r.rows.filter(function (x) { return !hid(x); });
+    return MOCK ? r : walk(r, function (n) { return ALIAS[n] || n; });
+  }
 
   async function call(action, body) {
     var s = session();
-    var req = Object.assign({ action: action, token: s && s.token }, body || {});
+    var req = Object.assign({ action: action, token: s && s.token }, MOCK ? body || {} : walk(body || {}, canon));
     if (MOCK) {
       await new Promise(function (r) { setTimeout(r, 80); });
-      return JSON.parse(JSON.stringify(mock(JSON.parse(JSON.stringify(req)))));
+      return fromServer(JSON.parse(JSON.stringify(mock(JSON.parse(JSON.stringify(req))))));
     }
     /* text/plain — בלי preflight, כמו בשאר השרתים של המרחב */
     var r = await fetch(EXEC, { method: 'POST', body: JSON.stringify(req), headers: { 'Content-Type': 'text/plain;charset=utf-8' }, credentials: 'omit', keepalive: !!(body && body.keepalive) });
-    return r.json();
+    return fromServer(await r.json());
   }
 
   /* ================= שרת מדומה ================= */
@@ -540,5 +558,5 @@
   }
   if (MOCK && /[?&]mock=seed\b/.test(location.search)) { try { var d0 = db(); if (!d0.seeded) { seedDb(d0, 12); save(d0); } } catch (e) {} }
 
-  root.API = { call: call, session: session, setSession: setSession, MOCK: MOCK, resetMock: resetMock, mockSeed: mockSeed, mockSend: mockSend };
+  root.API = { call: call, canon: canon, session: session, setSession: setSession, MOCK: MOCK, resetMock: resetMock, mockSeed: mockSeed, mockSend: mockSend };
 })(window);

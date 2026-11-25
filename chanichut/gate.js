@@ -32,7 +32,7 @@
   const opts = l => l.map(n => `<option>${esc(n)}</option>`).join('');
   $('gSchool').innerHTML = '<option value="">בחירה: בית ספר, פיקוח, מטה או רשת</option>'
     + `<optgroup label="פיקוח ומטה">${opts(TOP)}</optgroup><optgroup label="רשתות">${opts(NETS)}</optgroup><optgroup label="${SYS}">${opts([SYS])}</optgroup><optgroup label="בתי הספר">${opts(SCH)}</optgroup>`;
-  $('rSchool').innerHTML = '<option value="">בחירה מתוך 64 בתי הספר</option>' + opts(SCH);
+  $('rSchool').innerHTML = '<option value="">בחירת בית ספר</option>' + opts(SCH);
   const PLACES = TOP.concat(NETS, [SYS], SCH);
   try { const last = localStorage.getItem('chanichut2-school'); if (last && PLACES.includes(last)) $('gSchool').value = last; } catch (e) {}
   /* חיפוש במקום רשימה: בחיפוש רק בתי ספר, ו"כניסת פיקוח ומטה" מחליפה לרשימה הקצרה. #gSchool המוסתר נשאר הערך */
@@ -133,7 +133,7 @@
   $('gCode').onkeydown = e => { if (e.key === 'Enter') $('gEnter').click(); };
 
   /* ---------- 3. ההצפנה ---------- */
-  const rid = () => ME.school + '|' + ME.email;
+  const rid = () => API.canon(ME.school) + '|' + ME.email;   /* המפתח השמור במכשיר — לפי השם בשרת (מעיינות/עתיד זוקו, 25.11.26) */
   async function afterLogin() {
     ME = API.session().me;
     if (!ME || !ROLES.includes(ME.role)) { ME = null; try { await API.call('logout'); } catch (e) {} API.setSession(null); show('gLogin'); return msg('mLogin', ERR.badrole, true); }
