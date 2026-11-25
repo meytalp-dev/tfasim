@@ -33,7 +33,9 @@
   EXT_PAGE[2] = "mifgash-02/";
   /* 1.11.26: מפגש 3 א-סינכרוני: דף אחד לשני המסלולים, פרק בתיק ההטמעה. אין מצגת */
   EXT_PAGE[3] = "mifgash-03/";
-  var NO_DECK = { 3: true };
+  /* 25.11.26: יחידה 5 א-סינכרונית (מהתיק לביצוע: הדרכה לצוות), דף אחד לשני המסלולים, פרק 5 בתיק */
+  EXT_PAGE[5] = "mifgash-05/";
+  var NO_DECK = { 3: true, 5: true };
   /* 16.11.26: מפגש 4: מצגת (index.html) ודף מלווה (melave.html) נפרדים. התשובות נשמרות במכשיר של הרכז/ת, לא בשרת */
   EXT_PAGE[4] = "mifgash-04/";
   var LOCAL_PAGE = { 4: true };
@@ -73,15 +75,25 @@
       ["מצגת הדרכה על NotebookLM", "מדריך מלא לכלי, ללמוד בקצב שלך", "https://lerani.co.il/training/notebooklm/presentation.html"],
       ["תיק ההטמעה הבית ספרי", "כל מה שכתבתם בדפים המלווים, פרק לכל מפגש", "#v=tik"]
     ];
+    /* 25.11.26: יחידה 5, אותם משאבים בשני המסלולים: ההסברים והמצגות של מפגש 4 והכלים */
+    if (num === 5) return [
+      ["הדף המלווה של מפגש 4", "צעד אחר צעד, עם צילומים: Canvas, Vids ו-AI Studio", "mifgash-04/melave.html#t=" + tr],
+      ["מצגת מפגש 4", "כלי AI בחשבון משרד החינוך", "mifgash-04/index.html#t=" + tr],
+      ["המצגת לחדר המורים", "כלי AI לצוות, להציג בהדרכה", "mifgash-04/cheder-morim.html#t=" + tr],
+      ["Gemini (Canvas)", "תכנון ההדרכה, ופעילות אינטראקטיבית", "https://gemini.google.com/app"],
+      ["Google Vids", "הסרטון של ההדרכה", "https://vids.google.com/"],
+      ["Google AI Studio", "אתר או כלי לצוות", "https://aistudio.google.com/"],
+      ["תיק ההטמעה הבית ספרי", "כל מה שכתבתם בדפים המלווים, פרק לכל מפגש", "#v=tik"]
+    ];
     return [];
   }
   function extPageUrl(num, view) {
     var u = EXT_PAGE[num];
     if (Number(num) === 4) return "mifgash-04/" + (view === "deck" ? "index.html" : "melave.html") + "#t=" + (str(S.me.track) === "הובלה" ? "h" : "k");
     /* 1.11.26: מפגש 3, שני המסלולים: מפתח, שם, בית ספר ומסלול אחרי # */
-    if (num === 3) {
+    if (num === 3 || num === 5) {
       var tk3 = w.SH_auth && w.SH_auth.token ? w.SH_auth.token() : "";
-      return "mifgash-03/#k=" + encodeURIComponent(tk3) + "&n=" + encodeURIComponent(str(S.me.name)) + "&sc=" + encodeURIComponent(str(S.me.school)) +
+      return EXT_PAGE[num] + "#k=" + encodeURIComponent(tk3) + "&n=" + encodeURIComponent(str(S.me.name)) + "&sc=" + encodeURIComponent(str(S.me.school)) +
         "&t=" + (str(S.me.track) === "הובלה" ? "h" : "k");
     }
     /* 28.10.26: מפגש 2 בהובלה = דף מלווה חדש. המפתח, השם ובית הספר אחרי # (לא נשלחים לשרת של האתר) */
@@ -749,6 +761,16 @@
       ["הפתרון", [["suggest", "מה הנוטבוק הציע"], ["adopt", "הפתרון שאני מאמץ/ת, ולמה"], ["nb", "הקישור לנוטבוק", "", "link"]]],
       ["הפעולות לצוות", [["act1", "פעולה 1", "when1", "", "who1"], ["act2", "פעולה 2", "when2", "", "who2"], ["act3", "פעולה 3", "when3", "", "who3"]]],
       ["כללי הבסיס", [["rules", "מה הוספנו"]]],
+      ["הגשה", [["submitted", "הוגש ב-"]]]] },
+    /* 25.11.26: יחידה 5, שני המסלולים */
+    5: { t: "מהתיק לביצוע: הדרכה לצוות", groups: [
+      ["הצורך", [["needt", "הצורך שלנו"]]],
+      ["פעולה 1", [["act1", "הפעולה", "nwhen1", "", "who1"], ["done1", "מה עשיתי"], ["next1", "מה אעשה"]]],
+      ["פעולה 2", [["act2", "הפעולה", "nwhen2", "", "who2"], ["done2", "מה עשיתי"], ["next2", "מה אעשה"]]],
+      ["פעולה 3", [["act3", "הפעולה", "nwhen3", "", "who3"], ["done3", "מה עשיתי"], ["next3", "מה אעשה"]]],
+      ["ההדרכה לצוות", [["trtopic", "על מה"], ["traud", "למי"], ["plan_url", "התוכנית ב-Canvas", "", "link"], ["vid_url", "הסרטון ב-Vids", "", "link"],
+        ["vid_where", "איפה הסרטון בהדרכה"], ["act_tool", "הכלי של הפעילות"], ["act_url", "הפעילות", "", "link"], ["act_what", "מה המורים עושים בה"]]],
+      ["מתי מעבירים", [["trdate", "התאריך"], ["trwhere", "באיזו מסגרת, ולמי"]]],
       ["הגשה", [["submitted", "הוגש ב-"]]]] }
   };
   /* פרק 2 קיים רק בהובלה: הכלים עבדו במפגש 2 בדף אחר, בלי תיק */
@@ -793,7 +815,9 @@
         var c = TIK_CH[n], v = (d && d.s && d.s[n]) || {}, body = "";
         c.groups.forEach(function (g) {
           var rows = g[1].map(function (f) {
-            var val = str(v[f[0]]); if (f[2] && str(v[f[2]])) val += (val ? " · " : "") + "מתי: " + str(v[f[2]]);
+            /* 25.11.26: תאריך משדה date (2026-12-08) מוצג 8.12.2026 */
+            var iso = function (x) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(x); return m ? +m[3] + "." + +m[2] + "." + m[1] : x; };
+            var val = iso(str(v[f[0]])); if (f[2] && str(v[f[2]])) val += (val ? " · " : "") + "מתי: " + iso(str(v[f[2]]));
             if (f[4] && str(v[f[4]])) val += (val ? " · " : "") + "עם מי: " + str(v[f[4]]);
             if (!val) return "";
             var shown = f[3] === "link" && /^https?:\/\//.test(val) ? '<a href="' + esc(val) + '" target="_blank" rel="noopener">' + esc(val) + "</a>" : esc(val).replace(/\n/g, "<br>");

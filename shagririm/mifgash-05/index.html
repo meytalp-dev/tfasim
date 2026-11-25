@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>יחידה 5 · מהתיק לביצוע: הדרכה לצוות</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#10344F;--mute:#5E6B78;--line:#DDE4EA;--bg:#F6F8FA;--a:#1D6FA5;--a2:#2B7A78;--a3:#C2620C;--a4:#6B55B5;--ok:#2E7D32;--ff:'Assistant',Arial,sans-serif}
+html[lang=ar]{--ff:'Noto Sans Arabic','Assistant',Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--ff)}
+.logo{background:#fff;text-align:center;padding:10px 16px;border-bottom:1px solid var(--line)}
+.logo img{height:44px;width:auto}
+header{background:var(--ink);color:#fff;padding:18px 16px}
+header .in,.wrap,.bar .in{max-width:760px;margin:0 auto}
+header small{opacity:.8;font-size:14px}
+header h1{margin:2px 0 4px;font-size:28px;line-height:1.2}
+header p{margin:0;opacity:.9;font-size:15px}
+.lang{display:flex;gap:6px;margin-bottom:10px}
+.lang button{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,.5);border-radius:16px;padding:3px 12px;font:600 14px var(--ff);cursor:pointer}
+.lang button[aria-pressed=true]{background:#fff;color:var(--ink);border-color:#fff}
+.bar{position:sticky;top:0;z-index:4;background:#fff;border-bottom:1px solid var(--line);padding:8px 16px}
+.bar .in{display:flex;align-items:center;gap:10px}
+.bar .pos{flex:1;font-size:15px;color:var(--mute)}
+.bar .pos b{color:var(--ink)}
+.dots{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.dots button{width:22px;height:8px;border-radius:4px;border:0;background:var(--line);padding:0;cursor:pointer}
+.dots button.done{background:#9CC3DD}
+.dots button.cur{background:var(--ink)}
+.wrap{padding:0 16px 100px}
+.step{background:#fff;border:1px solid var(--line);border-inline-start:5px solid var(--c);border-radius:12px;padding:16px 18px;margin-top:16px}
+.step[hidden]{display:none}
+.kick{font-size:14px;font-weight:700;color:var(--c);margin:0 0 2px}
+.step h2{margin:0 0 6px;font-size:22px;line-height:1.3}
+.step p{margin:6px 0}
+.step ol,.step ul{margin:6px 0;padding-inline-start:22px}
+.step li{margin:4px 0}
+label.f{display:block;margin-top:12px;font-weight:600}
+label.f small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+textarea,input[type=text],input[type=url],input[type=date]{width:100%;margin-top:4px;border:1px solid #C9D3DC;border-radius:8px;padding:9px 11px;font:16px var(--ff);color:var(--ink);background:#FCFDFE}
+input[type=date]{display:block;max-width:220px}
+textarea{min-height:76px;resize:vertical}
+.btn{display:inline-flex;align-items:center;gap:6px;margin:8px 0 0 8px;background:var(--c);color:#fff;border:0;border-radius:10px;padding:10px 16px;font:600 16px var(--ff);cursor:pointer;text-decoration:none}
+.btn.ghost{background:#fff;color:var(--c);border:1.5px solid var(--c)}
+.btn.ok{background:var(--ok)}
+.btn.sm{padding:7px 12px;font-size:15px}
+.tools{margin:2px 0 6px}
+.pr{white-space:pre-wrap;background:#F1F5F9;border-radius:8px;padding:12px 14px;font-size:15px;margin-top:8px}
+.shot{display:block;width:100%;max-width:300px;height:auto;border:1px solid var(--line);border-radius:8px;margin:6px 0 12px;cursor:zoom-in}
+.shot.w{max-width:420px}
+.shot.s{max-width:160px}
+.more{margin-top:12px;border-top:1px dashed var(--line);padding-top:8px}
+.more summary{cursor:pointer;color:var(--c);font-weight:600}
+.more[open]{background:#FAFBFC}
+.more p{margin:10px 0 2px}
+.mine{background:#F1F5F9;border-radius:10px;padding:10px 12px;margin-top:8px}
+.mine b{display:block;font-size:14px;color:var(--mute);font-weight:600}
+.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.opt{border:1.5px solid var(--line);border-radius:20px;padding:6px 14px;background:#fff;cursor:pointer;font:16px var(--ff);color:var(--ink)}
+.opt[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;font-weight:600}
+.choose{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
+@media(max-width:520px){.choose{grid-template-columns:1fr}}
+.choose button{border:1.5px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;background:#fff;text-align:right;font:700 17px var(--ff);color:var(--ink)}
+.choose button small{display:block;font-weight:400;color:var(--mute);font-size:14px}
+.choose button[aria-pressed=true]{border-color:var(--c);background:#EAF2F9;box-shadow:inset 0 0 0 1.5px var(--c)}
+.warn{background:#FFF4E5;border:1px solid #F3C98B;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:15px}
+.tip{background:#EEF6EE;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:15px}
+.sub{margin-top:10px;color:var(--ok);font-weight:600}
+.check{list-style:none;padding:0!important}
+.check li{padding:4px 0;border-bottom:1px solid #EEF1F4}
+.check li::before{content:"";display:inline-block;width:10px;height:10px;border-radius:50%;margin-inline-end:8px;background:#C9D3DC}
+.check li.y::before{background:var(--ok)}
+.nav{display:flex;justify-content:space-between;gap:8px;margin-top:18px}
+.nav .btn{margin:0}
+.saved{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:20px;padding:6px 14px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none}
+.saved.on{opacity:.92}
+.stuckbtn{position:fixed;bottom:14px;left:14px;z-index:5;background:var(--a3);color:#fff;border:0;border-radius:24px;padding:10px 18px;font:700 16px var(--ff);cursor:pointer;box-shadow:0 4px 14px rgba(16,52,79,.25)}
+.modal{position:fixed;inset:0;z-index:10;background:rgba(16,52,79,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px}
+.modal[hidden]{display:none}
+.modal .box{background:#fff;border-radius:14px;padding:18px;max-width:520px;width:100%;--c:var(--a3)}
+.modal h3{margin:0 0 4px;font-size:20px}
+@media(min-width:600px){.modal{align-items:center}}
+.zoom{position:fixed;inset:0;z-index:12;background:rgba(16,52,79,.85);display:flex;align-items:center;justify-content:center;padding:12px;cursor:zoom-out}
+.zoom[hidden]{display:none}
+.zoom img{max-width:100%;max-height:100%;border-radius:8px;background:#fff}
+footer{text-align:center;color:var(--mute);font-size:13px;margin-top:30px}
+footer a{color:var(--mute)}
+</style>
+</head>
+<body>
+<div class="logo"><img src="../assets/logo-minhal.png" alt="משרד העבודה · המנהל להכשרה מקצועית"></div>
+<header><div class="in">
+  <div class="lang"><button type="button" data-lang="he">עברית</button><button type="button" data-lang="ar">العربية</button></div>
+  <small id="trk"></small>
+  <h1 data-ar="من الملف إلى التنفيذ: إرشاد للطاقم">מהתיק לביצוע: הדרכה לצוות</h1>
+  <p id="who"></p>
+</div></header>
+
+<div class="bar"><div class="in">
+  <div class="pos"><span id="pos"></span><div class="dots" id="dots"></div></div>
+  <button class="btn sm" type="button" id="topNext" style="--c:var(--ink)"></button>
+</div></div>
+
+<div class="wrap">
+<div class="warn" id="nokey" hidden data-ar="افتحوا الصفحة من أدفا، كي يُحفظ ما تكتبونه في ملف التطبيق. حاليًا يُحفظ فقط على هذا الحاسوب.">פתחו את הדף מאדווה, כדי שמה שתכתבו יישמר בתיק ההטמעה. בינתיים זה נשמר רק במחשב הזה.</div>
+
+<!-- 1 · פתיחה -->
+<section class="step" style="--c:var(--ink)" data-t="מה עושים ביחידה|ماذا نفعل في الوحدة">
+<h2 data-ar="ماذا نفعل في الوحدة">מה עושים ביחידה</h2>
+<ol>
+  <li data-ar="<b>نواصل ملف التطبيق:</b> لكل خطوة من الخطوات الثلاث التي كتبتموها في الوحدة 3، نكتب ماذا فعلتم حتى الآن، ماذا ستفعلون الآن، ومتى."><b>ממשיכים את תיק ההטמעה:</b> לכל אחת משלוש הפעולות שכתבתם ביחידה 3, כותבים מה כבר עשיתם, מה תעשו עכשיו, ומתי.</li>
+  <li data-ar="<b>نبني إرشادًا للطاقم بثلاث أدوات:</b> نخطّطه في Gemini Canvas، نُعدّ فيديو في Vids، ونبني فعالية للطاقم في Canvas أو في AI Studio."><b>בונים הדרכה לצוות בשלושה כלים:</b> מתכננים אותה ב-Gemini Canvas, מכינים סרטון ב-Vids, ובונים פעילות לצוות ב-Canvas או ב-AI Studio.</li>
+  <li data-ar="<b>نحدّد متى نقدّم الإرشاد.</b>"><b>קובעים מתי מעבירים את ההדרכה.</b></li>
+</ol>
+<p><span data-ar="التسليم">הגשה</span> <b id="due"></b>. <span data-ar="كل ما تكتبونه يُحفظ تلقائيًا. يُفضّل العمل من الحاسوب.">כל מה שכותבים נשמר לבד. עדיף לעבוד מהמחשב.</span></p>
+<p id="pre" hidden data-ar="ما كتبتموه في الوحدة 3 موجود هنا. أكملوا فقط ما ينقص.">מה שכתבתם ביחידה 3 כבר כאן. משלימים רק מה שחסר.</p>
+<p class="tip" data-ar="عالقون؟ زر «علقت» في أسفل الشاشة يرسل لنا رسالة، ونساعدكم عن بُعد.">נתקעתם? הכפתור "נתקעתי" בתחתית המסך שולח לנו הודעה, ונעזור לכם מרחוק.</p>
+<p><b data-ar="العروض والشروحات من اللقاء 4 (بالعبرية):">המצגות וההסברים ממפגש 4:</b></p>
+<a class="btn ghost sm" id="lnkDeck" target="_blank" rel="noopener" href="../mifgash-04/index.html" data-ar="عرض اللقاء 4">מצגת מפגש 4</a>
+<a class="btn ghost sm" id="lnkMelave" target="_blank" rel="noopener" href="../mifgash-04/melave.html" data-ar="الصفحة المرافقة للقاء 4، خطوة بخطوة">הדף המלווה של מפגש 4, צעד אחר צעד</a>
+<a class="btn ghost sm" id="lnkStaff" target="_blank" rel="noopener" href="../mifgash-04/cheder-morim.html" data-ar="العرض لغرفة المعلمين">המצגת לחדר המורים</a>
+</section>
+
+<!-- 2 · הצורך -->
+<section class="step" style="--c:var(--a)" data-t="הצורך שלנו|حاجتنا">
+<p class="kick" data-ar="ملف التطبيق">תיק ההטמעה</p>
+<h2 data-ar="حاجتنا">הצורך שלנו</h2>
+<p data-ar="هذه هي الحاجة التي اخترتموها في الوحدة 3. يمكن تدقيقها.">זה הצורך שבחרתם ביחידה 3. אפשר לדייק אותו.</p>
+<label class="f"><span data-ar="حاجة الطاقم، في جملة">הצורך של הצוות, במשפט</span><input type="text" data-k="needt" data-ph="למשל: המורים משתמשים ב-AI לעצמם, ועוד לא עם התלמידים|مثلًا: المعلمون يستخدمون AI لأنفسهم، وليس بعد مع الطلاب"></label>
+<div class="mine" id="adoptBox" hidden><b data-ar="الحل الذي تبنّيتموه في الوحدة 3">הפתרון שאימצתם ביחידה 3</b><span id="adoptTxt"></span></div>
+</section>
+
+<!-- 3-5 · הפעולות -->
+<section class="step act" style="--c:var(--a)" data-i="1" data-t="פעולה 1|الخطوة 1"></section>
+<section class="step act" style="--c:var(--a)" data-i="2" data-t="פעולה 2|الخطوة 2"></section>
+<section class="step act" style="--c:var(--a)" data-i="3" data-t="פעולה 3|الخطوة 3"></section>
+
+<!-- 6 · כניסה -->
+<section class="step" style="--c:var(--a4)" data-t="נכנסים לחשבון משרד החינוך|ندخل إلى حساب وزارة التربية">
+<p class="kick" data-ar="الإرشاد للطاقم · قبل كل شيء">ההדרכה לצוות · לפני הכול</p>
+<h2 data-ar="ندخل بحساب وزارة التربية والتعليم">נכנסים עם החשבון של משרד החינוך</h2>
+<p data-ar="في صفحة الدخول لبيئة غوغل في وزارة التربية نختار <b>«משרד העבודה»</b> (وزارة العمل)، وندخل بالحساب. هناك كل أدوات الوحدة، مجانًا.">בדף הכניסה של משרד החינוך לסביבת גוגל בוחרים <b>משרד העבודה</b>, ונכנסים עם החשבון. שם כל הכלים של היחידה, בחינם.</p>
+<a class="btn" target="_blank" rel="noopener" href="https://www.google.com/a/avoda-edu.org.il/ServiceLogin?continue=https://classroom.google.com/&passive=true" data-ar="الدخول إلى الحساب">כניסה לחשבון</a>
+<details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+<p data-ar="1. نختار «משרד העבודה» (وزارة العمل):">1. בוחרים "משרד העבודה":</p><img class="shot w" src="../mifgash-04/img/login-portal.png" alt="">
+<p data-ar="2. نضغط على النقاط التسع في الأعلى. هناك Gemini و-Vids:">2. לוחצים על 9 הנקודות למעלה. שם Gemini ו-Vids:</p><img class="shot" src="../mifgash-04/img/login-apps.png" alt="">
+<p data-ar="فُتح الحساب الشخصي؟ نضغط على الصورة في الزاوية، ونختار حساب وزارة التربية.">נפתח החשבון הפרטי? לוחצים על התמונה בפינה, ובוחרים את החשבון של משרד החינוך.</p>
+</details>
+</section>
+
+<!-- 7 · תכנון ב-Canvas -->
+<section class="step" style="--c:var(--a4)" data-t="מתכננים את ההדרכה ב-Canvas|نخطّط الإرشاد في Canvas">
+<p class="kick" data-ar="الإرشاد للطاقم · أداة 1 من 3">ההדרכה לצוות · כלי 1 מתוך 3</p>
+<h2 data-ar="نخطّط الإرشاد في Gemini Canvas">מתכננים את ההדרכה ב-Gemini Canvas</h2>
+<p data-ar="إرشاد للطاقم مدته 15 دقيقة، مرتبط بالحاجة. Canvas يكتب خطة يمكن تعديلها ومشاركتها.">הדרכה של 15 דקות לצוות, שמתחברת לצורך. Canvas כותב תוכנית שאפשר לערוך ולשתף.</p>
+<label class="f"><span data-ar="عن ماذا الإرشاد؟<small>أداة واحدة أو فكرة واحدة، تستجيب للحاجة.</small>">על מה ההדרכה?<small>כלי אחד או רעיון אחד, שעונה על הצורך.</small></span><input type="text" data-k="trtopic" data-ph="למשל: בוחן אינטראקטיבי לכיתה ב-Canvas, בעשר דקות|مثلًا: اختبار تفاعلي للصف في Canvas، خلال عشر دقائق"></label>
+<label class="f"><span data-ar="لمَن؟">למי?</span><input type="text" data-k="traud" data-ph="למשל: מורי המגמות, 12 מורים, רובם עוד לא ניסו AI|مثلًا: معلمو التخصصات، 12 معلمًا، أغلبهم لم يجرّبوا AI بعد"></label>
+<div class="tools"><a class="btn" target="_blank" rel="noopener" href="https://gemini.google.com/app" data-ar="فتح Gemini">פתיחת Gemini</a>
+<button class="btn ghost" type="button" id="cpPlan" data-ar="نسخ الطلب">העתקת הבקשה</button></div>
+<div class="pr" id="pPlan"></div>
+<details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+<p data-ar="1. في مربع الكتابة: <b>+</b> ← <b>«כלים נוספים»</b> (أدوات إضافية) ← <b>Canvas</b>.">1. בתיבת הכתיבה: <b>+</b> ← <b>כלים נוספים</b> ← <b>Canvas</b>.</p><img class="shot w" src="../mifgash-04/img/canvas-toggle.png" alt="">
+<p data-ar="2. نلصق الطلب ونرسله. سيسأل Gemini ثلاثة أسئلة عن الطاقم. نجيب، فتُفتح الخطة بجانب المحادثة.">2. מדביקים את הבקשה ושולחים. Gemini ישאל 3 שאלות על הצוות. עונים, והתוכנית נפתחת ליד השיחה.</p>
+<p data-ar="3. نغيّر في المحادثة ما يلزم، مثلًا: «اختصر العرض إلى 3 دقائق».">3. משנים בשיחה מה שצריך, למשל: "קצר את ההדגמה ל-3 דקות".</p>
+<p data-ar="4. فوق الخطة: <b>«שיתוף»</b> (مشاركة) ← ننسخ الرابط. يمكن أيضًا <b>التصدير إلى Google Docs</b>، ومشاركة المستند.">4. מעל התוכנית: <b>שיתוף</b> ← מעתיקים את הקישור. אפשר גם <b>ייצוא ל-Google Docs</b>, ולשתף את המסמך.</p>
+<p data-ar="حصلتم على نص عادي فقط في المحادثة؟ لم يكن Canvas مُفعّلًا. نفعّله ونرسل مرة أخرى.">קיבלתם רק טקסט רגיל בשיחה? Canvas לא היה מסומן. מסמנים, ושולחים שוב.</p>
+</details>
+<label class="f"><span data-ar="رابط الخطة<small>مشاركة ← نسخ الرابط.</small>">הקישור לתוכנית<small>שיתוף ← העתקת הקישור.</small></span><input type="url" data-k="plan_url" dir="ltr" placeholder="https://"></label>
+</section>
+
+<!-- 8 · Vids -->
+<section class="step" style="--c:var(--a2)" data-t="סרטון ב-Vids|فيديو في Vids">
+<p class="kick" data-ar="الإرشاد للطاقم · أداة 2 من 3">ההדרכה לצוות · כלי 2 מתוך 3</p>
+<h2 data-ar="نُعدّ فيديو في Vids، كجزء من الإرشاد">מכינים סרטון ב-Vids, כחלק מההדרכה</h2>
+<p data-ar="فيديو قصير يفتتح الإرشاد أو يعرض فيه شيئًا. الخطة من Canvas تتضمن 3 مشاهد: نلصقها في Vids واحدًا بعد الآخر.">סרטון קצר שפותח את ההדרכה או מדגים בה משהו. התוכנית מ-Canvas כבר כוללת 3 סצנות: מדביקים אותן ב-Vids אחת אחרי השנייה.</p>
+<div class="tools"><a class="btn" target="_blank" rel="noopener" href="https://vids.google.com/" data-ar="فتح Vids">פתיחת Vids</a>
+<button class="btn ghost" type="button" id="cpVid" data-ar="نسخ مشهد كمثال">העתקת סצנה לדוגמה</button></div>
+<div class="pr" id="pVid"></div>
+<details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+<p data-ar="1. نضغط <b>«יצירת סרטונים»</b> (إنشاء فيديوهات):">1. לוחצים <b>יצירת סרטונים</b>:</p><img class="shot w" src="../mifgash-04/img/vids-home.png" alt="">
+<p data-ar="2. نلصق مشهدًا في المربع تحت «יצירה» (إنشاء): مَن، أين، ماذا يحدث، وكيف تتحرك الكاميرا. بدون نص داخل الفيديو.">2. מדביקים סצנה בתיבה שמתחת ל"יצירה": מי, איפה, מה קורה, ואיך המצלמה זזה. בלי טקסט בתוך הסרטון.</p><img class="shot w" src="../mifgash-04/img/vids-create.png" alt="">
+<p data-ar="3. عندما يجهز المقطع نضغط <b>«הוספה»</b> (إضافة). بدون هذه الضغطة يُحذف الفيديو عند إغلاق التبويب.">3. כשהקטע מוכן, לוחצים <b>הוספה</b>. בלי הלחיצה הזו הסרטון נמחק כשסוגרים את הכרטיסייה.</p><img class="shot w" src="../mifgash-04/img/vids-made.png" alt="">
+<p data-ar="4. مشهد إضافي: علامة <b>+</b> الزرقاء بجانب الخط الزمني، ومرة أخرى «הוספה».">4. סצנה נוספת: ה-<b>+</b> הכחול ליד ציר הזמן, ושוב "הוספה".</p><img class="shot w" src="../mifgash-04/img/vids-plus.png" alt="">
+<p data-ar="5. ترجمة نصية: في الشريط الجانبي، <b>«כתוביות»</b>.">5. כתוביות: בסרגל הצד, <b>כתוביות</b>.</p><img class="shot s" src="../mifgash-04/img/vids-captions.png" alt="">
+<p data-ar="6. في الأعلى: <b>«שיתוף»</b> (مشاركة) ← ننسخ الرابط. للعرض بدون إنترنت: ملف ← تنزيل ← فيديو MP4.">6. למעלה: <b>שיתוף</b> ← מעתיקים את הקישור. להקרנה בלי אינטרנט: קובץ ← הורדה ← סרטון MP4.</p>
+</details>
+<label class="f"><span data-ar="رابط الفيديو">הקישור לסרטון</span><input type="url" data-k="vid_url" dir="ltr" placeholder="https://"></label>
+<label class="f"><span data-ar="أين يدخل الفيديو في الإرشاد؟">איפה הסרטון נכנס בהדרכה?</span><input type="text" data-k="vid_where" data-ph="למשל: בפתיחה, לפני שאני מראה את הכלי|مثلًا: في الافتتاح، قبل أن أعرض الأداة"></label>
+</section>
+
+<!-- 9 · פעילות -->
+<section class="step" style="--c:var(--a3)" data-t="פעילות לצוות|فعالية للطاقم">
+<p class="kick" data-ar="الإرشاد للطاقم · أداة 3 من 3">ההדרכה לצוות · כלי 3 מתוך 3</p>
+<h2 data-ar="نبني فعالية للمعلمين، يقومون بها خلال الإرشاد">בונים פעילות למורים, שעושים אותה בהדרכה</h2>
+<p data-ar="نختار واحدة:">בוחרים אחד:</p>
+<div class="choose" id="actPick">
+  <button type="button" data-v="Canvas" data-ar="فعالية تفاعلية في Canvas<small>أسئلة مع تغذية راجعة فورية، في هاتف كل معلم</small>">פעילות אינטראקטיבית ב-Canvas<small>שאלות עם משוב מיד, בטלפון של כל מורה</small></button>
+  <button type="button" data-v="AI Studio" data-ar="موقع أو أداة في AI Studio<small>صفحة يدخلها المعلمون ويقومون فيها بشيء</small>">אתר או כלי ב-AI Studio<small>דף שהמורים נכנסים אליו ועושים בו משהו</small></button>
+</div>
+<div id="actCanvas" hidden>
+  <div class="tools"><a class="btn" target="_blank" rel="noopener" href="https://gemini.google.com/app" data-ar="فتح Gemini">פתיחת Gemini</a>
+  <button class="btn ghost" type="button" id="cpActC" data-ar="نسخ الطلب">העתקת הבקשה</button></div>
+  <div class="pr" id="pActC"></div>
+  <details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+  <p data-ar="1. محادثة جديدة، و<b>Canvas</b> مُفعّل (+ ← «כלים נוספים» ← Canvas). نلصق ونرسل. بعد نحو نصف دقيقة تُفتح الفعالية:">1. שיחה חדשה, <b>Canvas</b> מסומן (+ ← כלים נוספים ← Canvas). מדביקים ושולחים. אחרי כחצי דקה הפעילות נפתחת:</p><img class="shot w" src="../mifgash-04/img/canvas-result.png" alt="">
+  <p data-ar="2. نغيّر في المحادثة، مثلًا: «كبّر الأزرار».">2. משנים בשיחה, למשל: "הגדל את הכפתורים".</p>
+  <p data-ar="3. فوق الفعالية: <b>«ייצוא»</b> (تصدير) ← <b>Google Sites</b>:">3. מעל הפעילות: <b>ייצוא</b> ← <b>Google Sites</b>:</p><img class="shot w" src="../mifgash-04/img/canvas-export.png" alt="">
+  <p data-ar="4. في الرسالة التي تظهر: <b>«פתיחת האתר»</b> (فتح الموقع).">4. בהודעה שמופיעה: <b>פתיחת האתר</b>.</p><img class="shot" src="../mifgash-04/img/canvas-site-made.png" alt="">
+  <p data-ar="5. في الموقع: <b>«פרסום»</b> (نشر) في الأعلى، نكتب اسمًا للموقع، ومرة أخرى <b>«פרסום»</b>. يرى الموقع كل المستخدمين في نطاق وزارة التربية.">5. באתר: <b>פרסום</b> למעלה, כותבים שם לאתר, ושוב <b>פרסום</b>. את האתר רואים כל המשתמשים בדומיין של משרד החינוך.</p><img class="shot w" src="../mifgash-04/img/sites-publish-dialog.png" alt="">
+  <p data-ar="6. ننسخ عنوان الموقع.">6. מעתיקים את כתובת האתר.</p>
+  </details>
+</div>
+<div id="actStudio" hidden>
+  <div class="tools"><a class="btn" target="_blank" rel="noopener" href="https://aistudio.google.com/" data-ar="فتح AI Studio">פתיחת AI Studio</a>
+  <button class="btn ghost" type="button" id="cpActS" data-ar="نسخ الطلب">העתקת הבקשה</button></div>
+  <div class="pr" id="pActS"></div>
+  <details class="more"><summary data-ar="خطوة بخطوة، مع صور">צעד אחר צעד, עם תמונות</summary>
+  <p data-ar="1. aistudio.google.com ← في القائمة على اليسار، تحت BUILD: <b>New app</b>. الواجهة بالإنجليزية: نقرة يمين ← «ترجمة». نوقف الترجمة قبل أن نكتب.">1. aistudio.google.com ← בתפריט משמאל, תחת BUILD: <b>New app</b>. הממשק באנגלית: קליק ימני ← "תרגום לעברית". מכבים את התרגום לפני שכותבים.</p><img class="shot w" src="../mifgash-04/img/aistudio-newapp.png" alt="">
+  <p data-ar="2. بجانب مربع الكتابة: Default mode ← <b>PLAN</b>. نلصق ونرسل.">2. ליד תיבת הכתיבה: Default mode ← <b>PLAN</b>. מדביקים ושולחים.</p><img class="shot" src="../mifgash-04/img/as-modes.png" alt="">
+  <p data-ar="3. نجيب على الأسئلة ونوافق على الخطة. البناء يستغرق نحو دقيقتين. العرض فارغ؟ نكتب في المحادثة «Fix any build issues».">3. עונים לשאלות, ומאשרים את התוכנית. הבנייה לוקחת כ-2 דקות. התצוגה ריקה? כותבים בשיחה "Fix any build issues".</p><img class="shot" src="../mifgash-04/img/as-plan-ready.png" alt="">
+  <p data-ar="4. نشارك: <b>Share</b> ← نغيّر Restricted إلى <b>Public</b> ← ننسخ الرابط. ليس Publish، لأنه يطلب دفعًا.">4. משתפים: <b>Share</b> ← מחליפים Restricted ל-<b>Public</b> ← מעתיקים את הקישור. לא Publish, כי הוא מבקש תשלום.</p><img class="shot" src="../mifgash-04/img/as-share-public.png" alt="">
+  <p data-ar="مَن يفتح الرابط يدخل بحساب غوغل، ويرى تحذيرًا عن «مفتاح آخر». نضغط Continue.">מי שפותח את הקישור נכנס עם חשבון גוגל, ורואה אזהרה על "מפתח אחר". לוחצים Continue.</p>
+  </details>
+</div>
+<label class="f"><span data-ar="رابط الفعالية">הקישור לפעילות</span><input type="url" data-k="act_url" dir="ltr" placeholder="https://"></label>
+<label class="f"><span data-ar="ماذا يفعل المعلمون فيها؟">מה המורים עושים בה?</span><input type="text" data-k="act_what" data-ph="למשל: עונים ל-6 שאלות בטלפון, ובסוף בוחרים דבר אחד לנסות בכיתה|مثلًا: يجيبون عن 6 أسئلة في الهاتف، وفي النهاية يختارون شيئًا واحدًا لتجربته في الصف"></label>
+</section>
+
+<!-- 10 · מתי -->
+<section class="step" style="--c:var(--a2)" data-t="מתי מעבירים|متى نقدّم الإرشاد">
+<p class="kick" data-ar="الإرشاد للطاقم">ההדרכה לצוות</p>
+<h2 data-ar="متى نقدّم الإرشاد؟">מתי מעבירים את ההדרכה?</h2>
+<p data-ar="نحدّد موعدًا الآن. الإرشاد نفسه نقدّمه في الموعد الذي حدّدتموه.">קובעים עכשיו מועד. את ההדרכה עצמה מעבירים במועד שקבעתם.</p>
+<label class="f"><span data-ar="التاريخ">התאריך</span><input type="date" data-k="trdate"></label>
+<label class="f"><span data-ar="في أي إطار، ولمَن؟">באיזו מסגרת, ולמי?</span><input type="text" data-k="trwhere" data-ph="למשל: ישיבת צוות ביום שלישי, מורי המגמות|مثلًا: اجتماع الطاقم يوم الثلاثاء، معلمو التخصصات"></label>
+<p class="tip" data-ar="ماذا نُحضّر: الخطة من Canvas، الفيديو (وأيضًا كملف MP4 في حال لم يكن إنترنت)، ورابط الفعالية على الشاشة أو في رمز QR.">מה מכינים: התוכנית מ-Canvas, הסרטון (גם כ-MP4, למקרה שאין אינטרנט), והקישור לפעילות על המסך או בקוד QR.</p>
+</section>
+
+<!-- 11 · מגישים -->
+<section class="step" style="--c:var(--ok)" data-t="מגישים|نسلّم">
+<h2 data-ar="نفحص ونسلّم">בודקים ומגישים</h2>
+<ul class="check" id="checkList"></ul>
+<p class="warn" style="margin-top:12px" data-ar="قبل التسليم: لا ندخل أسماء أو تفاصيل تعريفية للطلاب والمعلمين، ونفحص كل ناتج قبل أن يصل إلى الطاقم.">לפני שמגישים: לא מזינים שמות או פרטים מזהים של תלמידים ומורים, ובודקים כל תוצר לפני שהוא מגיע לצוות.</p>
+<button class="btn ok" type="button" id="submit" data-ar="سلّمت">הגשתי</button>
+<p class="sub" id="subOk" hidden></p>
+<p class="warn" id="subMiss" hidden></p>
+</section>
+
+<!-- 12 · משוב -->
+<section class="step" style="--c:var(--a3)" data-t="משוב|تغذية راجعة">
+<h2 data-ar="تغذية راجعة">משוב</h2>
+<label class="f"><span data-ar="إجمالًا، كيف كانت الوحدة؟<small>1 ليست جيدة · 5 ممتازة</small>">בסך הכול, איך הייתה היחידה?<small>1 לא טובה · 5 מצוינת</small></span></label>
+<div class="opts" data-k="fb_rate" data-opts="1|2|3|4|5"></div>
+<label class="f"><span data-ar="التعليمات كانت">ההוראות היו</span></label>
+<div class="opts" data-k="fb_clear" data-opts="ברורות|די ברורות|לא ברורות" data-opts-ar="واضحة|واضحة إلى حد ما|غير واضحة"></div>
+<label class="f"><span data-ar="أين علقت، أو ماذا كان ينقص">איפה נתקעתי, או מה היה חסר</span><textarea data-k="fb_stuck"></textarea></label>
+<p class="sub" id="endOk" hidden data-ar="شكرًا! يمكن العودة إلى كل مرحلة والتحديث حتى موعد التسليم.">תודה! אפשר לחזור לכל שלב ולעדכן עד מועד ההגשה.</p>
+</section>
+
+<div class="nav"><button class="btn ghost" type="button" id="prev" style="--c:var(--ink)" data-ar="السابق">הקודם</button>
+<button class="btn" type="button" id="next" style="--c:var(--ink)"></button></div>
+
+<footer><span data-ar="إدارة التأهيل المهني · وزارة العمل · بُني مع">המנהל להכשרה מקצועית · משרד העבודה · נבנה עם</span> <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos</a></footer>
+</div>
+
+<button class="stuckbtn" type="button" id="stuckOpen" data-ar="علقت">נתקעתי</button>
+<div class="modal" id="stuck" hidden><div class="box">
+  <h3 data-ar="علقت">נתקעתי</h3>
+  <p data-ar="اكتبوا في جملة أين علقتم. تصلنا رسالة ونعود إليكم.">כתבו במשפט איפה נתקעתם. ההודעה מגיעה אלינו, ונחזור אליכם.</p>
+  <label class="f"><span data-ar="في أي مرحلة؟">באיזה שלב?</span><input type="text" id="stuckStep"></label>
+  <label class="f"><span data-ar="ماذا حدث؟">מה קרה?</span><textarea id="stuckMsg"></textarea></label>
+  <button class="btn" type="button" id="stuckSend" style="--c:var(--a3)" data-ar="إرسال">שליחה</button>
+  <button class="btn ghost" type="button" id="stuckClose" style="--c:var(--mute)" data-ar="إغلاق">סגירה</button>
+  <p class="sub" id="stuckOk" hidden data-ar="وصلتنا الرسالة. نعود إليكم قريبًا.">ההודעה הגיעה אלינו. נחזור אליכם בהקדם.</p>
+</div></div>
+<div class="zoom" id="zoom" hidden><img alt=""></div>
+<div class="saved" id="saved"></div>
+
+<script>
+(function () {
+  var API = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
+  /* ממסר המרחב: שולח מ-merhav את מייל "נתקעתי"/"הגשתי" שהשרת שמר (src=shaglive) */
+  var RELAY = "https://script.google.com/macros/s/AKfycbxbudrzz-JSNpEeHwayjq6u8Xmz4dAsmV8FQGwHjZDeC3g028_I2uk2wX2Pi762ULZD1w/exec";
+  var S = 5;  // היחידה. כל שמירה נכתבת לפרק 5 בתיק בלבד. פרק 3 נקרא רק למילוי מראש
+
+  /* מי אני: אדווה מעבירה אחרי # את המפתח האישי, השם, בית הספר והמסלול */
+  var H = {};
+  location.hash.replace(/^#/, "").split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) H[p[0]] = decodeURIComponent(p[1] || ""); });
+  var K = /^[A-Za-z0-9]{6,40}$/.test(H.k || "") ? H.k : "";
+  var T = H.t === "h" ? "h" : "k";
+  /* כל מסלול במועד שלו, כמו בגיליון "מפגשים" */
+  var DUE = { k: "14.12", h: "16.12" };
+  var L = 0;  // 0 עברית, 1 ערבית. הערכים שנשמרים בשדות בחירה תמיד בעברית
+  try { L = (H.l || localStorage.getItem("shag-lang")) === "ar" ? 1 : 0; } catch (e) { L = H.l === "ar" ? 1 : 0; }
+  var $ = function (id) { return document.getElementById(id); };
+  var TX = {
+    trk: ["שגרירי חדשנות · {tr} · יחידה 5 · בקצב אישי", "سفراء الابتكار · {tr} · الوحدة 5 · بوتيرة شخصية"],
+    trk_k: ["מסלול הכלים", "مسار الأدوات"], trk_h: ["מסלול הובלה", "مسار القيادة"],
+    who: ["מה שתכתבו כאן נשמר בתיק ההטמעה.", "ما تكتبونه هنا يُحفظ في ملف التطبيق."],
+    due: ["עד {d}", "حتى {d}"],
+    pos: ["שלב <b>{n}</b> מתוך {m} · {t}", "المرحلة <b>{n}</b> من {m} · {t}"],
+    next: ["סיימתי, לשלב הבא", "أنهيت، إلى المرحلة التالية"], done: ["סיימתי", "أنهيت"],
+    saved: ["נשמר", "حُفظ"], copied: ["הועתק", "تم النسخ"], sending: ["שולחים…", "نرسل…"],
+    sub: ["הוגש ב-{d}. אפשר לעדכן עד {u}.", "سُلّم في {d}. يمكن التحديث حتى {u}."],
+    miss: ["עוד חסר: {m}. אפשר להשלים עד {u}.", "ما زال ينقص: {m}. يمكن الإكمال حتى {u}."],
+    was: ["ביחידה 3 כתבתם שזה יקרה: {w}", "في الوحدة 3 كتبتم أن هذا سيحدث: {w}"], with: [", עם ", "، مع "],
+    a_kick: ["תיק ההטמעה · פעולה {i} מתוך 3", "ملف التطبيق · الخطوة {i} من 3"],
+    a_h: ["פעולה {i}: מה עשיתי, ומה אעשה", "الخطوة {i}: ماذا فعلت، وماذا سأفعل"],
+    a_act: ["הפעולה<small>מה שכתבתם ביחידה 3. אפשר לעדכן.</small>", "الخطوة<small>ما كتبتموه في الوحدة 3. يمكن التحديث.</small>"],
+    a_done: ["מה עשיתי עד עכשיו, בדיוק<small>מה, מתי ועם מי. עוד לא התחלתם? כותבים את זה, ומה עצר.</small>", "ماذا فعلت حتى الآن، بالضبط<small>ماذا، متى ومع مَن. لم تبدأوا بعد؟ نكتب ذلك، وما الذي أوقفنا.</small>"],
+    a_next: ["מה אעשה עכשיו, בדיוק", "ماذا سأفعل الآن، بالضبط"],
+    a_when: ["מתי", "متى"], a_who: ["עם מי", "مع مَن"]
+  };
+  function tx(k) { return TX[k][L]; }
+  var EX = [
+    [["למשל: הדרכה של 15 דקות בישיבת צוות על בוחן ב-NotebookLM", "مثلًا: إرشاد لمدة 15 دقيقة في اجتماع الطاقم حول اختبار في NotebookLM"],
+     ["למשל: ב-1.12 הראיתי בישיבת צוות את הבוחן שבניתי ב-NotebookLM. 8 מורים השתתפו, ו-3 ביקשו שאעזור להם לבנות בוחן למקצוע שלהם.", "مثلًا: في 1.12 عرضت في اجتماع الطاقم الاختبار الذي بنيته في NotebookLM. شارك 8 معلمين، وطلب 3 منهم أن أساعدهم في بناء اختبار لموضوعهم."],
+     ["למשל: לשבת עם 3 המורים, כל אחד בנפרד, ולבנות איתם בוחן אחד למקצוע שלו. כל מורה מעביר/ה אותו בכיתה אחת.", "مثلًا: أن أجلس مع المعلمين الثلاثة، كل واحد على حدة، ونبني معه اختبارًا واحدًا لموضوعه. كل معلم يقدّمه في صف واحد."]],
+    [["למשל: שיחה עם המנהלת על זמן להדרכות", "مثلًا: حديث مع المديرة حول وقت للإرشادات"],
+     ["למשל: עוד לא התחלתי. דיברתי עם המנהלת, והיא אישרה 15 דקות בישיבת הצוות של דצמבר.", "مثلًا: لم أبدأ بعد. تحدثت مع المديرة، ووافقت على 15 دقيقة في اجتماع الطاقم في كانون الأول."],
+     ["למשל: להעביר את ההדרכה שאני בונה ביחידה הזו, ולבקש מכל מורה לנסות כלי אחד באותו שבוע.", "مثلًا: أن أقدّم الإرشاد الذي أبنيه في هذه الوحدة، وأطلب من كل معلم أن يجرّب أداة واحدة في الأسبوع نفسه."]],
+    [["למשל: מעקב אחרי מורים שמנסים AI בכיתה", "مثلًا: متابعة المعلمين الذين يجرّبون AI في الصف"],
+     ["למשל: הכנתי טבלה של מורים שכבר ניסו AI בכיתה. יש בה 5 שמות.", "مثلًا: أعددت جدولًا للمعلمين الذين جرّبوا AI في الصف. فيه 5 أسماء."],
+     ["למשל: לפגוש כל אחד מ-5 המורים ל-10 דקות, ולשאול מה עבד ומה לא.", "مثلًا: أن ألتقي كل واحد من المعلمين الخمسة لمدة 10 دقائق، وأسأل ما الذي نجح وما الذي لم ينجح."]]
+  ];
+  var WHO_PH = ["למשל: 3 מורות מגמת חשמל", "مثلًا: 3 معلمات في تخصص الكهرباء"];
+
+  if (!K) $("nokey").hidden = false;
+  $("lnkDeck").href = "../mifgash-04/index.html#t=" + T;
+  $("lnkMelave").href = "../mifgash-04/melave.html#t=" + T;
+  $("lnkStaff").href = "../mifgash-04/cheder-morim.html#t=" + T;
+
+  var LS = "tik-s5-" + (K || "local"), st = {};
+  try { st = JSON.parse(localStorage.getItem(LS) || "{}"); } catch (e) {}
+  var CID = (function () { try { var c = localStorage.getItem("shag-cid"); if (!c) { c = "c" + Math.random().toString(36).slice(2, 10); localStorage.setItem("shag-cid", c); } return c; } catch (e) { return "c" + Date.now(); } })();
+
+  var tmr, savedEl = $("saved");
+  function save() {
+    st.track = T === "h" ? "הובלה" : "כלים";
+    st.lang = L ? "ערבית" : "עברית";
+    try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+    clearTimeout(tmr);
+    tmr = setTimeout(function () {
+      if (K) post({ kind: "tik", track: T, s: S, k: K, name: H.n || "", school: H.sc || "", value: st });
+      savedEl.classList.add("on"); setTimeout(function () { savedEl.classList.remove("on"); }, 1200);
+    }, 900);
+  }
+  function post(o) {
+    try { return fetch(API, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" }, body: JSON.stringify(o) }); } catch (e) { return Promise.reject(e); }
+  }
+
+  /* שלוש הפעולות: מה עשיתי, מה אעשה, מתי ועם מי (מיטל, 25.11.26: "שיפרטו בדיוק מה עשו ומה יעשו ומתי") */
+  function buildActs() {
+    document.querySelectorAll("section.act").forEach(function (sec) {
+      var i = sec.dataset.i, e = EX[i - 1], r = function (k) { return tx(k).replace("{i}", i); };
+      var ph = function (p) { return p[0].replace(/"/g, "&quot;") + "|" + p[1].replace(/"/g, "&quot;"); };
+      sec.innerHTML = '<p class="kick">' + r("a_kick") + "</p><h2>" + r("a_h") + "</h2>" +
+        '<label class="f">' + tx("a_act") + '<input type="text" data-k="act' + i + '" data-ph="' + ph(e[0]) + '"></label>' +
+        '<p class="mine" id="was' + i + '" hidden></p>' +
+        '<label class="f">' + tx("a_done") + '<textarea data-k="done' + i + '" data-ph="' + ph(e[1]) + '"></textarea></label>' +
+        '<label class="f">' + tx("a_next") + '<textarea data-k="next' + i + '" data-ph="' + ph(e[2]) + '"></textarea></label>' +
+        '<label class="f">' + tx("a_when") + '<input type="date" data-k="nwhen' + i + '"></label>' +
+        '<label class="f">' + tx("a_who") + '<input type="text" data-k="who' + i + '" data-ph="' + ph(WHO_PH) + '"></label>';
+    });
+  }
+
+  /* הבקשות להעתקה, בשפת הדף. ממלאים אותן ממה שנכתב בדף */
+  function v(k, d) { var x = String(st[k] || "").trim(); return x || d; }
+  function pPlan() {
+    if (L) return "أنا مركّز/ة ابتكار في مدرسة للتأهيل المهني" + (H.sc ? ": " + H.sc : "") + ".\n" +
+      "حاجة طاقمنا: " + v("needt", "[الحاجة]") + ".\n" +
+      "موضوع الإرشاد: " + v("trtopic", "[عن ماذا الإرشاد]") + ". الجمهور: " + v("traud", "[لمَن]") + ".\n" +
+      "اكتب/ي في Canvas خطة لإرشاد مدته 15 دقيقة لطاقم المعلمين:\n" +
+      "1. افتتاح، دقيقتان: فيديو قصير سأُعدّه في Google Vids. اكتب/ي 3 مشاهد للفيديو: في كل مشهد مَن، أين، ماذا يحدث، وكيف تتحرك الكاميرا. بدون نص داخل الفيديو.\n" +
+      "2. عرض، 4 دقائق: ماذا أعرض على الشاشة، خطوة بخطوة.\n" +
+      "3. المعلمون يعملون، 7 دقائق: فعالية تفاعلية سأبنيها في Canvas أو في AI Studio. صِف/ي ماذا يفعل المعلمون فيها.\n" +
+      "4. ختام، دقيقتان: ماذا يأخذ كل معلم/ة معه/ا، وخطوة واحدة للتجربة في الأسبوع القادم.\n" +
+      "5. اعتراضان متوقعان من الطاقم، وبماذا نجيب باختصار.\n" +
+      "قبل أن تكتب/ي، اسألني 3 أسئلة عن الطاقم.\n" +
+      "اكتب/ي بالعربية البسيطة.";
+    return "אני רכז/ת חדשנות בבית ספר של הכשרה מקצועית" + (H.sc ? ": " + H.sc : "") + ".\n" +
+      "הצורך של הצוות שלנו: " + v("needt", "[הצורך]") + ".\n" +
+      "נושא ההדרכה: " + v("trtopic", "[על מה ההדרכה]") + ". הקהל: " + v("traud", "[למי]") + ".\n" +
+      "כתוב/י ב-Canvas תוכנית להדרכה של 15 דקות לצוות המורים:\n" +
+      "1. פתיחה, 2 דקות: סרטון קצר שאכין ב-Google Vids. כתוב/י 3 סצנות לסרטון: בכל סצנה מי, איפה, מה קורה, ואיך המצלמה זזה. בלי טקסט בתוך הסרטון.\n" +
+      "2. הדגמה, 4 דקות: מה אני מראה על המסך, צעד אחר צעד.\n" +
+      "3. המורים עושים, 7 דקות: פעילות אינטראקטיבית שאבנה ב-Canvas או ב-AI Studio. תאר/י מה המורים עושים בה.\n" +
+      "4. סיום, 2 דקות: מה כל מורה לוקח/ת איתו/ה, וצעד אחד לנסות בשבוע הקרוב.\n" +
+      "5. שתי התנגדויות צפויות מהצוות, ומה עונים בקצרה.\n" +
+      "לפני שאת/ה כותב/ת, שאל/י אותי 3 שאלות על הצוות.\n" +
+      "כתוב/י בעברית פשוטה, בלי מילים באנגלית.";
+  }
+  var P_VID = ["מורה במגמה מקצועית עומד/ת ליד מחשב בחדר המורים, ומראה לשני עמיתים משהו על המסך. הם מחייכים ומהנהנים. המצלמה מתקרבת לאט למסך. אור יום רך, סגנון ריאליסטי.",
+    "معلم/ة في تخصص مهني يقف/تقف بجانب حاسوب في غرفة المعلمين، ويُري/تُري زميلين شيئًا على الشاشة. يبتسمان ويومئان. الكاميرا تقترب ببطء من الشاشة. ضوء نهار ناعم، أسلوب واقعي."];
+  function pActC() {
+    if (L) return "أنشئ/ي في Canvas فعالية قصيرة لطاقم المعلمين، في موضوع: " + v("trtopic", "[موضوع الإرشاد]") + ".\n" +
+      "6 أسئلة أو مهام قصيرة يقوم بها كل معلم في الهاتف خلال الإرشاد. بعد كل إجابة: تغذية راجعة فورية وشرح بجملة واحدة.\n" +
+      "في النهاية: شاشة تلخيص، فيها خطوة واحدة للتجربة في الصف هذا الأسبوع.\n" +
+      "بالعربية البسيطة، من اليمين إلى اليسار، أزرار كبيرة مريحة في الهاتف.";
+    return "צור/י ב-Canvas פעילות קצרה לצוות המורים, בנושא: " + v("trtopic", "[נושא ההדרכה]") + ".\n" +
+      "6 שאלות או משימות קצרות שכל מורה עושה בטלפון במהלך ההדרכה. אחרי כל תשובה: משוב מיד והסבר של משפט אחד.\n" +
+      "בסוף: מסך סיכום, ובו צעד אחד לנסות בכיתה השבוע.\n" +
+      "בעברית פשוטה, מימין לשמאל, כפתורים גדולים שנוחים בטלפון.";
+  }
+  function pActS() {
+    if (L) return "ابنِ موقعًا قصيرًا لطاقم المعلمين، بالعربية، من اليمين إلى اليسار، في موضوع: " + v("trtopic", "[موضوع الإرشاد]") + ".\n" +
+      "في الصفحة: شرح من 3 أسطر، مثال واحد من مدرسة مهنية، وفعالية مدتها 5 دقائق يقوم بها كل معلم في الهاتف: [مثلًا: 4 أسئلة اختيار مع تغذية راجعة فورية].\n" +
+      "في النهاية: زر «ماذا أجرّب هذا الأسبوع» مع 3 خيارات.\n" +
+      "بدون أسماء وبدون تفاصيل لمن يدخل. تصميم نظيف، أزرار كبيرة، مناسب للهاتف.";
+    return "בנה אתר קצר לצוות המורים, בעברית, מימין לשמאל, בנושא: " + v("trtopic", "[נושא ההדרכה]") + ".\n" +
+      "בדף: הסבר של 3 שורות, דוגמה אחת מבית ספר מקצועי, ופעילות של 5 דקות שכל מורה עושה בטלפון: [למשל: 4 שאלות בחירה עם משוב מיד].\n" +
+      "בסוף: כפתור \"מה אני מנסה השבוע\" עם 3 אפשרויות לבחירה.\n" +
+      "בלי שמות ובלי פרטים של מי שנכנס. עיצוב נקי, כפתורים גדולים, מתאים לטלפון.";
+  }
+  function prompts() { $("pPlan").textContent = pPlan(); $("pVid").textContent = P_VID[L]; $("pActC").textContent = pActC(); $("pActS").textContent = pActS(); }
+
+  /* שדות */
+  function bind() {
+    document.querySelectorAll("[data-k]").forEach(function (el) {
+      var k = el.dataset.k;
+      if (el.classList.contains("opts")) {
+        el.innerHTML = "";
+        var he = el.dataset.opts.split("|"), ar = (el.dataset.optsAr || el.dataset.opts).split("|");
+        he.forEach(function (o, i) {
+          var b = document.createElement("button"); b.type = "button"; b.className = "opt"; b.textContent = L ? ar[i] : o;
+          b.setAttribute("aria-pressed", st[k] === o ? "true" : "false");
+          b.onclick = function () { st[k] = o; el.querySelectorAll(".opt").forEach(function (x) { x.setAttribute("aria-pressed", x === b ? "true" : "false"); }); save();
+            if (k === "fb_rate") post({ kind: "feedback", track: T, s: S, cid: CID, value: { rate: o, good: "", change: st.fb_stuck || "" } }); };
+          el.appendChild(b);
+        });
+        return;
+      }
+      el.value = st[k] || "";
+      if (!el.dataset.bound) { el.dataset.bound = "1"; el.addEventListener("input", function () { st[k] = el.value; save(); prompts(); }); }
+    });
+    document.querySelectorAll("[data-ph]").forEach(function (el) { el.placeholder = el.dataset.ph.split("|")[L]; });
+  }
+
+  /* פעילות: Canvas או AI Studio */
+  function showAct() {
+    document.querySelectorAll("#actPick button").forEach(function (b) { b.setAttribute("aria-pressed", st.act_tool === b.dataset.v ? "true" : "false"); });
+    $("actCanvas").hidden = st.act_tool !== "Canvas";
+    $("actStudio").hidden = st.act_tool !== "AI Studio";
+  }
+  document.querySelectorAll("#actPick button").forEach(function (b) { b.onclick = function () { st.act_tool = b.dataset.v; save(); showAct(); }; });
+
+  /* מה שכתבו ביחידה 3 */
+  var S3 = {};
+  function showWas() {
+    if (S3.adopt) { $("adoptBox").hidden = false; $("adoptTxt").textContent = S3.adopt; }
+    [1, 2, 3].forEach(function (i) {
+      var w = S3["when" + i], el = $("was" + i);
+      if (w && el) { el.hidden = false; el.textContent = tx("was").replace("{w}", w) + (S3["who" + i] ? tx("with") + S3["who" + i] : ""); }
+    });
+  }
+
+  /* הגשה: אפשר להגיש גם עם חוסרים, ואז רואים מה חסר */
+  var REQ = [["needt", "הצורך", "الحاجة"], ["done1", "פעולה 1: מה עשיתי", "الخطوة 1: ماذا فعلت"], ["next1", "פעולה 1: מה אעשה", "الخطوة 1: ماذا سأفعل"], ["nwhen1", "פעולה 1: מתי", "الخطوة 1: متى"],
+    ["done2", "פעולה 2: מה עשיתי", "الخطوة 2: ماذا فعلت"], ["next2", "פעולה 2: מה אעשה", "الخطوة 2: ماذا سأفعل"], ["nwhen2", "פעולה 2: מתי", "الخطوة 2: متى"],
+    ["done3", "פעולה 3: מה עשיתי", "الخطوة 3: ماذا فعلت"], ["next3", "פעולה 3: מה אעשה", "الخطوة 3: ماذا سأفعل"], ["nwhen3", "פעולה 3: מתי", "الخطوة 3: متى"],
+    ["plan_url", "הקישור לתוכנית ב-Canvas", "رابط الخطة في Canvas"], ["vid_url", "הקישור לסרטון ב-Vids", "رابط الفيديو في Vids"], ["act_url", "הקישור לפעילות", "رابط الفعالية"], ["trdate", "מתי מעבירים את ההדרכה", "متى نقدّم الإرشاد"]];
+  function missing() { return REQ.filter(function (r) { return !String(st[r[0]] || "").trim(); }); }
+  function showCheck() {
+    $("checkList").innerHTML = REQ.map(function (r) { return '<li class="' + (String(st[r[0]] || "").trim() ? "y" : "") + '">' + r[1 + L] + "</li>"; }).join("");
+    if (!st.submitted) return;
+    var ok = $("subOk"); ok.hidden = false; ok.textContent = tx("sub").replace("{d}", st.submitted).replace("{u}", DUE[T]);
+    var m = missing().map(function (r) { return r[1 + L]; }), mm = $("subMiss");
+    mm.hidden = !m.length; mm.textContent = m.length ? tx("miss").replace("{m}", m.join(" · ")).replace("{u}", DUE[T]) : "";
+  }
+  $("submit").onclick = function () {
+    var d = new Date(); st.submitted = d.getDate() + "." + (d.getMonth() + 1); save(); showCheck();
+    if (K) { var id = rid(); post({ kind: "submit", track: T, s: S, id: id, k: K, name: H.n || "", school: H.sc || "", value: st })
+      .then(function () { return fetch(RELAY + "?src=shaglive&id=" + id, { mode: "no-cors" }); }).catch(function () {}); }
+  };
+  function rid() {
+    var id = "", a = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var rnd = window.crypto && crypto.getRandomValues ? crypto.getRandomValues(new Uint8Array(32)) : null;
+    for (var i = 0; i < 32; i++) id += a[(rnd ? rnd[i] : Math.floor(Math.random() * 256)) % a.length];
+    return id;
+  }
+
+  /* ספר: שלב אחד בכל פעם. המיקום נשמר בכתובת (&p=) כדי שרענון לא יחזיר להתחלה */
+  var steps = Array.prototype.slice.call(document.querySelectorAll("section.step"));
+  var title = function (s) { return s.dataset.t.split("|")[L]; };
+  var cur = Math.max(0, Math.min(steps.length - 1, (+H.p || +st._p || 1) - 1));
+  function go(n, scroll) {
+    cur = Math.max(0, Math.min(steps.length - 1, n));
+    steps.forEach(function (s, i) { s.hidden = i !== cur; });
+    $("pos").innerHTML = tx("pos").replace("{n}", cur + 1).replace("{m}", steps.length).replace("{t}", title(steps[cur]));
+    $("dots").innerHTML = steps.map(function (s, i) { return '<button type="button" aria-label="' + title(s) + '" class="' + (i === cur ? "cur" : i < cur ? "done" : "") + '" data-n="' + i + '"></button>'; }).join("");
+    var last = cur === steps.length - 1;
+    $("prev").style.visibility = cur ? "visible" : "hidden";
+    $("next").textContent = $("topNext").textContent = last ? tx("done") : tx("next");
+    if (steps[cur].querySelector("#checkList")) showCheck();
+    st._p = cur + 1; try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {}
+    var h = location.hash.replace(/&?p=\d+/, ""); history.replaceState(null, "", (h || "#") + "&p=" + (cur + 1));
+    if (scroll !== false) window.scrollTo(0, 0);
+  }
+  function next() { if (cur === steps.length - 1) { $("endOk").hidden = false; return; } go(cur + 1); }
+  $("next").onclick = $("topNext").onclick = next;
+  $("prev").onclick = function () { go(cur - 1); };
+  $("dots").onclick = function (e) { var b = e.target.closest("button[data-n]"); if (b) go(+b.dataset.n); };
+
+  /* הגדלת צילום */
+  var zoom = $("zoom");
+  document.addEventListener("click", function (e) { if (e.target.classList && e.target.classList.contains("shot")) { zoom.querySelector("img").src = e.target.src; zoom.hidden = false; } });
+  zoom.onclick = function () { zoom.hidden = true; };
+
+  function render() { bind(); showAct(); showWas(); prompts(); showCheck(); }
+
+  /* שפה: כל אלמנט עם data-ar מחליף את התוכן שלו */
+  function setLang() {
+    document.documentElement.lang = L ? "ar" : "he";
+    document.querySelectorAll("[data-ar]").forEach(function (el) {
+      if (el.dataset.he === undefined) el.dataset.he = el.innerHTML;
+      el.innerHTML = L ? el.dataset.ar : el.dataset.he;
+    });
+    document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", (b.dataset.lang === "ar") === !!L ? "true" : "false"); });
+    $("trk").textContent = tx("trk").replace("{tr}", tx("trk_" + T));
+    $("who").textContent = (K && H.n ? H.n + (H.sc ? " · " + H.sc : "") + " · " : "") + tx("who");
+    $("due").textContent = tx("due").replace("{d}", DUE[T]);
+    savedEl.textContent = tx("saved");
+    buildActs(); render(); go(cur, false);
+  }
+  document.querySelectorAll(".lang button").forEach(function (b) {
+    b.onclick = function () { L = b.dataset.lang === "ar" ? 1 : 0; try { localStorage.setItem("shag-lang", b.dataset.lang); } catch (e) {} setLang(); if (st.submitted || Object.keys(st).length > 2) save(); };
+  });
+  setLang();
+
+  /* מילוי מראש מהתיק: קודם פרק 5 (מה שכבר נכתב כאן), ואז פרק 3 (ואם אין, פרק 2 בהובלה). כותבים רק לפרק 5 */
+  var FROM3 = ["needt", "need", "act1", "act2", "act3", "who1", "who2", "who3"];
+  if (K) fetch(API + "?api=tik&k=" + encodeURIComponent(K)).then(function (r) { return r.json(); }).then(function (d) {
+    var s5 = (d && d.s && d.s["5"]) || {}, s3 = (d && d.s && d.s["3"]) || {}, s2 = (d && d.s && d.s["2"]) || {}, got = false, pre = false;
+    S3 = {}; ["adopt", "when1", "when2", "when3", "who1", "who2", "who3"].forEach(function (k) { S3[k] = s3[k] || s2[k] || ""; });
+    Object.keys(s5).forEach(function (k) { if (k !== "_p" && !st[k] && s5[k]) { st[k] = s5[k]; got = true; } });
+    FROM3.forEach(function (k) { var x = s3[k] || s2[k]; if (!st[k] && x) { st[k] = x; pre = got = true; } });
+    if (pre) $("pre").hidden = false;
+    if (got) { try { localStorage.setItem(LS, JSON.stringify(st)); } catch (e) {} }
+    render();
+  }).catch(function () {});
+
+  /* נתקעתי: שורה בגיליון + מייל ל-merhav דרך הממסר. השלב = השלב שפתוח עכשיו (בעברית, בשביל מיטל) */
+  var modal = $("stuck");
+  $("stuckOpen").onclick = function () { $("stuckStep").value = title(steps[cur]); $("stuckOk").hidden = true; modal.hidden = false; $("stuckMsg").focus(); };
+  $("stuckClose").onclick = function () { modal.hidden = true; };
+  modal.addEventListener("click", function (e) { if (e.target === modal) modal.hidden = true; });
+  $("stuckSend").onclick = function () {
+    var msg = $("stuckMsg"), btn = this;
+    if (!msg.value.trim()) { msg.focus(); return; }
+    var id = rid(), o = btn.textContent; btn.textContent = tx("sending"); btn.disabled = true;
+    post({ kind: "stuck", track: T, s: S, id: id, name: H.n || "", school: H.sc || "", step: steps[cur].dataset.t.split("|")[0], msg: msg.value, lang: L ? "ערבית" : "עברית" })
+      .then(function () { return fetch(RELAY + "?src=shaglive&id=" + id, { mode: "no-cors" }); })
+      .catch(function () {})
+      .then(function () { btn.textContent = o; btn.disabled = false; msg.value = ""; $("stuckOk").hidden = false; });
+  };
+
+  function copy(text, btn) {
+    var o = btn.textContent;
+    var done = function () { btn.textContent = tx("copied"); setTimeout(function () { btn.textContent = o; }, 1600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, function () { fb(text); done(); }); else { fb(text); done(); }
+  }
+  function fb(t) { var a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); try { document.execCommand("copy"); } catch (e) {} a.remove(); }
+  $("cpPlan").onclick = function () { copy(pPlan(), this); };
+  $("cpVid").onclick = function () { copy(P_VID[L], this); };
+  $("cpActC").onclick = function () { copy(pActC(), this); };
+  $("cpActS").onclick = function () { copy(pActS(), this); };
+})();
+</script>
+</body>
+</html>

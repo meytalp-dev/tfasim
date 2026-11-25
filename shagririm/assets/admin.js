@@ -28,6 +28,8 @@
   EXT_PAGE[2] = "mifgash-02/";
   /* 1.11.26: מפגש 3 א-סינכרוני, דף אחד לשני המסלולים, בלי מצגת */
   EXT_PAGE[3] = "mifgash-03/";
+  /* 25.11.26: יחידה 5 א-סינכרונית (כמו ב-shell.js), דף אחד לשני המסלולים, בלי מצגת */
+  EXT_PAGE[5] = "mifgash-05/";
   /* 16.11.26: מפגש 4 (כמו ב-shell.js): index.html = מצגת, melave.html = דף מלווה. התשובות לא נאספות בשרת */
   EXT_PAGE[4] = "mifgash-04/";
   /* משאבי המפגש — אותה רשימה כמו sessionRes ב-shell.js. אצל מיטל השאלון במצב בדיקה (לא נספר),
@@ -58,7 +60,7 @@
   var LIVE_DASH = "https://script.google.com/macros/s/AKfycbwGb9lbCxfj99AUyVPvqDBMLV64lREB_w-8ct-UnH4c9gRouSZK6yE7ZTIjvtnFgu87/exec";
   function extUrl(tr, num, view) {
     if (Number(num) === 2 && tr === "הובלה") return "mifgash-02/" + (view === "deck" ? "h-deck.html" : "h.html");
-    if (Number(num) === 3) return "mifgash-03/#t=" + (tr === "הובלה" ? "h" : "k");
+    if (Number(num) === 3 || Number(num) === 5) return EXT_PAGE[num] + "#t=" + (tr === "הובלה" ? "h" : "k");
     if (Number(num) === 4) return "mifgash-04/" + (view === "deck" ? "index.html" : "melave.html") + "#t=" + (tr === "הובלה" ? "h" : "k");
     return EXT_PAGE[num] ? EXT_PAGE[num] + "?v=" + (view || "comp") + "&t=" + (tr === "הובלה" ? "h" : "k") : "";
   }
@@ -650,7 +652,7 @@
       return '<div class="v2-bigitem quiet"><span class="ic">' + ico(icon) + '</span><span class="tx"><b>' + esc(title) + "</b><span>" + esc(sub) + "</span></span></div>";
     }
     h += '<div class="v2-big">';
-    if (Number(s.num) === 3) h += quiet("slides", "מצגת המפגש", "ביחידה עצמית אין מצגת.");
+    if (Number(s.num) === 3 || Number(s.num) === 5) h += quiet("slides", "מצגת המפגש", "ביחידה עצמית אין מצגת.");
     else if (EXT_PAGE[s.num]) h += big(extUrl(tr, s.num, "deck"), "slides", "מצגת המפגש", "אותה מצגת שהרכזים פותחים. הערות המרצה מוצגות רק לך", "פתיחה");
     else if (str(s.slides)) h += big(s.slides, "slides", "מצגת המפגש", "נפתחת בלשונית נפרדת", "פתיחה");
     else h += quiet("slides", "מצגת המפגש", s.isUnit ? "ביחידה עצמית אין מצגת." : "המצגת עוד לא הועלתה (עמודה \"קישור מצגת\" בגיליון).");
@@ -864,8 +866,19 @@
       more: [["ex1sub", "משימה 1: מקצוע"], ["ex1nb", "משימה 1: נוטבוק", "link"], ["rules", "כללים שהוספו"],
         ["guess", "ההשערה"], ["gemini", "מה Gemini מצא"], ["surprise", "מה הפתיע"], ["good", "ממה התרשמו"], ["challenge", "איפה האתגר"]],
       fb: [["fb_rate", "דירוג"], ["fb_clear", "ההוראות היו ברורות?"], ["fb_stuck", "איפה נתקעו"]]
+    },
+    /* 25.11.26: יחידה 5. "עוד חסר" מחושב כאן לפי req (בשרת אדווה SUBS_REQUIRED עדיין של יחידה 3) */
+    5: {
+      main: [["needt", "הצורך"], ["trtopic", "ההדרכה: על מה"], ["traud", "למי"], ["trdate", "מתי מעבירים", "date"], ["trwhere", "באיזו מסגרת"]],
+      acts5: [1, 2, 3],
+      links: [["plan_url", "התוכנית ב-Canvas"], ["vid_url", "הסרטון ב-Vids"], ["act_url", "הפעילות"]],
+      more: [["act_tool", "הכלי של הפעילות"], ["act_what", "מה המורים עושים בפעילות"], ["vid_where", "איפה הסרטון בהדרכה"]],
+      req: [["plan_url", "תוכנית"], ["vid_url", "סרטון"], ["act_url", "פעילות"], ["trdate", "תאריך ההדרכה"],
+        ["done1", "פעולה 1"], ["next1", "פעולה 1"], ["done2", "פעולה 2"], ["next2", "פעולה 2"], ["done3", "פעולה 3"], ["next3", "פעולה 3"]],
+      fb: [["fb_rate", "דירוג"], ["fb_clear", "ההוראות היו ברורות?"], ["fb_stuck", "איפה נתקעו"]]
     }
   };
+  function subIso(x) { var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str(x)); return m ? +m[3] + "." + +m[2] + "." + m[1] : str(x); }
 
   function subUnits(tr) { return sessionsOf(tr).filter(function (s) { return s.isUnit; }); }
   /* ברירת המחדל: היחידה שהחלון שלה פתוח; אחרת האחרונה שכבר נפתחה; אחרת הראשונה */
@@ -956,22 +969,36 @@
     var tags = "";
     if (it.today) tags += '<span class="a-tag today">היום</span>';
     if (it.resubmitted) tags += '<span class="a-tag warn">הוגש מחדש אחרי התגובה</span>';
-    if (it.missing && it.missing.length) tags += '<span class="a-tag warn" title="' + esc(it.missing.join(" · ")) + '">עוד חסר: ' + esc(it.missing.join(" · ")) + "</span>";
+    var miss = V.req ? V.req.filter(function (r) { return !str(f[r[0]]); }).map(function (r) { return r[1]; })
+      .filter(function (x, i, a) { return a.indexOf(x) === i; }) : (it.missing || []);
+    if (miss.length) tags += '<span class="a-tag warn" title="' + esc(miss.join(" · ")) + '">עוד חסר: ' + esc(miss.join(" · ")) + "</span>";
     if (it.stuck && it.stuck.length) tags += '<span class="a-tag warn">לחצו “נתקעתי”</span>';
     if (it.state === "השלים") tags += '<span class="a-tag ok">השלים</span>';
     if (/^ar/i.test(str(it.lang))) tags += '<span class="a-tag">הדף בערבית</span>';
     var dl = "";
-    V.main.forEach(function (m) { var v = str(f[m[0]]); dl += "<dt>" + esc(m[1]) + "</dt><dd>" + (v ? esc(v) : '<span class="a-empty">לא מולא</span>') + "</dd>"; });
-    var acts = V.acts.map(function (a, i) {
+    V.main.forEach(function (m) { var v = m[2] === "date" ? subIso(f[m[0]]) : str(f[m[0]]); dl += "<dt>" + esc(m[1]) + "</dt><dd>" + (v ? esc(v) : '<span class="a-empty">לא מולא</span>') + "</dd>"; });
+    /* 25.11.26: יחידה 5 — לכל פעולה: מה עשו, מה יעשו, מתי ועם מי; ושלושה קישורים לתוצרים */
+    if (V.acts5) {
+      var a5 = V.acts5.map(function (i) {
+        var t = str(f["act" + i]), d = str(f["done" + i]), n = str(f["next" + i]); if (!t && !d && !n) return "";
+        return "<li><b>" + esc(t || "פעולה " + i) + "</b><br><small class=\"a-meta\">מה עשו: </small>" + (d ? esc(d) : '<span class="a-miss">לא כתבו</span>') +
+          "<br><small class=\"a-meta\">מה יעשו: </small>" + (n ? esc(n) : '<span class="a-miss">לא כתבו</span>') +
+          "<br><small class=\"a-meta\">" + (str(f["nwhen" + i]) ? "מתי: " + esc(subIso(f["nwhen" + i])) : '<span class="a-miss">בלי תאריך</span>') +
+          (str(f["who" + i]) ? " · עם מי: " + esc(f["who" + i]) : "") + "</small></li>";
+      }).filter(String).join("");
+      dl += "<dt>3 הפעולות</dt><dd>" + (a5 ? '<ol class="a-acts">' + a5 + "</ol>" : '<span class="a-empty">לא מולאו</span>') + "</dd>";
+      V.links.forEach(function (l) { var v = str(f[l[0]]); dl += "<dt>" + esc(l[1]) + "</dt><dd>" + (v ? subVal(v, true) : '<span class="a-miss">אין קישור</span>') + "</dd>"; });
+    }
+    var acts = V.acts5 ? "" : V.acts.map(function (a, i) {
       var v = str(f[a[0]]); if (!v) return "";
       var extra = [str(f[a[1]]) ? "מתי: " + esc(f[a[1]]) : '<span class="a-miss">בלי תאריך</span>', str(f[a[2]]) ? "עם מי: " + esc(f[a[2]]) : '<span class="a-miss">בלי שותף/ה</span>'];
       return "<li>" + esc(v) + ' <small class="a-meta">· ' + extra.join(" · ") + "</small></li>";
     }).filter(String).join("");
-    dl += "<dt>3 הפעולות</dt><dd>" + (acts ? '<ol class="a-acts">' + acts + "</ol>" : '<span class="a-empty">לא מולאו</span>') + "</dd>";
-    var nb = str(f[V.nb[0]]);
+    if (!V.acts5) dl += "<dt>3 הפעולות</dt><dd>" + (acts ? '<ol class="a-acts">' + acts + "</ol>" : '<span class="a-empty">לא מולאו</span>') + "</dd>";
+    var nb = V.nb ? str(f[V.nb[0]]) : "";
     /* 3.11.26: קישור עריכה (notebook.google.com/notebook/...) לרוב לא פתוח לשיתוף; קישור שיתוף הוא notebooklm.link.google */
     var nbWarn = nb && /^https?:\/\//.test(nb) && !/notebooklm\.link\.google/.test(nb) ? ' <span class="a-tag warn" title="קישור עריכה. אם לא נפתח: לבקש שיתוף לכל מי שיש לו את הקישור">לבדוק שיתוף</span>' : "";
-    dl += "<dt>" + esc(V.nb[1]) + "</dt><dd>" + (nb ? subVal(nb, true) + nbWarn : '<span class="a-miss">אין קישור</span>') + "</dd>";
+    if (V.nb) dl += "<dt>" + esc(V.nb[1]) + "</dt><dd>" + (nb ? subVal(nb, true) + nbWarn : '<span class="a-miss">אין קישור</span>') + "</dd>";
     var more = V.more.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + subVal(v, m[2] === "link") + "</dd>" : ""; }).join("");
     var fb = V.fb.map(function (m) { var v = str(f[m[0]]); return v ? "<dt>" + esc(m[1]) + "</dt><dd>" + esc(v) + "</dd>" : ""; }).join("");
     var stuck = (it.stuck || []).map(function (s) { return "<li>" + (s.step ? "<b>" + esc(s.step) + ":</b> " : "") + esc(s.msg) + ' <small class="a-meta" translate="no">· ' + esc(s.at) + "</small></li>"; }).join("");
