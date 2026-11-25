@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>הדף המלווה · כנס בני ובנות השירות 16.12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#ECE8DF;--paper:#F6F0E3;--card:#FFFCF5;--gold:#A57A2E;--red:#C8453A;--blue:#2F6FB5;--ink:#2b2722;--mute:#7a6f60;--line:#E3D9C6;--ok:#2E7D4F}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Heebo",sans-serif;font-size:17px;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+svg.i{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.top{background:#fff;border-bottom:1px solid #e6e6e6}
+.top div{max-width:640px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.top img{height:32px}
+.me{font-size:.82rem;color:var(--mute);text-align:left}
+main{flex:1;width:100%;max-width:640px;margin:0 auto;padding:18px 14px 30px}
+.sheetpaper{background:var(--paper);border-radius:6px;box-shadow:0 14px 34px -24px rgba(0,0,0,.45);padding:24px 20px 26px;position:relative;overflow:hidden}
+.flw{position:absolute;width:42px;height:42px;top:12px;left:12px}
+.kick{font-size:.82rem;color:var(--mute);margin:0}
+h1{font-family:"Frank Ruhl Libre",serif;font-weight:900;color:var(--gold);font-size:1.9rem;line-height:1.15;margin:4px 0 8px;padding-left:44px}
+h2{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:1.25rem;margin:18px 0 6px}
+p{margin:0 0 10px}
+.mute{color:var(--mute)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:99px;padding:13px 22px;background:var(--red);color:#fff;font-weight:700;cursor:pointer;font-size:1rem;text-decoration:none}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.l{display:block;font-weight:700;margin:14px 0 6px}
+.inp{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;font-size:1rem}
+textarea.inp{min-height:90px;resize:vertical}
+.inp:focus{outline:2px solid var(--red);outline-offset:1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.err{color:#B3261E;font-size:.88rem;min-height:1.2em;margin-top:6px}
+.note{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:12px 0}
+.done{display:flex;gap:10px;align-items:center;color:var(--ok);font-weight:700}
+/* בינגו */
+.bingo{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.cell{aspect-ratio:1;border:1.5px solid var(--line);background:#fff;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:6px;cursor:pointer;font-weight:700;font-size:.95rem;line-height:1.2}
+.cell small{display:block;font-weight:500;font-size:.72rem;color:var(--mute);margin-top:4px}
+.cell.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.cell.on small{color:#dce8f7}
+.cell.mine{border-style:dashed}
+.banner{background:var(--red);color:#fff;border-radius:14px;padding:12px 16px;font-weight:800;text-align:center;margin-top:12px;font-size:1.15rem}
+/* שאלון */
+.q{font-family:"Frank Ruhl Libre",serif;font-size:1.3rem;font-weight:700;margin:10px 0 12px}
+.opts{display:grid;gap:8px}
+.opt{border:1.5px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;text-align:right;cursor:pointer;font-size:1rem}
+.opt:active{background:#f5efe3}
+.prog{display:flex;gap:6px;margin:6px 0}
+.prog i{flex:1;height:5px;border-radius:9px;background:var(--line)}
+.prog i.on{background:var(--gold)}
+.score{font-family:"Frank Ruhl Libre",serif;font-size:3.4rem;font-weight:900;color:var(--blue);text-align:center;line-height:1}
+/* גלויה */
+.pc{background:#fff;border-radius:6px;padding:18px;border:1px solid var(--line);margin-top:10px;box-shadow:0 8px 18px -14px rgba(0,0,0,.4)}
+.pc .t{font-family:"Amatic SC",cursive;font-size:1.9rem;color:var(--blue);line-height:1.15}
+.pc .f{color:var(--mute);font-size:.88rem;margin-top:6px}
+/* קלף נושא */
+.deck{perspective:900px;margin:14px auto 4px;width:220px;height:150px;cursor:pointer}
+.deck .in{position:relative;width:100%;height:100%;transition:transform .6s;transform-style:preserve-3d}
+.deck.flip .in{transform:rotateY(180deg)}
+.deck .fc{position:absolute;inset:0;border-radius:16px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;text-align:center;padding:12px;font-weight:800}
+.deck .back{background:var(--gold);color:#fff;font-size:1.05rem;border:6px solid #fff;box-shadow:0 10px 24px -12px rgba(0,0,0,.5)}
+.deck .front{background:#fff;color:var(--red);transform:rotateY(180deg);font-family:"Frank Ruhl Libre",serif;font-size:1.55rem;border:2px solid var(--red)}
+/* שלבים */
+.stages{margin-top:18px}
+.stages .chips{gap:6px}
+.stages .chip{font-size:.82rem;padding:6px 12px}
+.stages .chip.now{border-color:var(--red);color:var(--red);font-weight:700}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 18px;border-radius:99px;font-size:.92rem;z-index:2000;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1500;display:none;align-items:flex-end;justify-content:center}
+.sheet-bg.on{display:flex}
+.sheet{background:var(--paper);width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:20px 18px calc(20px + env(safe-area-inset-bottom));max-height:86vh;overflow:auto}
+.plist{display:grid;gap:6px;margin-top:10px;max-height:46vh;overflow:auto}
+.plist button{text-align:right;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;cursor:pointer}
+.plist button small{color:var(--mute);margin-inline-start:6px}
+footer{text-align:center;padding:16px;color:var(--mute);font-size:.8rem}
+footer .credit{font-size:.72rem;color:#8A97A6;margin-top:4px}
+footer a{color:inherit}
+.help{display:inline-flex;align-items:center;gap:6px;color:var(--mute);text-decoration:none;margin-bottom:8px;font-size:.82rem}
+.help svg{width:16px;height:16px}
+.ltr{direction:ltr;unicode-bidi:isolate}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="anemone" viewBox="0 0 40 40">
+    <g fill="#C8453A"><ellipse cx="20" cy="9" rx="6.5" ry="9"/><ellipse cx="20" cy="31" rx="6.5" ry="9"/><ellipse cx="9" cy="20" rx="9" ry="6.5"/><ellipse cx="31" cy="20" rx="9" ry="6.5"/></g>
+    <g fill="#D9574A" transform="rotate(45 20 20)"><ellipse cx="20" cy="10" rx="5" ry="8"/><ellipse cx="20" cy="30" rx="5" ry="8"/><ellipse cx="10" cy="20" rx="8" ry="5"/><ellipse cx="30" cy="20" rx="8" ry="5"/></g>
+    <circle cx="20" cy="20" r="5.5" fill="#2b2240"/>
+  </symbol>
+</svg>
+<header class="top"><div><img src="logo-minhal.png" alt="המנהל להכשרה מקצועית · משרד העבודה"><span class="me" id="me"></span></div></header>
+<main id="main"></main>
+<footer>
+  <a class="help" href="https://wa.me/972536256653" target="_blank" rel="noopener"><svg class="i" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.5A8.4 8.4 0 1 1 21 11.5z"/></svg>נתקלתם בבעיה? שלחו הודעה</a>
+  <div>כנס בני ובנות השירות · המנהל להכשרה מקצועית · משרד העבודה</div>
+  <div class="credit">נבנה על ידי <a href="https://impactos.co.il/" target="_blank" rel="noopener">impactos · impactos.co.il</a></div>
+</footer>
+<div class="sheet-bg" id="sheetBg"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="config.js"></script>
+<script>
+(function(){
+'use strict';
+var qs=new URLSearchParams(location.search);
+var API=(qs.get('api')||window.SHERUT_API||'').trim();
+var APIQ=qs.get('api')?'?api='+encodeURIComponent(qs.get('api')):'';
+var SCHOOLS=['אורט אורמת','אורט בית הערבה','אורט תל נוף','אורט תעשייה אווירית',"אנרג'י טק",'בית אל','בית דוד','דן גורמה','דרור גליל','הדר','התיכון החברתי חיפה','חוש"ן','מצפה רמון','עמל אשדוד','עמל טק אין','עתיד באר שבע','עתיד בת עמי','עתיד כרמיאל','עתיד פלמחים','צור ברק','צור ים','קמ"ג דימונה','רימונים','רמת דוד','תיכון החממה','תיכון חברתי ת"א','עתיד זוקו','תיכון שיח','תפן ליזמות'];
+var ROLES=['בן/בת שירות','רכזת בית ספר','רכזת עמותה'];
+var STAGES=[['sagur','לפני הכנס'],['chazon','לוח החזון שלי'],['tachbivim','מי בתחביבים שלי'],['makira','כמה את מכירה אותי?'],['havtacha','ההבטחה ההדדית'],['kartis','כרטיס פעילות'],['sikum','סיכום היום'],['sof','סוף היום']];
+var TOPICS=['הפסקה פעילה','חג ומועד','טקס','היכרות וגיבוש','מוגנות ושייכות','שיח ערכי','יצירה'];
+var QUIZ=[
+  ['הבוקר שלי מתחיל עם...',['קפה','תה','שוקו','רק מים']],
+  ['בהפסקה הכי סביר למצוא אותי...',['בחצר עם תלמידים','בחדר המורים','במשרד של הרכזת','עם הטלפון בפינה שקטה']],
+  ['אם הייתי בעל חיים, הייתי...',['חתול','כלב','ציפור','דולפין']],
+  ['השיר שתמיד מקפיץ אותי לרקוד...',['מזרחי','פופ','ישראלי ישן','אני לא רוקדת']],
+  ['החופשה החלומית שלי...',['ים','הרים וטבע','עיר גדולה בחו״ל','בבית על הספה']]
+];
+var OPENERS=['השנה אני אדאג ש','את יכולה לסמוך עליי ש','אני מבטיחה ל'];
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function icon(n){ var P={next:'<path d="M15 6l-6 6 6 6"/>',check:'<circle cx="12" cy="12" r="9.5"/><path d="m8 12.5 2.7 2.7L16 9.8"/>',down:'<path d="M12 4v12m-5-5 5 5 5-5M5 20h14"/>',board:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h4v4H7zM14 9h3M14 13h3M7 16h10"/>',refresh:'<path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v4h-4"/>'}; return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">'+P[n]+'</svg>'; }
+function toast(m){ var t=$('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(t._h); t._h=setTimeout(function(){t.classList.remove('on');},2600); }
+function getJSON(q){ return fetch(API+(API.indexOf('?')<0?'?':'&')+q,{credentials:'omit'}).then(function(r){return r.json();}); }
+function postJSON(o){ return fetch(API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).then(function(r){return r.json();}); }
+function sheet(html,fn){ $('sheet').innerHTML=html; $('sheetBg').classList.add('on'); if(fn) fn(); }
+function closeSheet(){ $('sheetBg').classList.remove('on'); }
+$('sheetBg').addEventListener('click',function(e){ if(e.target===this) closeSheet(); });
+
+/* זהות משותפת עם לוח החזון */
+var PID=localStorage.getItem('sherut-pid');
+if(!PID){ PID=Array.from(crypto.getRandomValues(new Uint8Array(8))).map(function(b){return (b%36).toString(36);}).join('')+Date.now().toString(36).slice(-4); localStorage.setItem('sherut-pid',PID); }
+var ME=null; try{ ME=JSON.parse(localStorage.getItem('sherut-profile')||'null'); }catch(e){}
+var LS='sherut-melave'; var L={}; try{ L=JSON.parse(localStorage.getItem(LS)||'{}'); }catch(e){}
+function saveL(){ try{ localStorage.setItem(LS,JSON.stringify(L)); }catch(e){} }
+
+var STAGE='sagur', VIEW=null, peopleCache=null;
+function stageIdx(s){ for(var i=0;i<STAGES.length;i++) if(STAGES[i][0]===s) return i; return 0; }
+function people(school){ return getJSON('mode=people'+(school?'&school='+encodeURIComponent(school):'')).then(function(r){ return (r.people||[]).filter(function(p){return p.pid!==PID;}); }); }
+
+function shell(title,kick,body){
+  $('main').innerHTML='<article class="sheetpaper"><svg class="flw"><use href="#anemone"/></svg><p class="kick">'+esc(kick||'כנס בני ובנות השירות · 16.12')+'</p><h1>'+esc(title)+'</h1><div id="body">'+body+'</div></article>'+stagesNav();
+  var sn=$('stagesNav'); if(sn) sn.onclick=function(e){ var b=e.target.closest('.chip'); if(!b) return; VIEW=b.getAttribute('data-s'); render(); window.scrollTo(0,0); };
+}
+function stagesNav(){
+  var cur=stageIdx(STAGE); if(cur<2) return '';
+  var v=VIEW||STAGE;
+  return '<nav class="stages" aria-label="השלבים של היום"><p class="kick">השלבים שנפתחו</p><div class="chips" id="stagesNav">'+
+    STAGES.slice(1,cur+1).map(function(s){ return '<button class="chip'+(s[0]===STAGE?' now':'')+'" data-s="'+s[0]+'" aria-pressed="'+(s[0]===v)+'">'+s[1]+'</button>'; }).join('')+'</div></nav>';
+}
+
+/* ---------- פרופיל ---------- */
+function profileForm(){
+  var p=ME||{name:'',role:'',school:''}, isOther=p.school&&SCHOOLS.indexOf(p.school)<0;
+  shell('ברוכים הבאים','כנס בני ובנות השירות · 16.12',
+    '<p>כמה פרטים, ומתחילים.</p><form id="f" novalidate><label class="l" for="nm">שם</label><input class="inp" id="nm" autocomplete="name" maxlength="40" value="'+esc(p.name)+'">'+
+    '<div class="l">תפקיד</div><div class="chips" id="roles">'+ROLES.map(function(r){return '<button type="button" class="chip" aria-pressed="'+(p.role===r)+'">'+r+'</button>';}).join('')+'</div>'+
+    '<label class="l" for="sc">בית ספר</label><select class="inp" id="sc"><option value="" disabled'+(p.school?'':' selected')+'>בחרו בית ספר</option>'+SCHOOLS.map(function(s){return '<option'+(p.school===s?' selected':'')+'>'+esc(s)+'</option>';}).join('')+'<option value="other"'+(isOther?' selected':'')+'>אחר</option></select>'+
+    '<div id="ow"'+(isOther?'':' hidden')+'><label class="l" for="ot">שם בית הספר</label><input class="inp" id="ot" maxlength="40" value="'+(isOther?esc(p.school):'')+'"></div>'+
+    '<div class="err" id="err" role="alert"></div><button class="btn wide" type="submit">המשך '+icon('next')+'</button></form>');
+  var role=p.role;
+  $('roles').onclick=function(e){ var b=e.target.closest('.chip'); if(!b) return; role=b.textContent; this.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===b);}); };
+  $('sc').onchange=function(){ $('ow').hidden=this.value!=='other'; };
+  $('f').onsubmit=function(e){ e.preventDefault();
+    var name=$('nm').value.trim(), sc=$('sc').value, school=sc==='other'?$('ot').value.trim():sc;
+    var er=!name?'כתבו את השם.':!role?'בחרו תפקיד.':!school?'בחרו בית ספר.':''; $('err').textContent=er; if(er) return;
+    ME={name:name,role:role,school:school}; localStorage.setItem('sherut-profile',JSON.stringify(ME));
+    join().then(function(){ render(); }); };
+}
+function join(){ if(!API||!ME) return Promise.resolve(); return postJSON({a:'join',pid:PID,name:ME.name,role:ME.role,school:ME.school}).catch(function(){}); }
+
+/* ---------- שלבים ---------- */
+function render(){
+  $('me').textContent=ME? ME.name+' · '+ME.school : '';
+  if(!ME) return profileForm();
+  var s=VIEW||STAGE;
+  ({sagur:vSagur,chazon:vChazon,tachbivim:vHobbies,makira:vQuiz,havtacha:vPromise,kartis:vCard,sikum:vSikum,sof:vSof}[s]||vSagur)();
+}
+function vSagur(){ shell('הדף המלווה','כנס בני ובנות השירות · 16.12','<p>הדף ייפתח ביום הכנס. בכל שלב של היום תופיע כאן הפעילות של אותו רגע.</p><p class="mute">ו׳ טבת · <span class="ltr">16.12.26</span> · MY CAMPUS, הלח״י 21, בני ברק</p>'); }
+function vChazon(){
+  shell('לוח החזון שלי','פתיחה · 9:30–10:30',
+    '<p>בונים לוח חזון אישי על התפקיד: תמונות, חפץ, ערך, משפט ושיר. אחר כך משתפים בקבוצה של בית הספר ושולחים מדבקות מחמאה.</p>'+
+    '<a class="btn wide" href="chazon.html'+APIQ+'">'+icon('board')+'לבניית הלוח</a>');
+}
+
+/* מי בתחביבים שלי */
+var HOB=null;
+function seeded(seed){ var h=2166136261; for(var i=0;i<seed.length;i++){ h^=seed.charCodeAt(i); h=Math.imul(h,16777619); } return function(){ h|=0; h=h+0x6D2B79F5|0; var t=Math.imul(h^h>>>15,1|h); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function vHobbies(){
+  shell('מי בתחביבים שלי','משחקון · 10 דקות','<p class="mute">טוען...</p>');
+  getJSON('mode=hobbies&pid='+PID).then(function(r){ HOB=r; drawHobbies(); }).catch(offline);
+}
+function drawHobbies(){
+  var r=HOB, b=$('body'); if(!b) return;
+  if(!r.mine.length){
+    var sel=[];
+    b.innerHTML='<p>בחרו 3 עד 6 תחביבים שלכם. אחר כך מחפשים בחדר אנשים שאוהבים את אותם דברים.</p><div class="chips" id="hc">'+r.list.map(function(h){return '<button class="chip" aria-pressed="false">'+esc(h)+'</button>';}).join('')+'</div><div class="err" id="err"></div><button class="btn wide" id="go" style="margin-top:12px">לכרטיס הבינגו '+icon('next')+'</button>';
+    $('hc').onclick=function(e){ var x=e.target.closest('.chip'); if(!x) return; var h=x.textContent, i=sel.indexOf(h);
+      if(i>=0){ sel.splice(i,1); x.setAttribute('aria-pressed','false'); } else if(sel.length<6){ sel.push(h); x.setAttribute('aria-pressed','true'); } else toast('עד 6 תחביבים'); };
+    $('go').onclick=function(){ if(sel.length<3){ $('err').textContent='בחרו לפחות 3.'; return; } this.disabled=true;
+      join().then(function(){ return postJSON({a:'hobbies',pid:PID,list:sel}); }).then(function(x){ if(x.ok){ r.mine=sel; drawHobbies(); } else { toast('לא נשמר. נסו שוב.'); } }).catch(offline); };
+    return;
+  }
+  var rnd=seeded(PID), pool=r.list.slice(); for(var i=pool.length-1;i>0;i--){ var j=Math.floor(rnd()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+  var grid=pool.slice(0,9), on=grid.map(function(h){ return !!r.found[h]; });
+  var lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]], bingo=lines.some(function(l){ return l.every(function(k){return on[k];}); });
+  b.innerHTML='<p>מצאו בחדר מישהי שאוהבת את מה שכתוב במשבצת, ובחרו אותה מהרשימה. שורה מלאה = בינגו.</p>'+
+    '<div class="bingo">'+grid.map(function(h,k){ return '<button class="cell'+(on[k]?' on':'')+(r.mine.indexOf(h)>=0?' mine':'')+'" data-h="'+esc(h)+'">'+esc(h)+(on[k]?'<small>'+esc(r.found[h])+'</small>':'')+'</button>'; }).join('')+'</div>'+
+    (bingo?'<div class="banner">בינגו!</div>':'')+
+    '<p class="mute" style="margin-top:10px;font-size:.86rem">התחביבים שלך: '+esc(r.mine.join(', '))+'</p>';
+  b.querySelector('.bingo').onclick=function(e){ var c=e.target.closest('.cell'); if(!c||c.classList.contains('on')) return; pickHobby(c.getAttribute('data-h')); };
+}
+function pickPerson(title,list,onPick){
+  sheet('<h2>'+esc(title)+'</h2><input class="inp" id="pq" placeholder="חיפוש שם" autocomplete="off"><div class="plist" id="pl"></div><div class="row"><button class="btn ghost" id="pn">ביטול</button></div>',function(){
+    function draw(){ var q=$('pq').value.trim(); $('pl').innerHTML=list.filter(function(p){return !q||p.name.indexOf(q)>=0;}).map(function(p){ return '<button data-p="'+p.pid+'">'+esc(p.name)+'<small>'+esc(p.school)+'</small></button>'; }).join('')||'<p class="mute">לא נמצאו שמות.</p>'; }
+    draw(); $('pq').oninput=draw; $('pn').onclick=closeSheet;
+    $('pl').onclick=function(e){ var b=e.target.closest('button'); if(!b) return; var p=list.filter(function(x){return x.pid===b.getAttribute('data-p');})[0]; closeSheet(); onPick(p); };
+  });
+}
+function pickHobby(h){
+  people().then(function(list){
+    pickPerson('מי אוהבת '+h+'?',list,function(p){
+      postJSON({a:'found',pid:PID,hobby:h,who:p.pid}).then(function(x){
+        if(x.match){ HOB.found[h]=p.name; drawHobbies(); toast('מצאת! '+p.name+' אוהבת '+h); }
+        else toast(p.name+' לא בחרה ב'+h+'. חפשו מישהי אחרת.');
+      }).catch(offline);
+    });
+  }).catch(offline);
+}
+
+/* כמה את מכירה אותי */
+var QZ=null;
+function vQuiz(){
+  shell('כמה את מכירה אותי?','משחקון בזוגות · רכזת ובת שירות','<p class="mute">טוען...</p>');
+  getJSON('mode=quiz&pid='+PID).then(function(r){ QZ=r; drawQuiz(); }).catch(offline);
+}
+function askFive(title,answers,done){
+  var i=answers.length, b=$('body');
+  if(i>=5) return done(answers);
+  b.innerHTML='<p class="mute">'+esc(title)+'</p><div class="prog">'+[0,1,2,3,4].map(function(k){return '<i class="'+(k<i?'on':'')+'"></i>';}).join('')+'</div>'+
+    '<div class="q">'+esc(QUIZ[i][0])+'</div><div class="opts" id="op">'+QUIZ[i][1].map(function(o,k){return '<button class="opt" data-k="'+k+'">'+esc(o)+'</button>';}).join('')+'</div>';
+  $('op').onclick=function(e){ var o=e.target.closest('.opt'); if(!o) return; answers.push(+o.getAttribute('data-k')); askFive(title,answers,done); };
+}
+var qzTimer=null;
+function drawQuiz(){
+  clearTimeout(qzTimer); var r=QZ, b=$('body'); if(!b) return;
+  if(!r.self){ return askFive('קודם עונים על עצמך',[],function(a){ b.innerHTML='<p class="mute">שומר...</p>'; join().then(function(){ return postJSON({a:'quiz',pid:PID,self:a}); }).then(function(x){ QZ=x; drawQuiz(); }).catch(offline); }); }
+  if(!r.partner){
+    b.innerHTML='<div class="done">'+icon('check')+'ענית על עצמך</div><p style="margin-top:10px">עכשיו בחרו את השותפה שלכם מבית הספר: הרכזת, או בת השירות שלה. ננחש מה היא ענתה.</p><button class="btn wide" id="pp">בחירת שותפה</button>';
+    $('pp').onclick=function(){ people(ME.school).then(function(list){ list.sort(function(a,c){ return (a.role===ME.role)-(c.role===ME.role); });
+      pickPerson('עם מי משחקים?',list,function(p){ askFive('מה '+p.name+' ענתה?',[],function(g){ b.innerHTML='<p class="mute">שומר...</p>';
+        postJSON({a:'guess',pid:PID,partner:p.pid,guesses:g}).then(function(x){ QZ=x; drawQuiz(); }).catch(offline); }); }); }).catch(offline); };
+    return;
+  }
+  if(r.score==null){
+    b.innerHTML='<p>ניחשת את התשובות של <b>'+esc(r.partner.name)+'</b>.</p><div class="note">מחכים ש'+esc(r.partner.name)+' תענה על עצמה. הציון יופיע כאן לבד.</div>';
+    qzTimer=setTimeout(function(){ if((VIEW||STAGE)!=='makira') return; getJSON('mode=quiz&pid='+PID).then(function(x){ QZ=x; drawQuiz(); }).catch(function(){}); },6000);
+    return;
+  }
+  var msg=['מתחילות להכיר','יש על מה לדבר בהפסקה','לא רע בכלל','מכירות טוב','כמעט קוראות מחשבות','נשמות תאומות'][r.score];
+  b.innerHTML='<p>ניחשת את התשובות של <b>'+esc(r.partner.name)+'</b>:</p><div class="score">'+r.score+'/5</div><p style="text-align:center;font-weight:700;margin-top:6px">'+msg+'</p><p class="mute" style="text-align:center">עכשיו תשוו תשובות ותגלו מה פספסתן.</p>';
+}
+
+/* ההבטחה ההדדית */
+var prTimer=null;
+function vPromise(){
+  shell('ההבטחה ההדדית','רכזת ובת שירות','<p class="mute">טוען...</p>');
+  loadPromise();
+}
+function loadPromise(){ getJSON('mode=promises&pid='+PID).then(drawPromise).catch(offline); }
+function drawPromise(r){
+  clearTimeout(prTimer); var b=$('body'); if(!b) return;
+  var got=(r.got||[]).map(function(g,k){ return '<div class="pc"><div class="t">'+esc(g.text)+'</div><div class="f">מאת '+esc(g.from)+'</div><button class="btn ghost" data-k="'+k+'" style="margin-top:10px;padding:8px 14px;font-size:.9rem">'+icon('down')+'שמירה כגלויה</button></div>'; }).join('');
+  var mine=r.given? '<div class="done">'+icon('check')+'נשלח ל'+esc(r.given.to)+'</div><div class="pc"><div class="t">'+esc(r.given.text)+'</div></div><button class="btn ghost" id="again" style="margin-top:10px">עריכה</button>' : '';
+  b.innerHTML='<p>משפט אחד שאת נותנת לשותפה שלך לשנה הזו, ומשפט אחד שאת מקבלת ממנה.</p>'+
+    (mine||'<button class="btn wide" id="write">כתיבת ההבטחה שלי</button>')+
+    '<h2>מה קיבלתי</h2>'+(got||'<p class="mute">עוד לא הגיעה הבטחה. היא תופיע כאן לבד.</p>');
+  if($('write')) $('write').onclick=writePromise;
+  if($('again')) $('again').onclick=writePromise;
+  b.querySelectorAll('.pc .btn').forEach(function(x){ x.onclick=function(){ postcardPNG(r.got[+x.getAttribute('data-k')]); }; });
+  prTimer=setTimeout(function(){ if((VIEW||STAGE)==='havtacha' && !$('sheetBg').classList.contains('on')) loadPromise(); },10000);
+}
+function writePromise(){
+  people(ME.school).then(function(list){ list.sort(function(a,c){ return (a.role===ME.role)-(c.role===ME.role); });
+    pickPerson('למי ההבטחה?',list,function(p){
+      var op=OPENERS[0];
+      sheet('<h2>ההבטחה ל'+esc(p.name)+'</h2><div class="chips" id="oc">'+OPENERS.map(function(o,k){return '<button class="chip" aria-pressed="'+(k===0)+'">'+esc(o)+'...</button>';}).join('')+'</div>'+
+        '<label class="l" for="pt">המשך המשפט</label><textarea class="inp" id="pt" maxlength="120"></textarea><div class="row"><button class="btn" id="ps">שליחה</button><button class="btn ghost" id="pn">ביטול</button></div>',function(){
+        $('oc').onclick=function(e){ var x=e.target.closest('.chip'); if(!x) return; op=OPENERS[[].indexOf.call(this.children,x)]; this.querySelectorAll('.chip').forEach(function(c){c.setAttribute('aria-pressed',c===x);}); };
+        $('pn').onclick=closeSheet;
+        $('ps').onclick=function(){ var t=$('pt').value.trim(); if(!t){ $('pt').focus(); return; }
+          postJSON({a:'promise',pid:PID,to:p.pid,text:op+t}).then(function(x){ if(x.ok){ closeSheet(); toast('ההבטחה נשלחה'); loadPromise(); } else toast('לא נשלח. נסו שוב.'); }).catch(offline); };
+      });
+    });
+  }).catch(offline);
+}
+function postcardPNG(g){
+  var W=1200,H=800,c=document.createElement('canvas'); c.width=W; c.height=H; var x=c.getContext('2d'); x.direction='rtl';
+  x.fillStyle='#F6F0E3'; x.fillRect(0,0,W,H); x.strokeStyle='#A57A2E'; x.lineWidth=6; x.strokeRect(30,30,W-60,H-60);
+  function flower(cx,cy,s){ var k=s/20,i; x.save(); x.translate(cx,cy); x.fillStyle='#C8453A'; for(i=0;i<4;i++){ x.save(); x.rotate(i*Math.PI/2); x.beginPath(); x.ellipse(0,-11*k,6.5*k,9*k,0,0,7); x.fill(); x.restore(); } x.fillStyle='#D9574A'; for(i=0;i<4;i++){ x.save(); x.rotate(Math.PI/4+i*Math.PI/2); x.beginPath(); x.ellipse(0,-10*k,5*k,8*k,0,0,7); x.fill(); x.restore(); } x.fillStyle='#2b2240'; x.beginPath(); x.arc(0,0,5.5*k,0,7); x.fill(); x.restore(); }
+  flower(110,110,60); flower(W-100,H-100,44);
+  x.textAlign='center'; x.fillStyle='#A57A2E'; x.font='900 56px "Frank Ruhl Libre"'; x.fillText('ההבטחה שקיבלתי',W/2,150);
+  x.fillStyle='#2F6FB5'; x.font='700 78px "Amatic SC"'; var words=g.text.split(/\s+/), lines=[], cur='';
+  words.forEach(function(w){ var t=cur?cur+' '+w:w; if(x.measureText(t).width>W-260&&cur){ lines.push(cur); cur=w; } else cur=t; }); if(cur) lines.push(cur);
+  lines.forEach(function(l,i){ x.fillText(l,W/2,330+i*92); });
+  x.fillStyle='#7a6f60'; x.font='500 34px "Heebo"'; x.fillText('מאת '+g.from+' · כנס בני ובנות השירות · 16.12.26',W/2,H-90);
+  c.toBlob(function(bl){ var a=document.createElement('a'); a.href=URL.createObjectURL(bl); a.download='ההבטחה-שקיבלתי.png'; document.body.appendChild(a); a.click(); a.remove(); },'image/png');
+}
+
+/* כרטיס פעילות */
+function vCard(){
+  var topic=L.topic||'';
+  shell('כרטיס פעילות','בונים את מאגר הפעילויות',
+    '<p>בקבוצה: שולפים קלף נושא, ובונים פעילות שבנות שירות יכולות להעביר בבית הספר. הכרטיס עולה לאתר בנות השירות אחרי אישור.</p>'+
+    '<div class="deck'+(topic?' flip':'')+'" id="deck" role="button" aria-label="שליפת קלף נושא"><div class="in"><div class="fc back">שלפו קלף נושא</div><div class="fc front" id="tp">'+esc(topic)+'</div></div></div>'+
+    '<div id="cf"'+(topic?'':' hidden')+'>'+
+    '<p style="text-align:center"><button class="btn ghost" id="redraw" style="padding:6px 14px;font-size:.86rem">'+icon('refresh')+'קלף אחר</button></p>'+
+    '<form id="f" novalidate><label class="l" for="t1">שם הפעילות</label><input class="inp" id="t1" maxlength="80">'+
+    '<div class="row" style="margin-top:0"><div style="flex:1"><label class="l" for="t2">לאיזה גיל</label><input class="inp" id="t2" maxlength="30" placeholder="למשל ט׳–י׳"></div><div style="flex:1"><label class="l" for="t3">משך (דקות)</label><input class="inp" id="t3" inputmode="numeric" maxlength="4"></div></div>'+
+    '<label class="l" for="t4">חומרים</label><input class="inp" id="t4" maxlength="500">'+
+    '<label class="l" for="t5">שלבים (שורה לכל שלב)</label><textarea class="inp" id="t5" maxlength="2000"></textarea>'+
+    '<label class="l" for="t6">טיפ למי שמעבירה</label><input class="inp" id="t6" maxlength="300">'+
+    '<label class="l" for="t7">מי כתבו</label><input class="inp" id="t7" maxlength="120" value="'+esc(ME.name)+'">'+
+    '<div class="err" id="err" role="alert"></div><button class="btn wide" type="submit">שליחת הכרטיס</button></form></div>'+
+    (L.cards? '<p class="mute" style="margin-top:12px">שלחתן '+L.cards+' כרטיסים.</p>':''));
+  function draw(){ var cur=L.topic, t; do{ t=TOPICS[Math.floor(Math.random()*TOPICS.length)]; }while(t===cur&&TOPICS.length>1); L.topic=t; saveL(); $('tp').textContent=t; $('deck').classList.add('flip'); $('cf').hidden=false; }
+  $('deck').onclick=function(){ if(!L.topic) draw(); };
+  $('redraw').onclick=function(e){ e.preventDefault(); $('deck').classList.remove('flip'); setTimeout(draw,350); };
+  $('f').onsubmit=function(e){ e.preventDefault();
+    var d={a:'card',topic:L.topic,title:$('t1').value.trim(),ages:$('t2').value.trim(),duration:$('t3').value.trim(),materials:$('t4').value.trim(),steps:$('t5').value.trim(),tip:$('t6').value.trim(),authors:$('t7').value.trim(),school:ME.school};
+    var er=!d.title?'כתבו שם לפעילות.':!d.steps?'כתבו את שלבי הפעילות.':''; $('err').textContent=er; if(er) return;
+    var btn=this.querySelector('button[type=submit]'); btn.disabled=true;
+    postJSON(d).then(function(x){ btn.disabled=false; if(!x.ok){ toast('לא נשלח. נסו שוב.'); return; }
+      L.cards=(L.cards||0)+1; L.topic=''; saveL();
+      $('body').innerHTML='<div class="done">'+icon('check')+'הכרטיס נשלח</div><p style="margin-top:8px">הוא יופיע במאגר הפעילויות באתר אחרי אישור.</p><button class="btn ghost wide" id="more">כרטיס נוסף</button>';
+      $('more').onclick=vCard; }).catch(function(){ btn.disabled=false; offline(); });
+  };
+}
+
+/* סיכום */
+function myValues(){ try{ var s=JSON.parse(localStorage.getItem('chazon-sherut-1612')||'null'); return s? s.items.filter(function(i){return i.type==='value';}).map(function(i){return i.text;}) : []; }catch(e){ return []; } }
+function vSikum(){
+  var vals=myValues();
+  shell('סיכום היום','סוף הכנס',
+    '<h2>הערך שלך על המסך</h2>'+
+    (vals.length? '<p>הערך שבחרת בלוח החזון, <b>'+esc(vals.join(', '))+'</b>, נמצא עכשיו בפסיפס על המסך הגדול, יחד עם הערכים של כל בני ובנות השירות.</p>'
+                : '<p>עוד לא בחרת ערך בלוח החזון. מוסיפים ערך ללוח, והוא מצטרף לפסיפס על המסך.</p><a class="btn ghost" href="chazon.html'+APIQ+'">'+icon('board')+'ללוח החזון</a>')+
+    '<h2>גלויה לעצמי</h2>'+
+    (L.postcard? '<div class="done">'+icon('check')+'הגלויה נשמרה. היא תגיע אלייך במייל בסוף השנה.</div><div class="pc"><div class="t">'+esc(L.postcard)+'</div></div>'
+      : '<p>כתבו משפט לעצמכם, ליוני, כשהשנה נגמרת. הוא יישלח אליכם במייל בסוף השנה, יחד עם תזכורת ללוח החזון.</p>'+
+        '<form id="f" novalidate><label class="l" for="pt">המשפט</label><textarea class="inp" id="pt" maxlength="300" placeholder="מה הייתי רוצה לזכור ביוני?"></textarea>'+
+        '<label class="l" for="em">מייל</label><input class="inp ltr" id="em" type="email" inputmode="email" autocomplete="email" maxlength="80" style="text-align:left">'+
+        '<div class="err" id="err" role="alert"></div><button class="btn wide" type="submit">שמירת הגלויה</button></form>'));
+  if($('f')) $('f').onsubmit=function(e){ e.preventDefault(); var t=$('pt').value.trim(), em=$('em').value.trim();
+    var er=!t?'כתבו משפט.':!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)?'בדקו את כתובת המייל.':''; $('err').textContent=er; if(er) return;
+    join().then(function(){ return postJSON({a:'postcard',pid:PID,email:em,text:t}); }).then(function(x){ if(x.ok){ L.postcard=t; saveL(); vSikum(); } else toast('לא נשמר. נסו שוב.'); }).catch(offline); };
+}
+function vSof(){
+  shell('תודה שבאתם','כנס בני ובנות השירות · 16.12',
+    '<p>הלוח שלכם שמור בטלפון. אפשר לחזור אליו, להוריד אותו או להדפיס.</p>'+
+    '<div class="row"><a class="btn" href="chazon.html'+APIQ+'">'+icon('board')+'לוח החזון שלי</a><a class="btn ghost" href="https://pedagogiamh.co.il/sherut/" target="_blank" rel="noopener">אתר בנות השירות</a></div>');
+}
+function offline(){ toast('אין חיבור כרגע. נסו שוב בעוד רגע.'); }
+
+/* ---------- מצב היום (נפתח לפי מיטל) ---------- */
+function poll(){
+  if(!API){ return; }
+  getJSON('mode=state').then(function(r){
+    if(r&&r.ok&&r.stage!==STAGE){ var first=!poll.ran; STAGE=r.stage; if(!first) toast('נפתח שלב חדש: '+STAGES[stageIdx(STAGE)][1]); VIEW=null; if(!$('sheetBg').classList.contains('on')) render(); }
+    poll.ran=true;
+  }).catch(function(){}).then(function(){ setTimeout(poll,12000); });
+}
+if(qs.get('s')&&stageIdx(qs.get('s'))) { STAGE=qs.get('s'); }
+render();
+if(ME) join();
+poll();
+})();
+</script>
+</body>
+</html>

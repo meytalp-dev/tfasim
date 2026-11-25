@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>המסך הגדול · כנס בני ובנות השירות 16.12</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Frank+Ruhl+Libre:wght@700;900&family=Heebo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F6F0E3;--gold:#A57A2E;--red:#C8453A;--blue:#2F6FB5;--ink:#2b2722;--mute:#7a6f60;--line:#E3D9C6}
+*{box-sizing:border-box}
+[hidden]{display:none !important}
+html,body{margin:0;height:100%}
+body{background:var(--paper);color:var(--ink);font-family:"Heebo",sans-serif}
+button{font:inherit;cursor:pointer}
+.flw{position:absolute;width:6vmin;height:6vmin}
+.flw svg{width:100%;height:100%;display:block}
+/* מסך */
+#screen{position:fixed;inset:0;overflow:hidden;display:flex;flex-direction:column}
+.sh{display:flex;align-items:center;justify-content:space-between;padding:2.2vmin 4vmin 0}
+.sh img{height:6vmin;background:#fff;padding:.8vmin 1.4vmin;border-radius:1vmin}
+.sh .t{font-family:"Frank Ruhl Libre",serif;font-weight:900;color:var(--gold);font-size:4.4vmin}
+.stage{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:2vmin 4vmin 4vmin}
+.qr{display:flex;align-items:center;gap:6vmin}
+.qr .box{background:#fff;padding:2.4vmin;border-radius:2vmin;box-shadow:0 2vmin 5vmin -3vmin rgba(0,0,0,.35)}
+.qr .box img{width:46vmin;height:46vmin;display:block}
+.qr h1{font-family:"Frank Ruhl Libre",serif;font-size:7vmin;color:var(--gold);margin:0 0 2vmin;line-height:1.1}
+.qr p{font-size:3.4vmin;margin:0 0 1.4vmin}
+.qr .u{font-size:2.6vmin;color:var(--mute);direction:ltr;unicode-bidi:isolate}
+.gal{display:flex;gap:4vmin;align-items:center;justify-content:center;height:100%}
+.gal figure{margin:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;animation:in .8s ease}
+.gal img{height:70vh;max-width:42vw;object-fit:contain;border-radius:1vmin;box-shadow:0 2vmin 5vmin -3vmin rgba(0,0,0,.45);background:#fff}
+.gal figcaption{font-size:3vmin;margin-top:1.6vmin;font-weight:700}
+.gal figcaption span{color:var(--mute);font-weight:400}
+@keyframes in{from{opacity:0;transform:translateY(2vmin)}to{opacity:1;transform:none}}
+.mos{display:flex;flex-wrap:wrap;gap:1.4vmin;align-content:center;justify-content:center;max-height:100%;overflow:hidden}
+.tile{border-radius:1.4vmin;padding:1.4vmin 2.4vmin;color:#fff;text-align:center;animation:in .6s ease both}
+.tile b{display:block;font-family:"Frank Ruhl Libre",serif;font-size:5vmin;line-height:1.1}
+.tile span{font-size:2.2vmin;opacity:.85}
+.tile.big b{font-size:7vmin}
+.mos.few .tile{padding:2.4vmin 4vmin}
+.mos.few .tile b{font-size:8vmin}
+.pl{display:grid;grid-template-columns:1.6fr 1fr;gap:4vmin;align-items:center;width:100%;height:100%}
+.pl iframe{width:100%;aspect-ratio:16/9;border:0;border-radius:1.4vmin;background:#000}
+.pl h2{font-family:"Frank Ruhl Libre",serif;font-size:5.4vmin;margin:0;line-height:1.1}
+.pl .by{font-size:3vmin;color:var(--mute);margin:.6vmin 0 2vmin}
+.pl .line{font-family:"Amatic SC",cursive;color:var(--blue);font-size:6vmin;line-height:1.1}
+.pl .who{font-size:2.6vmin;margin-top:2vmin}
+.pl .who b{color:var(--red)}
+.startbtn{font-size:3vmin;padding:2vmin 5vmin;border-radius:99px;border:0;background:var(--red);color:#fff;font-weight:800}
+.cards{width:100%}
+.cards .n{font-family:"Frank Ruhl Libre",serif;font-weight:900;font-size:16vmin;color:var(--blue);line-height:1;text-align:center}
+.cards .cap{text-align:center;font-size:3.4vmin;margin-bottom:3vmin}
+.cards ul{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:1.4vmin;justify-content:center}
+.cards li{background:#fff;border:1px solid var(--line);border-radius:99px;padding:1vmin 2.4vmin;font-size:2.4vmin}
+.empty{font-size:3.4vmin;color:var(--mute);text-align:center}
+/* לוח בקרה */
+#admin{max-width:640px;margin:0 auto;padding:16px 14px 40px;font-size:16px}
+#admin h1{font-family:"Frank Ruhl Libre",serif;color:var(--gold);margin:6px 0 4px;font-size:1.7rem}
+#admin h2{font-size:1.05rem;margin:22px 0 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ab{border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:12px;text-align:right;font-weight:700}
+.ab small{display:block;font-weight:400;color:var(--mute);font-size:.78rem}
+.ab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ab.on small{color:#ddd}
+.cnt{display:flex;flex-wrap:wrap;gap:8px}
+.cnt div{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.85rem}
+.cnt b{display:block;font-size:1.3rem;color:var(--blue)}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:8px}
+.card .st{font-size:.78rem;font-weight:700;padding:2px 8px;border-radius:99px;background:#F1E2C6}
+.card .st.ok{background:#DDEBDD}.card .st.no{background:#F3D6D2}
+.card pre{white-space:pre-wrap;font-family:inherit;margin:6px 0;font-size:.9rem}
+.card .acts{display:flex;gap:8px;margin-top:8px}
+.card .acts button{border-radius:99px;padding:7px 14px;border:1.5px solid var(--line);background:#fff;font-weight:700}
+.card .acts .yes{background:#2E7D4F;color:#fff;border-color:#2E7D4F}
+.inp{width:100%;padding:12px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem}
+.msg{color:#B3261E;margin-top:8px}
+a.lnk{color:var(--blue)}
+</style>
+</head>
+<body>
+<div id="screen" hidden></div>
+<div id="admin" hidden></div>
+<script src="config.js"></script>
+<script>
+(function(){
+'use strict';
+var qs=new URLSearchParams(location.search), API=(qs.get('api')||window.SHERUT_API||'').trim();
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function getJSON(q){ return fetch(API+(API.indexOf('?')<0?'?':'&')+q,{credentials:'omit'}).then(function(r){return r.json();}); }
+function postJSON(o){ return fetch(API,{method:'POST',credentials:'omit',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(o)}).then(function(r){return r.json();}); }
+var PAL=['#C8453A','#2F6FB5','#A57A2E','#2b2722','#8E5B3A','#3E7F72'];
+function hash(s){ var h=0; for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))|0; return Math.abs(h); }
+var FLW='<svg viewBox="0 0 40 40"><g fill="#C8453A"><ellipse cx="20" cy="9" rx="6.5" ry="9"/><ellipse cx="20" cy="31" rx="6.5" ry="9"/><ellipse cx="9" cy="20" rx="9" ry="6.5"/><ellipse cx="31" cy="20" rx="9" ry="6.5"/></g><g fill="#D9574A" transform="rotate(45 20 20)"><ellipse cx="20" cy="10" rx="5" ry="8"/><ellipse cx="20" cy="30" rx="5" ry="8"/><ellipse cx="10" cy="20" rx="8" ry="5"/><ellipse cx="30" cy="20" rx="8" ry="5"/></g><circle cx="20" cy="20" r="5.5" fill="#2b2240"/></svg>';
+
+var STAGES=[['sagur','לפני הכנס','הדף המלווה סגור'],['chazon','לוח החזון','פתיחה 9:30'],['tachbivim','מי בתחביבים שלי','בינגו'],['makira','כמה את מכירה אותי?','זוגות'],['havtacha','ההבטחה ההדדית','זוגות'],['kartis','כרטיס פעילות','בקבוצות'],['sikum','סיכום היום','ערך + גלויה'],['sof','סוף היום','תודה וקישורים']];
+var SCREENS=[['qr','ברקוד לדף המלווה','סריקה בכניסה'],['gallery','גלריית לוחות','הלוחות מתחלפים'],['mosaic','פסיפס הערכים','הסיכום'],['playlist','הפלייליסט','השירים מהלוחות'],['cards','מאגר הפעילויות','כמה כרטיסים נשלחו']];
+
+/* ================= לוח בקרה ================= */
+if(qs.get('v')==='admin'){
+  if(qs.get('k')){ localStorage.setItem('sherut-admin-key',qs.get('k')); qs.delete('k'); history.replaceState(null,'','?'+qs.toString()); }
+  var K=localStorage.getItem('sherut-admin-key')||'', A=$('admin'); A.hidden=false;
+  var data=null;
+  function op(o){ o.a='admin'; o.k=K; return postJSON(o).then(function(r){ if(!r.ok){ if(r.err==='key'){ K=''; localStorage.removeItem('sherut-admin-key'); } throw r; } data=r; drawAdmin(); }); }
+  function login(){
+    A.innerHTML='<h1>לוח הבקרה</h1><p>כנס בני ובנות השירות · 16.12</p><label for="kk">מפתח ניהול</label><input class="inp" id="kk" autocomplete="off"><button class="ab" id="kg" style="margin-top:10px;width:100%">כניסה</button><div class="msg" id="km"></div>';
+    $('kg').onclick=function(){ K=$('kk').value.trim(); localStorage.setItem('sherut-admin-key',K); op({op:'list'}).catch(function(){ $('km').textContent='המפתח לא נכון, או שאין חיבור.'; }); };
+  }
+  function drawAdmin(){
+    var d=data, c=d.counts, pend=d.cards.filter(function(x){return x.status==='ממתין';}), rest=d.cards.filter(function(x){return x.status!=='ממתין';});
+    var scr=location.pathname.split('/').pop()+(qs.get('api')?'?api='+encodeURIComponent(qs.get('api')):'');
+    A.innerHTML='<h1>לוח הבקרה</h1><p>כנס בני ובנות השירות · 16.12 · <a class="lnk" href="'+scr+'" target="_blank" rel="noopener">פתיחת המסך הגדול</a></p>'+
+      '<h2>מה פתוח עכשיו בטלפונים</h2><div class="grid" id="sg">'+STAGES.map(function(s){return '<button class="ab'+(d.stage===s[0]?' on':'')+'" data-s="'+s[0]+'">'+s[1]+'<small>'+s[2]+'</small></button>';}).join('')+'</div>'+
+      '<h2>מה מוצג על המסך</h2><div class="grid" id="vg">'+SCREENS.map(function(s){return '<button class="ab'+(d.screen===s[0]?' on':'')+'" data-v="'+s[0]+'">'+s[1]+'<small>'+s[2]+'</small></button>';}).join('')+'</div>'+
+      '<h2>מספרים</h2><div class="cnt">'+[['people','משתתפים'],['boards','לוחות'],['stickers','מדבקות'],['hobbies','בבינגו'],['quiz','במשחק הזוגות'],['promises','הבטחות'],['postcards','גלויות']].map(function(x){return '<div><b>'+(c[x[0]]||0)+'</b>'+x[1]+'</div>';}).join('')+'</div>'+
+      '<h2>כרטיסי פעילות שממתינים לאישור ('+pend.length+')</h2>'+(pend.map(cardHTML).join('')||'<p>אין כרטיסים שממתינים.</p>')+
+      (rest.length?'<h2>כבר טופלו ('+rest.length+')</h2>'+rest.map(cardHTML).join(''):'')+
+      '<p style="margin-top:20px"><button class="ab" id="rf">רענון</button></p>';
+    $('sg').onclick=function(e){ var b=e.target.closest('.ab'); if(b) op({op:'stage',stage:b.getAttribute('data-s')}).catch(err); };
+    $('vg').onclick=function(e){ var b=e.target.closest('.ab'); if(b) op({op:'screen',screen:b.getAttribute('data-v')}).catch(err); };
+    A.querySelectorAll('.card .acts button').forEach(function(b){ b.onclick=function(){ op({op:b.getAttribute('data-op'),id:b.getAttribute('data-id')}).catch(err); }; });
+    $('rf').onclick=function(){ op({op:'list'}).catch(err); };
+  }
+  function cardHTML(x){
+    var cls=x.status==='מאושר'?' ok':x.status==='נדחה'?' no':'';
+    return '<div class="card"><span class="st'+cls+'">'+esc(x.status)+'</span> <b>'+esc(x.title)+'</b> · '+esc(x.topic)+'<div style="color:#7a6f60;font-size:.85rem">'+esc([x.school,x.authors,x.ages,x.duration?x.duration+' דק׳':''].filter(Boolean).join(' · '))+'</div>'+
+      (x.materials?'<div><b>חומרים:</b> '+esc(x.materials)+'</div>':'')+'<pre>'+esc(x.steps)+'</pre>'+(x.tip?'<div><b>טיפ:</b> '+esc(x.tip)+'</div>':'')+
+      '<div class="acts">'+(x.status!=='מאושר'?'<button class="yes" data-op="approve" data-id="'+x.id+'">אישור לאתר</button>':'')+(x.status!=='נדחה'?'<button data-op="reject" data-id="'+x.id+'">לא לפרסם</button>':'')+'</div></div>';
+  }
+  function err(e){ if(e&&e.err==='key') return login(); alert('לא עבר. בדקו חיבור ונסו שוב.'); }
+  if(!API){ A.innerHTML='<h1>לוח הבקרה</h1><p>עוד אין כתובת שרת ב-config.js.</p>'; return; }
+  if(K) op({op:'list'}).catch(function(e){ login(); }); else login();
+  return;
+}
+
+/* ================= המסך הגדול ================= */
+var S=$('screen'); S.hidden=false;
+S.innerHTML='<span class="flw" style="bottom:3vmin;left:3vmin">'+FLW+'</span><div class="sh"><img src="logo-minhal.png" alt=""><div class="t">כנס בני ובנות השירות ורכזות</div></div><div class="stage" id="st"></div>';
+var MODE=null, timer=null, ytStarted=false;
+function setMode(m){ if(m===MODE) return; MODE=m; clearTimeout(timer); ({qr:qr,gallery:gallery,mosaic:mosaic,playlist:playlist,cards:cards}[m]||qr)(); }
+function qr(){
+  var url='tfasim.pedagogiamh.co.il/kenes-sherut/melave.html';
+  $('st').innerHTML='<div class="qr"><div><h1>הדף המלווה</h1><p>סורקים, כותבים שם ובית ספר,</p><p>וכל פעילות של היום נפתחת בטלפון.</p><div class="u">'+url+'</div></div><div class="box"><img src="qr-melave.svg" alt="ברקוד לדף המלווה"></div></div>';
+}
+function gallery(){
+  var list=[], i=0;
+  function next(){
+    if(MODE!=='gallery') return;
+    getJSON('mode=gallery').then(function(r){ list=r.boards||[]; if(!list.length){ $('st').innerHTML='<div class="empty">הלוחות יופיעו כאן ברגע שיישמרו.</div>'; timer=setTimeout(next,8000); return; }
+      var pick=[list[i%list.length]]; if(list.length>1) pick.push(list[(i+1)%list.length]); i+=pick.length;
+      return Promise.all(pick.map(function(b){ return getJSON('mode=img&pid='+b.pid).then(function(x){ return {b:b,img:x.img}; }); })).then(function(rs){
+        if(MODE!=='gallery') return;
+        $('st').innerHTML='<div class="gal">'+rs.filter(function(x){return x.img;}).map(function(x){ return '<figure><img src="'+x.img+'" alt=""><figcaption>'+esc(x.b.name)+' <span>· '+esc(x.b.school)+'</span></figcaption></figure>'; }).join('')+'</div>';
+        timer=setTimeout(next,9000); });
+    }).catch(function(){ timer=setTimeout(next,8000); });
+  }
+  next();
+}
+function mosaic(){
+  var shown=0;
+  function load(){
+    if(MODE!=='mosaic') return;
+    getJSON('mode=values').then(function(r){
+      var v=r.values||[]; if(!v.length){ $('st').innerHTML='<div class="empty">הערכים מלוחות החזון יופיעו כאן.</div>'; }
+      else if(v.length!==shown){
+        var cnt={}; v.forEach(function(x){ cnt[x.value]=(cnt[x.value]||0)+1; });
+        $('st').innerHTML='<div class="mos'+(v.length<12?' few':'')+'">'+v.map(function(x,k){ return '<div class="tile'+(cnt[x.value]>2?' big':'')+'" style="background:'+PAL[hash(x.value)%PAL.length]+';animation-delay:'+Math.min(k,60)*40+'ms"><b>'+esc(x.value)+'</b><span>'+esc(x.name)+'</span></div>'; }).join('')+'</div>';
+        shown=v.length;
+      }
+    }).catch(function(){}).then(function(){ timer=setTimeout(load,10000); });
+  }
+  load();
+}
+function playlist(){
+  var songs=[], i=0;
+  function play(){
+    if(MODE!=='playlist') return;
+    getJSON('mode=songs').then(function(r){ songs=r.songs||[];
+      if(!songs.length){ $('st').innerHTML='<div class="empty">השירים מלוחות החזון יתנגנו כאן.</div>'; timer=setTimeout(play,10000); return; }
+      var s=songs[i%songs.length]; i++;
+      if(!ytStarted){ $('st').innerHTML='<button class="startbtn" id="go">התחלת הפלייליסט ('+songs.length+' שירים)</button>'; $('go').onclick=function(){ ytStarted=true; i--; play(); }; return; }
+      $('st').innerHTML='<div class="pl"><iframe src="https://www.youtube.com/embed/'+s.yt+'?autoplay=1&rel=0&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen title="'+esc(s.title)+'"></iframe>'+
+        '<div><h2>'+esc(s.title)+'</h2><div class="by">'+esc(s.by)+'</div>'+(s.line?'<div class="line">"'+esc(s.line)+'"</div>':'')+'<div class="who">השיר של <b>'+esc(s.name)+'</b> · '+esc(s.school)+'</div></div></div>';
+      timer=setTimeout(play,120000);
+    }).catch(function(){ timer=setTimeout(play,10000); });
+  }
+  play();
+}
+function cards(){
+  function load(){
+    if(MODE!=='cards') return;
+    getJSON('mode=cards').then(function(r){ var c=r.cards||[];
+      $('st').innerHTML='<div class="cards"><div class="n">'+c.length+'</div><div class="cap">פעילויות במאגר של בנות השירות</div><ul>'+c.slice(-24).map(function(x){return '<li>'+esc(x.title)+'</li>';}).join('')+'</ul></div>';
+    }).catch(function(){}).then(function(){ timer=setTimeout(load,15000); });
+  }
+  load();
+}
+function poll(){
+  if(!API){ setMode('qr'); return; }
+  getJSON('mode=state').then(function(r){ if(r&&r.ok) setMode(qs.get('show')||r.screen); }).catch(function(){ if(!MODE) setMode('qr'); }).then(function(){ setTimeout(poll,5000); });
+}
+poll();
+})();
+</script>
+</body>
+</html>
